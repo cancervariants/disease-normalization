@@ -19,6 +19,7 @@ fastapi = "*"
 click = "*"
 owlready2 = "*"
 boto3 = "*"
+requests = "*"
 
 [requires]
 python_version = "3.7"
