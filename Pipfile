@@ -12,6 +12,7 @@ flake8-docstrings = "*"
 pre-commit = "*"
 coveralls = "*"
 coverage = "*"
+ipykernel = "*"
 
 [packages]
 pydantic = "*"
@@ -20,7 +21,6 @@ click = "*"
 owlready2 = "*"
 boto3 = "*"
 requests = "*"
-ipykernel = "*"
 rdflib = "*"
 
 [requires]
