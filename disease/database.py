@@ -188,35 +188,34 @@ class Database:
             logger.error(e.response['Error']['Message'])
             return []
 
-    def get_merged_record(self, merge_ref) -> Optional[Dict]:
-        """Fetch merged record from given reference.
-
-        :param str merge_ref: key for merged record, formated as a string
-            of grouped concept IDs separated by vertical bars, ending with
-            `##merger`. Must be correctly-cased.
-        :return: complete merged record if lookup successful, None otherwise
-        """
-        try:
-            match = self.diseases.get_item(Key={
-                'label_and_type': merge_ref.lower(),
-                'concept_id': merge_ref
-            })
-            return match['Item']
-        except ClientError as e:
-            logger.error(e.response['Error']['Message'])
-            return None
-        except KeyError:
-            return None
-
-    def add_record(self, record: Dict, record_type: str):
+    def add_record(self, record: Dict):
         """Add new record to database.
 
-        :param Dict record: record (of any type) to upload. Must include
-            `concept_id` key. If record is of the `identity` type, the
-            concept_id must be correctly-cased.
-        :param str record_type: one of 'identity', 'label', or 'alias'.
+        :param Dict record: record to upload
         """
-        prefix = record['concept_id'].split(':')[0]
-        record['src_name'] = PREFIX_LOOKUP[prefix]
-        record['label_and_type'] = f'{record["concept_id"].lower()}##{record_type}'  # noqa: E501
-        self.batch.put_item(Item=record)
+        id_prefix = record['concept_id'].split(':')[0]
+        record['src_name'] = PREFIX_LOOKUP[id_prefix]
+        record['label_and_type'] = f'{record["concept_id"].lower()}##identity'
+        try:
+            self.batch.put_item(Item=record)
+        except ClientError as e:
+            logger.error(e.response['Error']['Message'])
+
+    def add_ref_record(self, term: str, concept_id: str, ref_type: str):
+        """Add auxilliary/reference record to database.
+
+        :param str term: referent term
+        :param str concept_id: concept ID to refer to
+        :param str ref_type: one of ('alias', 'label')
+        """
+        label_and_type = f'{term.lower()}##{ref_type}'
+        src_name = PREFIX_LOOKUP[concept_id.split(':')[0]]
+        record = {
+            'label_and_type': label_and_type,
+            'concept_id': concept_id.lower(),
+            'src_name': src_name,
+        }
+        try:
+            self.batch.put_item(Item=record)
+        except ClientError as e:
+            logger.error(e.response['Error']['Message'])
