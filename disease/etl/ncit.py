@@ -3,11 +3,14 @@ import logging
 from .base import Base
 from disease import PROJECT_ROOT
 from disease.database import Database
-from disease.schemas import Meta, SourceName
+from disease.schemas import Meta, SourceName, NamespacePrefix, Disease
 from pathlib import Path
 import requests
 import zipfile
 from os import remove, rename
+from typing import Set, Dict
+import owlready2 as owl
+from owlready2.entity import ThingClass
 
 
 logger = logging.getLogger('disease')
@@ -82,3 +85,90 @@ class NCIt(Base):
         params = dict(metadata)
         params['src_name'] = SourceName.NCIT.value
         self.database.metadata.put_item(Item=params)
+
+    def _get_typed_nodes(self, uq_nodes: Set[ThingClass],
+                         ncit: owl.namespace.Ontology) -> Set[ThingClass]:
+        """Get all nodes with semantic_type Neoplastic Process
+
+        :param Set[owlready2.entity.ThingClass] uq_nodes: set of unique class
+            nodes found so far.
+        :param owl.namespace.Ontology ncit: owlready2 Ontology instance for
+            NCI Thesaurus.
+        :return: uq_nodes, with the addition of all classes found to have
+            semantic_type Pharmacologic Substance and not of type
+            Retired_Concept
+        :rtype: Set[owlready2.entity.ThingClass]
+        """
+        graph = owl.default_world.as_rdflib_graph()
+
+        query_str = '''SELECT ?x WHERE {
+            ?x <http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#P106>
+            "Pharmacologic Substance"
+        }'''
+        typed_results = set(graph.query(query_str))
+
+        retired_query_str = '''SELECT ?x WHERE {
+            ?x <http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#P310>
+            "Retired_Concept"
+        }
+        '''
+        retired_results = set(graph.query(retired_query_str))
+
+        typed_results = typed_results - retired_results
+
+        for result in typed_results:
+            # parse result as URI and get ThingClass object back from NCIt
+            class_object = ncit[result[0].toPython().split('#')[1]]
+            uq_nodes.add(class_object)
+        return uq_nodes
+
+    def _transform_data(self):
+        """Get data from file and construct object for loading."""
+        ncit = owl.get_ontology(self._data_file.absolute().as_uri())
+        ncit.load()
+        uq_nodes = set()
+        uq_nodes = self._get_typed_nodes(uq_nodes, ncit)
+
+        for node in uq_nodes:
+            concept_id = f"{NamespacePrefix.NCIT.value}:{node.name}"
+            if node.P108:
+                label = node.P108.first()
+            else:
+                logger.warning(f"No label for concept {concept_id}")
+                continue
+            aliases = node.P90
+            if aliases and label in aliases:
+                aliases.remove(label)
+
+            xrefs = []
+            if node.P207:
+                xrefs.append(f"{NamespacePrefix.UMLS.value}:"
+                             f"{node.P207.first()}")
+
+            disease = {
+                'concept_id': concept_id,
+                'src_name': SourceName.NCIT.value,
+                'label': label,
+                'aliases': aliases,
+                'xrefs': xrefs
+            }
+            assert Disease(**disease)
+            self._load_disease(disease)
+
+    def _load_disease(self, disease: Dict):
+        """Load individual disease record along with reference items.
+
+        :param Dict disease: disease record to load
+        """
+        aliases = disease['aliases']
+        if len({a.casefold() for a in aliases}) > 20 or \
+                not disease['aliases']:
+            del disease['aliases']
+        else:
+            disease['aliases'] = list(set(aliases))
+            case_uq_aliases = {a.lower() for a in disease['aliases']}
+            concept_id = disease['concept_id']
+            for alias in case_uq_aliases:
+                self.db.add_ref_record(alias, concept_id, 'alias')
+        self.db.add_ref_record(disease['label'], concept_id, 'label')
+        self.db.add_record(disease)
