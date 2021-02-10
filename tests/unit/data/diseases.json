@@ -9,7 +9,8 @@
       "Neuroblastoma (Schwannian Stroma-poor)",
       "Neuroblastoma (Schwannian Stroma-Poor)",
       "NEUROBLASTOMA, MALIGNANT",
-      "Neuroblastoma, NOS"
+      "Neuroblastoma, NOS",
+      "neuroblastoma"
     ],
     "xrefs": ["umls:C0027819"],
     "src_name": "NCIt"

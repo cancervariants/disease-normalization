@@ -1,6 +1,6 @@
 """Test NCIt source."""
 import pytest
-from disease.schemas import Disease, MatchType
+from disease.schemas import MatchType
 from disease.query import QueryHandler
 from typing import Dict
 
@@ -23,7 +23,7 @@ def ncit():
 @pytest.fixture(scope='module')
 def neuroblastoma():
     """Build neuroblastoma test fixture."""
-    return Disease(**{
+    return {
         "label_and_type": "ncit:c3270##identity",
         "concept_id": "ncit:C3270",
         "label": "Neuroblastoma",
@@ -33,11 +33,13 @@ def neuroblastoma():
             "Neuroblastoma (Schwannian Stroma-poor)",
             "Neuroblastoma (Schwannian Stroma-Poor)",
             "NEUROBLASTOMA, MALIGNANT",
-            "Neuroblastoma, NOS"
+            "Neuroblastoma, NOS",
+            "neuroblastoma"
         ],
+        "other_identifiers": [],
         "xrefs": ["umls:C0027819"],
         "src_name": "NCIt"
-    })
+    }
 
 
 def compare_records(actual_record: Dict, fixture_record: Dict):
@@ -62,25 +64,25 @@ def test_concept_id_match(ncit, neuroblastoma):
     response = ncit.search('ncit:C3270')
     assert response['match_type'] == MatchType.CONCEPT_ID
     assert len(response['records']) == 1
-    actual_disease = response['records'][0]
+    actual_disease = response['records'][0].dict()
     compare_records(actual_disease, neuroblastoma)
 
     response = ncit.search('ncit:c3270')
     assert response['match_type'] == MatchType.CONCEPT_ID
     assert len(response['records']) == 1
-    actual_disease = response['records'][0]
+    actual_disease = response['records'][0].dict()
     compare_records(actual_disease, neuroblastoma)
 
     response = ncit.search('NCIT:C3270')
     assert response['match_type'] == MatchType.CONCEPT_ID
     assert len(response['records']) == 1
-    actual_disease = response['records'][0]
+    actual_disease = response['records'][0].dict()
     compare_records(actual_disease, neuroblastoma)
 
     response = ncit.search('C3270')
     assert response['match_type'] == MatchType.CONCEPT_ID
     assert len(response['records']) == 1
-    actual_disease = response['records'][0]
+    actual_disease = response['records'][0].dict()
     compare_records(actual_disease, neuroblastoma)
 
     response = ncit.search('3270')
@@ -92,19 +94,19 @@ def test_label_match(ncit, neuroblastoma):
     response = ncit.search('Neuroblastoma')
     assert response['match_type'] == MatchType.LABEL
     assert len(response['records']) == 1
-    actual_disease = response['records'][0]
+    actual_disease = response['records'][0].dict()
     compare_records(actual_disease, neuroblastoma)
 
     response = ncit.search('NEUROBLASTOMA')
     assert response['match_type'] == MatchType.LABEL
     assert len(response['records']) == 1
-    actual_disease = response['records'][0]
+    actual_disease = response['records'][0].dict()
     compare_records(actual_disease, neuroblastoma)
 
     response = ncit.search('neuroblastoma')
     assert response['match_type'] == MatchType.LABEL
     assert len(response['records']) == 1
-    actual_disease = response['records'][0]
+    actual_disease = response['records'][0].dict()
     compare_records(actual_disease, neuroblastoma)
 
 
@@ -113,25 +115,25 @@ def test_alias_match(ncit, neuroblastoma):
     response = ncit.search('neuroblastoma, nos')
     assert response['match_type'] == MatchType.ALIAS
     assert len(response['records']) == 1
-    actual_disease = response['records'][0]
+    actual_disease = response['records'][0].dict()
     compare_records(actual_disease, neuroblastoma)
 
     response = ncit.search('neuroblastoma (Schwannian Stroma-Poor)')
     assert response['match_type'] == MatchType.ALIAS
     assert len(response['records']) == 1
-    actual_disease = response['records'][0]
+    actual_disease = response['records'][0].dict()
     compare_records(actual_disease, neuroblastoma)
 
     response = ncit.search('Neuroblastoma, Malignant')
     assert response['match_type'] == MatchType.ALIAS
     assert len(response['records']) == 1
-    actual_disease = response['records'][0]
+    actual_disease = response['records'][0].dict()
     compare_records(actual_disease, neuroblastoma)
 
     response = ncit.search('Neural Crest Tumor, Malignant')
     assert response['match_type'] == MatchType.ALIAS
     assert len(response['records']) == 1
-    actual_disease = response['records'][0]
+    actual_disease = response['records'][0].dict()
     compare_records(actual_disease, neuroblastoma)
 
     response = ncit.search('neuroblastoma nbl')
