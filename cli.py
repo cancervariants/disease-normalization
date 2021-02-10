@@ -33,7 +33,7 @@ class CLI:
         help='Update all normalizer sources.'
     )
     def update_normalizer_db(normalizer, dev, db_url, update_all):
-        """Update select normalizer source(s) in the therapy database."""
+        """Update select normalizer source(s) in the disease database."""
         sources = {
             'ncit': NCIt,
         }
@@ -121,7 +121,7 @@ class CLI:
         except ClientError as e:
             click.echo(e.response['Error']['Message'])
 
-        # Delete source's data from therapies table
+        # Delete source's data from diseases table
         try:
             while True:
                 response = database.diseases.query(
@@ -134,7 +134,7 @@ class CLI:
                 if not records:
                     break
 
-                with database.therapies.batch_writer(
+                with database.diseases.batch_writer(
                         overwrite_by_pkeys=['label_and_type', 'concept_id']) \
                         as batch:
 
