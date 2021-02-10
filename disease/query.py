@@ -182,7 +182,7 @@ class QueryHandler:
             concept_id = f'{NAMESPACE_LOOKUP[prefix]}:{query}'
             id_lookup = self.db.get_record_by_id(concept_id, False)
             if id_lookup:
-                concept_id_items += id_lookup
+                concept_id_items.append(id_lookup)
         for item in concept_id_items:
             (resp, src_name) = self._add_record(resp, item,
                                                 MatchType.CONCEPT_ID.name)
