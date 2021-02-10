@@ -1,6 +1,6 @@
 """Main application for FastAPI"""
 from disease.query import QueryHandler, InvalidParameterException
-from disease.schemas import Service, NormalizationService
+from disease.schemas import Service
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.openapi.utils import get_openapi
 import html
@@ -39,6 +39,7 @@ app.openapi = custom_openapi
 # endpoint description text
 get_matches_summary = ("Given query, provide highest matches from "
                        "each source.")
+search_descr = "Search for disease term."
 response_descr = "A response to a validly-formed query."
 q_descr = "Disease term to search for."
 keyed_descr = ("If true, return response as key-value pairs of "
@@ -66,6 +67,7 @@ def search(q: str = Query(..., description=q_descr),
     """For each source, return strongest-match concepts for query string
     provided by user.
     """
+    print(q)
     try:
         response = query_handler.search_sources(html.unescape(q), keyed=keyed,
                                                 incl=incl, excl=excl)

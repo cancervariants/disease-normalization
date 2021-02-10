@@ -1,16 +1,16 @@
 """This module contains data models for representing VICC normalized
 disease records.
 """
-from typing import Any, Dict, Type, List, Optional, StrictBool, Union
+from typing import Any, Dict, Type, List, Optional, Union
 from enum import Enum, IntEnum
-from pydantic import BaseModel
+from pydantic import BaseModel, StrictBool
 
 
 class MatchType(IntEnum):
     """Define string constraints for use in Match Type attributes."""
 
     CONCEPT_ID = 100
-    NAME = 80
+    LABEL = 80
     ALIAS = 60
     FUZZY_MATCH = 20
     NO_MATCH = 0
@@ -32,6 +32,7 @@ class NamespacePrefix(Enum):
     """Define string constraints for namespace prefixes on concept IDs."""
 
     NCIT = "ncit"
+    UMLS = "umls"
 
 
 class Disease(BaseModel):

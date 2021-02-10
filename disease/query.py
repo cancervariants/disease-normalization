@@ -174,9 +174,9 @@ class QueryHandler:
         """
         concept_id_items = []
         if [p for p in PREFIX_LOOKUP.keys() if query.startswith(p)]:
-            id_lookup = self.db.get_record_by_id(query, False)
-            if id_lookup:
-                concept_id_items += id_lookup
+            record = self.db.get_record_by_id(query, False)
+            if record:
+                concept_id_items.append(record)
         for prefix in [p for p in NAMESPACE_LOOKUP.keys()
                        if query.startswith(p)]:
             concept_id = f'{NAMESPACE_LOOKUP[prefix]}:{query}'

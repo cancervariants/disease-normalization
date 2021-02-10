@@ -103,7 +103,7 @@ class NCIt(Base):
 
         query_str = '''SELECT ?x WHERE {
             ?x <http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#P106>
-            "Pharmacologic Substance"
+            "Neoplastic Process"
         }'''
         typed_results = set(graph.query(query_str))
 
@@ -161,14 +161,14 @@ class NCIt(Base):
         :param Dict disease: disease record to load
         """
         aliases = disease['aliases']
+        concept_id = disease['concept_id']
         if len({a.casefold() for a in aliases}) > 20 or \
                 not disease['aliases']:
             del disease['aliases']
         else:
             disease['aliases'] = list(set(aliases))
             case_uq_aliases = {a.lower() for a in disease['aliases']}
-            concept_id = disease['concept_id']
             for alias in case_uq_aliases:
-                self.db.add_ref_record(alias, concept_id, 'alias')
-        self.db.add_ref_record(disease['label'], concept_id, 'label')
-        self.db.add_record(disease)
+                self.database.add_ref_record(alias, concept_id, 'alias')
+        self.database.add_ref_record(disease['label'], concept_id, 'label')
+        self.database.add_record(disease)
