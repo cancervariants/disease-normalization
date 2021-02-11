@@ -46,7 +46,7 @@ Running unit tests is as easy as pytest.
 pipenv run pytest
 ```
 
-### Starting the therapy normalization service
+### Starting the disease normalization service
 
 From the project root, run the following:
 
