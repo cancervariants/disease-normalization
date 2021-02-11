@@ -67,7 +67,6 @@ def search(q: str = Query(..., description=q_descr),
     """For each source, return strongest-match concepts for query string
     provided by user.
     """
-    print(q)
     try:
         response = query_handler.search_sources(html.unescape(q), keyed=keyed,
                                                 incl=incl, excl=excl)
