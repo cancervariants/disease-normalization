@@ -92,7 +92,8 @@ class NCIt(Base):
 
     def _get_typed_nodes(self, uq_nodes: Set[ThingClass],
                          ncit: owl.namespace.Ontology) -> Set[ThingClass]:
-        """Get all nodes with semantic_type Neoplastic Process
+        """Get all nodes with semantic_type 'Neoplastic Process' or 'Disease
+        or Syndrome'.
 
         :param Set[owlready2.entity.ThingClass] uq_nodes: set of unique class
             nodes found so far.
@@ -105,11 +106,17 @@ class NCIt(Base):
         """
         graph = owl.default_world.as_rdflib_graph()
 
-        query_str = '''SELECT ?x WHERE {
+        neopl_query_str = '''SELECT ?x WHERE {
             ?x <http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#P106>
             "Neoplastic Process"
         }'''
-        typed_results = set(graph.query(query_str))
+        neopl_results = set(graph.query(neopl_query_str))
+
+        dos_query_str = '''SELECT ?x WHERE {
+            ?x <http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#P106>
+            "Disease or Syndrome"
+        }'''
+        dos_results = set(graph.query(dos_query_str))
 
         retired_query_str = '''SELECT ?x WHERE {
             ?x <http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#P310>
@@ -118,7 +125,7 @@ class NCIt(Base):
         '''
         retired_results = set(graph.query(retired_query_str))
 
-        typed_results = typed_results - retired_results
+        typed_results = neopl_results.union(dos_results) - retired_results
 
         for result in typed_results:
             # parse result as URI and get ThingClass object back from NCIt
