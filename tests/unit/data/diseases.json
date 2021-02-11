@@ -26,22 +26,22 @@
     "src_name": "NCIt"
   },
   {
-    "label_and_type": "neuroblastoma (nbl)",
+    "label_and_type": "neuroblastoma (nbl)##alias",
     "concept_id": "ncit:c3270",
     "src_name": "NCIt"
   },
   {
-    "label_and_type": "neuroblastoma (schwannian stroma-poor)",
+    "label_and_type": "neuroblastoma (schwannian stroma-poor)##alias",
     "concept_id": "ncit:c3270",
     "src_name": "NCIt"
   },
   {
-    "label_and_type": "neuroblastoma, malignant",
+    "label_and_type": "neuroblastoma, malignant##alias",
     "concept_id": "ncit:c3270",
     "src_name": "NCIt"
   },
   {
-    "label_and_type": "neuroblastoma, nos",
+    "label_and_type": "neuroblastoma, nos##alias",
     "concept_id": "ncit:c3270",
     "src_name": "NCIt"
   },
