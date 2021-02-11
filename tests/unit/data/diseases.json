@@ -44,5 +44,80 @@
     "label_and_type": "neuroblastoma, nos",
     "concept_id": "ncit:c3270",
     "src_name": "NCIt"
+  },
+  {
+    "label_and_type": "ncit:c2926##identity",
+    "concept_id": "ncit:C2926",
+    "label": "Lung Non-Small Cell Carcinoma",
+    "aliases": [
+      "Non Small Cell Lung Cancer NOS",
+      "Non-Small Cell Lung Cancer",
+      "Non-Small Cell Cancer of the Lung",
+      "NSCLC",
+      "non-small cell lung cancer",
+      "Non-Small Cell Carcinoma of the Lung",
+      "Non-Small Cell Cancer of Lung",
+      "Non-small cell lung cancer, NOS",
+      "Non-Small Cell Carcinoma of Lung",
+      "NSCLC - Non-Small Cell Lung Cancer",
+      "Non-Small Cell Lung Carcinoma"
+    ],
+    "xrefs": ["umls:C0007131"],
+    "src_name": "NCIt"
+  },
+  {
+    "label_and_type": "lung non-small cell carcinoma##label",
+    "concept_id": "ncit:c2926",
+    "src_name": "NCIt"
+  },
+  {
+    "label_and_type": "Non-Small Cell Cancer of the Lung##alias",
+    "concept_id": "ncit:c2926",
+    "src_name": "NCIt"
+  },
+  {
+    "label_and_type": "NSCLC##alias",
+    "concept_id": "ncit:c2926",
+    "src_name": "NCIt"
+  },
+  {
+    "label_and_type": "non-small cell lung cancer##alias",
+    "concept_id": "ncit:c2926",
+    "src_name": "NCIt"
+  },
+  {
+    "label_and_type": "Non-Small Cell Carcinoma of the Lung##alias",
+    "concept_id": "ncit:c2926",
+    "src_name": "NCIt"
+  },
+  {
+    "label_and_type": "Non-Small Cell Cancer of Lung##alias",
+    "concept_id": "ncit:c2926",
+    "src_name": "NCIt"
+  },
+  {
+    "label_and_type": "Non-Small Cell Carcinoma of Lung##alias",
+    "concept_id": "ncit:c2926",
+    "src_name": "NCIt"
+  },
+  {
+    "label_and_type": "Non-Small Cell Lung Cancer##alias",
+    "concept_id": "ncit:c2926",
+    "src_name": "NCIt"
+  },
+  {
+    "label_and_type": "non small cell lung cancer nos##alias",
+    "concept_id": "ncit:c2926",
+    "src_name": "NCIt"
+  },
+  {
+    "label_and_type": "NSCLC - Non-Small Cell Lung Cancer##alias",
+    "concept_id": "ncit:c2926",
+    "src_name": "NCIt"
+  },
+  {
+    "label_and_type": "Non-Small Cell Lung Carcinoma##alias",
+    "concept_id": "ncit:c2926",
+    "src_name": "NCIt"
   }
 ]
