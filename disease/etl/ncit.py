@@ -48,7 +48,11 @@ class NCIt(Base):
         logger.info('Downloading NCI Thesaurus...')
         url = self._SRC_DIR + self._SRC_FNAME
         zip_path = self._data_path / 'ncit.zip'
-        response = requests.get(url, stream=True)
+        try:
+            response = requests.get(url, stream=True)
+        except requests.exceptions.RequestException as e:
+            logger.error(f'NCIt download failed: {e}')
+            raise e
         handle = open(zip_path, "wb")
         for chunk in response.iter_content(chunk_size=512):
             if chunk:
@@ -162,8 +166,10 @@ class NCIt(Base):
         """
         aliases = disease['aliases']
         concept_id = disease['concept_id']
-        if len({a.casefold() for a in aliases}) > 20 or \
-                not disease['aliases']:
+        if len({a.casefold() for a in aliases}) > 20:
+            logger.debug(f'{concept_id} has > 20 aliases')
+            del disease['aliases']
+        elif not disease['aliases']:
             del disease['aliases']
         else:
             disease['aliases'] = list(set(aliases))

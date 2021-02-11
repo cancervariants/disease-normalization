@@ -163,6 +163,9 @@ class Database:
                 return response['Items'][0]
         except ClientError as e:
             logger.error(e.response['Error']['Message'])
+            logger.error(f"boto3 client error on get_records_by_id for "
+                         f"search term {concept_id}: "
+                         f"{e.response['Error']['Message']}")
             return None
         except KeyError:  # record doesn't exist
             return None
@@ -185,7 +188,9 @@ class Database:
             matches = self.diseases.query(KeyConditionExpression=filter_exp)
             return matches.get('Items', None)
         except ClientError as e:
-            logger.error(e.response['Error']['Message'])
+            logger.error(f"boto3 client error on get_records_by_type for "
+                         f"search term {query}: "
+                         f"{e.response['Error']['Message']}")
             return []
 
     def add_record(self, record: Dict):
@@ -199,7 +204,9 @@ class Database:
         try:
             self.batch.put_item(Item=record)
         except ClientError as e:
-            logger.error(e.response['Error']['Message'])
+            logger.error(f"boto3 client error on add_record for "
+                         f"{record['concept_id']}: "
+                         f"{e.response['Error']['Message']}")
 
     def add_ref_record(self, term: str, concept_id: str, ref_type: str):
         """Add auxilliary/reference record to database.
@@ -218,4 +225,5 @@ class Database:
         try:
             self.batch.put_item(Item=record)
         except ClientError as e:
-            logger.error(e.response['Error']['Message'])
+            logger.error(f"boto3 client error on add_ref {concept_id} for "
+                         f"type {ref_type}: {e.response['Error']['Message']}")
