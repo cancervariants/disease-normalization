@@ -218,5 +218,6 @@ class Database:
         try:
             self.batch.put_item(Item=record)
         except ClientError as e:
-            logger.error(f"boto3 client error on add_ref {concept_id} for "
-                         f"type {ref_type}: {e.response['Error']['Message']}")
+            logger.error(f"boto3 client error adding reference {term} for "
+                         f"{concept_id} with match type {ref_type}: "
+                         f"{e.response['Error']['Message']}")
