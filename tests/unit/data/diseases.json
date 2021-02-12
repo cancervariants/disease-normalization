@@ -35,11 +35,6 @@
     "src_name": "NCIt"
   },
   {
-    "label_and_type": "non-small cell lung cancer##alias",
-    "concept_id": "ncit:c2926",
-    "src_name": "NCIt"
-  },
-  {
     "label_and_type": "non-small cell carcinoma of the lung##alias",
     "concept_id": "ncit:c2926",
     "src_name": "NCIt"
