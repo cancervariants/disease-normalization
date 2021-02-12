@@ -1,51 +1,5 @@
 [
   {
-    "label_and_type": "ncit:c3270##identity",
-    "concept_id": "ncit:C3270",
-    "label": "Neuroblastoma",
-    "aliases": [
-      "Neural Crest Tumor, Malignant",
-      "Neuroblastoma (NBL)",
-      "Neuroblastoma (Schwannian Stroma-poor)",
-      "Neuroblastoma (Schwannian Stroma-Poor)",
-      "NEUROBLASTOMA, MALIGNANT",
-      "Neuroblastoma, NOS",
-      "neuroblastoma"
-    ],
-    "xrefs": ["umls:C0027819"],
-    "src_name": "NCIt"
-  },
-  {
-    "label_and_type": "neuroblastoma##label",
-    "concept_id": "ncit:c3270",
-    "src_name": "NCIt"
-  },
-  {
-    "label_and_type": "neural crest tumor, malignant##alias",
-    "concept_id": "ncit:c3270",
-    "src_name": "NCIt"
-  },
-  {
-    "label_and_type": "neuroblastoma (nbl)##alias",
-    "concept_id": "ncit:c3270",
-    "src_name": "NCIt"
-  },
-  {
-    "label_and_type": "neuroblastoma (schwannian stroma-poor)##alias",
-    "concept_id": "ncit:c3270",
-    "src_name": "NCIt"
-  },
-  {
-    "label_and_type": "neuroblastoma, malignant##alias",
-    "concept_id": "ncit:c3270",
-    "src_name": "NCIt"
-  },
-  {
-    "label_and_type": "neuroblastoma, nos##alias",
-    "concept_id": "ncit:c3270",
-    "src_name": "NCIt"
-  },
-  {
     "label_and_type": "ncit:c2926##identity",
     "concept_id": "ncit:C2926",
     "label": "Lung Non-Small Cell Carcinoma",
@@ -118,6 +72,52 @@
   {
     "label_and_type": "Non-Small Cell Lung Carcinoma##alias",
     "concept_id": "ncit:c2926",
+    "src_name": "NCIt"
+  },
+  {
+    "label_and_type": "ncit:c3270##identity",
+    "concept_id": "ncit:C3270",
+    "label": "Neuroblastoma",
+    "aliases": [
+      "Neural Crest Tumor, Malignant",
+      "Neuroblastoma (NBL)",
+      "Neuroblastoma (Schwannian Stroma-poor)",
+      "Neuroblastoma (Schwannian Stroma-Poor)",
+      "NEUROBLASTOMA, MALIGNANT",
+      "Neuroblastoma, NOS",
+      "neuroblastoma"
+    ],
+    "xrefs": ["umls:C0027819"],
+    "src_name": "NCIt"
+  },
+  {
+    "label_and_type": "neuroblastoma##label",
+    "concept_id": "ncit:c3270",
+    "src_name": "NCIt"
+  },
+  {
+    "label_and_type": "neural crest tumor, malignant##alias",
+    "concept_id": "ncit:c3270",
+    "src_name": "NCIt"
+  },
+  {
+    "label_and_type": "neuroblastoma (nbl)##alias",
+    "concept_id": "ncit:c3270",
+    "src_name": "NCIt"
+  },
+  {
+    "label_and_type": "neuroblastoma (schwannian stroma-poor)##alias",
+    "concept_id": "ncit:c3270",
+    "src_name": "NCIt"
+  },
+  {
+    "label_and_type": "neuroblastoma, malignant##alias",
+    "concept_id": "ncit:c3270",
+    "src_name": "NCIt"
+  },
+  {
+    "label_and_type": "neuroblastoma, nos##alias",
+    "concept_id": "ncit:c3270",
     "src_name": "NCIt"
   }
 ]
