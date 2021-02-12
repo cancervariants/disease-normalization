@@ -25,7 +25,7 @@ class SourceName(Enum):
 class SourceIDAfterNamespace(Enum):
     """Define string constraints after namespace."""
 
-    NCIT = "C"  # TODO double check that this is accurate
+    NCIT = "C"
 
 
 class NamespacePrefix(Enum):
@@ -55,7 +55,19 @@ class Disease(BaseModel):
                 schema.pop('title', None)
             for prop in schema.get('properties', {}).values():
                 prop.pop('title', None)
-            # TODO example
+            schema['example'] = {
+                "label": "Von Hippel-Lindau Syndrome",
+                "concept_id": "ncit:C3105",
+                "aliases": [
+                    "Von Hippel-Lindau Syndrome (VHL)",
+                    "Von Hippel-Lindau Disease",
+                    "Cerebroretinal Angiomatosis",
+                    "von Hippel-Lindau syndrome",
+                    "VHL syndrome"
+                ],
+                "other_identifiers": [],
+                "xrefs": ["umls:C0019562"]
+            }
 
 
 class Meta(BaseModel):
@@ -79,20 +91,18 @@ class Meta(BaseModel):
                 schema.pop('title', None)
             for prop in schema.get('properties', {}).values():
                 prop.pop('title', None)
-            # schema['example'] = {
-            #     'data_license': 'CC BY-SA 3.0',
-            #     'data_license_url':
-            #         'https://creativecommons.org/licenses/by-sa/3.0/',
-            #     'version': '27',
-            #     'data_url':
-            #         'http://ftp.ebi.ac.uk/pub/databases/chembl/ChEMBLdb/releases/chembl_27/',  # noqa: E501
-            #     'rdp_url': 'http://reusabledata.org/chembl.html',
-            #     'data_license_attributes': {
-            #         'non_commercial': False,
-            #         'share_alike': True,
-            #         'attribution': True
-            #     }
-            # }
+            schema['example'] = {
+                "data_license": "CC BY 4.0",
+                "data_license_url": "https://creativecommons.org/licenses/by/4.0/legalcode",  # noqa: E501
+                "version": "21.01d",
+                "data_url": "https://evs.nci.nih.gov/ftp1/NCI_Thesaurus/archive/21.01d_Release/",  # noqa: E501
+                "rdp_url": "http://reusabledata.org/ncit.html",
+                "data_license_attributes": {
+                    "non_commercial": False,
+                    "attribution": True,
+                    "share_alike": False
+                }
+            }
 
 
 class MatchesKeyed(BaseModel):
@@ -115,24 +125,34 @@ class MatchesKeyed(BaseModel):
                 schema.pop('title', None)
             for prop in schema.get('properties', {}).values():
                 prop.pop('title', None)
-            # schema['example'] = {
-            #     'match_type': 0,
-            #     'records': [],
-            #     'meta_': {
-            #         'data_license': 'CC BY-SA 3.0',
-            #         'data_license_url':
-            #             'https://creativecommons.org/licenses/by-sa/3.0/',
-            #         'version': '27',
-            #         'data_url':
-            #             'http://ftp.ebi.ac.uk/pub/databases/chembl/ChEMBLdb/releases/chembl_27/',  # noqa: E501
-            #         'rdp_url': 'http://reusabledata.org/chembl.html',
-            #         'data_license_attributes': {
-            #             'non_commercial': False,
-            #             'share_alike': True,
-            #             'attribution': True
-            #         }
-            #     },
-            # }
+            schema['example'] = {
+                "match_type": 80,
+                "records": [{
+                    "label": "Von Hippel-Lindau Syndrome",
+                    "concept_id": "ncit:C3105",
+                    "aliases": [
+                        "Von Hippel-Lindau Syndrome (VHL)",
+                        "Von Hippel-Lindau Disease",
+                        "Cerebroretinal Angiomatosis",
+                        "von Hippel-Lindau syndrome",
+                        "VHL syndrome"
+                    ],
+                    "other_identifiers": [],
+                    "xrefs": ["umls:C0019562"]
+                }],
+                "meta_": {
+                    "data_license": "CC BY 4.0",
+                    "data_license_url": "https://creativecommons.org/licenses/by/4.0/legalcode",  # noqa: E501
+                    "version": "21.01d",
+                    "data_url": "https://evs.nci.nih.gov/ftp1/NCI_Thesaurus/archive/21.01d_Release/",  # noqa: E501
+                    "rdp_url": "http://reusabledata.org/ncit.html",
+                    "data_license_attributes": {
+                        "non_commercial": False,
+                        "attribution": True,
+                        "share_alike": False
+                    }
+                }
+            }
 
 
 class MatchesListed(BaseModel):
@@ -156,25 +176,35 @@ class MatchesListed(BaseModel):
                 schema.pop('title', None)
             for prop in schema.get('properties', {}).values():
                 prop.pop('title', None)
-            # schema['example'] = {
-            #     'normalizer': 'ChEMBL',
-            #     'match_type': 0,
-            #     'records': [],
-            #     'meta_': {
-            #         'data_license': 'CC BY-SA 3.0',
-            #         'data_license_url':
-            #             'https://creativecommons.org/licenses/by-sa/3.0/',
-            #         'version': '27',
-            #         'data_url':
-            #             'http://ftp.ebi.ac.uk/pub/databases/chembl/ChEMBLdb/releases/chembl_27/',  # noqa: E501
-            #         'rdp_url': 'http://reusabledata.org/chembl.html',
-            #         'data_license_attributes': {
-            #             'non_commercial': False,
-            #             'share_alike': True,
-            #             'attribution': True
-            #         }
-            #     },
-            # }
+            schema['example'] = {
+                "source": "NCIt",
+                "match_type": 80,
+                "records": [{
+                    "label": "Von Hippel-Lindau Syndrome",
+                    "concept_id": "ncit:C3105",
+                    "aliases": [
+                        "Von Hippel-Lindau Syndrome (VHL)",
+                        "Von Hippel-Lindau Disease",
+                        "Cerebroretinal Angiomatosis",
+                        "von Hippel-Lindau syndrome",
+                        "VHL syndrome"
+                    ],
+                    "other_identifiers": [],
+                    "xrefs": ["umls:C0019562"]
+                }],
+                "meta_": {
+                    "data_license": "CC BY 4.0",
+                    "data_license_url": "https://creativecommons.org/licenses/by/4.0/legalcode",  # noqa: E501
+                    "version": "21.01d",
+                    "data_url": "https://evs.nci.nih.gov/ftp1/NCI_Thesaurus/archive/21.01d_Release/",  # noqa: E501
+                    "rdp_url": "http://reusabledata.org/ncit.html",
+                    "data_license_attributes": {
+                        "non_commercial": False,
+                        "attribution": True,
+                        "share_alike": False
+                    }
+                }
+            }
 
 
 class DataLicenseAttributes(BaseModel):
@@ -203,21 +233,36 @@ class Service(BaseModel):
                 schema.pop('title', None)
             for prop in schema.get('properties', {}).values():
                 prop.pop('title', None)
-            # schema['example'] = {
-            #     'query': 'CISPLATIN',
-            #     'warnings': None,
-            #     'meta_': {
-            #         'data_license': 'CC BY-SA 3.0',
-            #         'data_license_url':
-            #             'https://creativecommons.org/licenses/by-sa/3.0/',
-            #         'version': '27',
-            #         'data_url':
-            #             'http://ftp.ebi.ac.uk/pub/databases/chembl/ChEMBLdb/releases/chembl_27/',  # noqa: E501
-            #         'rdp_url': 'http://reusabledata.org/chembl.html',
-            #         'data_license_attributes': {
-            #             'non_commercial': False,
-            #             'share_alike': True,
-            #             'attribution': True
-            #         }
-            #     }
-            # }
+            schema['example'] = {
+                "query": "Von Hippel-Lindau Syndrome",
+                "warnings": None,
+                "source_matches": [{
+                    "source": "NCIt",
+                    "match_type": 80,
+                    "records": [{
+                        "label": "Von Hippel-Lindau Syndrome",
+                        "concept_id": "ncit:C3105",
+                        "aliases": [
+                            "Von Hippel-Lindau Syndrome (VHL)",
+                            "Von Hippel-Lindau Disease",
+                            "Cerebroretinal Angiomatosis",
+                            "von Hippel-Lindau syndrome",
+                            "VHL syndrome"
+                        ],
+                        "other_identifiers": [],
+                        "xrefs": ["umls:C0019562"]
+                    }],
+                    "meta_": {
+                        "data_license": "CC BY 4.0",
+                        "data_license_url": "https://creativecommons.org/licenses/by/4.0/legalcode",  # noqa: E501
+                        "version": "21.01d",
+                        "data_url": "https://evs.nci.nih.gov/ftp1/NCI_Thesaurus/archive/21.01d_Release/",  # noqa: E501
+                        "rdp_url": "http://reusabledata.org/ncit.html",
+                        "data_license_attributes": {
+                            "non_commercial": False,
+                            "attribution": True,
+                            "share_alike": False
+                        }
+                    }
+                }]
+            }
