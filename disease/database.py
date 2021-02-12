@@ -1,20 +1,14 @@
 """This module creates the database."""
+from disease import PREFIX_LOOKUP
 import boto3
-from disease.schemas import NamespacePrefix, SourceName
-from botocore.exceptions import ClientError
 from boto3.dynamodb.conditions import Key
+from botocore.exceptions import ClientError
 from os import environ
 from typing import Optional, Dict, List
 import logging
 
 logger = logging.getLogger('disease')
 logger.setLevel(logging.DEBUG)
-
-
-# should this be located in a shared module
-PREFIX_LOOKUP = {v.value: SourceName[k].value
-                 for k, v in NamespacePrefix.__members__.items()
-                 if k in SourceName.__members__.keys()}
 
 
 class Database:

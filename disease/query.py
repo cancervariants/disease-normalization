@@ -1,24 +1,11 @@
 """This module provides methods for handling queries."""
 import re
 from typing import List, Dict, Set, Optional
-
 from uvicorn.config import logger
+from disease import NAMESPACE_LOOKUP, PREFIX_LOOKUP, SOURCES_LOWER_LOOKUP
 from disease.database import Database
-from disease.schemas import Disease, Meta, MatchType, SourceName, \
-    NamespacePrefix, SourceIDAfterNamespace
+from disease.schemas import Disease, Meta, MatchType
 from botocore.exceptions import ClientError
-
-# use to fetch source name from schema based on concept id namespace
-# e.g. {'ncit': 'NCIt'}
-PREFIX_LOOKUP = {v.value: SourceName[k].value
-                 for k, v in NamespacePrefix.__members__.items()
-                 if k in SourceName.__members__.keys()}
-
-# use to generate namespace prefix from source ID value
-# e.g. {'c': 'NCIt'}
-NAMESPACE_LOOKUP = {v.value.lower(): NamespacePrefix[k].value
-                    for k, v in SourceIDAfterNamespace.__members__.items()
-                    if v.value != ''}
 
 
 class InvalidParameterException(Exception):
@@ -283,11 +270,8 @@ class QueryHandler:
         :raises InvalidParameterException: if both incl and excl args are
             provided, or if invalid source names are given.
         """
-        sources = {name.value.lower(): name.value for name in
-                   SourceName.__members__.values()}
-
         if not incl and not excl:
-            query_sources = set(sources.values())
+            query_sources = set(SOURCES_LOWER_LOOKUP.values())
         elif incl and excl:
             detail = "Cannot request both source inclusions and exclusions."
             raise InvalidParameterException(detail)
@@ -296,8 +280,8 @@ class QueryHandler:
             invalid_sources = []
             query_sources = set()
             for source in req_sources:
-                if source.lower() in sources.keys():
-                    query_sources.add(sources[source.lower()])
+                if source.lower() in SOURCES_LOWER_LOOKUP.keys():
+                    query_sources.add(SOURCES_LOWER_LOOKUP[source.lower()])
                 else:
                     invalid_sources.append(source)
             if invalid_sources:
@@ -309,9 +293,9 @@ class QueryHandler:
             invalid_sources = []
             query_sources = set()
             for req_l, req in req_excl_dict.items():
-                if req_l not in sources.keys():
+                if req_l not in SOURCES_LOWER_LOOKUP.keys():
                     invalid_sources.append(req)
-            for src_l, src in sources.items():
+            for src_l, src in SOURCES_LOWER_LOOKUP.items():
                 if src_l not in req_excl_dict.keys():
                     query_sources.add(src)
             if invalid_sources:

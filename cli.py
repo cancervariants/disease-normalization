@@ -1,6 +1,6 @@
 """This module provides a CLI util to make updates to normalizer database."""
 import click
-from disease.etl import NCIt
+from disease import SOURCES_CLASS_LOOKUP
 from disease.schemas import SourceName
 from disease.database import Database
 from botocore.exceptions import ClientError
@@ -34,10 +34,6 @@ class CLI:
     )
     def update_normalizer_db(normalizer, dev, db_url, update_all):
         """Update select normalizer source(s) in the disease database."""
-        sources = {
-            'ncit': NCIt,
-        }
-
         if dev:
             db: Database = Database(db_url='http://localhost:8000')
         elif db_url:
@@ -55,8 +51,8 @@ class CLI:
                 sys.exit()
 
         if update_all:
-            normalizers = list(src for src in sources)
-            CLI()._update_normalizers(normalizers, sources, db)
+            normalizers = list(src for src in SOURCES_CLASS_LOOKUP)
+            CLI()._update_normalizers(normalizers, SOURCES_CLASS_LOOKUP, db)
         elif not normalizer:
             CLI()._help_msg()
         else:
@@ -65,12 +61,13 @@ class CLI:
             if len(normalizers) == 0:
                 CLI()._help_msg()
 
-            non_sources = CLI()._check_norm_srcs_match(sources, normalizers)
+            non_sources = CLI()._check_norm_srcs_match(SOURCES_CLASS_LOOKUP,
+                                                       normalizers)
 
             if len(non_sources) != 0:
                 raise Exception(f"Not valid source(s): {non_sources}")
 
-            CLI()._update_normalizers(normalizers, sources, db)
+            CLI()._update_normalizers(normalizers, SOURCES_CLASS_LOOKUP, db)
 
     def _help_msg(self):
         """Display help message."""
