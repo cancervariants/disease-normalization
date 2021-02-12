@@ -34,5 +34,6 @@ NAMESPACE_LOOKUP = {v.value.lower(): NamespacePrefix[k].value
 
 # Use to lookup class object from source name. Should be one key-value pair
 # for every functioning ETL class.
+from disease.etl import NCIt  # noqa: E402 F401
 SOURCES_CLASS_LOOKUP = {s.value.lower(): eval(s.value)
                         for s in SourceName.__members__.values()}
