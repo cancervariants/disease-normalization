@@ -163,13 +163,13 @@ def test_alias_match(ncit, neuroblastoma, nsclc):
     actual_disease = response['records'][0].dict()
     compare_records(actual_disease, neuroblastoma)
 
-    response = ncit.search('NSCLC - Non-Small Cell Lung Cancer')
+    response = ncit.search('nsclc')
     assert response['match_type'] == MatchType.ALIAS
     assert len(response['records']) == 1
     actual_disease = response['records'][0].dict()
     compare_records(actual_disease, nsclc)
 
-    response = ncit.search('nsclc')
+    response = ncit.search('NSCLC - Non-Small Cell Lung Cancer')
     assert response['match_type'] == MatchType.ALIAS
     assert len(response['records']) == 1
     actual_disease = response['records'][0].dict()
