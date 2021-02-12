@@ -186,7 +186,7 @@ class QueryHandler:
         :param Dict resp: in-progress response object to return to client
         :param Set[str] sources: remaining unmatched sources
         :param str match_type: Match type to check for. Should be one of
-            ['trade_name', 'label', 'alias']
+            {'label', 'alias'}
         :return: Tuple with updated resp object and updated set of unmatched
                  sources
         """
