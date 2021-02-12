@@ -22,8 +22,8 @@ class NCIt(Base):
 
     def __init__(self,
                  database: Database,
-                 src_dir: str = "https://evs.nci.nih.gov/ftp1/NCI_Thesaurus/archive/20.09d_Release/",  # noqa F401
-                 src_fname: str = "Thesaurus_20.09d.OWL.zip",
+                 src_dir: str = "https://evs.nci.nih.gov/ftp1/NCI_Thesaurus/archive/21.01d_Release/",  # noqa F401
+                 src_fname: str = "Thesaurus_21.01d.OWL.zip",
                  data_path: Path = PROJECT_ROOT / 'data' / 'ncit'):
         """Override base class init method.
 
@@ -99,9 +99,7 @@ class NCIt(Base):
             nodes found so far.
         :param owl.namespace.Ontology ncit: owlready2 Ontology instance for
             NCI Thesaurus.
-        :return: uq_nodes, with the addition of all classes found to have
-            semantic_type Pharmacologic Substance and not of type
-            Retired_Concept
+        :return: uq_nodes with additions from above types added
         :rtype: Set[owlready2.entity.ThingClass]
         """
         graph = owl.default_world.as_rdflib_graph()
