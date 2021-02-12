@@ -156,7 +156,6 @@ class Database:
                 response = self.diseases.query(KeyConditionExpression=exp)
                 return response['Items'][0]
         except ClientError as e:
-            logger.error(e.response['Error']['Message'])
             logger.error(f"boto3 client error on get_records_by_id for "
                          f"search term {concept_id}: "
                          f"{e.response['Error']['Message']}")
