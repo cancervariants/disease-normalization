@@ -25,12 +25,12 @@
     "src_name": "NCIt"
   },
   {
-    "label_and_type": "Non-Small Cell Cancer of the Lung##alias",
+    "label_and_type": "non-small cell cancer of the lung##alias",
     "concept_id": "ncit:c2926",
     "src_name": "NCIt"
   },
   {
-    "label_and_type": "NSCLC##alias",
+    "label_and_type": "nsclc##alias",
     "concept_id": "ncit:c2926",
     "src_name": "NCIt"
   },
@@ -40,22 +40,22 @@
     "src_name": "NCIt"
   },
   {
-    "label_and_type": "Non-Small Cell Carcinoma of the Lung##alias",
+    "label_and_type": "non-small cell carcinoma of the lung##alias",
     "concept_id": "ncit:c2926",
     "src_name": "NCIt"
   },
   {
-    "label_and_type": "Non-Small Cell Cancer of Lung##alias",
+    "label_and_type": "non-small cell cancer of lung##alias",
     "concept_id": "ncit:c2926",
     "src_name": "NCIt"
   },
   {
-    "label_and_type": "Non-Small Cell Carcinoma of Lung##alias",
+    "label_and_type": "non-small cell carcinoma of lung##alias",
     "concept_id": "ncit:c2926",
     "src_name": "NCIt"
   },
   {
-    "label_and_type": "Non-Small Cell Lung Cancer##alias",
+    "label_and_type": "non-small cell lung cancer##alias",
     "concept_id": "ncit:c2926",
     "src_name": "NCIt"
   },
@@ -65,12 +65,12 @@
     "src_name": "NCIt"
   },
   {
-    "label_and_type": "NSCLC - Non-Small Cell Lung Cancer##alias",
+    "label_and_type": "nsclc - non-small cell lung cancer##alias",
     "concept_id": "ncit:c2926",
     "src_name": "NCIt"
   },
   {
-    "label_and_type": "Non-Small Cell Lung Carcinoma##alias",
+    "label_and_type": "non-small cell lung carcinoma##alias",
     "concept_id": "ncit:c2926",
     "src_name": "NCIt"
   },
