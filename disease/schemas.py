@@ -46,6 +46,7 @@ class Disease(BaseModel):
     aliases: Optional[List[str]]
     other_identifiers: Optional[List[str]]
     xrefs: Optional[List[str]]
+    pediatric: bool
 
     class Config:
         """Configure model."""
@@ -69,7 +70,8 @@ class Disease(BaseModel):
                     "VHL syndrome"
                 ],
                 "other_identifiers": [],
-                "xrefs": ["umls:C0019562"]
+                "xrefs": ["umls:C0019562"],
+                "pediatric": None,
             }
 
 
@@ -141,7 +143,8 @@ class MatchesKeyed(BaseModel):
                         "VHL syndrome"
                     ],
                     "other_identifiers": [],
-                    "xrefs": ["umls:C0019562"]
+                    "xrefs": ["umls:C0019562"],
+                    "pediatric": None,
                 }],
                 "meta_": {
                     "data_license": "CC BY 4.0",
@@ -193,7 +196,8 @@ class MatchesListed(BaseModel):
                         "VHL syndrome"
                     ],
                     "other_identifiers": [],
-                    "xrefs": ["umls:C0019562"]
+                    "xrefs": ["umls:C0019562"],
+                    "pediatric": None
                 }],
                 "meta_": {
                     "data_license": "CC BY 4.0",
@@ -253,7 +257,8 @@ class Service(BaseModel):
                             "VHL syndrome"
                         ],
                         "other_identifiers": [],
-                        "xrefs": ["umls:C0019562"]
+                        "xrefs": ["umls:C0019562"],
+                        "pediatric": None,
                     }],
                     "meta_": {
                         "data_license": "CC BY 4.0",
