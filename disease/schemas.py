@@ -20,12 +20,14 @@ class SourceName(Enum):
     """Define string constraints to ensure consistent capitalization."""
 
     NCIT = "NCIt"
+    Mondo = "Mondo"
 
 
 class SourceIDAfterNamespace(Enum):
     """Define string constraints after namespace."""
 
     NCIT = "C"
+    MONDO = "MONDO_"
 
 
 class NamespacePrefix(Enum):
@@ -33,6 +35,7 @@ class NamespacePrefix(Enum):
 
     NCIT = "ncit"
     UMLS = "umls"
+    MONDO = "mondo"
 
 
 class Disease(BaseModel):
