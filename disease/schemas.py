@@ -27,7 +27,7 @@ class SourceIDAfterNamespace(Enum):
     """Define string constraints after namespace."""
 
     NCIT = "C"
-    MONDO = "MONDO_"
+    MONDO = ""
 
 
 class NamespacePrefix(Enum):
