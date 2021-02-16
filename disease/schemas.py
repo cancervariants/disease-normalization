@@ -70,6 +70,14 @@ class Disease(BaseModel):
             }
 
 
+class DataLicenseAttributes(BaseModel):
+    """Define constraints for data license attributes."""
+
+    non_commercial: StrictBool
+    share_alike: StrictBool
+    attribution: StrictBool
+
+
 class Meta(BaseModel):
     """Metadata for a given source to return in response object."""
 
@@ -205,14 +213,6 @@ class MatchesListed(BaseModel):
                     }
                 }
             }
-
-
-class DataLicenseAttributes(BaseModel):
-    """Define constraints for data license attributes."""
-
-    non_commercial: StrictBool
-    share_alike: StrictBool
-    attribution: StrictBool
 
 
 class Service(BaseModel):
