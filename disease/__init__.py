@@ -34,6 +34,7 @@ NAMESPACE_LOOKUP = {v.value.lower(): NamespacePrefix[k].value
                     if v.value != ''}
 
 from disease.etl import NCIt  # noqa: E402 F401
+from disease.etl import Mondo  # noqa: E402 F401
 # Use to lookup class object from source name. Should be one key-value pair
 # for every functioning ETL class.
 SOURCES_CLASS_LOOKUP = {s.value.lower(): eval(s.value)

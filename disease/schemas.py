@@ -31,11 +31,31 @@ class SourceIDAfterNamespace(Enum):
 
 
 class NamespacePrefix(Enum):
-    """Define string constraints for namespace prefixes on concept IDs."""
+    """Define string constraints for how concept ID namespace prefixes are
+    stored.
+    """
 
     NCIT = "ncit"
-    UMLS = "umls"
     MONDO = "mondo"
+    UMLS = "umls"
+    DO = "DOID"
+    EFO = "efo"
+    SNOMEDCT = "snomedct"
+    ICD9 = "icd9"
+    ICD10 = "icd"
+    ICDO = "icdo"
+    ORPHANET = "orphanet"
+    OGMS = "ogms"
+    MESH = "mesh"
+    IDO = "ido"
+    GARD = "gard"
+    OMIM = "omim"
+    OMIMPS = "omimps"
+    KEGG = "kegg.disease"
+    COHD = "cohd"
+    HPO = "HP"
+    NIFSTD = "nifstd"
+    MF = "mf"
 
 
 class Disease(BaseModel):
