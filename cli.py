@@ -38,21 +38,12 @@ class CLI:
             db: Database = Database(db_url='http://localhost:8000')
         elif db_url:
             db: Database = Database(db_url=db_url)
-        elif 'DISEASE_NORM_DB_URL' in environ.keys():
-            # environment variable will be picked up by DB instance
-            db: Database = Database()
         else:
-            if click.confirm("Are you sure you want to update"
-                             " the production database?", default=False):
-                click.echo("Updating production db...")
-                db: Database = Database()
-            else:
-                click.echo("Exiting CLI.")
-                sys.exit()
+            db: Database = Database()
 
         if update_all:
             normalizers = list(src for src in SOURCES_CLASS_LOOKUP)
-            CLI()._update_normalizers(normalizers, SOURCES_CLASS_LOOKUP, db)
+            CLI()._update_normalizers(normalizers, db)
         elif not normalizer:
             CLI()._help_msg()
         else:
@@ -61,13 +52,12 @@ class CLI:
             if len(normalizers) == 0:
                 CLI()._help_msg()
 
-            non_sources = CLI()._check_norm_srcs_match(SOURCES_CLASS_LOOKUP,
-                                                       normalizers)
+            non_sources = CLI()._check_norm_srcs_match(normalizers)
 
             if len(non_sources) != 0:
                 raise Exception(f"Not valid source(s): {non_sources}")
 
-            CLI()._update_normalizers(normalizers, SOURCES_CLASS_LOOKUP, db)
+            CLI()._update_normalizers(normalizers, db)
 
     def _help_msg(self):
         """Display help message."""
@@ -81,7 +71,7 @@ class CLI:
         """Check that entered normalizers are actual sources."""
         return set(normalizers) - {src for src in sources}
 
-    def _update_normalizers(self, normalizers, sources, db):
+    def _update_normalizers(self, normalizers, db):
         """Update selected normalizer sources."""
         for n in normalizers:
             click.echo(f"\nDeleting {n}...")
@@ -93,7 +83,7 @@ class CLI:
                        f"{delete_time:.5f} seconds.\n")
             click.echo(f"Loading {n}...")
             start_load = timer()
-            source = sources[n](database=db)
+            source = SOURCES_CLASS_LOOKUP[n](database=db)
             source.perform_etl()
             end_load = timer()
             load_time = end_load - start_load

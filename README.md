@@ -56,5 +56,4 @@ From the project root, run the following:
 
 Next, view the OpenAPI docs on your local machine:
 
-http://127.0.0.1:8000/docs
-
+http://127.0.0.1:8000/disease
