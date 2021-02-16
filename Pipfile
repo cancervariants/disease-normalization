@@ -14,6 +14,10 @@ coveralls = "*"
 coverage = "*"
 ipykernel = "*"
 matplotlib = "*"
+uvloop = "*"
+websockets = "*"
+httptool = "*"
+typing-extension = "*"
 
 [packages]
 pydantic = "*"
