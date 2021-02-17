@@ -3,6 +3,8 @@ from disease import PREFIX_LOOKUP
 import boto3
 from boto3.dynamodb.conditions import Key
 from botocore.exceptions import ClientError
+import click
+import sys
 from os import environ
 from typing import Optional, Dict, List
 import logging
@@ -37,7 +39,7 @@ class Database:
             else:
                 click.echo("Exiting.")
                 sys.exit()
-                
+
             boto_params = {
                 'region_name': region_name
             }

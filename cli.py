@@ -6,8 +6,6 @@ from disease.database import Database
 from botocore.exceptions import ClientError
 from boto3.dynamodb.conditions import Key
 from timeit import default_timer as timer
-import sys
-from os import environ
 
 
 class CLI:
