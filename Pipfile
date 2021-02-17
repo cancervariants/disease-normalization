@@ -14,10 +14,6 @@ coveralls = "*"
 coverage = "*"
 ipykernel = "*"
 matplotlib = "*"
-uvloop = "*"
-websockets = "*"
-httptool = "*"
-typing-extension = "*"
 
 [packages]
 pydantic = "*"
@@ -28,6 +24,10 @@ boto3 = "*"
 requests = "*"
 rdflib = "*"
 uvicorn = "*"
+uvloop = "*"
+websockets = "*"
+httptools = "*"
+typing-extension = "*"
 
 [requires]
 python_version = "3.7"
