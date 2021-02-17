@@ -160,7 +160,7 @@ class NCIt(Base):
             if maps_to:
                 icdo_list = list(filter(lambda s: icdo_re.match(s), maps_to))
                 if len(icdo_list) == 1:
-                    xrefs.append(f"{NamespacePrefix.ICDO.value}"
+                    xrefs.append(f"{NamespacePrefix.ICDO.value}:"
                                  f"{icdo_list[0]}")
             imdrf = node.hasDbXref
             if imdrf:
