@@ -37,7 +37,7 @@ def neuroblastoma():
             "neuroblastoma"
         ],
         "other_identifiers": [],
-        "xrefs": ["umls:C0027819", "icdo:9500/3"],
+        "xrefs": ["umls:C0027819", "icd.o:9500/3"],
         "src_name": "NCIt"
     }
 

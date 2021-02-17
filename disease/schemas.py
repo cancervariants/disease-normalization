@@ -33,7 +33,7 @@ class NamespacePrefix(Enum):
 
     NCIT = "ncit"
     UMLS = "umls"
-    ICDO = "icdo"
+    ICDO = "icd.o"
     IMDRF = "imdrf"
 
 
