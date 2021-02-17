@@ -1,0 +1,118 @@
+[
+  {
+    "label_and_type": "ncit:c2926##identity",
+    "concept_id": "ncit:C2926",
+    "label": "Lung Non-Small Cell Carcinoma",
+    "aliases": [
+      "Non Small Cell Lung Cancer NOS",
+      "Non-Small Cell Lung Cancer",
+      "Non-Small Cell Cancer of the Lung",
+      "NSCLC",
+      "non-small cell lung cancer",
+      "Non-Small Cell Carcinoma of the Lung",
+      "Non-Small Cell Cancer of Lung",
+      "Non-small cell lung cancer, NOS",
+      "Non-Small Cell Carcinoma of Lung",
+      "NSCLC - Non-Small Cell Lung Cancer",
+      "Non-Small Cell Lung Carcinoma"
+    ],
+    "xrefs": ["umls:C0007131"],
+    "src_name": "NCIt"
+  },
+  {
+    "label_and_type": "lung non-small cell carcinoma##label",
+    "concept_id": "ncit:c2926",
+    "src_name": "NCIt"
+  },
+  {
+    "label_and_type": "non-small cell cancer of the lung##alias",
+    "concept_id": "ncit:c2926",
+    "src_name": "NCIt"
+  },
+  {
+    "label_and_type": "nsclc##alias",
+    "concept_id": "ncit:c2926",
+    "src_name": "NCIt"
+  },
+  {
+    "label_and_type": "non-small cell carcinoma of the lung##alias",
+    "concept_id": "ncit:c2926",
+    "src_name": "NCIt"
+  },
+  {
+    "label_and_type": "non-small cell cancer of lung##alias",
+    "concept_id": "ncit:c2926",
+    "src_name": "NCIt"
+  },
+  {
+    "label_and_type": "non-small cell carcinoma of lung##alias",
+    "concept_id": "ncit:c2926",
+    "src_name": "NCIt"
+  },
+  {
+    "label_and_type": "non-small cell lung cancer##alias",
+    "concept_id": "ncit:c2926",
+    "src_name": "NCIt"
+  },
+  {
+    "label_and_type": "non small cell lung cancer nos##alias",
+    "concept_id": "ncit:c2926",
+    "src_name": "NCIt"
+  },
+  {
+    "label_and_type": "nsclc - non-small cell lung cancer##alias",
+    "concept_id": "ncit:c2926",
+    "src_name": "NCIt"
+  },
+  {
+    "label_and_type": "non-small cell lung carcinoma##alias",
+    "concept_id": "ncit:c2926",
+    "src_name": "NCIt"
+  },
+  {
+    "label_and_type": "ncit:c3270##identity",
+    "concept_id": "ncit:C3270",
+    "label": "Neuroblastoma",
+    "aliases": [
+      "Neural Crest Tumor, Malignant",
+      "Neuroblastoma (NBL)",
+      "Neuroblastoma (Schwannian Stroma-poor)",
+      "Neuroblastoma (Schwannian Stroma-Poor)",
+      "NEUROBLASTOMA, MALIGNANT",
+      "Neuroblastoma, NOS",
+      "neuroblastoma"
+    ],
+    "xrefs": ["umls:C0027819", "icd.o:9500/3"],
+    "src_name": "NCIt"
+  },
+  {
+    "label_and_type": "neuroblastoma##label",
+    "concept_id": "ncit:c3270",
+    "src_name": "NCIt"
+  },
+  {
+    "label_and_type": "neural crest tumor, malignant##alias",
+    "concept_id": "ncit:c3270",
+    "src_name": "NCIt"
+  },
+  {
+    "label_and_type": "neuroblastoma (nbl)##alias",
+    "concept_id": "ncit:c3270",
+    "src_name": "NCIt"
+  },
+  {
+    "label_and_type": "neuroblastoma (schwannian stroma-poor)##alias",
+    "concept_id": "ncit:c3270",
+    "src_name": "NCIt"
+  },
+  {
+    "label_and_type": "neuroblastoma, malignant##alias",
+    "concept_id": "ncit:c3270",
+    "src_name": "NCIt"
+  },
+  {
+    "label_and_type": "neuroblastoma, nos##alias",
+    "concept_id": "ncit:c3270",
+    "src_name": "NCIt"
+  }
+]
