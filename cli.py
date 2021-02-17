@@ -1,6 +1,6 @@
 """This module provides a CLI util to make updates to normalizer database."""
 import click
-from disease import SOURCES_CLASS_LOOKUP
+from disease import SOURCES_CLASS_LOOKUP, SOURCES
 from disease.schemas import SourceName
 from disease.database import Database
 from botocore.exceptions import ClientError
@@ -50,7 +50,7 @@ class CLI:
             if len(normalizers) == 0:
                 CLI()._help_msg()
 
-            non_sources = CLI()._check_norm_srcs_match(normalizers)
+            non_sources = set(normalizers) - {src for src in SOURCES}
 
             if len(non_sources) != 0:
                 raise Exception(f"Not valid source(s): {non_sources}")
@@ -64,10 +64,6 @@ class CLI:
             "Must either enter 1 or more sources, or use `--update_all` parameter")  # noqa: E501
         click.echo(ctx.get_help())
         ctx.exit()
-
-    def _check_norm_srcs_match(self, sources, normalizers):
-        """Check that entered normalizers are actual sources."""
-        return set(normalizers) - {src for src in sources}
 
     def _update_normalizers(self, normalizers, db):
         """Update selected normalizer sources."""

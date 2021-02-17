@@ -14,6 +14,10 @@ logger.setLevel(logging.DEBUG)
 
 
 from disease.schemas import SourceName, SourceIDAfterNamespace, NamespacePrefix  # noqa: E402, E501
+# sources we import directly
+SOURCES = {source.value.lower(): source.value
+           for source in SourceName.__members__.values()}
+
 # use to lookup source name from lower-case string
 # technically the same as PREFIX_LOOKUP, but source namespace prefixes
 # sometimes differ from their names
