@@ -11,5 +11,18 @@
       "share_alike": false,
       "attribution": true
     }
+  },
+  {
+    "src_name": "MONDO",
+    "data_license": "CC BY 4.0",
+    "data_license_url": "https://creativecommons.org/licenses/by/4.0/legalcode",
+    "version": "20210129",
+    "data_url": "https://mondo.monarchinitiative.org/pages/download/",
+    "rdp_url": "http://reusabledata.org/monarch.html",
+    "data_license_attributes": {
+      "non_commercial": false,
+      "share_alike": false,
+      "attribution": true
+    }
   }
 ]

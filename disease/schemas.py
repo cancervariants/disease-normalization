@@ -43,7 +43,6 @@ class NamespacePrefix(Enum):
     SNOMEDCT = "snomedct"
     ICD9 = "icd9"
     ICD10 = "icd"
-    ICDO = "icdo"
     ORPHANET = "orphanet"
     OGMS = "ogms"
     MESH = "mesh"
@@ -56,6 +55,8 @@ class NamespacePrefix(Enum):
     HPO = "HP"
     NIFSTD = "nifstd"
     MF = "mf"
+    ICDO = "icd.o"
+    IMDRF = "imdrf"
 
 
 class Disease(BaseModel):
@@ -93,6 +94,14 @@ class Disease(BaseModel):
                 "xrefs": ["umls:C0019562"],
                 "pediatric": None,
             }
+
+
+class DataLicenseAttributes(BaseModel):
+    """Define constraints for data license attributes."""
+
+    non_commercial: StrictBool
+    share_alike: StrictBool
+    attribution: StrictBool
 
 
 class Meta(BaseModel):
@@ -232,14 +241,6 @@ class MatchesListed(BaseModel):
                     }
                 }
             }
-
-
-class DataLicenseAttributes(BaseModel):
-    """Define constraints for data license attributes."""
-
-    non_commercial: StrictBool
-    share_alike: StrictBool
-    attribution: StrictBool
 
 
 class Service(BaseModel):

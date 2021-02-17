@@ -3,6 +3,8 @@ from disease import PREFIX_LOOKUP
 import boto3
 from boto3.dynamodb.conditions import Key
 from botocore.exceptions import ClientError
+import click
+import sys
 from os import environ
 from typing import Optional, Dict, List
 import logging
@@ -31,6 +33,13 @@ class Database:
                 'endpoint_url': environ['DISEASE_NORM_DB_URL']
             }
         else:
+            if click.confirm("Are you sure you want to update "
+                             "the production database?", default=False):
+                click.echo("Updating the production database...")
+            else:
+                click.echo("Exiting.")
+                sys.exit()
+
             boto_params = {
                 'region_name': region_name
             }

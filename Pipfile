@@ -24,6 +24,10 @@ boto3 = "*"
 requests = "*"
 rdflib = "*"
 uvicorn = "*"
+uvloop = "*"
+websockets = "*"
+httptools = "*"
+typing-extensions = "*"
 
 [requires]
 python_version = "3.7"
