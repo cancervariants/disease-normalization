@@ -27,7 +27,7 @@ uvicorn = "*"
 uvloop = "*"
 websockets = "*"
 httptools = "*"
-typing-extension = "*"
+typing-extensions = "*"
 
 [requires]
 python_version = "3.7"
