@@ -1,6 +1,6 @@
 """This module provides a CLI util to make updates to normalizer database."""
 import click
-from disease import SOURCES_CLASS_LOOKUP, SOURCES
+from disease import SOURCES_CLASS_LOOKUP, SOURCES_LOWER_LOOKUP
 from disease.schemas import SourceName
 from disease.database import Database
 from botocore.exceptions import ClientError
@@ -50,7 +50,8 @@ class CLI:
             if len(normalizers) == 0:
                 CLI()._help_msg()
 
-            non_sources = set(normalizers) - {src for src in SOURCES}
+            non_sources = set(normalizers) - {src for src
+                                              in SOURCES_LOWER_LOOKUP}
 
             if len(non_sources) != 0:
                 raise Exception(f"Not valid source(s): {non_sources}")
