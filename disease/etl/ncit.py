@@ -11,10 +11,13 @@ from os import remove, rename
 from typing import Set, Dict
 import owlready2 as owl
 from owlready2.entity import ThingClass
+import re
 
 
 logger = logging.getLogger('disease')
 logger.setLevel(logging.DEBUG)
+
+icdo_re = re.compile("[0-9]+/[0-9]+")
 
 
 class NCIt(Base):
@@ -153,6 +156,16 @@ class NCIt(Base):
             if node.P207:
                 xrefs.append(f"{NamespacePrefix.UMLS.value}:"
                              f"{node.P207.first()}")
+            maps_to = node.P375
+            if maps_to:
+                icdo_list = filter(lambda s: icdo_re.match(s), maps_to)
+                if len(icdo_list) == 1:
+                    xrefs.append(f"{NamespacePrefix.ICDO.value}"
+                                 f"{icdo_list[0]}")
+            imdrf = node.hasDbXref
+            if imdrf:
+                xrefs.append(f"{NamespacePrefix.IMDRF.value}:"
+                             f"{imdrf[0].split(':')[1]}")
 
             disease = {
                 'concept_id': concept_id,

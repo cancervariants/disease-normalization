@@ -33,6 +33,8 @@ class NamespacePrefix(Enum):
 
     NCIT = "ncit"
     UMLS = "umls"
+    ICDO = "icdo"
+    IMDRF = "imdrf"
 
 
 class Disease(BaseModel):
