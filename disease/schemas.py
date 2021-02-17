@@ -20,7 +20,7 @@ class SourceName(Enum):
     """Define string constraints to ensure consistent capitalization."""
 
     NCIT = "NCIt"
-    Mondo = "Mondo"
+    MONDO = "Mondo"
 
 
 class SourceIDAfterNamespace(Enum):
@@ -57,6 +57,7 @@ class NamespacePrefix(Enum):
     MF = "mf"
     ICDO = "icd.o"
     IMDRF = "imdrf"
+    MEDDRA = "meddra"
 
 
 class Disease(BaseModel):
@@ -67,7 +68,7 @@ class Disease(BaseModel):
     aliases: Optional[List[str]]
     other_identifiers: Optional[List[str]]
     xrefs: Optional[List[str]]
-    pediatric: bool
+    pediatric: Optional[bool]
 
     class Config:
         """Configure model."""

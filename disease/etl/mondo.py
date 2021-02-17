@@ -6,9 +6,8 @@ from disease.database import Database
 from disease.schemas import Meta, SourceName, NamespacePrefix, Disease
 from pathlib import Path
 import requests
-from typing import Set
+from typing import Set, Dict
 import owlready2 as owl
-from owlready2.entity import ThingClass
 from rdflib.term import URIRef
 
 
@@ -22,10 +21,12 @@ MONDO_PREFIX_LOOKUP = {
     "SCTID": NamespacePrefix.SNOMEDCT,
     "ICD9": NamespacePrefix.ICD9,
     "OGMS": NamespacePrefix.OGMS,
+    "Orphanet": NamespacePrefix.ORPHANET,
     "MESH": NamespacePrefix.MESH,
     "EFO": NamespacePrefix.EFO,
     "UMLS": NamespacePrefix.UMLS,
     "ICD10": NamespacePrefix.ICD10,
+    "ICDO": NamespacePrefix.ICDO,
     "IDO": NamespacePrefix.IDO,
     "GARD": NamespacePrefix.GARD,
     "OMIM": NamespacePrefix.OMIM,
@@ -35,7 +36,8 @@ MONDO_PREFIX_LOOKUP = {
     "HPO": NamespacePrefix.HPO,
     "NIFSTD": NamespacePrefix.NIFSTD,
     "MF": NamespacePrefix.MF,
-    "ICDO": NamespacePrefix.ICDO,
+    "HP": NamespacePrefix.HPO,
+    "MedDRA": NamespacePrefix.MEDDRA,
 }
 
 
@@ -106,64 +108,87 @@ class Mondo(Base):
         params['src_name'] = SourceName.MONDO.value
         self.database.metadata.put_item(Item=params)
 
-    def _collect_diseases(self) -> Set[URIRef]:
-        """Retrieve IRIs for all disease terms.
+    def _collect_subclasses(self, uri) -> Set[URIRef]:
+        """Retrieve URIs for all terms that are subclasses of given URI.
 
-        :return: Set of URI references to all disease subclasses
+        :param str uri: uri of superclass
+        :return: Set of URIs for all classes that are subclasses of it
         """
         graph = owl.default_world.as_rdflib_graph()
-        disease_query = """
-        SELECT ?c WHERE {
-        ?c rdfs:subClassOf* <http://purl.obolibrary.org/obo/MONDO_0000001>
-        }
+        query = """
+        SELECT ?c WHERE {{
+        ?c rdfs:subClassOf* <{uri}>
+        }}
         """
-        return {item.c for item in graph.query(disease_query)}
+        return {item.c for item in graph.query(query)}
 
     def _transform_data(self):
         """Gather and transform disease entities."""
         mondo = owl.get_ontology(self._data_file.absolute().as_uri())
         mondo.load()
 
-        disease_uris = self._collect_diseases()
+        disease_root = "http://purl.obolibrary.org/obo/MONDO_0000001"
+        disease_uris = self._collect_subclasses(disease_root)
+        peds_neoplasm_root = "http://purl.obolibrary.org/obo/MONDO_0006517"
+        peds_uris = {u.toPython() for u
+                     in self._collect_subclasses(peds_neoplasm_root)}
+        adult_onset_pattern = 'http://purl.obolibrary.org/obo/mondo/patterns/adult.yaml'  # noqa: E501
 
         for uri in disease_uris:
-            disease = mondo.get(iri=uri)[0]
-            self._load_disease(disease)
+            try:
+                disease = mondo.search(iri=uri)[0]
+            except TypeError:
+                print(uri)
+                raise Exception
+            label = disease.label[0]
+            params = {
+                'concept_id': disease.id[0].lower(),
+                'label': label,
+                'aliases': list({d for d in disease.hasExactSynonym if d != label}),  # noqa: E501
+                'xrefs': [],
+                'other_identifiers': []
+            }
+            for ref in disease.hasDbXref:
+                prefix, id_no = ref.split(':')
+                try:
+                    normed_prefix = MONDO_PREFIX_LOOKUP[prefix]
+                except KeyError:
+                    print(uri)
+                    raise Exception
+                other_id = f'{normed_prefix.value}:{id_no}'
 
-    def _load_disease(self, disease: ThingClass):
+                if normed_prefix == NamespacePrefix.NCIT:
+                    params['xrefs'].append(other_id)
+                elif normed_prefix == NamespacePrefix.KEGG:
+                    other_id = f'{normed_prefix.value}:H{id_no}'
+                    params['other_identifiers'].append(other_id)
+                else:
+                    params['other_identifiers'].append(other_id)
+
+            if disease.iri in peds_uris:
+                params['pediatric'] = True
+            else:
+                conforms_to = disease.conformsTo
+                if conforms_to and adult_onset_pattern in conforms_to:
+                    params['pediatric'] = False
+
+            assert Disease(**params)  # check input validity
+            self._load_disease(params)
+
+    def _load_disease(self, disease: Dict):
         """Load individual disease and associated references.
 
-        :param ThingClass disease: individual Owl class for given disease
+        :param Dict disease: individual disease record to be loaded
         """
-        params = {
-            'concept_id': disease.id[0].lower(),
-            'label': disease.label[0],
-            'aliases': list(set(disease.hasExactSynonym)),
-            'xrefs': [],
-            'other_identifiers': []
-        }
-        for ref in disease.hasDbXref:
-            prefix, id_no = ref.split(':')
-            normed_prefix = MONDO_PREFIX_LOOKUP[prefix]
-            other_id = f'{normed_prefix.value}:{id_no}'
-            if normed_prefix == NamespacePrefix.NCIT:
-                params['xrefs'].append(other_id)
-            if normed_prefix == NamespacePrefix.KEGG:
-                other_id = f'{normed_prefix.value}:H{id_no}'
-                params['other_identifiers'].append(other_id)
-            else:
-                params['other_identifiers'].append(other_id)
-        assert Disease(**params)  # check input validity
-
-        concept_id = params['concept_id']
-        aliases = params['aliases']
+        concept_id = disease['concept_id']
+        aliases = disease['aliases']
         if aliases:
             for alias in aliases:
                 self.database.add_ref_record(alias, concept_id, 'alias')
         else:
-            del params['aliases']
+            del disease['aliases']
         for key in ('xrefs', 'other_identifiers'):
-            if not params[key]:
-                del params[key]
-        self.database.add_record(params)
-        self.database.add_ref_record(params['label'], concept_id, 'label')
+            if not disease[key]:
+                del disease[key]
+        self.database.add_record(disease)
+        self.database.add_ref_record(disease['label'], concept_id, 'label')
