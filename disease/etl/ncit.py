@@ -158,7 +158,7 @@ class NCIt(Base):
                              f"{node.P207.first()}")
             maps_to = node.P375
             if maps_to:
-                icdo_list = filter(lambda s: icdo_re.match(s), maps_to)
+                icdo_list = list(filter(lambda s: icdo_re.match(s), maps_to))
                 if len(icdo_list) == 1:
                     xrefs.append(f"{NamespacePrefix.ICDO.value}"
                                  f"{icdo_list[0]}")
