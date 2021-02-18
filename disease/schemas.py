@@ -42,7 +42,10 @@ class NamespacePrefix(Enum):
     EFO = "efo"
     SNOMEDCT = "snomedct"
     ICD9 = "icd9"
+    ICD9CM = "icd9.cm"
     ICD10 = "icd"
+    ICD10CM = "icd10.cm"
+    ICDO = "icd.o"
     ORPHANET = "orphanet"
     OGMS = "ogms"
     MESH = "mesh"
@@ -55,9 +58,14 @@ class NamespacePrefix(Enum):
     HPO = "HP"
     NIFSTD = "nifstd"
     MF = "mf"
-    ICDO = "icd.o"
     IMDRF = "imdrf"
     MEDDRA = "meddra"
+    ONCOTREE = "oncotree"
+    WIKIPEDIA = "wikipedia.en"
+    WIKIDATA = "wikidata"
+    MEDGEN = "medgen"
+    MP = "MP"
+    PATO = "pato"
 
 
 class Disease(BaseModel):

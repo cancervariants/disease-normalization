@@ -1,6 +1,6 @@
-"""Module to load disease data from Mondo."""
-import logging
+"""Module to load disease data from Mondo Disease Ontology."""
 from .base import Base
+import logging
 from disease import PROJECT_ROOT
 from disease.database import Database
 from disease.schemas import Meta, SourceName, NamespacePrefix, Disease
@@ -19,13 +19,16 @@ MONDO_PREFIX_LOOKUP = {
     "NCIT": NamespacePrefix.NCIT,
     "DOID": NamespacePrefix.DO,
     "SCTID": NamespacePrefix.SNOMEDCT,
-    "ICD9": NamespacePrefix.ICD9,
     "OGMS": NamespacePrefix.OGMS,
     "Orphanet": NamespacePrefix.ORPHANET,
     "MESH": NamespacePrefix.MESH,
     "EFO": NamespacePrefix.EFO,
     "UMLS": NamespacePrefix.UMLS,
+    "UMLS_CUI": NamespacePrefix.UMLS,
+    "ICD9": NamespacePrefix.ICD9,
+    "ICD9CM": NamespacePrefix.ICD9CM,
     "ICD10": NamespacePrefix.ICD10,
+    "ICD10CM": NamespacePrefix.ICD10CM,
     "ICDO": NamespacePrefix.ICDO,
     "IDO": NamespacePrefix.IDO,
     "GARD": NamespacePrefix.GARD,
@@ -38,6 +41,13 @@ MONDO_PREFIX_LOOKUP = {
     "MF": NamespacePrefix.MF,
     "HP": NamespacePrefix.HPO,
     "MedDRA": NamespacePrefix.MEDDRA,
+    "MEDDRA": NamespacePrefix.MEDDRA,
+    "ONCOTREE": NamespacePrefix.ONCOTREE,
+    "Wikipedia": NamespacePrefix.WIKIPEDIA,
+    "Wikidata": NamespacePrefix.WIKIDATA,
+    "MEDGEN": NamespacePrefix.MEDGEN,
+    "MP": NamespacePrefix.MP,
+    "PATO": NamespacePrefix.PATO,
 }
 
 
@@ -115,7 +125,7 @@ class Mondo(Base):
         :return: Set of URIs for all classes that are subclasses of it
         """
         graph = owl.default_world.as_rdflib_graph()
-        query = """
+        query = f"""
         SELECT ?c WHERE {{
         ?c rdfs:subClassOf* <{uri}>
         }}
@@ -127,6 +137,7 @@ class Mondo(Base):
         mondo = owl.get_ontology(self._data_file.absolute().as_uri())
         mondo.load()
 
+        # gather constants/search materials
         disease_root = "http://purl.obolibrary.org/obo/MONDO_0000001"
         disease_uris = self._collect_subclasses(disease_root)
         peds_neoplasm_root = "http://purl.obolibrary.org/obo/MONDO_0006517"
@@ -138,8 +149,8 @@ class Mondo(Base):
             try:
                 disease = mondo.search(iri=uri)[0]
             except TypeError:
-                print(uri)
-                raise Exception
+                logger.error(f"Could not retrieve class for URI {uri}")
+                continue
             label = disease.label[0]
             params = {
                 'concept_id': disease.id[0].lower(),
@@ -149,21 +160,19 @@ class Mondo(Base):
                 'other_identifiers': []
             }
             for ref in disease.hasDbXref:
-                prefix, id_no = ref.split(':')
-                try:
-                    normed_prefix = MONDO_PREFIX_LOOKUP[prefix]
-                except KeyError:
-                    print(uri)
-                    raise Exception
+                prefix, id_no = ref.split(':', 1)
+                normed_prefix = MONDO_PREFIX_LOOKUP.get(prefix, None)
+                if not normed_prefix:
+                    continue
                 other_id = f'{normed_prefix.value}:{id_no}'
 
                 if normed_prefix == NamespacePrefix.NCIT:
-                    params['xrefs'].append(other_id)
+                    params['other_identifiers'].append(other_id)
                 elif normed_prefix == NamespacePrefix.KEGG:
                     other_id = f'{normed_prefix.value}:H{id_no}'
-                    params['other_identifiers'].append(other_id)
+                    params['xrefs'].append(other_id)
                 else:
-                    params['other_identifiers'].append(other_id)
+                    params['xrefs'].append(other_id)
 
             if disease.iri in peds_uris:
                 params['pediatric'] = True
