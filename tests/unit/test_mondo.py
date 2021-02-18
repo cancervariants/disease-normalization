@@ -16,7 +16,7 @@ def mondo():
         def search(self, query_str):
             response = self.query_handler.search_sources(query_str, keyed=True,
                                                          incl='mondo')
-            return response['source_matches']['MONDO']
+            return response['source_matches']['Mondo']
     return QueryGetter()
 
 
@@ -39,11 +39,11 @@ def neuroblastoma():
             "DOID:769",
             "gard:0007185",
             "meddra:10029260",
-            "icdo:9500/3",
-            "sctid:432328008",
+            "icd.o:9500/3",
+            "snomedct:432328008",
             "umls:CN205405",
             "efo:0000621",
-            "icd10:C74.9",
+            "icd:C74.9",
             "oncotree:NBL",
             "mesh:D009447"
         ]
@@ -63,8 +63,8 @@ def richter_syndrome():
         ],
         "other_identifiers": ["ncit:C35424"],
         "xrefs": [
-            "icd10:C91.1",
-            "sctid:277550009",
+            "icd:C91.1",
+            "snomedct:277550009",
             "umls:C0349631",
             "gard:0007578",
             "DOID:1703"
@@ -89,96 +89,96 @@ def compare_records(actual_record: Dict, fixture_record: Dict):
         assert set(actual_record['xrefs']) == set(fixture_record['xrefs'])
 
 
-def test_concept_id_match(ncit, neuroblastoma, richter_syndrome):
+def test_concept_id_match(mondo, neuroblastoma, richter_syndrome):
     """Test that concept ID search resolves to correct record"""
-    response = ncit.search('mondo:0005072')
+    response = mondo.search('mondo:0005072')
     assert response['match_type'] == MatchType.CONCEPT_ID
     assert len(response['records']) == 1
     actual_disease = response['records'][0].dict()
     compare_records(actual_disease, neuroblastoma)
 
-    response = ncit.search('mondo:0002083')
+    response = mondo.search('mondo:0002083')
     assert response['match_type'] == MatchType.CONCEPT_ID
     assert len(response['records']) == 1
     actual_disease = response['records'][0].dict()
     compare_records(actual_disease, richter_syndrome)
 
-    response = ncit.search('MONDO:0005072')
+    response = mondo.search('MONDO:0005072')
     assert response['match_type'] == MatchType.CONCEPT_ID
     assert len(response['records']) == 1
     actual_disease = response['records'][0].dict()
-    compare_records(actual_disease, richter_syndrome)
+    compare_records(actual_disease, neuroblastoma)
 
-    response = ncit.search('0002083')
+    response = mondo.search('0002083')
     assert response['match_type'] == MatchType.NO_MATCH
 
 
-def test_label_match(ncit, neuroblastoma, richter_syndrome):
+def test_label_match(mondo, neuroblastoma, richter_syndrome):
     """Test that label search resolves to correct record."""
-    response = ncit.search('Neuroblastoma')
+    response = mondo.search('Neuroblastoma')
     assert response['match_type'] == MatchType.LABEL
     assert len(response['records']) == 1
     actual_disease = response['records'][0].dict()
     compare_records(actual_disease, neuroblastoma)
 
-    response = ncit.search('NEUROBLASTOMA')
+    response = mondo.search('NEUROBLASTOMA')
     assert response['match_type'] == MatchType.LABEL
     assert len(response['records']) == 1
     actual_disease = response['records'][0].dict()
     compare_records(actual_disease, neuroblastoma)
 
-    response = ncit.search('richter syndrome')
+    response = mondo.search('richter syndrome')
     assert response['match_type'] == MatchType.LABEL
     assert len(response['records']) == 1
     actual_disease = response['records'][0].dict()
     compare_records(actual_disease, richter_syndrome)
 
 
-def test_alias_match(ncit, neuroblastoma, richter_syndrome):
+def test_alias_match(mondo, neuroblastoma, richter_syndrome):
     """Test that alias search resolves to correct record."""
-    response = ncit.search('neuroblastoma, malignant')
+    response = mondo.search('neuroblastoma, malignant')
     assert response['match_type'] == MatchType.ALIAS
     assert len(response['records']) == 1
     actual_disease = response['records'][0].dict()
     compare_records(actual_disease, neuroblastoma)
 
-    response = ncit.search('RICHTER TRANSFORMATION')
+    response = mondo.search('RICHTER TRANSFORMATION')
     assert response['match_type'] == MatchType.ALIAS
     assert len(response['records']) == 1
     actual_disease = response['records'][0].dict()
     compare_records(actual_disease, richter_syndrome)
 
-    response = ncit.search('Neuroblastoma, Malignant')
+    response = mondo.search('Neuroblastoma, Malignant')
     assert response['match_type'] == MatchType.ALIAS
     assert len(response['records']) == 1
     actual_disease = response['records'][0].dict()
     compare_records(actual_disease, neuroblastoma)
 
-    response = ncit.search('neuroblastoma (Schwannian Stroma-poor)')
+    response = mondo.search('neuroblastoma (Schwannian Stroma-poor)')
     assert response['match_type'] == MatchType.ALIAS
     assert len(response['records']) == 1
     actual_disease = response['records'][0].dict()
     compare_records(actual_disease, neuroblastoma)
 
-    response = ncit.search("Richter's transformation")
+    response = mondo.search("Richter's transformation")
     assert response['match_type'] == MatchType.ALIAS
     assert len(response['records']) == 1
     actual_disease = response['records'][0].dict()
     compare_records(actual_disease, richter_syndrome)
 
-    response = ncit.search("Richter's syndrome")
+    response = mondo.search("Richter's syndrome")
     assert response['match_type'] == MatchType.ALIAS
     assert len(response['records']) == 1
     actual_disease = response['records'][0].dict()
     compare_records(actual_disease, richter_syndrome)
 
-    response = ncit.search("neuroblastoma Schwannian Stroma-poor")
+    response = mondo.search("neuroblastoma Schwannian Stroma-poor")
     assert response['match_type'] == MatchType.NO_MATCH
 
 
-def test_meta(ncit):
+def test_meta(mondo):
     """Test that meta field is correct."""
-    response = ncit.search('neuroblastoma')
+    response = mondo.search('neuroblastoma')
     assert response['meta_'].data_license == 'CC BY 4.0'
     assert response['meta_'].data_license_url == \
         'https://creativecommons.org/licenses/by/4.0/legalcode'

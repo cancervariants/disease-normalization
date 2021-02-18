@@ -26,7 +26,7 @@ def test_query(query_handler):
     assert resp['query'] == 'Neuroblastoma'
     matches = resp['source_matches']
     assert isinstance(matches, list)
-    assert len(matches) == 1
+    assert len(matches) == 2
     ncit = list(filter(lambda m: m['source'] == 'NCIt',
                        matches))[0]
     assert len(ncit['records']) == 1
