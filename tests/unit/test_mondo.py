@@ -40,7 +40,6 @@ def neuroblastoma():
             "gard:0007185",
             "meddra:10029260",
             "icd.o:9500/3",
-            "snomedct:432328008",
             "umls:CN205405",
             "efo:0000621",
             "icd:C74.9",
@@ -65,7 +64,6 @@ def richter_syndrome():
         "other_identifiers": ["ncit:C35424"],
         "xrefs": [
             "icd:C91.1",
-            "snomedct:277550009",
             "umls:C0349631",
             "gard:0007578",
             "DOID:1703"

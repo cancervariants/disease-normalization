@@ -40,7 +40,6 @@ class NamespacePrefix(Enum):
     UMLS = "umls"
     DO = "DOID"
     EFO = "efo"
-    SNOMEDCT = "snomedct"
     ICD9 = "icd9"
     ICD9CM = "icd9.cm"
     ICD10 = "icd"

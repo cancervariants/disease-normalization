@@ -18,7 +18,6 @@ logger.setLevel(logging.DEBUG)
 MONDO_PREFIX_LOOKUP = {
     "NCIT": NamespacePrefix.NCIT,
     "DOID": NamespacePrefix.DO,
-    "SCTID": NamespacePrefix.SNOMEDCT,
     "OGMS": NamespacePrefix.OGMS,
     "Orphanet": NamespacePrefix.ORPHANET,
     "MESH": NamespacePrefix.MESH,
