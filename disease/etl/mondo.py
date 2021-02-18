@@ -34,7 +34,7 @@ MONDO_PREFIX_LOOKUP = {
     "GARD": NamespacePrefix.GARD,
     "OMIM": NamespacePrefix.OMIM,
     "OMIMPS": NamespacePrefix.OMIMPS,
-    "KEGG": NamespacePrefix.KEGG,  # also need to +'H' to ID
+    "KEGG": NamespacePrefix.KEGG,
     "COHD": NamespacePrefix.COHD,
     "HPO": NamespacePrefix.HPO,
     "NIFSTD": NamespacePrefix.NIFSTD,
@@ -65,7 +65,7 @@ class Mondo(Base):
         :param therapy.database.Database database: app database instance
         :param str src_dload_page: user-facing download page
         :param str src_url: direct URL to OWL file download
-        :param pathlib.Path data_path: path to local NCIt data directory
+        :param pathlib.Path data_path: path to local Mondo data directory
         """
         self.database = database
         self._SRC_DLOAD_PAGE = src_dload_page
@@ -80,14 +80,14 @@ class Mondo(Base):
         self._transform_data()
 
     def _download_data(self):
-        """Download NCI thesaurus source file for loading into normalizer."""
-        logger.info('Downloading NCI Thesaurus...')
+        """Download Mondo thesaurus source file for loading into normalizer."""
+        logger.info('Downloading Mondo data...')
         try:
             response = requests.get(self._SRC_URL, stream=True)
         except requests.exceptions.RequestException as e:
-            logger.error(f'MONDO download failed: {e}')
+            logger.error(f'Mondo download failed: {e}')
             raise e
-        handle = open(self._data_path / f'mondo_{self.version}.owl', "wb")
+        handle = open(self._data_path / f'mondo_{self._version}.owl', "wb")
         for chunk in response.iter_content(chunk_size=512):
             if chunk:
                 handle.write(chunk)
@@ -156,6 +156,7 @@ class Mondo(Base):
             except IndexError:
                 logger.warning(f"No label for concept {uri}")
                 continue
+
             params = {
                 'concept_id': disease.id[0].lower(),
                 'label': label,
@@ -163,6 +164,7 @@ class Mondo(Base):
                 'xrefs': [],
                 'other_identifiers': []
             }
+
             for ref in disease.hasDbXref:
                 prefix, id_no = ref.split(':', 1)
                 normed_prefix = MONDO_PREFIX_LOOKUP.get(prefix, None)
@@ -207,5 +209,6 @@ class Mondo(Base):
         for key in ('xrefs', 'other_identifiers'):
             if not disease[key]:
                 del disease[key]
+
         self.database.add_record(disease)
         self.database.add_ref_record(disease['label'], concept_id, 'label')
