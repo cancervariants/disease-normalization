@@ -1,7 +1,7 @@
 """Module to load disease data from Mondo Disease Ontology."""
 from .base import Base
 import logging
-from disease import PROJECT_ROOT, PREFIX_LOOKUP
+from disease import PROJECT_ROOT
 from disease.database import Database
 from disease.schemas import Meta, SourceName, NamespacePrefix, Disease
 from pathlib import Path
@@ -171,7 +171,7 @@ class Mondo(Base):
                     continue
                 other_id = f'{normed_prefix.value}:{id_no}'
 
-                if PREFIX_LOOKUP.get(normed_prefix, None):
+                if normed_prefix == NamespacePrefix.NCIT:
                     params['other_identifiers'].append(other_id)
                 elif normed_prefix == NamespacePrefix.KEGG:
                     other_id = f'{normed_prefix.value}:H{id_no}'
