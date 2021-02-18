@@ -46,7 +46,8 @@ def neuroblastoma():
             "icd:C74.9",
             "oncotree:NBL",
             "mesh:D009447"
-        ]
+        ],
+        "pediatric": None,
     }
 
 
@@ -68,7 +69,44 @@ def richter_syndrome():
             "umls:C0349631",
             "gard:0007578",
             "DOID:1703"
-        ]
+        ],
+        "pediatric": None,
+    }
+
+
+@pytest.fixture(scope='module')
+def pediatric_liposarcoma():
+    """Construct a test fixture for pediatric liposarcoma. Tests the
+    pediatric flag.
+    """
+    return {
+        "concept_id": "mondo:0003587",
+        "label": "pediatric liposarcoma",
+        "aliases": [
+            "childhood liposarcoma",
+            "liposarcoma"
+        ],
+        "other_identifiers": ["ncit:C8091"],
+        "xrefs": [
+            "DOID:5695",
+            "umls:C0279984"
+        ],
+        "pediatric": True,
+    }
+
+
+@pytest.fixture(scope="module")
+def cystic_teratoma_adult():
+    """Construct a test fixture for adult cystic teratoma. Tests the
+    pediatric flag.
+    """
+    return {
+        "concept_id": "mondo:0004099",
+        "label": "adult cystic teratoma",
+        "aliases": ["cystic teratoma of adults"],
+        "other_identifiers": ["ncit:C9012"],
+        "xrefs": ["umls:C1368888", "DOID:7079"],
+        "pediatric": False,
     }
 
 
@@ -87,9 +125,11 @@ def compare_records(actual_record: Dict, fixture_record: Dict):
     assert ('xrefs' in actual_record) == ('xrefs' in fixture_record)
     if 'xrefs' in actual_record or 'xrefs' in fixture_record:
         assert set(actual_record['xrefs']) == set(fixture_record['xrefs'])
+    assert actual_record['pediatric'] is fixture_record['pediatric']
 
 
-def test_concept_id_match(mondo, neuroblastoma, richter_syndrome):
+def test_concept_id_match(mondo, neuroblastoma, richter_syndrome,
+                          pediatric_liposarcoma):
     """Test that concept ID search resolves to correct record"""
     response = mondo.search('mondo:0005072')
     assert response['match_type'] == MatchType.CONCEPT_ID
@@ -109,11 +149,18 @@ def test_concept_id_match(mondo, neuroblastoma, richter_syndrome):
     actual_disease = response['records'][0].dict()
     compare_records(actual_disease, neuroblastoma)
 
+    response = mondo.search('mondo:0003587')
+    assert response['match_type'] == MatchType.CONCEPT_ID
+    assert len(response['records']) == 1
+    actual_disease = response['records'][0].dict()
+    compare_records(actual_disease, pediatric_liposarcoma)
+
     response = mondo.search('0002083')
     assert response['match_type'] == MatchType.NO_MATCH
 
 
-def test_label_match(mondo, neuroblastoma, richter_syndrome):
+def test_label_match(mondo, neuroblastoma, richter_syndrome,
+                     pediatric_liposarcoma, cystic_teratoma_adult):
     """Test that label search resolves to correct record."""
     response = mondo.search('Neuroblastoma')
     assert response['match_type'] == MatchType.LABEL
@@ -132,6 +179,18 @@ def test_label_match(mondo, neuroblastoma, richter_syndrome):
     assert len(response['records']) == 1
     actual_disease = response['records'][0].dict()
     compare_records(actual_disease, richter_syndrome)
+
+    response = mondo.search('pediatric liposarcoma')
+    assert response['match_type'] == MatchType.LABEL
+    assert len(response['records']) == 1
+    actual_disease = response['records'][0].dict()
+    compare_records(actual_disease, pediatric_liposarcoma)
+
+    response = mondo.search('Adult Cystic Teratoma')
+    assert response['match_type'] == MatchType.LABEL
+    assert len(response['records']) == 1
+    actual_disease = response['records'][0].dict()
+    compare_records(actual_disease, cystic_teratoma_adult)
 
 
 def test_alias_match(mondo, neuroblastoma, richter_syndrome):

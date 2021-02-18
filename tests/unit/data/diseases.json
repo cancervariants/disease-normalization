@@ -200,5 +200,46 @@
     "label_and_type": "richter's transformation##alias",
     "concept_id": "mondo:0002083",
     "src_name": "Mondo"
+  },
+  {
+      "label_and_type": "mondo:0003587##identity",
+      "concept_id": "mondo:0003587",
+      "label": "pediatric liposarcoma",
+      "aliases": [
+          "childhood liposarcoma",
+          "liposarcoma"
+      ],
+      "other_identifiers": ["ncit:C8091"],
+      "xrefs": [
+          "DOID:5695",
+          "umls:C0279984"
+      ],
+      "pediatric": true,
+      "src_name": "Mondo"
+  },
+  {
+      "label_and_type": "pediatric liposarcoma##label",
+      "concept_id": "mondo:0003587",
+      "src_name": "Mondo"
+  },
+  {
+      "label_and_type": "mondo:0004099##identity",
+      "concept_id": "mondo:0004099",
+      "label": "adult cystic teratoma",
+      "aliases": ["cystic teratoma of adults"],
+      "other_identifiers": ["ncit:C9012"],
+      "xrefs": ["umls:C1368888", "DOID:7079"],
+      "pediatric": false,
+      "src_name": "Mondo"
+  },
+  {
+    "label_and_type": "adult cystic teratoma##label",
+    "concept_id": "mondo:0004099",
+    "src_name": "Mondo"
+  },
+  {
+    "label_and_type": "cystic teratoma of adults##label",
+    "concept_id": "mondo:0004099",
+    "src_name": "Mondo"
   }
 ]

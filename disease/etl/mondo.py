@@ -154,7 +154,7 @@ class Mondo(Base):
             try:
                 label = disease.label[0]
             except IndexError:
-                logger.warning(f"No label for concept {uri}")
+                logger.debug(f"No label for concept {uri}")
                 continue
 
             params = {
