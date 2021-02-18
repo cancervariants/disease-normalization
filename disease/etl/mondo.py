@@ -151,7 +151,11 @@ class Mondo(Base):
             except TypeError:
                 logger.error(f"Could not retrieve class for URI {uri}")
                 continue
-            label = disease.label[0]
+            try:
+                label = disease.label[0]
+            except IndexError:
+                logger.warning(f"No label for concept {uri}")
+                continue
             params = {
                 'concept_id': disease.id[0].lower(),
                 'label': label,
@@ -192,8 +196,12 @@ class Mondo(Base):
         concept_id = disease['concept_id']
         aliases = disease['aliases']
         if aliases:
-            for alias in aliases:
-                self.database.add_ref_record(alias, concept_id, 'alias')
+            if len({a.casefold() for a in aliases}) > 20:
+                logger.debug(f'{concept_id} has > 20 aliases')
+                del disease['aliases']
+            else:
+                for alias in aliases:
+                    self.database.add_ref_record(alias, concept_id, 'alias')
         else:
             del disease['aliases']
         for key in ('xrefs', 'other_identifiers'):
