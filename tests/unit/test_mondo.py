@@ -7,7 +7,7 @@ from typing import Dict
 
 @pytest.fixture(scope='module')
 def mondo():
-    """Build MONDO ETL test fixture."""
+    """Build Mondo ETL test fixture."""
     class QueryGetter:
 
         def __init__(self):
