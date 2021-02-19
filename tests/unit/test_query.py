@@ -20,40 +20,18 @@ def query_handler():
     return QueryGetter()
 
 
-@pytest.fixture(scope='module')
-def neuroblastoma():
-    """Build neuroblastoma test fixture."""
-    return {
-        "label_and_type": "ncit:c3270##identity",
-        "concept_id": "ncit:C3270",
-        "label": "Neuroblastoma",
-        "aliases": [
-            "Neural Crest Tumor, Malignant",
-            "Neuroblastoma (NBL)",
-            "Neuroblastoma (Schwannian Stroma-poor)",
-            "Neuroblastoma (Schwannian Stroma-Poor)",
-            "NEUROBLASTOMA, MALIGNANT",
-            "Neuroblastoma, NOS",
-            "neuroblastoma"
-        ],
-        "other_identifiers": [],
-        "xrefs": ["umls:C0027819"],
-        "src_name": "NCIt"
-    }
-
-
 def test_query(query_handler):
     """Test that query returns properly-structured response."""
     resp = query_handler.normalize('Neuroblastoma', keyed=False)
     assert resp['query'] == 'Neuroblastoma'
     matches = resp['source_matches']
     assert isinstance(matches, list)
-    assert len(matches) == 1
-    wikidata = list(filter(lambda m: m['source'] == 'NCIt',
-                           matches))[0]
-    assert len(wikidata['records']) == 1
-    wikidata_record = wikidata['records'][0]
-    assert wikidata_record.label == 'Neuroblastoma'
+    assert len(matches) == 2
+    ncit = list(filter(lambda m: m['source'] == 'NCIt',
+                       matches))[0]
+    assert len(ncit['records']) == 1
+    ncit_record = ncit['records'][0]
+    assert ncit_record.label == 'Neuroblastoma'
 
 
 def test_query_keyed(query_handler):
@@ -61,27 +39,27 @@ def test_query_keyed(query_handler):
     resp = query_handler.normalize('Neuroblastoma', keyed=True)
     matches = resp['source_matches']
     assert isinstance(matches, dict)
-    chemidplus = matches['NCIt']
-    chemidplus_record = chemidplus['records'][0]
-    assert chemidplus_record.label == 'Neuroblastoma'
+    ncit = matches['NCIt']
+    ncit_record = ncit['records'][0]
+    assert ncit_record.label == 'Neuroblastoma'
 
 
 def test_query_specify_query_handlers(query_handler):
     """Test inclusion and exclusion of sources in query."""
     # test full inclusion
-    sources = 'ncit'
+    sources = 'ncit,mondo'
     resp = query_handler.normalize('Neuroblastoma', keyed=True,
                                    incl=sources, excl='')
     matches = resp['source_matches']
-    assert len(matches) == 1
+    assert len(matches) == 2
     assert 'NCIt' in matches
+    assert 'Mondo' in matches
 
     # test full exclusion
     resp = query_handler.normalize('Neuroblastoma', keyed=True,
-                                   excl='ncit')
+                                   excl=sources)
     matches = resp['source_matches']
     assert len(matches) == 0
-    assert 'NCIt' not in matches
 
     # test case insensitive
     resp = query_handler.normalize('Neuroblastoma', keyed=True, excl='NCIt')
@@ -99,4 +77,4 @@ def test_query_specify_query_handlers(query_handler):
     # test error for supplying both incl and excl args
     with pytest.raises(InvalidParameterException):
         resp = query_handler.normalize('Neuroblastoma', keyed=True,
-                                       incl='ncit', excl='ncit')
+                                       incl='mondo', excl='ncit')

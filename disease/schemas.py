@@ -20,21 +20,51 @@ class SourceName(Enum):
     """Define string constraints to ensure consistent capitalization."""
 
     NCIT = "NCIt"
+    MONDO = "Mondo"
 
 
 class SourceIDAfterNamespace(Enum):
     """Define string constraints after namespace."""
 
     NCIT = "C"
+    MONDO = ""
 
 
 class NamespacePrefix(Enum):
-    """Define string constraints for namespace prefixes on concept IDs."""
+    """Define string constraints for how concept ID namespace prefixes are
+    stored.
+    """
 
     NCIT = "ncit"
+    MONDO = "mondo"
     UMLS = "umls"
+    DO = "DOID"
+    EFO = "efo"
+    ICD9 = "icd9"
+    ICD9CM = "icd9.cm"
+    ICD10 = "icd"
+    ICD10CM = "icd10.cm"
     ICDO = "icd.o"
+    ORPHANET = "orphanet"
+    OGMS = "ogms"
+    MESH = "mesh"
+    IDO = "ido"
+    GARD = "gard"
+    OMIM = "omim"
+    OMIMPS = "omimps"
+    KEGG = "kegg.disease"
+    COHD = "cohd"
+    HPO = "HP"
+    NIFSTD = "nifstd"
+    MF = "mf"
     IMDRF = "imdrf"
+    MEDDRA = "meddra"
+    ONCOTREE = "oncotree"
+    WIKIPEDIA = "wikipedia.en"
+    WIKIDATA = "wikidata"
+    MEDGEN = "medgen"
+    MP = "MP"
+    PATO = "pato"
 
 
 class Disease(BaseModel):
@@ -45,6 +75,7 @@ class Disease(BaseModel):
     aliases: Optional[List[str]]
     other_identifiers: Optional[List[str]]
     xrefs: Optional[List[str]]
+    pediatric: Optional[bool]
 
     class Config:
         """Configure model."""
@@ -68,7 +99,8 @@ class Disease(BaseModel):
                     "VHL syndrome"
                 ],
                 "other_identifiers": [],
-                "xrefs": ["umls:C0019562"]
+                "xrefs": ["umls:C0019562"],
+                "pediatric": None,
             }
 
 
@@ -148,7 +180,8 @@ class MatchesKeyed(BaseModel):
                         "VHL syndrome"
                     ],
                     "other_identifiers": [],
-                    "xrefs": ["umls:C0019562"]
+                    "xrefs": ["umls:C0019562"],
+                    "pediatric": None,
                 }],
                 "meta_": {
                     "data_license": "CC BY 4.0",
@@ -200,7 +233,8 @@ class MatchesListed(BaseModel):
                         "VHL syndrome"
                     ],
                     "other_identifiers": [],
-                    "xrefs": ["umls:C0019562"]
+                    "xrefs": ["umls:C0019562"],
+                    "pediatric": None
                 }],
                 "meta_": {
                     "data_license": "CC BY 4.0",
@@ -252,7 +286,8 @@ class Service(BaseModel):
                             "VHL syndrome"
                         ],
                         "other_identifiers": [],
-                        "xrefs": ["umls:C0019562"]
+                        "xrefs": ["umls:C0019562"],
+                        "pediatric": None,
                     }],
                     "meta_": {
                         "data_license": "CC BY 4.0",

@@ -114,5 +114,130 @@
     "label_and_type": "neuroblastoma, nos##alias",
     "concept_id": "ncit:c3270",
     "src_name": "NCIt"
+  },
+  {
+    "label_and_type": "mondo:0005072##identity",
+    "concept_id": "mondo:0005072",
+    "label": "neuroblastoma",
+    "aliases": [
+      "neural Crest tumor, malignant",
+      "neuroblastoma (Schwannian Stroma-poor)",
+      "neuroblastoma, malignant"
+    ],
+    "other_identifiers": ["ncit:C3270"],
+    "xrefs": [
+      "orphanet:635",
+      "nifstd:birnlex_12631",
+      "umls:C0027819",
+      "DOID:769",
+      "gard:0007185",
+      "meddra:10029260",
+      "icd.o:9500/3",
+      "umls:CN205405",
+      "efo:0000621",
+      "icd:C74.9",
+      "oncotree:NBL",
+      "mesh:D009447"
+    ],
+    "src_name": "Mondo"
+  },
+  {
+    "label_and_type": "neuroblastoma##label",
+    "concept_id": "mondo:0005072",
+    "src_name": "Mondo"
+  },
+  {
+    "label_and_type": "neural crest tumor, malignant##alias",
+    "concept_id": "mondo:0005072",
+    "src_name": "Mondo"
+  },
+  {
+    "label_and_type": "neuroblastoma (schwannian stroma-poor)##alias",
+    "concept_id": "mondo:0005072",
+    "src_name": "Mondo"
+  },
+  {
+    "label_and_type": "neuroblastoma, malignant##alias",
+    "concept_id": "mondo:0005072",
+    "src_name": "Mondo"
+  },
+  {
+    "label_and_type": "mondo:0002083##identity",
+    "concept_id": "mondo:0002083",
+    "label": "Richter syndrome",
+    "aliases": [
+      "Richter's syndrome",
+      "Richter transformation",
+      "Richter's transformation"
+    ],
+    "other_identifiers": ["ncit:C35424"],
+    "xrefs": [
+      "icd:C91.1",
+      "umls:C0349631",
+      "gard:0007578",
+      "DOID:1703"
+    ],
+    "src_name": "Mondo"
+  },
+  {
+    "label_and_type": "richter syndrome##label",
+    "concept_id": "mondo:0002083",
+    "src_name": "Mondo"
+  },
+  {
+    "label_and_type": "richter's syndrome##alias",
+    "concept_id": "mondo:0002083",
+    "src_name": "Mondo"
+  },
+  {
+    "label_and_type": "richter transformation##alias",
+    "concept_id": "mondo:0002083",
+    "src_name": "Mondo"
+  },
+  {
+    "label_and_type": "richter's transformation##alias",
+    "concept_id": "mondo:0002083",
+    "src_name": "Mondo"
+  },
+  {
+      "label_and_type": "mondo:0003587##identity",
+      "concept_id": "mondo:0003587",
+      "label": "pediatric liposarcoma",
+      "aliases": [
+          "childhood liposarcoma",
+          "liposarcoma"
+      ],
+      "other_identifiers": ["ncit:C8091"],
+      "xrefs": [
+          "DOID:5695",
+          "umls:C0279984"
+      ],
+      "pediatric": true,
+      "src_name": "Mondo"
+  },
+  {
+      "label_and_type": "pediatric liposarcoma##label",
+      "concept_id": "mondo:0003587",
+      "src_name": "Mondo"
+  },
+  {
+      "label_and_type": "mondo:0004099##identity",
+      "concept_id": "mondo:0004099",
+      "label": "adult cystic teratoma",
+      "aliases": ["cystic teratoma of adults"],
+      "other_identifiers": ["ncit:C9012"],
+      "xrefs": ["umls:C1368888", "DOID:7079"],
+      "pediatric": false,
+      "src_name": "Mondo"
+  },
+  {
+    "label_and_type": "adult cystic teratoma##label",
+    "concept_id": "mondo:0004099",
+    "src_name": "Mondo"
+  },
+  {
+    "label_and_type": "cystic teratoma of adults##label",
+    "concept_id": "mondo:0004099",
+    "src_name": "Mondo"
   }
 ]
