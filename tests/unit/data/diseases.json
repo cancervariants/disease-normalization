@@ -171,12 +171,7 @@
       "Richter's transformation"
     ],
     "other_identifiers": ["ncit:C35424"],
-    "xrefs": [
-      "icd:C91.1",
-      "umls:C0349631",
-      "gard:0007578",
-      "DOID:1703"
-    ],
+    "xrefs": ["icd:C91.1", "umls:C0349631", "gard:0007578", "DOID:1703"],
     "src_name": "Mondo"
   },
   {
@@ -200,35 +195,29 @@
     "src_name": "Mondo"
   },
   {
-      "label_and_type": "mondo:0003587##identity",
-      "concept_id": "mondo:0003587",
-      "label": "pediatric liposarcoma",
-      "aliases": [
-          "childhood liposarcoma",
-          "liposarcoma"
-      ],
-      "other_identifiers": ["ncit:C8091"],
-      "xrefs": [
-          "DOID:5695",
-          "umls:C0279984"
-      ],
-      "pediatric": true,
-      "src_name": "Mondo"
+    "label_and_type": "mondo:0003587##identity",
+    "concept_id": "mondo:0003587",
+    "label": "pediatric liposarcoma",
+    "aliases": ["childhood liposarcoma", "liposarcoma"],
+    "other_identifiers": ["ncit:C8091"],
+    "xrefs": ["DOID:5695", "umls:C0279984"],
+    "pediatric": true,
+    "src_name": "Mondo"
   },
   {
-      "label_and_type": "pediatric liposarcoma##label",
-      "concept_id": "mondo:0003587",
-      "src_name": "Mondo"
+    "label_and_type": "pediatric liposarcoma##label",
+    "concept_id": "mondo:0003587",
+    "src_name": "Mondo"
   },
   {
-      "label_and_type": "mondo:0004099##identity",
-      "concept_id": "mondo:0004099",
-      "label": "adult cystic teratoma",
-      "aliases": ["cystic teratoma of adults"],
-      "other_identifiers": ["ncit:C9012"],
-      "xrefs": ["umls:C1368888", "DOID:7079"],
-      "pediatric": false,
-      "src_name": "Mondo"
+    "label_and_type": "mondo:0004099##identity",
+    "concept_id": "mondo:0004099",
+    "label": "adult cystic teratoma",
+    "aliases": ["cystic teratoma of adults"],
+    "other_identifiers": ["ncit:C9012"],
+    "xrefs": ["umls:C1368888", "DOID:7079"],
+    "pediatric": false,
+    "src_name": "Mondo"
   },
   {
     "label_and_type": "adult cystic teratoma##label",
@@ -239,5 +228,37 @@
     "label_and_type": "cystic teratoma of adults##label",
     "concept_id": "mondo:0004099",
     "src_name": "Mondo"
+  },
+  {
+    "label_and_type": "doid:769##identity",
+    "concept_id": "DOID:769",
+    "label": "neuroblastoma",
+    "other_identifiers": ["ncit:C3270"],
+    "xrefs": [
+      "efo:0000621",
+      "gard:7185",
+      "icd.o:M9500/3",
+      "mesh:D009447",
+      "orphanet:635",
+      "umls:C0027819"
+    ],
+    "src_name": "do"
+  },
+  {
+    "label_and_type": "neuroblastoma##label",
+    "concept_id": "DOID:769",
+    "src_name": "do"
+  },
+  {
+    "label_and_type": "doid:5695##identity",
+    "concept_id": "DOID:5695",
+    "label": "pediatric liposarcoma",
+    "other_identifiers": ["ncit:C8091"],
+    "xrefs": ["umls:C0279984"]
+  },
+  {
+    "label_and_type": "pediatric liposarcoma##label",
+    "concept_id": "DOID:5695",
+    "src_name": "do"
   }
 ]

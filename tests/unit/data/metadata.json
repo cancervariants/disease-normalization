@@ -24,5 +24,18 @@
       "share_alike": false,
       "attribution": true
     }
+  },
+  {
+    "src_name": "DO",
+    "data_license": "CC0 1.0",
+    "data_license_url": "https://creativecommons.org/publicdomain/zero/1.0/legalcode",
+    "version": "20210219",
+    "data_url": "http://purl.obolibrary.org/obo/doid.owl",
+    "rdp_url": null,
+    "data_license_attributes": {
+      "non_commercial": false,
+      "share_alike": false,
+      "attribution": false
+    }
   }
 ]
