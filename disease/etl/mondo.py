@@ -1,14 +1,13 @@
 """Module to load disease data from Mondo Disease Ontology."""
-from .base import Base
+from .base import OWLBase
 import logging
 from disease import PROJECT_ROOT, PREFIX_LOOKUP
 from disease.database import Database
 from disease.schemas import Meta, SourceName, NamespacePrefix, Disease
 from pathlib import Path
 import requests
-from typing import Set, Dict
 import owlready2 as owl
-from rdflib.term import URIRef
+from typing import Dict
 
 
 logger = logging.getLogger('disease')
@@ -50,7 +49,7 @@ MONDO_PREFIX_LOOKUP = {
 }
 
 
-class Mondo(Base):
+class Mondo(OWLBase):
     """Gather and load data from Mondo."""
 
     def __init__(self,
@@ -117,20 +116,6 @@ class Mondo(Base):
         params['src_name'] = SourceName.MONDO.value
         self.database.metadata.put_item(Item=params)
 
-    def _collect_subclasses(self, uri) -> Set[URIRef]:
-        """Retrieve URIs for all terms that are subclasses of given URI.
-
-        :param str uri: uri of superclass
-        :return: Set of URIs for all classes that are subclasses of it
-        """
-        graph = owl.default_world.as_rdflib_graph()
-        query = f"""
-        SELECT ?c WHERE {{
-        ?c rdfs:subClassOf* <{uri}>
-        }}
-        """
-        return {item.c for item in graph.query(query)}
-
     def _transform_data(self):
         """Gather and transform disease entities."""
         mondo = owl.get_ontology(self._data_file.absolute().as_uri())
@@ -138,10 +123,9 @@ class Mondo(Base):
 
         # gather constants/search materials
         disease_root = "http://purl.obolibrary.org/obo/MONDO_0000001"
-        disease_uris = self._collect_subclasses(disease_root)
+        disease_uris = self._get_subclasses(disease_root)
         peds_neoplasm_root = "http://purl.obolibrary.org/obo/MONDO_0006517"
-        peds_uris = {u.toPython() for u
-                     in self._collect_subclasses(peds_neoplasm_root)}
+        peds_uris = self._get_subclasses(peds_neoplasm_root)
         adult_onset_pattern = 'http://purl.obolibrary.org/obo/mondo/patterns/adult.yaml'  # noqa: E501
 
         for uri in disease_uris:

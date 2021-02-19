@@ -1,6 +1,6 @@
 """Module to load disease data from NCIt."""
 import logging
-from .base import Base
+from .base import OWLBase
 from disease import PROJECT_ROOT
 from disease.database import Database
 from disease.schemas import Meta, SourceName, NamespacePrefix, Disease
@@ -20,7 +20,7 @@ logger.setLevel(logging.DEBUG)
 icdo_re = re.compile("[0-9]+/[0-9]+")
 
 
-class NCIt(Base):
+class NCIt(OWLBase):
     """Gather and load data from NCIt."""
 
     def __init__(self,
@@ -93,76 +93,48 @@ class NCIt(Base):
         params['src_name'] = SourceName.NCIT.value
         self.database.metadata.put_item(Item=params)
 
-    def _get_typed_nodes(self, uq_nodes: Set[ThingClass],
-                         ncit: owl.namespace.Ontology) -> Set[ThingClass]:
+    def _get_disease_classes(self) -> Set[ThingClass]:
         """Get all nodes with semantic_type 'Neoplastic Process' or 'Disease
         or Syndrome'.
 
-        :param Set[owlready2.entity.ThingClass] uq_nodes: set of unique class
-            nodes found so far.
-        :param owl.namespace.Ontology ncit: owlready2 Ontology instance for
-            NCI Thesaurus.
         :return: uq_nodes with additions from above types added
         :rtype: Set[owlready2.entity.ThingClass]
         """
-        graph = owl.default_world.as_rdflib_graph()
-
-        neopl_query_str = '''SELECT ?x WHERE {
-            ?x <http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#P106>
-            "Neoplastic Process"
-        }'''
-        neopl_results = set(graph.query(neopl_query_str))
-
-        dos_query_str = '''SELECT ?x WHERE {
-            ?x <http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#P106>
-            "Disease or Syndrome"
-        }'''
-        dos_results = set(graph.query(dos_query_str))
-
-        retired_query_str = '''SELECT ?x WHERE {
-            ?x <http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#P310>
-            "Retired_Concept"
-        }
-        '''
-        retired_results = set(graph.query(retired_query_str))
-
-        typed_results = neopl_results.union(dos_results) - retired_results
-
-        for result in typed_results:
-            # parse result as URI and get ThingClass object back from NCIt
-            class_object = ncit[result[0].toPython().split('#')[1]]
-            uq_nodes.add(class_object)
-        return uq_nodes
+        p106 = "http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#P106"
+        neopl = self._get_by_property_value(p106, "Neoplastic Process")
+        dos = self._get_by_property_value(p106, "Disease or Syndrome")
+        p310 = "http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#P106"
+        retired = self._get_by_property_value(p310, "Retired_Concept")
+        uris = {neopl.union(dos) - retired}
+        return uris
 
     def _transform_data(self):
         """Get data from file and construct object for loading."""
-        ncit = owl.get_ontology(self._data_file.absolute().as_uri())
-        ncit.load()
-        uq_nodes = set()
-        uq_nodes = self._get_typed_nodes(uq_nodes, ncit)
-
-        for node in uq_nodes:
-            concept_id = f"{NamespacePrefix.NCIT.value}:{node.name}"
-            if node.P108:
-                label = node.P108.first()
+        ncit = owl.get_ontology(self._data_file.absolute().as_uri()).load()
+        disease_uris = self._get_typed_nodes()
+        for uri in disease_uris:
+            disease_class = ncit.search(iri=uri)
+            concept_id = f"{NamespacePrefix.NCIT.value}:{disease_class.name}"
+            if disease_class.P108:
+                label = disease_class.P108.first()
             else:
                 logger.warning(f"No label for concept {concept_id}")
                 continue
-            aliases = node.P90
+            aliases = disease_class.P90
             if aliases and label in aliases:
                 aliases.remove(label)
 
             xrefs = []
-            if node.P207:
+            if disease_class.P207:
                 xrefs.append(f"{NamespacePrefix.UMLS.value}:"
-                             f"{node.P207.first()}")
-            maps_to = node.P375
+                             f"{disease_class.P207.first()}")
+            maps_to = disease_class.P375
             if maps_to:
                 icdo_list = list(filter(lambda s: icdo_re.match(s), maps_to))
                 if len(icdo_list) == 1:
                     xrefs.append(f"{NamespacePrefix.ICDO.value}:"
                                  f"{icdo_list[0]}")
-            imdrf = node.hasDbXref
+            imdrf = disease_class.hasDbXref
             if imdrf:
                 xrefs.append(f"{NamespacePrefix.IMDRF.value}:"
                              f"{imdrf[0].split(':')[1]}")
