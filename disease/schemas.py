@@ -21,6 +21,7 @@ class SourceName(Enum):
 
     NCIT = "NCIt"
     MONDO = "Mondo"
+    DO = "DO"
 
 
 class SourceIDAfterNamespace(Enum):
@@ -28,6 +29,7 @@ class SourceIDAfterNamespace(Enum):
 
     NCIT = "C"
     MONDO = ""
+    DO = ""
 
 
 class NamespacePrefix(Enum):
