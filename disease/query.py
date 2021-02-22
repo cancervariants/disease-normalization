@@ -4,7 +4,7 @@ from typing import List, Dict, Set, Optional
 from uvicorn.config import logger
 from disease import NAMESPACE_LOOKUP, PREFIX_LOOKUP, SOURCES_LOWER_LOOKUP
 from disease.database import Database
-from disease.schemas import Disease, Meta, MatchType
+from disease.schemas import Disease, Meta, MatchType, SourceName
 from botocore.exceptions import ClientError
 
 
@@ -309,4 +309,115 @@ class QueryHandler:
         else:
             response = self._response_list(query_str, query_sources)
 
+        return response
+
+    def _add_merged_meta(self, response: Dict) -> Dict:
+        """Add source metadata to response object.
+        :param Dict response: in-progress response object
+        :return: completed resopnse object.
+        """
+        sources_meta = {}
+        for concept_id in response['record']['concept_ids']:
+            prefix = concept_id.split(':')[0]
+            src_name = PREFIX_LOOKUP[prefix]
+            if src_name not in sources_meta:
+                sources_meta[src_name] = self._fetch_meta(src_name)
+        response['meta_'] = sources_meta
+        return response
+
+    def _format_merged_record(self, merged_record: Dict) -> Dict:
+        """Transform merged record (as served by DB) into response object
+        format.
+        :param Dict merged_record: merged record as returned by DB call
+        :return: formatted record
+        """
+        del merged_record['label_and_type']
+        merged_record['concept_ids'] = merged_record['concept_id'].split('|')
+        del merged_record['concept_id']
+        return merged_record
+
+    def _add_merged_record(self, response: Dict, merge_ref: str) -> Dict:
+        """Add referenced concept ID group to response object.
+        :param Dict response: in-progress response object. Should have
+            match_type attribute filled in already.
+        :param str merge_ref: primary key for concept ID group lookup.
+        :return: completed response object.
+        """
+        merged_record = self.db.get_record_by_id(merge_ref, False, True)
+        if not merged_record:
+            logger.warning(f"Could not retrieve merged record for concept "
+                           f"ID group {merge_ref} "
+                           f"by way of query {response['query']}")
+            response['match_type'] = MatchType.NO_MATCH
+            return response
+        response['record'] = self._format_merged_record(merged_record)
+        response = self._add_merged_meta(response)
+        return response
+
+    def _record_order(self, record: Dict) -> (int, str):
+        """Construct priority order for matching. Only called by sort().
+        :param Dict record: individual record item in iterable to sort
+        :return: tuple with rank value and concept ID
+        """
+        # TODO reevaluate/update
+        src = record['src_name']
+        if src == SourceName.RXNORM.value:
+            source_rank = 1
+        elif src == SourceName.NCIT.value:
+            source_rank = 2
+        elif src == SourceName.CHEMIDPLUS.value:
+            source_rank = 3
+        else:
+            source_rank = 4
+        return (source_rank, record['concept_id'])
+
+    def search_groups(self, query_str: str) -> Dict:
+        """Return merged, normalized concept for given search term.
+        :param str query_str: string to search against
+        """
+        # prepare basic response
+        response = {
+            'query': query_str,
+            'warnings': self._emit_warnings(query_str),
+        }
+        if query_str == '':
+            response['match_type'] = MatchType.NO_MATCH
+            return response
+        query_str = query_str.lower()
+
+        # check merged concept ID match
+        record = self.db.get_record_by_id(query_str, case_sensitive=False,
+                                          merge=True)
+        if record:
+            response['match_type'] = MatchType.CONCEPT_ID
+            response['record'] = self._format_merged_record(record)
+            response = self._add_merged_meta(response)
+            return response
+
+        # check concept ID match
+        record = self.db.get_record_by_id(query_str, case_sensitive=False)
+        if record:
+            response['match_type'] = MatchType.CONCEPT_ID
+            response = self._add_merged_record(response, record['merge_ref'])
+            return response
+
+        # check other match types
+        for match_type in ['label', 'trade_name', 'alias']:
+            # get matches list for match tier
+            query_matches = self.db.get_records_by_type(query_str, match_type)
+            query_matches = [self.db.get_record_by_id(m['concept_id'], False)
+                             for m in query_matches]
+            query_matches.sort(key=self._record_order)
+
+            # attempt merge ref resolution until successful
+            for match in query_matches:
+                record = self.db.get_record_by_id(match['concept_id'], False)
+                if record:
+                    merge_ref = record['merge_ref']
+                    if merge_ref:
+                        response['match_type'] = MatchType[match_type.upper()]
+                        return self._add_merged_record(response, merge_ref)
+
+        if not query_matches:
+            response['match_type'] = MatchType.NO_MATCH
         return response
