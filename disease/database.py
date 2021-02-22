@@ -200,7 +200,7 @@ class Database:
 
         :param Dict record: record to upload
         """
-        id_prefix = record['concept_id'].split(':')[0]
+        id_prefix = record['concept_id'].split(':')[0].lower()
         record['src_name'] = PREFIX_LOOKUP[id_prefix]
         record['label_and_type'] = f'{record["concept_id"].lower()}##identity'
         try:
@@ -218,7 +218,7 @@ class Database:
         :param str ref_type: one of ('alias', 'label')
         """
         label_and_type = f'{term.lower()}##{ref_type}'
-        src_name = PREFIX_LOOKUP[concept_id.split(':')[0]]
+        src_name = PREFIX_LOOKUP[concept_id.split(':')[0].lower()]
         record = {
             'label_and_type': label_and_type,
             'concept_id': concept_id.lower(),
