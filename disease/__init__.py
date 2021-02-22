@@ -23,7 +23,7 @@ SOURCES_LOWER_LOOKUP = {name.value.lower(): name.value for name in
 
 # use to fetch source name from schema based on concept id namespace
 # e.g. {'ncit': 'NCIt'}
-PREFIX_LOOKUP = {v.value: SourceName[k].value
+PREFIX_LOOKUP = {v.value.lower(): SourceName[k].value
                  for k, v in NamespacePrefix.__members__.items()
                  if k in SourceName.__members__.keys()}
 
