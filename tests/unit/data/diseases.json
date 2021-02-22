@@ -242,12 +242,12 @@
       "orphanet:635",
       "umls:C0027819"
     ],
-    "src_name": "do"
+    "src_name": "DO"
   },
   {
     "label_and_type": "neuroblastoma##label",
     "concept_id": "DOID:769",
-    "src_name": "do"
+    "src_name": "DO"
   },
   {
     "label_and_type": "doid:5695##identity",
@@ -255,12 +255,12 @@
     "label": "pediatric liposarcoma",
     "other_identifiers": ["ncit:C8091"],
     "xrefs": ["umls:C0279984"],
-    "src_name": "do"
+    "src_name": "DO"
   },
   {
     "label_and_type": "pediatric liposarcoma##label",
     "concept_id": "DOID:5695",
-    "src_name": "do"
+    "src_name": "DO"
   },
   {
     "label_and_type": "doid:1703##identity",
@@ -269,16 +269,16 @@
     "aliases": ["Richter syndrome"],
     "other_identifiers": ["ncit:C35424"],
     "xrefs": ["umls:C0349631", "gard:7578", "icd10.cm:C91.1"],
-    "src_name": "do"
+    "src_name": "DO"
   },
   {
     "label_and_type": "richter's syndrome##label",
     "concept_id": "DOID:1703",
-    "src_name": "do"
+    "src_name": "DO"
   },
   {
     "label_and_type": "richter syndrome##alias",
     "concept_id": "DOID:1703",
-    "src_name": "do"
+    "src_name": "DO"
   }
 ]
