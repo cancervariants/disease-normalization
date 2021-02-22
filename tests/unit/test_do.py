@@ -84,9 +84,10 @@ def compare_records(actual_record: Dict, fixture_record: Dict):
 
 def test_concept_id_match(do, neuroblastoma, pediatric_liposarcoma, richter):
     """Test that concept ID search resolves to correct record"""
-    # import boto3
-    # from boto3.dynamodb.conditions import Key
-    # response = boto3.resource('dynamodb', endpoint_url="http://localhost:8000").Table('disease_concepts').query(KeyConditionExpression=Key('label_and_type').eq('doid:769##identity'))['Items'][0]  # noqa: E501
+    import boto3
+    from boto3.dynamodb.conditions import Key
+    response = boto3.resource('dynamodb', endpoint_url="http://localhost:8000").Table('disease_concepts').query(KeyConditionExpression=Key('label_and_type').eq('doid:769##identity'))['Items'][0]  # noqa: E501
+    print(response)
     response = do.search('DOID:769')
     print(response)
     assert response['match_type'] == MatchType.CONCEPT_ID
