@@ -1,24 +1,42 @@
 """Disease Ontology ETL module."""
 import logging
-from .base import Base
+from .base import OWLBase
 from pathlib import Path
-from disease import PROJECT_ROOT
-from disease.schemas import Meta, SourceName
+from disease import PROJECT_ROOT, PREFIX_LOOKUP
+from disease.schemas import Meta, SourceName, NamespacePrefix, Disease
 from disease.database import Database
 import requests
 from datetime import datetime
+import owlready2 as owl
+from typing import Dict
 
 
 logger = logging.getLogger('disease')
 logger.setLevel(logging.DEBUG)
 
+DO_PREFIX_LOOKUP = {
+    "EFO": NamespacePrefix.EFO.value,
+    "GARD": NamespacePrefix.GARD.value,
+    "ICDO": NamespacePrefix.ICDO.value,
+    "MESH": NamespacePrefix.MESH.value,
+    "NCI": NamespacePrefix.NCIT.value,
+    "ORDO": NamespacePrefix.ORPHANET.value,
+    "UMLS_CUI": NamespacePrefix.UMLS.value,
+    "ICD9CM": NamespacePrefix.ICD9CM.value,
+    "ICD10CM": NamespacePrefix.ICD10CM.value,
+    "OMIM": NamespacePrefix.OMIM.value,
+    "KEGG": NamespacePrefix.KEGG.value,
+    "MEDDRA": NamespacePrefix.MEDDRA.value,
+}
 
-class DO(Base):
+
+class DO(OWLBase):
     """Disease Ontology ETL class."""
 
     def __init__(self,
                  database: Database,
-                 src_url: str = "http://purl.obolibrary.org/obo/doid.owl",
+                 src_dload_page: str = "http://www.obofoundry.org/ontology/doid.html",  # noqa: E501
+                 src_url: str = "https://raw.githubusercontent.com/DiseaseOntology/HumanDiseaseOntology/master/src/ontology/doid-merged.obo",  # noqa: E501
                  data_path: Path = PROJECT_ROOT / 'data' / 'do'):
         """Override base class init method.
 
@@ -27,6 +45,7 @@ class DO(Base):
         :param pathlib.Path data_path: path to local DO data directory
         """
         self.database = database
+        self._SRC_DLOAD_PAGE = src_dload_page
         self._SRC_URL = src_url
         self._data_path = data_path
 
@@ -56,11 +75,12 @@ class DO(Base):
     def _extract_data(self):
         """Get DO source file."""
         self._data_path.mkdir(exist_ok=True, parents=True)
-        dir_files = list(self._data_path.iterdir())
+        dir_files = [f for f in self._data_path.iterdir()
+                     if f.name.startswith('do')]
         if len(dir_files) == 0:
             self._download_data()
             dir_files = list(self._data_path.iterdir())
-        self._data_file = sorted(dir_files)[-1]
+        self._data_file = sorted(dir_files, reverse=True)[0]
         self._version = self._data_file.stem.split('_')[1]
 
     def _load_meta(self):
@@ -69,7 +89,7 @@ class DO(Base):
             "data_license": "CC0 1.0",
             "data_license_url": "https://creativecommons.org/publicdomain/zero/1.0/legalcode",  # noqa: E501
             "version": self._version,
-            "data_url": self._SRC_URL,
+            "data_url": self._SRC_DLOAD_PAGE,
             "rdp_url": None,
             "data_license_attributes": {
                 "non_commercial": False,
@@ -80,3 +100,57 @@ class DO(Base):
         assert Meta(**metadata_params)
         metadata_params['src_name'] = SourceName.DO.value
         self.database.metadata.put_item(Item=metadata_params)
+
+    def _transform_data(self):
+        """Transform source data and send to loading method."""
+        do = owl.get_ontology("http://purl.obolibrary.org/obo/doid/doid-merged.owl").load()  # noqa: E501
+        disease_uri = 'http://purl.obolibrary.org/obo/DOID_4'
+        diseases = self._get_subclasses(disease_uri)
+        for uri in diseases:
+            disease_class = do.search(iri=uri)[0]
+            if disease_class.deprecated:
+                continue
+
+            concept_id = f"{NamespacePrefix.DO.value}:{uri.split('_')[-1]}"
+
+            synonyms = disease_class.hasExactSynonym
+            if synonyms:
+                aliases = list(set(synonyms))
+            else:
+                aliases = []
+
+            other_ids = []
+            xrefs = []
+            db_xrefs = set(disease_class.hasDbXref)
+            for other_id in db_xrefs:
+                prefix, id_no = other_id.split(':', 1)
+                normed_prefix = DO_PREFIX_LOOKUP.get(prefix, None)
+                if normed_prefix:
+                    other_id_no = f'{normed_prefix}:{id_no}'
+                    if normed_prefix in PREFIX_LOOKUP:
+                        other_ids.append(other_id_no)
+                    else:
+                        xrefs.append(other_id_no)
+
+            disease = {
+                "concept_id": concept_id,
+                "label": disease_class.label[0],
+                "aliases": aliases,
+                "other_identifiers": other_ids,
+                "xrefs": xrefs
+            }
+            assert Disease(**disease)
+            self._load_disease(disease)
+
+    def _load_disease(self, disease: Dict):
+        """Load individual disease record along with reference items.
+
+        :param Dict disease: disease record to load
+        """
+        # TODO add aliases
+        for key in ['other_identifiers', 'xrefs']:
+            if not disease[key]:
+                del disease[key]
+        self.database.add_ref_record(disease['label'], disease['concept_id'],
+                                     'label')
+        self.database.add_record(disease)
