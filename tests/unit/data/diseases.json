@@ -254,11 +254,31 @@
     "concept_id": "DOID:5695",
     "label": "pediatric liposarcoma",
     "other_identifiers": ["ncit:C8091"],
-    "xrefs": ["umls:C0279984"]
+    "xrefs": ["umls:C0279984"],
+    "src_name": "do"
   },
   {
     "label_and_type": "pediatric liposarcoma##label",
     "concept_id": "DOID:5695",
+    "src_name": "do"
+  },
+  {
+    "label_and_type": "doid:1703##identity",
+    "concept_id": "DOID:1703",
+    "label": "Richter's syndrome",
+    "aliases": ["Richter syndrome"],
+    "other_identifiers": ["ncit:C35424"],
+    "xrefs": ["umls:C0349631", "gard:7578", "icd10.cm:C91.1"],
+    "src_name": "do"
+  },
+  {
+    "label_and_type": "richter's syndrome##label",
+    "concept_id": "DOID:1703",
+    "src_name": "do"
+  },
+  {
+    "label_and_type": "richter syndrome##alias",
+    "concept_id": "DOID:1703",
     "src_name": "do"
   }
 ]
