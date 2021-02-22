@@ -54,7 +54,7 @@ class Mondo(OWLBase):
 
     def __init__(self,
                  database: Database,
-                 src_dload_page: str = "https://mondo.monarchinitiative.org/pages/download/",  # noqa F401
+                 src_dload_page: str = "https://mondo.monarchinitiative.org/pages/download/",  # noqa: E501
                  src_url: str = "http://purl.obolibrary.org/obo/mondo.owl",
                  version: str = "20210129",
                  data_path: Path = PROJECT_ROOT / 'data' / 'mondo'):
@@ -103,7 +103,7 @@ class Mondo(OWLBase):
     def _load_meta(self):
         """Load metadata"""
         metadata = Meta(data_license="CC BY 4.0",
-                        data_license_url="https://creativecommons.org/licenses/by/4.0/legalcode",  # noqa F401
+                        data_license_url="https://creativecommons.org/licenses/by/4.0/legalcode",  # noqa: E501
                         version=self._version,
                         data_url=self._SRC_DLOAD_PAGE,
                         rdp_url='http://reusabledata.org/monarch.html',
