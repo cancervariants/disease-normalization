@@ -253,6 +253,29 @@ class MatchesListed(BaseModel):
             }
 
 
+class MergedMatch(BaseModel):
+    """Represent merged concept in response to client."""
+
+    label: Optional[str]
+    concept_ids: List[str]
+    aliases: Optional[List[str]]
+    xrefs: Optional[List[str]]
+    pediatric: Optional[bool]
+
+    class Config:
+        """Enables orm_mode"""
+
+        @staticmethod
+        def schema_extra(schema: Dict[str, Any],
+                         model: Type['MergedMatch']) -> None:
+            """Configure OpenAPI schema"""
+            if 'title' in schema.keys():
+                schema.pop('title', None)
+            for prop in schema.get('properties', {}).values():
+                prop.pop('title', None)
+            schema['example'] = {}  # TODO
+
+
 class Service(BaseModel):
     """Core response schema containing matches for each source"""
 
@@ -305,3 +328,26 @@ class Service(BaseModel):
                     }
                 }]
             }
+
+
+class NormalizationService(BaseModel):
+    """Response containing one or more merged records and source data."""
+
+    query: str
+    warnings: Optional[Dict]
+    match_type: MatchType
+    record: Optional[MergedMatch]
+    meta_: Optional[Dict[SourceName, Meta]]
+
+    class Config:
+        """Enables orm_mode"""
+
+        @staticmethod
+        def schema_extra(schema: Dict[str, Any],
+                         model: Type['NormalizationService']) -> None:
+            """Configure OpenAPI schema"""
+            if 'title' in schema.keys():
+                schema.pop('title', None)
+            for prop in schema.get('properties', {}).values():
+                prop.pop('title', None)
+            schema['example'] = {}  # TODO
