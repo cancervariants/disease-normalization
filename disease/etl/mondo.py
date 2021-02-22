@@ -94,11 +94,12 @@ class Mondo(OWLBase):
     def _extract_data(self):
         """Get Mondo source file."""
         self._data_path.mkdir(exist_ok=True, parents=True)
-        dir_files = list(self._data_path.iterdir())
+        dir_files = [f for f in self._data_path.iterdir()
+                     if f.name.startswith('mondo')]
         if len(dir_files) == 0:
             self._download_data()
             dir_files = list(self._data_path.iterdir())
-        self._data_file = sorted(dir_files)[-1]
+        self._data_file = sorted(dir_files, reverse=True)[0]
 
     def _load_meta(self):
         """Load metadata"""
