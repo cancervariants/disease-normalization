@@ -147,10 +147,21 @@ class DO(OWLBase):
 
         :param Dict disease: disease record to load
         """
-        # TODO add aliases
+        concept_id = disease['concept_id']
+        aliases = disease['aliases']
+        if len({a.casefold() for a in aliases}) > 20:
+            logger.debug(f'{concept_id} has > 20 aliases')
+            del disease['aliases']
+        elif not aliases:
+            del disease['aliases']
+        else:
+            disease['aliases'] = list(set(aliases))
+            case_uq_aliases = {a.lower() for a in disease['aliases']}
+            for alias in case_uq_aliases:
+                self.database.add_ref_record(alias, concept_id, 'alias')
         for key in ['other_identifiers', 'xrefs']:
             if not disease[key]:
                 del disease[key]
-        self.database.add_ref_record(disease['label'], disease['concept_id'],
+        self.database.add_ref_record(disease['label'], concept_id,
                                      'label')
         self.database.add_record(disease)

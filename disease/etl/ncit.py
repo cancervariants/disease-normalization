@@ -160,7 +160,7 @@ class NCIt(OWLBase):
         if len({a.casefold() for a in aliases}) > 20:
             logger.debug(f'{concept_id} has > 20 aliases')
             del disease['aliases']
-        elif not disease['aliases']:
+        elif not aliases:
             del disease['aliases']
         else:
             disease['aliases'] = list(set(aliases))

@@ -124,7 +124,7 @@ def test_label_match(do, neuroblastoma, pediatric_liposarcoma):
 def test_alias_match(do, richter):
     """Test that alias searches resolve to correct records."""
     response = do.search('Richter Syndrome')
-    assert response['match_type'] == MatchType.LABEL
+    assert response['match_type'] == MatchType.ALIAS
     assert len(response['records']) == 1
     actual_disease = response['records'][0].dict()
     compare_records(actual_disease, richter)
