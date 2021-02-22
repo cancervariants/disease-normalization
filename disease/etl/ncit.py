@@ -106,15 +106,15 @@ class NCIt(OWLBase):
         dos = self._get_by_property_value(p106, "Disease or Syndrome")
         p310 = "http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#P106"
         retired = self._get_by_property_value(p310, "Retired_Concept")
-        uris = {neopl.union(dos) - retired}
+        uris = neopl.union(dos) - retired
         return uris
 
     def _transform_data(self):
         """Get data from file and construct object for loading."""
         ncit = owl.get_ontology(self._data_file.absolute().as_uri()).load()
-        disease_uris = self._get_typed_nodes()
+        disease_uris = self._get_disease_classes()
         for uri in disease_uris:
-            disease_class = ncit.search(iri=uri)
+            disease_class = ncit.search(iri=uri)[0]
             concept_id = f"{NamespacePrefix.NCIT.value}:{disease_class.name}"
             if disease_class.P108:
                 label = disease_class.P108.first()

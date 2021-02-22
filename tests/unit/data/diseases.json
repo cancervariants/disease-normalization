@@ -199,8 +199,8 @@
     "concept_id": "mondo:0003587",
     "label": "pediatric liposarcoma",
     "aliases": ["childhood liposarcoma", "liposarcoma"],
-    "other_identifiers": ["ncit:C8091"],
-    "xrefs": ["DOID:5695", "umls:C0279984"],
+    "other_identifiers": ["DOID:5695", "ncit:C8091"],
+    "xrefs": ["umls:C0279984"],
     "pediatric": true,
     "src_name": "Mondo"
   },

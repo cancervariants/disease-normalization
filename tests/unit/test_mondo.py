@@ -85,9 +85,8 @@ def pediatric_liposarcoma():
             "childhood liposarcoma",
             "liposarcoma"
         ],
-        "other_identifiers": ["ncit:C8091"],
+        "other_identifiers": ["DOID:5695", "ncit:C8091"],
         "xrefs": [
-            "DOID:5695",
             "umls:C0279984"
         ],
         "pediatric": True,

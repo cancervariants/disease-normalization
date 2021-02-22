@@ -15,37 +15,37 @@ logger.setLevel(logging.DEBUG)
 
 
 MONDO_PREFIX_LOOKUP = {
-    "NCIT": NamespacePrefix.NCIT,
-    "DOID": NamespacePrefix.DO,
-    "OGMS": NamespacePrefix.OGMS,
-    "Orphanet": NamespacePrefix.ORPHANET,
-    "MESH": NamespacePrefix.MESH,
-    "EFO": NamespacePrefix.EFO,
-    "UMLS": NamespacePrefix.UMLS,
-    "UMLS_CUI": NamespacePrefix.UMLS,
-    "ICD9": NamespacePrefix.ICD9,
-    "ICD9CM": NamespacePrefix.ICD9CM,
-    "ICD10": NamespacePrefix.ICD10,
-    "ICD10CM": NamespacePrefix.ICD10CM,
-    "ICDO": NamespacePrefix.ICDO,
-    "IDO": NamespacePrefix.IDO,
-    "GARD": NamespacePrefix.GARD,
-    "OMIM": NamespacePrefix.OMIM,
-    "OMIMPS": NamespacePrefix.OMIMPS,
-    "KEGG": NamespacePrefix.KEGG,
-    "COHD": NamespacePrefix.COHD,
-    "HPO": NamespacePrefix.HPO,
-    "NIFSTD": NamespacePrefix.NIFSTD,
-    "MF": NamespacePrefix.MF,
-    "HP": NamespacePrefix.HPO,
-    "MedDRA": NamespacePrefix.MEDDRA,
-    "MEDDRA": NamespacePrefix.MEDDRA,
-    "ONCOTREE": NamespacePrefix.ONCOTREE,
-    "Wikipedia": NamespacePrefix.WIKIPEDIA,
-    "Wikidata": NamespacePrefix.WIKIDATA,
-    "MEDGEN": NamespacePrefix.MEDGEN,
-    "MP": NamespacePrefix.MP,
-    "PATO": NamespacePrefix.PATO,
+    "NCIT": NamespacePrefix.NCIT.value,
+    "DOID": NamespacePrefix.DO.value,
+    "OGMS": NamespacePrefix.OGMS.value,
+    "Orphanet": NamespacePrefix.ORPHANET.value,
+    "MESH": NamespacePrefix.MESH.value,
+    "EFO": NamespacePrefix.EFO.value,
+    "UMLS": NamespacePrefix.UMLS.value,
+    "UMLS_CUI": NamespacePrefix.UMLS.value,
+    "ICD9": NamespacePrefix.ICD9.value,
+    "ICD9CM": NamespacePrefix.ICD9CM.value,
+    "ICD10": NamespacePrefix.ICD10.value,
+    "ICD10CM": NamespacePrefix.ICD10CM.value,
+    "ICDO": NamespacePrefix.ICDO.value,
+    "IDO": NamespacePrefix.IDO.value,
+    "GARD": NamespacePrefix.GARD.value,
+    "OMIM": NamespacePrefix.OMIM.value,
+    "OMIMPS": NamespacePrefix.OMIMPS.value,
+    "KEGG": NamespacePrefix.KEGG.value,
+    "COHD": NamespacePrefix.COHD.value,
+    "HPO": NamespacePrefix.HPO.value,
+    "NIFSTD": NamespacePrefix.NIFSTD.value,
+    "MF": NamespacePrefix.MF.value,
+    "HP": NamespacePrefix.HPO.value,
+    "MedDRA": NamespacePrefix.MEDDRA.value,
+    "MEDDRA": NamespacePrefix.MEDDRA.value,
+    "ONCOTREE": NamespacePrefix.ONCOTREE.value,
+    "Wikipedia": NamespacePrefix.WIKIPEDIA.value,
+    "Wikidata": NamespacePrefix.WIKIDATA.value,
+    "MEDGEN": NamespacePrefix.MEDGEN.value,
+    "MP": NamespacePrefix.MP.value,
+    "PATO": NamespacePrefix.PATO.value,
 }
 
 
@@ -119,8 +119,7 @@ class Mondo(OWLBase):
 
     def _transform_data(self):
         """Gather and transform disease entities."""
-        mondo = owl.get_ontology(self._data_file.absolute().as_uri())
-        mondo.load()
+        mondo = owl.get_ontology(self._data_file.absolute().as_uri()).load()
 
         # gather constants/search materials
         disease_root = "http://purl.obolibrary.org/obo/MONDO_0000001"
@@ -154,12 +153,12 @@ class Mondo(OWLBase):
                 normed_prefix = MONDO_PREFIX_LOOKUP.get(prefix, None)
                 if not normed_prefix:
                     continue
-                other_id = f'{normed_prefix.value}:{id_no}'
+                other_id = f'{normed_prefix}:{id_no}'
 
-                if normed_prefix.value in PREFIX_LOOKUP:
+                if normed_prefix.lower() in PREFIX_LOOKUP:
                     params['other_identifiers'].append(other_id)
                 elif normed_prefix == NamespacePrefix.KEGG:
-                    other_id = f'{normed_prefix.value}:H{id_no}'
+                    other_id = f'{normed_prefix}:H{id_no}'
                     params['xrefs'].append(other_id)
                 else:
                     params['xrefs'].append(other_id)
