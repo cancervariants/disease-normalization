@@ -7,7 +7,7 @@ from disease.schemas import Meta, SourceName, NamespacePrefix, Disease
 from pathlib import Path
 import requests
 import owlready2 as owl
-from typing import Dict
+from typing import Dict, List
 
 
 logger = logging.getLogger('disease')
@@ -72,12 +72,17 @@ class Mondo(OWLBase):
         self._SRC_URL = src_url
         self._version = version
         self._data_path = data_path
+        self._processed_ids = []
 
-    def perform_etl(self):
-        """Public-facing method to initiate ETL procedures on given data."""
+    def perform_etl(self) -> List[str]:
+        """Public-facing method to initiate ETL procedures on given data.
+
+        :return: List of concept IDs that were added.
+        """
         self._extract_data()
         self._load_meta()
         self._transform_data()
+        return self._processed_ids
 
     def _download_data(self):
         """Download Mondo thesaurus source file for loading into normalizer."""
@@ -167,17 +172,18 @@ class Mondo(OWLBase):
                     params['xrefs'].append(other_id)
 
             if disease.iri in peds_uris:
-                params['pediatric'] = True
+                params['pediatric_disease'] = True
             else:
                 conforms_to = disease.conformsTo
                 if conforms_to and adult_onset_pattern in conforms_to:
-                    params['pediatric'] = False
+                    params['pediatric_disease'] = False
 
             assert Disease(**params)  # check input validity
             self._load_disease(params)
 
     def _load_disease(self, disease: Dict):
-        """Load individual disease and associated references.
+        """Load individual disease and associated references. Stores disease
+        concept_id in `self._processed_ids` attribute.
 
         :param Dict disease: individual disease record to be loaded
         """
@@ -198,3 +204,4 @@ class Mondo(OWLBase):
 
         self.database.add_record(disease)
         self.database.add_ref_record(disease['label'], concept_id, 'label')
+        self._processed_ids.append(concept_id)

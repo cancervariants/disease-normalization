@@ -71,6 +71,13 @@ class NamespacePrefix(Enum):
     WIKIDATA = "wikidata"
 
 
+class SourcePriority(IntEnum):
+    """Define priorities for sources in building merged concepts."""
+
+    NCIT = 1
+    MONDO = 2
+
+
 class Disease(BaseModel):
     """Define disease record."""
 
@@ -79,7 +86,7 @@ class Disease(BaseModel):
     aliases: Optional[List[str]]
     other_identifiers: Optional[List[str]]
     xrefs: Optional[List[str]]
-    pediatric: Optional[bool]
+    pediatric_disease: Optional[bool]
 
     class Config:
         """Configure model."""
@@ -104,7 +111,7 @@ class Disease(BaseModel):
                 ],
                 "other_identifiers": [],
                 "xrefs": ["umls:C0019562"],
-                "pediatric": None,
+                "pediatric_disease": None,
             }
 
 
@@ -185,7 +192,7 @@ class MatchesKeyed(BaseModel):
                     ],
                     "other_identifiers": [],
                     "xrefs": ["umls:C0019562"],
-                    "pediatric": None,
+                    "pediatric_disease": None,
                 }],
                 "meta_": {
                     "data_license": "CC BY 4.0",
@@ -238,7 +245,7 @@ class MatchesListed(BaseModel):
                     ],
                     "other_identifiers": [],
                     "xrefs": ["umls:C0019562"],
-                    "pediatric": None
+                    "pediatric_disease": None
                 }],
                 "meta_": {
                     "data_license": "CC BY 4.0",
@@ -262,7 +269,7 @@ class MergedMatch(BaseModel):
     concept_ids: List[str]
     aliases: Optional[List[str]]
     xrefs: Optional[List[str]]
-    pediatric: Optional[bool]
+    pediatric_disease: Optional[bool]
 
     class Config:
         """Enables orm_mode"""
@@ -270,6 +277,29 @@ class MergedMatch(BaseModel):
         @staticmethod
         def schema_extra(schema: Dict[str, Any],
                          model: Type['MergedMatch']) -> None:
+            """Configure OpenAPI schema"""
+            if 'title' in schema.keys():
+                schema.pop('title', None)
+            for prop in schema.get('properties', {}).values():
+                prop.pop('title', None)
+            schema['example'] = {}  # TODO
+
+
+class NormalizationService(BaseModel):
+    """Response containing one or more merged records and source data."""
+
+    query: str
+    warnings: Optional[Dict]
+    match_type: MatchType
+    record: Optional[MergedMatch]
+    meta_: Optional[Dict[SourceName, Meta]]
+
+    class Config:
+        """Enables orm_mode"""
+
+        @staticmethod
+        def schema_extra(schema: Dict[str, Any],
+                         model: Type['NormalizationService']) -> None:
             """Configure OpenAPI schema"""
             if 'title' in schema.keys():
                 schema.pop('title', None)
@@ -314,7 +344,7 @@ class Service(BaseModel):
                         ],
                         "other_identifiers": [],
                         "xrefs": ["umls:C0019562"],
-                        "pediatric": None,
+                        "pediatric_disease": None,
                     }],
                     "meta_": {
                         "data_license": "CC BY 4.0",
@@ -330,26 +360,3 @@ class Service(BaseModel):
                     }
                 }]
             }
-
-
-class NormalizationService(BaseModel):
-    """Response containing one or more merged records and source data."""
-
-    query: str
-    warnings: Optional[Dict]
-    match_type: MatchType
-    record: Optional[MergedMatch]
-    meta_: Optional[Dict[SourceName, Meta]]
-
-    class Config:
-        """Enables orm_mode"""
-
-        @staticmethod
-        def schema_extra(schema: Dict[str, Any],
-                         model: Type['NormalizationService']) -> None:
-            """Configure OpenAPI schema"""
-            if 'title' in schema.keys():
-                schema.pop('title', None)
-            for prop in schema.get('properties', {}).values():
-                prop.pop('title', None)
-            schema['example'] = {}  # TODO
