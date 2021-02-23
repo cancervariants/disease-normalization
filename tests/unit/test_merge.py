@@ -51,5 +51,33 @@ def compare_merged_records(actual_record: Dict, fixture_record: Dict):
 def neuroblastoma():
     """Create neuroblastoma fixture."""
     return {
-        "label_and_type": "mondo:0005072|"
+        "label_and_type": "mondo:0005072|ncit:c3270|doid:769##merger",
+        "concept_id": "mondo:0005072|ncit:C3270|DOID:769##merger",
+        "label": "Neuroblastoma",
+        "aliases": [
+            "neuroblastoma",
+            "Neural Crest Tumor, Malignant",
+            "Neuroblastoma (Schwannian Stroma-poor)",
+            "Neuroblastoma (Schwannian Stroma-Poor)",
+            "Neuroblastoma, NOS",
+            "NEUROBLASTOMA, MALIGNANT",
+            "Neuroblastoma (NBL)"
+            "neural Crest tumor, malignant",
+            "neuroblastoma, malignant"
+        ],
+        "xrefs": [
+            "umls:C0027819",
+            "icd.o:9500/3"
+            "efo:0000621",
+            "gard:0007185",
+            "icd:C74.9",
+            "icd.o:9500/3",
+            "mesh:D009447",
+            "meddra:10029260",
+            "nifstd:birnlex_12631",
+            "oncotree:NBL",
+            "orphanet:635",
+            "umls:CN205405"
+        ],
+        "pediatric": None
     }

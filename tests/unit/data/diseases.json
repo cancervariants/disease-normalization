@@ -210,6 +210,16 @@
     "src_name": "Mondo"
   },
   {
+    "label_and_type": "liposarcoma##alias",
+    "concept_id": "mondo:0003587",
+    "src_name": "Mondo"
+  },
+  {
+    "label_and_type": "childhood liposarcoma##alias",
+    "concept_id": "mondo:0003587",
+    "src_name": "Mondo"
+  },
+  {
     "label_and_type": "mondo:0004099##identity",
     "concept_id": "mondo:0004099",
     "label": "adult cystic teratoma",
@@ -279,6 +289,164 @@
   {
     "label_and_type": "richter syndrome##alias",
     "concept_id": "DOID:1703",
+    "src_name": "DO"
+  },
+  {
+    "label_and_type": "mondo:0005233##identity",
+    "concept_id": "mondo:0005233",
+    "label": "non-small cell lung carcinoma",
+    "aliases": [
+      "NSCLC - non-small cell lung cancer",
+      "non-small cell lung carcinoma",
+      "non-small cell carcinoma of lung",
+      "non-small cell carcinoma of the lung",
+      "non-small cell cancer of lung",
+      "non-small cell lung cancer",
+      "non-small cell cancer of the lung",
+      "NSCLC"
+    ],
+    "other_identifiers": ["ncit:C2926", "DOID:3908"],
+    "xrefs": [
+      "mesh:D002289",
+      "umls:C0007131",
+      "oncotree:NSCLC",
+      "efo:0003060",
+      "icd10:C34",
+      "kegg.disease:05223",
+      "HP:0030358"
+    ],
+    "src_name": "Mondo"
+  },
+  {
+    "label_and_type": "non-small cell lung carcinoma##label",
+    "concept_id": "mondo:0005233",
+    "src_name": "Mondo"
+  },
+  {
+    "label_and_type": "nsclc - non-small cell lung cancer##alias",
+    "concept_id": "mondo:0005233",
+    "src_name": "Mondo"
+  },
+  {
+    "label_and_type": "non-small cell lung carcinoma##alias",
+    "concept_id": "mondo:0005233",
+    "src_name": "Mondo"
+  },
+  {
+    "label_and_type": "non-small cell carcinoma of lung##alias",
+    "concept_id": "mondo:0005233",
+    "src_name": "Mondo"
+  },
+  {
+    "label_and_type": "non-small cell carcinoma of the lung##alias",
+    "concept_id": "mondo:0005233",
+    "src_name": "Mondo"
+  },
+  {
+    "label_and_type": "non-small cell cancer of lung##alias",
+    "concept_id": "mondo:0005233",
+    "src_name": "Mondo"
+  },
+  {
+    "label_and_type": "non-small cell lung cancer##alias",
+    "concept_id": "mondo:0005233",
+    "src_name": "Mondo"
+  },
+  {
+    "label_and_type": "non-small cell cancer of the lung##alias",
+    "concept_id": "mondo:0005233",
+    "src_name": "Mondo"
+  },
+  {
+    "label_and_type": "ncit:c35424##identity",
+    "concept_id": "ncit:C35424",
+    "label": "Richter Syndrome",
+    "aliases": [
+      "Richter's Syndrome",
+      "Richter syndrome",
+      "Richter transformation",
+      "Richter's Transformation"
+    ],
+    "xrefs": ["umls:C0349631"],
+    "src_name": "NCIt"
+  },
+  {
+    "label_and_type": "richter syndrome##label",
+    "concept_id": "ncit:C35424",
+    "src_name": "NCIt"
+  },
+  {
+    "label_and_type": "richter's syndrome##alias",
+    "concept_id": "ncit:C35424",
+    "src_name": "NCIt"
+  },
+  {
+    "label_and_type": "richter syndrome##alias",
+    "concept_id": "ncit:C35424",
+    "src_name": "NCIt"
+  },
+  {
+    "label_and_type": "richter transformation##alias",
+    "concept_id": "ncit:C35424",
+    "src_name": "NCIt"
+  },
+  {
+    "label_and_type": "richter's transformation##alias",
+    "concept_id": "ncit:C35424",
+    "src_name": "NCIt"
+  },
+  {
+    "label_and_type": "ncit:c8091##identity",
+    "label": "Childhood Liposarcoma",
+    "concept_id": "ncit:C8091",
+    "aliases": ["Liposarcoma", "Pediatric Liposarcoma"],
+    "xrefs": ["umls:C0279984"],
+    "src_name": "NCIt"
+  },
+  {
+    "label_and_type": "childhood liposarcoma##label",
+    "concept_id": "ncit:C8091",
+    "src_name": "NCIt"
+  },
+  {
+    "label_and_type": "liposarcoma##alias",
+    "concept_id": "ncit:C8091",
+    "src_name": "NCIt"
+  },
+  {
+    "label_and_type": "peidatric liposarcoma##alias",
+    "concept_id": "ncit:C8091",
+    "src_name": "NCIt"
+  },
+  {
+    "label_and_type": "ncit:c9012##identity",
+    "label": "Adult Cystic Teratoma",
+    "concept_id": "ncit:C9012",
+    "aliases": ["Adult cystic teratoma"],
+    "xrefs": ["icd.o:9080/0"],
+    "src_name": "NCIt"
+  },
+  {
+    "label_and_type": "adult cystic teratoma##label",
+    "concept_id": "ncit:C9012",
+    "src_name": "NCIt"
+  },
+  {
+    "label_and_type": "adult cystic teratoma##alias",
+    "concept_id": "ncit:C9012",
+    "src_name": "NCIt"
+  },
+  {
+    "label_and_type": "doid:7079##identity",
+    "label": "adult cystic teratoma",
+    "concept_id": "DOID:7079",
+    "other_identifiers": ["ncit:C9012"],
+    "xrefs": ["umls:C1368888"],
+    "src_name": "DO"
+  },
+  {
+    "label_and_type": "adult cystic teratoma##label",
+    "concept_id": "DOID:769",
     "src_name": "DO"
   }
 ]
