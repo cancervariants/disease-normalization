@@ -201,7 +201,7 @@
     "aliases": ["childhood liposarcoma", "liposarcoma"],
     "other_identifiers": ["ncit:C8091"],
     "xrefs": ["DOID:5695", "umls:C0279984"],
-    "pediatric": true,
+    "pediatric_disease": true,
     "src_name": "Mondo"
   },
   {
@@ -226,7 +226,7 @@
     "aliases": ["cystic teratoma of adults"],
     "other_identifiers": ["ncit:C9012"],
     "xrefs": ["umls:C1368888", "DOID:7079"],
-    "pediatric": false,
+    "pediatric_disease": false,
     "src_name": "Mondo"
   },
   {

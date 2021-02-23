@@ -46,7 +46,7 @@ def neuroblastoma():
             "oncotree:NBL",
             "mesh:D009447"
         ],
-        "pediatric": None,
+        "pediatric_disease": None,
     }
 
 
@@ -68,7 +68,7 @@ def richter_syndrome():
             "gard:0007578",
             "DOID:1703"
         ],
-        "pediatric": None,
+        "pediatric_disease": None,
     }
 
 
@@ -89,7 +89,7 @@ def pediatric_liposarcoma():
             "DOID:5695",
             "umls:C0279984"
         ],
-        "pediatric": True,
+        "pediatric_disease": True,
     }
 
 
@@ -104,7 +104,7 @@ def cystic_teratoma_adult():
         "aliases": ["cystic teratoma of adults"],
         "other_identifiers": ["ncit:C9012"],
         "xrefs": ["umls:C1368888", "DOID:7079"],
-        "pediatric": False,
+        "pediatric_disease": False,
     }
 
 
@@ -123,7 +123,8 @@ def compare_records(actual_record: Dict, fixture_record: Dict):
     assert ('xrefs' in actual_record) == ('xrefs' in fixture_record)
     if 'xrefs' in actual_record or 'xrefs' in fixture_record:
         assert set(actual_record['xrefs']) == set(fixture_record['xrefs'])
-    assert actual_record['pediatric'] is fixture_record['pediatric']
+    assert actual_record['pediatric_disease'] is \
+        fixture_record['pediatric_disease']
 
 
 def test_concept_id_match(mondo, neuroblastoma, richter_syndrome,
