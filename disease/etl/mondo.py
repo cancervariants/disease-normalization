@@ -23,6 +23,7 @@ MONDO_PREFIX_LOOKUP = {
     "EFO": NamespacePrefix.EFO,
     "GARD": NamespacePrefix.GARD,
     "HP": NamespacePrefix.HPO,
+    "HPO": NamespacePrefix.HPO,
     "ICD9": NamespacePrefix.ICD9,
     "ICD9CM": NamespacePrefix.ICD9CM,
     "ICD10": NamespacePrefix.ICD10,
@@ -30,7 +31,6 @@ MONDO_PREFIX_LOOKUP = {
     "ICDO": NamespacePrefix.ICDO,
     "IDO": NamespacePrefix.IDO,
     "KEGG": NamespacePrefix.KEGG,
-    "HPO": NamespacePrefix.HPO,
     "MedDRA": NamespacePrefix.MEDDRA,
     "MEDDRA": NamespacePrefix.MEDDRA,
     "MEDGEN": NamespacePrefix.MEDGEN,
@@ -126,8 +126,7 @@ class Mondo(OWLBase):
 
     def _transform_data(self):
         """Gather and transform disease entities."""
-        mondo = owl.get_ontology(self._data_file.absolute().as_uri())
-        mondo.load()
+        mondo = owl.get_ontology(self._data_file.absolute().as_uri()).load()
 
         # gather constants/search materials
         disease_root = "http://purl.obolibrary.org/obo/MONDO_0000001"
@@ -161,12 +160,12 @@ class Mondo(OWLBase):
                 normed_prefix = MONDO_PREFIX_LOOKUP.get(prefix, None)
                 if not normed_prefix:
                     continue
-                other_id = f'{normed_prefix.value}:{id_no}'
+                other_id = f'{normed_prefix}:{id_no}'
 
-                if normed_prefix.value in PREFIX_LOOKUP:
+                if normed_prefix.lower() in PREFIX_LOOKUP:
                     params['other_identifiers'].append(other_id)
                 elif normed_prefix == NamespacePrefix.KEGG:
-                    other_id = f'{normed_prefix.value}:H{id_no}'
+                    other_id = f'{normed_prefix}:H{id_no}'
                     params['xrefs'].append(other_id)
                 else:
                     params['xrefs'].append(other_id)

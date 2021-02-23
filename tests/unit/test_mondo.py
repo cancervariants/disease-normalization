@@ -31,12 +31,14 @@ def neuroblastoma():
             "neuroblastoma (Schwannian Stroma-poor)",
             "neuroblastoma, malignant"
         ],
-        "other_identifiers": ["ncit:C3270"],
+        "other_identifiers": [
+            "ncit:C3270",
+            "DOID:769",
+        ],
         "xrefs": [
             "orphanet:635",
             "nifstd:birnlex_12631",
             "umls:C0027819",
-            "DOID:769",
             "gard:0007185",
             "meddra:10029260",
             "icd.o:9500/3",
@@ -61,12 +63,11 @@ def richter_syndrome():
             "Richter transformation",
             "Richter's transformation"
         ],
-        "other_identifiers": ["ncit:C35424"],
+        "other_identifiers": ["ncit:C35424", "DOID:1703"],
         "xrefs": [
             "icd:C91.1",
             "umls:C0349631",
             "gard:0007578",
-            "DOID:1703"
         ],
         "pediatric_disease": None,
     }
@@ -84,9 +85,8 @@ def pediatric_liposarcoma():
             "childhood liposarcoma",
             "liposarcoma"
         ],
-        "other_identifiers": ["ncit:C8091"],
+        "other_identifiers": ["DOID:5695", "ncit:C8091"],
         "xrefs": [
-            "DOID:5695",
             "umls:C0279984"
         ],
         "pediatric_disease": True,
@@ -102,9 +102,9 @@ def cystic_teratoma_adult():
         "concept_id": "mondo:0004099",
         "label": "adult cystic teratoma",
         "aliases": ["cystic teratoma of adults"],
-        "other_identifiers": ["ncit:C9012"],
-        "xrefs": ["umls:C1368888", "DOID:7079"],
         "pediatric_disease": False,
+        "other_identifiers": ["ncit:C9012", "DOID:7079"],
+        "xrefs": ["umls:C1368888"],
     }
 
 

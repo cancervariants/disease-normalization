@@ -127,7 +127,7 @@ class DO(OWLBase):
                 normed_prefix = DO_PREFIX_LOOKUP.get(prefix, None)
                 if normed_prefix:
                     other_id_no = f'{normed_prefix}:{id_no}'
-                    if normed_prefix in PREFIX_LOOKUP:
+                    if normed_prefix.lower() in PREFIX_LOOKUP:
                         other_ids.append(other_id_no)
                     else:
                         xrefs.append(other_id_no)
