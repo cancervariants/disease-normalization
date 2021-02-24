@@ -108,15 +108,22 @@ class Database:
                             'WriteCapacityUnits': 10
                         }
                     },
-                    # {
-                    #     'IndexName': 'type_index',
-                    #     'KeySchema': [
-                    #         {
-                    #             'AttributeName'
-
-                    #         }]
-
-                    # }
+                    {
+                        'IndexName': 'type_index',
+                        'KeySchema': [
+                            {
+                                'AttributeName': 'item_type',
+                                'KeyType': 'HASH'
+                            }
+                        ],
+                        'Projection': {
+                            'ProjectionType': 'KEYS_ONLY'
+                        },
+                        'ProvisionedThroughput': {
+                            'ReadCapacityUnits': 10,
+                            'WriteCapacityUnits': 10
+                        }
+                    }
                 ],
                 ProvisionedThroughput={
                     'ReadCapacityUnits': 10,
@@ -239,6 +246,7 @@ class Database:
         record['src_name'] = PREFIX_LOOKUP[id_prefix]
         label_and_type = f'{record["concept_id"].lower()}##{record_type}'
         record['label_and_type'] = label_and_type
+        record['item_type'] = record_type
         try:
             self.batch.put_item(Item=record)
         except ClientError as e:
@@ -259,6 +267,7 @@ class Database:
             'label_and_type': label_and_type,
             'concept_id': concept_id.lower(),
             'src_name': src_name,
+            'item_type': ref_type,
         }
         try:
             self.batch.put_item(Item=record)
