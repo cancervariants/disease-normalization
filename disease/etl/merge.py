@@ -1,7 +1,7 @@
 """Create concept groups and merged records."""
 from disease.database import Database
 from disease.schemas import SourcePriority
-from typing import Set, Dict
+from typing import Set, Dict, List
 import logging
 from timeit import default_timer as timer
 
@@ -59,26 +59,22 @@ class Merge:
         start = timer()
         for record_id, group in self._groups:
             try:
-                merged_record = self._generate_merged_record(group)
+                merged_record, merged_ids = self._generate_merged_record(group)
             except AttributeError:
                 logger.error("`create_merged_concepts` received invalid group:"
                              f"{group} for concept {record_id}")
                 continue
             self._database.add_record(merged_record, 'merger')
             merge_ref = merged_record['concept_id'].lower()
-            try:
-                concept_ids = merged_record['concept_ids']
-            except KeyError:
-                logger.error(f"Could not access concept IDs in merged record "
-                             f"{merged_record} from group {group}")
-            for concept_id in concept_ids:
+
+            for concept_id in merged_ids:
                 self._database.update_record(concept_id, 'merge_ref',
                                              merge_ref)
         end = timer()
         logger.info("merged concept generation successful.")
         logger.debug(f'Generated and added concepts in {end - start} seconds)')
 
-    def _generate_merged_record(self, record_id_set: Set[str]) -> Dict:
+    def _generate_merged_record(self, record_id_set: Set[str]) -> (Dict, List):
         """Generate merged record from provided concept ID group.
         Where attributes are sets, they should be merged, and where they are
         scalars, assign from the highest-priority source where that attribute
@@ -89,10 +85,12 @@ class Merge:
         :return: completed merged drug object to be stored in DB
         """
         records = []
+        final_ids = []
         for record_id in record_id_set:
             record = self._database.get_record_by_id(record_id)
             if record:
                 records.append(record)
+                final_ids.append(record['concept_id'])
             else:
                 logger.error(f"generate_merged_record could not retrieve "
                              f"record for {record_id} in {record_id_set}")
@@ -133,4 +131,4 @@ class Merge:
 
         merged_properties['label_and_type'] = \
             f'{merged_properties["concept_id"].lower()}##merger'
-        return merged_properties
+        return (merged_properties, final_ids)

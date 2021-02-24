@@ -107,7 +107,16 @@ class Database:
                             'ReadCapacityUnits': 10,
                             'WriteCapacityUnits': 10
                         }
-                    }
+                    },
+                    # {
+                    #     'IndexName': 'type_index',
+                    #     'KeySchema': [
+                    #         {
+                    #             'AttributeName'
+
+                    #         }]
+
+                    # }
                 ],
                 ProvisionedThroughput={
                     'ReadCapacityUnits': 10,

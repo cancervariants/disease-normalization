@@ -101,6 +101,7 @@ class CLI:
             click.echo("Generating merged concepts...")
             merge = Merge(database=db)
             merge.create_merged_concepts(processed_ids)
+            click.echo("Merged concept generation complete.")
 
     def _delete_data(self, source, database):
         # Delete source's metadata
