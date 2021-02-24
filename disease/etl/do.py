@@ -118,10 +118,11 @@ class DO(OWLBase):
                 continue
 
             concept_id = f"{NamespacePrefix.DO.value}:{uri.split('_')[-1]}"
+            label = disease_class.label[0]
 
             synonyms = disease_class.hasExactSynonym
             if synonyms:
-                aliases = list(set(synonyms))
+                aliases = list({s for s in synonyms if s != label})
             else:
                 aliases = []
 
@@ -140,7 +141,7 @@ class DO(OWLBase):
 
             disease = {
                 "concept_id": concept_id,
-                "label": disease_class.label[0],
+                "label": label,
                 "aliases": aliases,
                 "other_identifiers": other_ids,
                 "xrefs": xrefs
