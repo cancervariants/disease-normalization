@@ -402,7 +402,7 @@ class QueryHandler:
             return response
 
         # check other match types
-        for match_type in ['label', 'trade_name', 'alias']:
+        for match_type in ['label', 'alias']:
             # get matches list for match tier
             query_matches = self.db.get_records_by_type(query_str, match_type)
             query_matches = [self.db.get_record_by_id(m['concept_id'], False)

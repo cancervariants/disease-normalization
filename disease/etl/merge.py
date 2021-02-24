@@ -28,11 +28,19 @@ class Merge:
         :param Set[str] record_ids: concept identifiers from which groups
             should be generated.
         """
+        if None in record_ids:
+            logger.error("`create_merged_concepts` received Nonetype instance "
+                         "in record_ids")
         # build groups
         logger.info(f'Generating record ID sets from {len(record_ids)} records')  # noqa E501
         start = timer()
         for concept_id in record_ids:
-            record = self._database.get_record_by_id(concept_id)
+            try:
+                record = self._database.get_record_by_id(concept_id)
+            except AttributeError:
+                logger.error(f"`create_merged_concepts` received invalid "
+                             f"concept ID: {concept_id}")
+                continue
             if not record:
                 logger.error(f"generate_merged_concepts couldn't find "
                              f"{concept_id}")

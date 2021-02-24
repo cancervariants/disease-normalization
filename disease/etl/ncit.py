@@ -8,7 +8,7 @@ from pathlib import Path
 import requests
 import zipfile
 from os import remove, rename
-from typing import Set, Dict
+from typing import Set, Dict, List
 import owlready2 as owl
 from owlready2.entity import ThingClass
 import re
@@ -40,7 +40,7 @@ class NCIt(OWLBase):
         self._SRC_FNAME = src_fname
         self._data_path = data_path
 
-    def perform_etl(self) -> Set[str]:
+    def perform_etl(self) -> List[str]:
         """Public-facing method to initiate ETL procedures on given data.
 
         :return: empty set (because NCIt IDs shouldn't be used to construct
@@ -50,7 +50,7 @@ class NCIt(OWLBase):
         self._load_meta()
         self._transform_data()
         self.database.flush_batch()
-        return set()
+        return []
 
     def _download_data(self):
         """Download NCI thesaurus source file for loading into normalizer."""

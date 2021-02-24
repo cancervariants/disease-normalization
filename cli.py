@@ -76,7 +76,7 @@ class CLI:
 
     def _update_normalizers(self, normalizers, db, update_merged):
         """Update selected normalizer sources."""
-        processed_ids = set()
+        processed_ids = []
         for n in normalizers:
             click.echo(f"\nDeleting {n}...")
             start_delete = timer()
@@ -97,10 +97,10 @@ class CLI:
             click.echo(f"Loaded {n} in {load_time:.5f} seconds.")
             click.echo(f"Total time for {n}: "
                        f"{(delete_time + load_time):.5f} seconds.")
-            if update_merged and processed_ids:
-                click.echo("Generating merged concepts...")
-                merge = Merge(database=db)
-                merge.create_merged_concepts(processed_ids)
+        if update_merged and processed_ids:
+            click.echo("Generating merged concepts...")
+            merge = Merge(database=db)
+            merge.create_merged_concepts(processed_ids)
 
     def _delete_data(self, source, database):
         # Delete source's metadata

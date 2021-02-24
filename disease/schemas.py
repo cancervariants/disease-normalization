@@ -76,6 +76,7 @@ class SourcePriority(IntEnum):
 
     NCIT = 1
     MONDO = 2
+    DO = 3
 
 
 class Disease(BaseModel):

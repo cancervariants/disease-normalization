@@ -208,7 +208,4 @@ class Mondo(OWLBase):
 
         self.database.add_record(disease)
         self.database.add_ref_record(disease['label'], concept_id, 'label')
-        if concept_id:
-            self._processed_ids.append(concept_id)
-        else:
-            logger.error(f"Weird stuf going on w/ {concept_id}")
+        self._processed_ids.append(concept_id)

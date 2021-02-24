@@ -8,7 +8,7 @@ from disease.database import Database
 import requests
 from datetime import datetime
 import owlready2 as owl
-from typing import Dict, Set
+from typing import Dict, List
 
 
 logger = logging.getLogger('disease')
@@ -49,7 +49,7 @@ class DO(OWLBase):
         self._SRC_URL = src_url
         self._data_path = data_path
 
-    def perform_etl(self) -> Set[str]:
+    def perform_etl(self) -> List[str]:
         """Public-facing method to initiate ETL procedures on given data.
 
         :return: empty set (because NCIt IDs shouldn't be used to construct
@@ -59,7 +59,7 @@ class DO(OWLBase):
         self._load_meta()
         self._transform_data()
         self.database.flush_batch()
-        return set()
+        return []
 
     def _download_data(self):
         """Download DO source file."""
