@@ -207,7 +207,7 @@ class Database:
         :return: complete merged record if lookup successful, None otherwise
         """
         try:
-            match = self.therapies.get_item(Key={
+            match = self.diseases.get_item(Key={
                 'label_and_type': merge_ref.lower(),
                 'concept_id': merge_ref
             })
@@ -270,13 +270,13 @@ class Database:
         update_expression = f"set {field}=:r"
         update_values = {':r': new_value}
         try:
-            self.therapies.update_item(Key=key,
-                                       UpdateExpression=update_expression,
-                                       ExpressionAttributeValues=update_values)
+            self.diseases.update_item(Key=key,
+                                      UpdateExpression=update_expression,
+                                      ExpressionAttributeValues=update_values)
         except ClientError as e:
             logger.error(e.response['Error']['Message'])
 
     def flush_batch(self):
         """Flush internal batch_writer."""
-        self.batch.__exit__()
+        self.batch.__exit__(*sys.exc_info())
         self.batch = self.diseases.batch_writer()
