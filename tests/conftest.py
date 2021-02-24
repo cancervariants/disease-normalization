@@ -16,6 +16,7 @@ def mock_database():
         def __init__(self):
             """Initialize mock database object. This class's method's shadow the
             actual Database class methods.
+
             `self.records` loads preexisting DB items.
             `self.added_records` stores add record requests, with the
             concept_id as the key and the complete record as the value.
@@ -72,6 +73,7 @@ def mock_database():
         def get_records_by_type(self, query: str,
                                 match_type: str) -> List[Dict]:
             """Retrieve records for given query and match type.
+
             :param query: string to match against
             :param str match_type: type of match to look for. Should be one
                 of "alias" or "label" (use get_record_by_id for
@@ -88,6 +90,7 @@ def mock_database():
 
         def get_merged_record(self, merge_ref) -> Optional[Dict]:
             """Fetch merged record from given reference.
+
             :param str merge_ref: key for merged record, formated as a string
                 of grouped concept IDs separated by vertical bars, ending with
                 `##merger`. Must be correctly-cased.
@@ -103,6 +106,7 @@ def mock_database():
 
         def add_record(self, record: Dict, record_type: str):
             """Store add record request sent to database.
+
             :param Dict record: record (of any type) to upload. Must include
                 `concept_id` key. If record is of the `identity` type, the
                 concept_id must be correctly-cased.
@@ -113,6 +117,7 @@ def mock_database():
         def update_record(self, concept_id: str, attribute: str,
                           new_value: Any):
             """Store update request sent to database.
+
             :param str concept_id: record to update
             :param str field: name of field to update
             :parm str new_value: new value
