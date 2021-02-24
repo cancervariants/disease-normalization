@@ -1,6 +1,6 @@
 """Main application for FastAPI"""
 from disease.query import QueryHandler, InvalidParameterException
-from disease.schemas import Service
+from disease.schemas import Service, NormalizationService
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.openapi.utils import get_openapi
 import html
@@ -70,6 +70,31 @@ def search(q: str = Query(..., description=q_descr),
     try:
         response = query_handler.search_sources(html.unescape(q), keyed=keyed,
                                                 incl=incl, excl=excl)
+    except InvalidParameterException as e:
+        raise HTTPException(status_code=422, detail=str(e))
+    return response
+
+
+merged_matches_summary = "Given query, provide normalized record."
+merged_response_descr = "A response to a validly-formed query."
+merged_q_descr = "Disease to normalize."
+normalize_description = ("Return merged strongest-match concept for query "
+                         "string provided by user.")
+
+
+@app.get("/disease/normalize",
+         summary=merged_matches_summary,
+         operation_id="getQuerymergedResponse",
+         response_description=merged_response_descr,
+         response_model=NormalizationService,
+         description=normalize_description)
+def normalize(q: str = Query(..., description=merged_q_descr)):
+    """Return strongest-match normalized concept for query string provided by
+    user.
+    :param q: therapy search term
+    """
+    try:
+        response = query_handler.search_groups(q)
     except InvalidParameterException as e:
         raise HTTPException(status_code=422, detail=str(e))
     return response
