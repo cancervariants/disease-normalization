@@ -319,7 +319,7 @@ class QueryHandler:
         sources_meta = {}
         for concept_id in response['record']['concept_ids']:
             prefix = concept_id.split(':')[0]
-            src_name = PREFIX_LOOKUP[prefix]
+            src_name = PREFIX_LOOKUP[prefix.lower()]
             if src_name not in sources_meta:
                 sources_meta[src_name] = self._fetch_meta(src_name)
         response['meta_'] = sources_meta
@@ -361,14 +361,15 @@ class QueryHandler:
         """
         # TODO reevaluate/update
         src = record['src_name']
-        if src == SourceName.RXNORM.value:
+        if src == SourceName.NCIT.value:
             source_rank = 1
-        elif src == SourceName.NCIT.value:
+        elif src == SourceName.MONDO.value:
             source_rank = 2
-        elif src == SourceName.CHEMIDPLUS.value:
+        elif src == SourceName.DO.value:
             source_rank = 3
         else:
-            source_rank = 4
+            logger.warning(f"query.record_order: Invalid source name for "
+                           f"{record}")
         return (source_rank, record['concept_id'])
 
     def search_groups(self, query_str: str) -> Dict:
