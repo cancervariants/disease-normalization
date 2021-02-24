@@ -49,7 +49,7 @@ class Merge:
             if other_ids:
                 group = set(other_ids + [concept_id])
             else:
-                group = {other_ids}
+                group = {concept_id}
             self._groups.append((concept_id, group))
         end = timer()
         logger.debug(f'Built record ID sets in {end - start} seconds')
@@ -58,10 +58,20 @@ class Merge:
         logger.info('Creating merged records and updating database...')
         start = timer()
         for record_id, group in self._groups:
-            merged_record = self._generate_merged_record(group)
+            try:
+                merged_record = self._generate_merged_record(group)
+            except AttributeError:
+                logger.error("`create_merged_concepts` received invalid group:"
+                             f"{group} for concept {record_id}")
+                continue
             self._database.add_record(merged_record, 'merger')
             merge_ref = merged_record['concept_id'].lower()
-            for concept_id in group:
+            try:
+                concept_ids = merged_record['concept_ids']
+            except KeyError:
+                logger.error(f"Could not access concept IDs in merged record "
+                             f"{merged_record} from group {group}")
+            for concept_id in concept_ids:
                 self._database.update_record(concept_id, 'merge_ref',
                                              merge_ref)
         end = timer()
@@ -74,7 +84,7 @@ class Merge:
         scalars, assign from the highest-priority source where that attribute
         is non-null.
 
-        Priority is NCIt > Mondo.
+        Priority is NCIt > Mondo > DO.
         :param Set record_id_set: group of concept IDs
         :return: completed merged drug object to be stored in DB
         """
@@ -103,7 +113,8 @@ class Merge:
         scalar_fields = ['label', 'pediatric_disease']
         for record in records:
             for field in set_fields:
-                merged_properties[field] |= set(record[field])
+                if field in record:
+                    merged_properties[field] |= set(record[field])
             if not merged_properties['concept_id']:
                 merged_properties['concept_id'] = record['concept_id']
             else:
