@@ -37,8 +37,7 @@ class OWLBase(Base):
         """Retrieve URIs for all terms that are subclasses of given URI.
 
         :param str uri: URI for class
-        :return: Set of URIs (strings) for all classes that are subclasses of
-            it
+        :return: Set of URIs (strings) for all subclasses of `uri`
         """
         graph = owl.default_world.as_rdflib_graph()
         query = f"""
@@ -50,7 +49,7 @@ class OWLBase(Base):
 
     def _get_by_property_value(self, prop: str,
                                value: str) -> Set[str]:
-        """Get all nodes with given value for a specific property.
+        """Get all classes with given value for a specific property.
 
         :param str prop: property URI
         :param str value: property value

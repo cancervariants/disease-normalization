@@ -143,7 +143,8 @@ class Database:
             )
 
     def get_record_by_id(self, concept_id: str,
-                         case_sensitive: bool = True) -> Optional[Dict]:
+                         case_sensitive: bool = True,
+                         merge: bool = False) -> Optional[Dict]:
         """Fetch record corresponding to provided concept ID
 
         :param str concept_id: concept ID for disease record
@@ -153,7 +154,10 @@ class Database:
         :return: complete disease record, if match is found; None otherwise
         """
         try:
-            pk = f'{concept_id.lower()}##identity'
+            if merge:
+                pk = f'{concept_id.lower()}##merger'
+            else:
+                pk = f'{concept_id.lower()}##identity'
             if case_sensitive:
                 match = self.diseases.get_item(Key={
                     'label_and_type': pk,
@@ -214,14 +218,16 @@ class Database:
         except KeyError:
             return None
 
-    def add_record(self, record: Dict):
+    def add_record(self, record: Dict, record_type="identity"):
         """Add new record to database.
 
         :param Dict record: record to upload
+        :param str record_type: type of record (either 'identity' or 'merger')
         """
         id_prefix = record['concept_id'].split(':')[0].lower()
         record['src_name'] = PREFIX_LOOKUP[id_prefix]
-        record['label_and_type'] = f'{record["concept_id"].lower()}##identity'
+        label_and_type = f'{record["concept_id"].lower()}##{record_type}'
+        record['label_and_type'] = label_and_type
         try:
             self.batch.put_item(Item=record)
         except ClientError as e:
@@ -269,3 +275,8 @@ class Database:
                                        ExpressionAttributeValues=update_values)
         except ClientError as e:
             logger.error(e.response['Error']['Message'])
+
+    def flush_batch(self):
+        """Flush internal batch_writer."""
+        self.batch.__exit__()
+        self.batch = self.diseases.batch_writer()

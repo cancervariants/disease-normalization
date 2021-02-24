@@ -29,12 +29,20 @@ class Merge:
             should be generated.
         """
         # build groups
-        logger.info('Generating record ID sets...')
+        logger.info(f'Generating record ID sets from {len(record_ids)} records')  # noqa E501
         start = timer()
         for concept_id in record_ids:
             record = self._database.get_record_by_id(concept_id)
-            other_ids = record['other_identifiers']
-            self._groups.append((concept_id, set(other_ids + [concept_id])))
+            if not record:
+                logger.error(f"generate_merged_concepts couldn't find "
+                             f"{concept_id}")
+                continue
+            other_ids = record.get('other_identifiers', None)
+            if other_ids:
+                group = set(other_ids + [concept_id])
+            else:
+                group = {other_ids}
+            self._groups.append((concept_id, group))
         end = timer()
         logger.debug(f'Built record ID sets in {end - start} seconds')
 
@@ -68,17 +76,13 @@ class Merge:
             if record:
                 records.append(record)
             else:
-                logger.error(f"Merge record generator could not retrieve "
+                logger.error(f"generate_merged_record could not retrieve "
                              f"record for {record_id} in {record_id_set}")
 
         def record_order(record):
             """Provide priority values of concepts for sort function."""
             src = record['src_name'].upper()
-            if src in SourcePriority.__members__:
-                source_rank = SourcePriority[src].value
-            else:
-                raise Exception(f"Prohibited source: {src} in concept_id "
-                                f"{record['concept_id']}")
+            source_rank = SourcePriority[src].value
             return (source_rank, record['concept_id'])
         records.sort(key=record_order)
 

@@ -16,38 +16,38 @@ logger.setLevel(logging.DEBUG)
 
 MONDO_PREFIX_LOOKUP = {
     # built-in sources
-    "NCIT": NamespacePrefix.NCIT,
-    "DOID": NamespacePrefix.DO,
+    "NCIT": NamespacePrefix.NCIT.value,
+    "DOID": NamespacePrefix.DO.value,
     # external sources
-    "COHD": NamespacePrefix.COHD,
-    "EFO": NamespacePrefix.EFO,
-    "GARD": NamespacePrefix.GARD,
-    "HP": NamespacePrefix.HPO,
-    "HPO": NamespacePrefix.HPO,
-    "ICD9": NamespacePrefix.ICD9,
-    "ICD9CM": NamespacePrefix.ICD9CM,
-    "ICD10": NamespacePrefix.ICD10,
-    "ICD10CM": NamespacePrefix.ICD10CM,
-    "ICDO": NamespacePrefix.ICDO,
-    "IDO": NamespacePrefix.IDO,
-    "KEGG": NamespacePrefix.KEGG,
-    "MedDRA": NamespacePrefix.MEDDRA,
-    "MEDDRA": NamespacePrefix.MEDDRA,
-    "MEDGEN": NamespacePrefix.MEDGEN,
-    "MESH": NamespacePrefix.MESH,
-    "MF": NamespacePrefix.MF,
-    "MP": NamespacePrefix.MP,
-    "NIFSTD": NamespacePrefix.NIFSTD,
-    "OGMS": NamespacePrefix.OGMS,
-    "OMIM": NamespacePrefix.OMIM,
-    "OMIMPS": NamespacePrefix.OMIMPS,
-    "ONCOTREE": NamespacePrefix.ONCOTREE,
-    "Orphanet": NamespacePrefix.ORPHANET,
-    "PATO": NamespacePrefix.PATO,
-    "UMLS": NamespacePrefix.UMLS,
-    "UMLS_CUI": NamespacePrefix.UMLS,
-    "Wikidata": NamespacePrefix.WIKIDATA,
-    "Wikipedia": NamespacePrefix.WIKIPEDIA,
+    "COHD": NamespacePrefix.COHD.value,
+    "EFO": NamespacePrefix.EFO.value,
+    "GARD": NamespacePrefix.GARD.value,
+    "HP": NamespacePrefix.HPO.value,
+    "HPO": NamespacePrefix.HPO.value,
+    "ICD9": NamespacePrefix.ICD9.value,
+    "ICD9CM": NamespacePrefix.ICD9CM.value,
+    "ICD10": NamespacePrefix.ICD10.value,
+    "ICD10CM": NamespacePrefix.ICD10CM.value,
+    "ICDO": NamespacePrefix.ICDO.value,
+    "IDO": NamespacePrefix.IDO.value,
+    "KEGG": NamespacePrefix.KEGG.value,
+    "MedDRA": NamespacePrefix.MEDDRA.value,
+    "MEDDRA": NamespacePrefix.MEDDRA.value,
+    "MEDGEN": NamespacePrefix.MEDGEN.value,
+    "MESH": NamespacePrefix.MESH.value,
+    "MF": NamespacePrefix.MF.value,
+    "MP": NamespacePrefix.MP.value,
+    "NIFSTD": NamespacePrefix.NIFSTD.value,
+    "OGMS": NamespacePrefix.OGMS.value,
+    "OMIM": NamespacePrefix.OMIM.value,
+    "OMIMPS": NamespacePrefix.OMIMPS.value,
+    "ONCOTREE": NamespacePrefix.ONCOTREE.value,
+    "Orphanet": NamespacePrefix.ORPHANET.value,
+    "PATO": NamespacePrefix.PATO.value,
+    "UMLS": NamespacePrefix.UMLS.value,
+    "UMLS_CUI": NamespacePrefix.UMLS.value,
+    "Wikidata": NamespacePrefix.WIKIDATA.value,
+    "Wikipedia": NamespacePrefix.WIKIPEDIA.value,
 }
 
 
@@ -82,6 +82,7 @@ class Mondo(OWLBase):
         self._extract_data()
         self._load_meta()
         self._transform_data()
+        self.database.flush_batch()
         return self._processed_ids
 
     def _download_data(self):
@@ -139,18 +140,20 @@ class Mondo(OWLBase):
             try:
                 disease = mondo.search(iri=uri)[0]
             except TypeError:
-                logger.error(f"Could not retrieve class for URI {uri}")
+                logger.error(f"Mondo.transform_data could not retrieve class "
+                             f"for URI {uri}")
                 continue
             try:
                 label = disease.label[0]
             except IndexError:
-                logger.debug(f"No label for concept {uri}")
+                logger.debug(f"No label for Mondo concept {uri}")
                 continue
 
+            aliases = list({d for d in disease.hasExactSynonym if d != label})
             params = {
                 'concept_id': disease.id[0].lower(),
                 'label': label,
-                'aliases': list({d for d in disease.hasExactSynonym if d != label}),  # noqa: E501
+                'aliases': aliases,
                 'xrefs': [],
                 'other_identifiers': []
             }
@@ -187,20 +190,25 @@ class Mondo(OWLBase):
         :param Dict disease: individual disease record to be loaded
         """
         concept_id = disease['concept_id']
-        aliases = disease['aliases']
+
+        aliases = {a.lower() for a in disease['aliases']}
         if aliases:
-            if len({a.casefold() for a in aliases}) > 20:
-                logger.debug(f'{concept_id} has > 20 aliases')
+            if len(aliases) > 20:
+                logger.debug(f'{concept_id} has >20 aliases')
                 del disease['aliases']
             else:
                 for alias in aliases:
                     self.database.add_ref_record(alias, concept_id, 'alias')
         else:
             del disease['aliases']
+
         for key in ('xrefs', 'other_identifiers'):
             if not disease[key]:
                 del disease[key]
 
         self.database.add_record(disease)
         self.database.add_ref_record(disease['label'], concept_id, 'label')
-        self._processed_ids.append(concept_id)
+        if concept_id:
+            self._processed_ids.append(concept_id)
+        else:
+            logger.error(f"Weird stuf going on w/ {concept_id}")

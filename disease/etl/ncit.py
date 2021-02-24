@@ -40,11 +40,17 @@ class NCIt(OWLBase):
         self._SRC_FNAME = src_fname
         self._data_path = data_path
 
-    def perform_etl(self):
-        """Public-facing method to initiate ETL procedures on given data."""
+    def perform_etl(self) -> Set[str]:
+        """Public-facing method to initiate ETL procedures on given data.
+
+        :return: empty set (because NCIt IDs shouldn't be used to construct
+            merged concept groups)
+        """
         self._extract_data()
         self._load_meta()
         self._transform_data()
+        self.database.flush_batch()
+        return set()
 
     def _download_data(self):
         """Download NCI thesaurus source file for loading into normalizer."""
