@@ -124,12 +124,11 @@
       "neuroblastoma (Schwannian Stroma-poor)",
       "neuroblastoma, malignant"
     ],
-    "other_identifiers": ["ncit:C3270"],
+    "other_identifiers": ["DOID:769", "ncit:C3270"],
     "xrefs": [
       "orphanet:635",
       "nifstd:birnlex_12631",
       "umls:C0027819",
-      "DOID:769",
       "gard:0007185",
       "meddra:10029260",
       "icd.o:9500/3",
@@ -447,6 +446,24 @@
   {
     "label_and_type": "adult cystic teratoma##label",
     "concept_id": "DOID:769",
+    "src_name": "DO"
+  },
+  {
+    "label_and_type": "doid:3908##identity",
+    "label": "lung non-small cell carcinoma",
+    "concept_id": "DOID:3908",
+    "other_identifiers": ["ncit:C2926"],
+    "xrefs": [
+      "umls:C0007131",
+      "kegg.disease:05223",
+      "efo:0003060",
+      "mesh:D002289"
+    ],
+    "src_name": "DO"
+  },
+  {
+    "label_and_type": "lung non-small cell carcinoma##label",
+    "concept_id": "doid:3908",
     "src_name": "DO"
   }
 ]

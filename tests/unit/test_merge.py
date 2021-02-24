@@ -23,9 +23,6 @@ def merge_handler(mock_database):
         def get_updates(self):
             return self.merge._database.updates
 
-        def create_record_id_set(self, record_id):
-            return self.merge._create_record_id_set(record_id)
-
         def generate_merged_record(self, record_id_set):
             return self.merge._generate_merged_record(record_id_set)
 
@@ -45,6 +42,12 @@ def compare_merged_records(actual_record: Dict, fixture_record: Dict):
     assert ('xrefs' in actual_record) == ('xrefs' in fixture_record)
     if 'xrefs' in actual_record or 'xrefs' in fixture_record:
         assert set(actual_record['xrefs']) == set(fixture_record['xrefs'])
+    assert ('pediatric_disease' in actual_record) == \
+        ('pediatric_disease' in fixture_record)
+    if 'pediatric_disease' in actual_record or \
+            'pediatric_disease' in fixture_record:
+        assert set(actual_record['pediatric_disease']) == \
+            set(fixture_record['pediatric_disease'])
 
 
 @pytest.fixture(scope='module')
