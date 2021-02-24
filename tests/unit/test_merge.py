@@ -184,7 +184,6 @@ def teratoma():
         "aliases": ["Adult cystic teratoma", "cystic teratoma of adults"],
         "xrefs": ["icd.o:9080/0", "umls:C1368888"],
         "item_type": "merger",
-        "pediatric_disease": False
     }
 
 

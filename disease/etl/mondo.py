@@ -134,7 +134,6 @@ class Mondo(OWLBase):
         disease_uris = self._get_subclasses(disease_root)
         peds_neoplasm_root = "http://purl.obolibrary.org/obo/MONDO_0006517"
         peds_uris = self._get_subclasses(peds_neoplasm_root)
-        adult_onset_pattern = 'http://purl.obolibrary.org/obo/mondo/patterns/adult.yaml'  # noqa: E501
 
         for uri in disease_uris:
             try:
@@ -175,10 +174,6 @@ class Mondo(OWLBase):
 
             if disease.iri in peds_uris:
                 params['pediatric_disease'] = True
-            else:
-                conforms_to = disease.conformsTo
-                if conforms_to and adult_onset_pattern in conforms_to:
-                    params['pediatric_disease'] = False
 
             assert Disease(**params)  # check input validity
             self._load_disease(params)

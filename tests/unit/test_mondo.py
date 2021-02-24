@@ -102,7 +102,7 @@ def cystic_teratoma_adult():
         "concept_id": "mondo:0004099",
         "label": "adult cystic teratoma",
         "aliases": ["cystic teratoma of adults"],
-        "pediatric_disease": False,
+        "pediatric_disease": None,
         "other_identifiers": ["ncit:C9012", "DOID:7079"],
         "xrefs": ["umls:C1368888"],
     }

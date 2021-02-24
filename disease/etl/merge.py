@@ -82,7 +82,8 @@ class Merge:
 
         Priority is NCIt > Mondo > DO.
         :param Set record_id_set: group of concept IDs
-        :return: completed merged drug object to be stored in DB
+        :return: completed merged drug object to be stored in DB, as well as
+            a list of the IDs ultimately included in said record
         """
         records = []
         final_ids = []
