@@ -52,6 +52,8 @@ excl_descr = ("Comma-separated list of source names to exclude in "
               "response. Will include all other sources. Will return HTTP "
               "status code 422: Unprocessable Entity if both 'incl' and"
               "'excl' parameters are given.")
+normalize_description = ("Return merged strongest-match concept for query "
+                         "string provided by user.")
 
 
 @app.get("/disease/search",
@@ -78,8 +80,6 @@ def search(q: str = Query(..., description=q_descr),
 merged_matches_summary = "Given query, provide normalized record."
 merged_response_descr = "A response to a validly-formed query."
 merged_q_descr = "Disease to normalize."
-normalize_description = ("Return merged strongest-match concept for query "
-                         "string provided by user.")
 
 
 @app.get("/disease/normalize",
