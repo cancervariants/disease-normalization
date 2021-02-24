@@ -213,7 +213,9 @@ class Database:
             })
             return match['Item']
         except ClientError as e:
-            logger.error(e.response['Error']['Message'])
+            logger.error("boto3 client error in "
+                         "`database.get_merged_record()`: "
+                         f"{e.response['Error']['Message']}")
             return None
         except KeyError:
             return None
@@ -231,7 +233,7 @@ class Database:
         try:
             self.batch.put_item(Item=record)
         except ClientError as e:
-            logger.error(f"boto3 client error on add_record for "
+            logger.error("boto3 client error on add_record for "
                          f"{record['concept_id']}: "
                          f"{e.response['Error']['Message']}")
 
@@ -274,7 +276,8 @@ class Database:
                                       UpdateExpression=update_expression,
                                       ExpressionAttributeValues=update_values)
         except ClientError as e:
-            logger.error(e.response['Error']['Message'])
+            logger.error(f"boto3 client error in `database.update_record()`: "
+                         f"{e.response['Error']['Message']}")
 
     def flush_batch(self):
         """Flush internal batch_writer."""
