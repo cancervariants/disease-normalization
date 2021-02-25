@@ -162,7 +162,6 @@ class DO(OWLBase):
         elif not aliases:
             del disease['aliases']
         else:
-            disease['aliases'] = list(set(aliases))
             case_uq_aliases = {a.lower() for a in disease['aliases']}
             for alias in case_uq_aliases:
                 self.database.add_ref_record(alias, concept_id, 'alias')
