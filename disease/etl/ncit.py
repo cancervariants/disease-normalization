@@ -73,17 +73,6 @@ class NCIt(OWLBase):
         rename(self._data_path / 'Thesaurus.owl', self._data_path / f'ncit_{version}.owl')  # noqa: E501
         logger.info('Finished downloading NCI Thesaurus')
 
-    def _extract_data(self):
-        """Get NCIt source file."""
-        self._data_path.mkdir(exist_ok=True, parents=True)
-        dir_files = [f for f in self._data_path.iterdir()
-                     if f.name.startswith('ncit')]
-        if len(dir_files) == 0:
-            self._download_data()
-            dir_files = list(self._data_path.iterdir())
-        self._data_file = sorted(dir_files, reverse=True)[0]
-        self._version = self._data_file.stem.split('_')[1]
-
     def _load_meta(self):
         """Load metadata"""
         metadata = Meta(data_license="CC BY 4.0",

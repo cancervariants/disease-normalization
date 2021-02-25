@@ -5,7 +5,6 @@ from pathlib import Path
 from disease import PROJECT_ROOT, PREFIX_LOOKUP
 from disease.schemas import Meta, SourceName, NamespacePrefix, Disease
 from disease.database import Database
-import requests
 from datetime import datetime
 import owlready2 as owl
 from typing import Dict, List
@@ -36,58 +35,31 @@ class DO(OWLBase):
     def __init__(self,
                  database: Database,
                  src_dload_page: str = "http://www.obofoundry.org/ontology/doid.html",  # noqa: E501
-                 src_url: str = "https://raw.githubusercontent.com/DiseaseOntology/HumanDiseaseOntology/master/src/ontology/doid-merged.obo",  # noqa: E501
+                 src_url: str = "http://purl.obolibrary.org/obo/doid/doid-merged.owl",  # noqa: E501
                  data_path: Path = PROJECT_ROOT / 'data' / 'do'):
         """Override base class init method.
 
         :param therapy.database.Database database: app database instance
-        :param str src_url: URL for source data OWL file
+        :param str src_dload_page: URL for source data download webpage
+        :param str src_url: URL for source data file
         :param pathlib.Path data_path: path to local DO data directory
         """
         self.database = database
         self._SRC_DLOAD_PAGE = src_dload_page
         self._SRC_URL = src_url
         self._data_path = data_path
+        self._version = datetime.strftime(datetime.now(), "%Y%m%d")
 
     def perform_etl(self) -> List[str]:
         """Public-facing method to initiate ETL procedures on given data.
 
-        :return: empty set (because NCIt IDs shouldn't be used to construct
+        :return: empty list (because NCIt IDs shouldn't be used to construct
             merged concept groups)
         """
-        self._extract_data()
         self._load_meta()
         self._transform_data()
         self.database.flush_batch()
         return []
-
-    def _download_data(self):
-        """Download DO source file."""
-        logger.info('Downloading Disease Ontology...')
-        try:
-            response = requests.get(self._SRC_URL, stream=True)
-        except requests.exceptions.RequestException as e:
-            logger.error(f'DO download failed: {e}')
-            raise e
-        today = datetime.strftime(datetime.today(), "%Y%m%d")
-        outfile_path = self._data_path / f'do_{today}.owl'
-        handle = open(outfile_path, "wb")
-        for chunk in response.iter_content(chunk_size=512):
-            if chunk:
-                handle.write(chunk)
-        self._version = today
-        logger.info('Finished downloading Disease Ontology')
-
-    def _extract_data(self):
-        """Get DO source file."""
-        self._data_path.mkdir(exist_ok=True, parents=True)
-        dir_files = [f for f in self._data_path.iterdir()
-                     if f.name.startswith('do')]
-        if len(dir_files) == 0:
-            self._download_data()
-            dir_files = list(self._data_path.iterdir())
-        self._data_file = sorted(dir_files, reverse=True)[0]
-        self._version = self._data_file.stem.split('_')[1]
 
     def _load_meta(self):
         """Load metadata"""
@@ -109,7 +81,7 @@ class DO(OWLBase):
 
     def _transform_data(self):
         """Transform source data and send to loading method."""
-        do = owl.get_ontology("http://purl.obolibrary.org/obo/doid/doid-merged.owl").load()  # noqa: E501
+        do = owl.get_ontology(self._SRC_URL).load()
         disease_uri = 'http://purl.obolibrary.org/obo/DOID_4'
         diseases = self._get_subclasses(disease_uri)
         for uri in diseases:
