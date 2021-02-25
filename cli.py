@@ -35,7 +35,8 @@ class CLI:
     @click.option(
         '--update_merged',
         is_flag=True,
-        help='Update concepts for normalize endpoint.'
+        help='Update concepts for normalize endpoint. Must select either'
+             '--update_all or include Mondo as a normalizer source argument.'
     )
     def update_normalizer_db(normalizer, dev, db_url, update_all,
                              update_merged):
@@ -63,6 +64,9 @@ class CLI:
 
             if len(non_sources) != 0:
                 raise Exception(f"Not valid source(s): {non_sources}")
+
+            if update_merged and 'Mondo' not in normalizers:
+                CLI()._help_msg()
 
             CLI()._update_normalizers(normalizers, db, update_merged)
 
