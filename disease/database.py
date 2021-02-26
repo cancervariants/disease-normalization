@@ -33,12 +33,14 @@ class Database:
                 'endpoint_url': environ['DISEASE_NORM_DB_URL']
             }
         else:
-            if click.confirm("Are you sure you want to update "
-                             "the production database?", default=False):
-                click.echo("Updating the production database...")
-            else:
-                click.echo("Exiting.")
-                sys.exit()
+            if 'DISEASE_NORM_PROD' not in environ \
+                    or environ['DISEASE_NORM_PROD'] == 'false':
+                if click.confirm("Are you sure you want to update "
+                                 "the production database?", default=False):
+                    click.echo("Updating the production database...")
+                else:
+                    click.echo("Exiting.")
+                    sys.exit()
 
             boto_params = {
                 'region_name': region_name
