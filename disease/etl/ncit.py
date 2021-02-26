@@ -71,24 +71,14 @@ class NCIt(OWLBase):
         remove(zip_path)
         version = self._SRC_DIR.split('/')[-2].split('_')[0]
         rename(self._data_path / 'Thesaurus.owl', self._data_path / f'ncit_{version}.owl')  # noqa: E501
+        self._version = version
         logger.info('Finished downloading NCI Thesaurus')
-
-    def _extract_data(self):
-        """Get NCIt source file."""
-        self._data_path.mkdir(exist_ok=True, parents=True)
-        dir_files = [f for f in self._data_path.iterdir()
-                     if f.name.startswith('ncit')]
-        if len(dir_files) == 0:
-            self._download_data()
-            dir_files = list(self._data_path.iterdir())
-        self._data_file = sorted(dir_files, reverse=True)[0]
-        self._version = self._data_file.stem.split('_')[1]
 
     def _load_meta(self):
         """Load metadata"""
         metadata = Meta(data_license="CC BY 4.0",
                         data_license_url="https://creativecommons.org/licenses/by/4.0/legalcode",  # noqa F401
-                        version=self._version,
+                        version=self._data_file.stem.split('_')[1],
                         data_url=self._SRC_DIR,
                         rdp_url='http://reusabledata.org/ncit.html',
                         data_license_attributes={
