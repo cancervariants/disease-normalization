@@ -6,7 +6,7 @@ from botocore.exceptions import ClientError
 import click
 import sys
 from os import environ
-from typing import Optional, Dict, List
+from typing import Optional, Dict, List, Any
 import logging
 
 logger = logging.getLogger('disease')
@@ -88,6 +88,10 @@ class Database:
                     {
                         'AttributeName': 'src_name',
                         'AttributeType': 'S'
+                    },
+                    {
+                        'AttributeName': 'item_type',
+                        'AttributeType': 'S'
                     }
 
                 ],
@@ -97,6 +101,22 @@ class Database:
                         'KeySchema': [
                             {
                                 'AttributeName': 'src_name',
+                                'KeyType': 'HASH'
+                            }
+                        ],
+                        'Projection': {
+                            'ProjectionType': 'KEYS_ONLY'
+                        },
+                        'ProvisionedThroughput': {
+                            'ReadCapacityUnits': 10,
+                            'WriteCapacityUnits': 10
+                        }
+                    },
+                    {
+                        'IndexName': 'type_index',
+                        'KeySchema': [
+                            {
+                                'AttributeName': 'item_type',
                                 'KeyType': 'HASH'
                             }
                         ],
@@ -143,7 +163,8 @@ class Database:
             )
 
     def get_record_by_id(self, concept_id: str,
-                         case_sensitive: bool = True) -> Optional[Dict]:
+                         case_sensitive: bool = True,
+                         merge: bool = False) -> Optional[Dict]:
         """Fetch record corresponding to provided concept ID
 
         :param str concept_id: concept ID for disease record
@@ -153,7 +174,10 @@ class Database:
         :return: complete disease record, if match is found; None otherwise
         """
         try:
-            pk = f'{concept_id.lower()}##identity'
+            if merge:
+                pk = f'{concept_id.lower()}##merger'
+            else:
+                pk = f'{concept_id.lower()}##identity'
             if case_sensitive:
                 match = self.diseases.get_item(Key={
                     'label_and_type': pk,
@@ -195,18 +219,42 @@ class Database:
                          f"{e.response['Error']['Message']}")
             return []
 
-    def add_record(self, record: Dict):
+    def get_merged_record(self, merge_ref) -> Optional[Dict]:
+        """Fetch merged record from given reference.
+        :param str merge_ref: key for merged record, formated as a string
+            of grouped concept IDs separated by vertical bars, ending with
+            `##merger`. Must be correctly-cased.
+        :return: complete merged record if lookup successful, None otherwise
+        """
+        try:
+            match = self.diseases.get_item(Key={
+                'label_and_type': merge_ref.lower(),
+                'concept_id': merge_ref
+            })
+            return match['Item']
+        except ClientError as e:
+            logger.error("boto3 client error in "
+                         "`database.get_merged_record()`: "
+                         f"{e.response['Error']['Message']}")
+            return None
+        except KeyError:
+            return None
+
+    def add_record(self, record: Dict, record_type="identity"):
         """Add new record to database.
 
         :param Dict record: record to upload
+        :param str record_type: type of record (either 'identity' or 'merger')
         """
-        id_prefix = record['concept_id'].split(':')[0]
+        id_prefix = record['concept_id'].split(':')[0].lower()
         record['src_name'] = PREFIX_LOOKUP[id_prefix]
-        record['label_and_type'] = f'{record["concept_id"].lower()}##identity'
+        label_and_type = f'{record["concept_id"].lower()}##{record_type}'
+        record['label_and_type'] = label_and_type
+        record['item_type'] = record_type
         try:
             self.batch.put_item(Item=record)
         except ClientError as e:
-            logger.error(f"boto3 client error on add_record for "
+            logger.error("boto3 client error on add_record for "
                          f"{record['concept_id']}: "
                          f"{e.response['Error']['Message']}")
 
@@ -218,11 +266,12 @@ class Database:
         :param str ref_type: one of ('alias', 'label')
         """
         label_and_type = f'{term.lower()}##{ref_type}'
-        src_name = PREFIX_LOOKUP[concept_id.split(':')[0]]
+        src_name = PREFIX_LOOKUP[concept_id.split(':')[0].lower()]
         record = {
             'label_and_type': label_and_type,
             'concept_id': concept_id.lower(),
             'src_name': src_name,
+            'item_type': ref_type,
         }
         try:
             self.batch.put_item(Item=record)
@@ -230,3 +279,29 @@ class Database:
             logger.error(f"boto3 client error adding reference {term} for "
                          f"{concept_id} with match type {ref_type}: "
                          f"{e.response['Error']['Message']}")
+
+    def update_record(self, concept_id: str, field: str, new_value: Any):
+        """Update the field of an individual record to a new value.
+
+        :param str concept_id: record to update
+        :param str field: name of field to update
+        :parm str new_value: new value
+        """
+        key = {
+            'label_and_type': f'{concept_id.lower()}##identity',
+            'concept_id': concept_id
+        }
+        update_expression = f"set {field}=:r"
+        update_values = {':r': new_value}
+        try:
+            self.diseases.update_item(Key=key,
+                                      UpdateExpression=update_expression,
+                                      ExpressionAttributeValues=update_values)
+        except ClientError as e:
+            logger.error(f"boto3 client error in `database.update_record()`: "
+                         f"{e.response['Error']['Message']}")
+
+    def flush_batch(self):
+        """Flush internal batch_writer."""
+        self.batch.__exit__(*sys.exc_info())
+        self.batch = self.diseases.batch_writer()

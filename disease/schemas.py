@@ -21,6 +21,7 @@ class SourceName(Enum):
 
     NCIT = "NCIt"
     MONDO = "Mondo"
+    DO = "DO"
 
 
 class SourceIDAfterNamespace(Enum):
@@ -28,6 +29,7 @@ class SourceIDAfterNamespace(Enum):
 
     NCIT = "C"
     MONDO = ""
+    DO = ""
 
 
 class NamespacePrefix(Enum):
@@ -35,36 +37,46 @@ class NamespacePrefix(Enum):
     stored.
     """
 
+    # built-in sources
     NCIT = "ncit"
     MONDO = "mondo"
-    UMLS = "umls"
     DO = "DOID"
+    # external sources
+    COHD = "cohd"
     EFO = "efo"
+    GARD = "gard"
+    HPO = "HP"
     ICD9 = "icd9"
     ICD9CM = "icd9.cm"
     ICD10 = "icd"
     ICD10CM = "icd10.cm"
     ICDO = "icd.o"
-    ORPHANET = "orphanet"
-    OGMS = "ogms"
-    MESH = "mesh"
     IDO = "ido"
-    GARD = "gard"
+    IMDRF = "imdrf"
+    KEGG = "kegg.disease"
+    MEDDRA = "meddra"
+    MEDGEN = "medgen"
+    MESH = "mesh"
+    MF = "mf"
+    MP = "MP"
+    NIFSTD = "nifstd"
+    OGMS = "ogms"
     OMIM = "omim"
     OMIMPS = "omimps"
-    KEGG = "kegg.disease"
-    COHD = "cohd"
-    HPO = "HP"
-    NIFSTD = "nifstd"
-    MF = "mf"
-    IMDRF = "imdrf"
-    MEDDRA = "meddra"
     ONCOTREE = "oncotree"
+    ORPHANET = "orphanet"
+    PATO = "pato"
+    UMLS = "umls"
     WIKIPEDIA = "wikipedia.en"
     WIKIDATA = "wikidata"
-    MEDGEN = "medgen"
-    MP = "MP"
-    PATO = "pato"
+
+
+class SourcePriority(IntEnum):
+    """Define priorities for sources in building merged concepts."""
+
+    NCIT = 1
+    MONDO = 2
+    DO = 3
 
 
 class Disease(BaseModel):
@@ -75,7 +87,7 @@ class Disease(BaseModel):
     aliases: Optional[List[str]]
     other_identifiers: Optional[List[str]]
     xrefs: Optional[List[str]]
-    pediatric: Optional[bool]
+    pediatric_disease: Optional[bool]
 
     class Config:
         """Configure model."""
@@ -100,7 +112,7 @@ class Disease(BaseModel):
                 ],
                 "other_identifiers": [],
                 "xrefs": ["umls:C0019562"],
-                "pediatric": None,
+                "pediatric_disease": None,
             }
 
 
@@ -181,7 +193,7 @@ class MatchesKeyed(BaseModel):
                     ],
                     "other_identifiers": [],
                     "xrefs": ["umls:C0019562"],
-                    "pediatric": None,
+                    "pediatric_disease": None,
                 }],
                 "meta_": {
                     "data_license": "CC BY 4.0",
@@ -234,7 +246,7 @@ class MatchesListed(BaseModel):
                     ],
                     "other_identifiers": [],
                     "xrefs": ["umls:C0019562"],
-                    "pediatric": None
+                    "pediatric_disease": None
                 }],
                 "meta_": {
                     "data_license": "CC BY 4.0",
@@ -249,6 +261,52 @@ class MatchesListed(BaseModel):
                     }
                 }
             }
+
+
+class MergedMatch(BaseModel):
+    """Represent merged concept in response to client."""
+
+    label: Optional[str]
+    concept_ids: List[str]
+    aliases: Optional[List[str]]
+    xrefs: Optional[List[str]]
+    pediatric_disease: Optional[bool]
+
+    class Config:
+        """Enables orm_mode"""
+
+        @staticmethod
+        def schema_extra(schema: Dict[str, Any],
+                         model: Type['MergedMatch']) -> None:
+            """Configure OpenAPI schema"""
+            if 'title' in schema.keys():
+                schema.pop('title', None)
+            for prop in schema.get('properties', {}).values():
+                prop.pop('title', None)
+            schema['example'] = {}  # TODO
+
+
+class NormalizationService(BaseModel):
+    """Response containing one or more merged records and source data."""
+
+    query: str
+    warnings: Optional[Dict]
+    match_type: MatchType
+    record: Optional[MergedMatch]
+    meta_: Optional[Dict[SourceName, Meta]]
+
+    class Config:
+        """Enables orm_mode"""
+
+        @staticmethod
+        def schema_extra(schema: Dict[str, Any],
+                         model: Type['NormalizationService']) -> None:
+            """Configure OpenAPI schema"""
+            if 'title' in schema.keys():
+                schema.pop('title', None)
+            for prop in schema.get('properties', {}).values():
+                prop.pop('title', None)
+            schema['example'] = {}  # TODO
 
 
 class Service(BaseModel):
@@ -287,7 +345,7 @@ class Service(BaseModel):
                         ],
                         "other_identifiers": [],
                         "xrefs": ["umls:C0019562"],
-                        "pediatric": None,
+                        "pediatric_disease": None,
                     }],
                     "meta_": {
                         "data_license": "CC BY 4.0",

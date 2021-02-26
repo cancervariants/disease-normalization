@@ -22,8 +22,8 @@ SOURCES_LOWER_LOOKUP = {name.value.lower(): name.value for name in
                         SourceName.__members__.values()}
 
 # use to fetch source name from schema based on concept id namespace
-# e.g. {'ncit': 'NCIt'}
-PREFIX_LOOKUP = {v.value: SourceName[k].value
+# e.g. {'ncit': 'NCIt', 'doid': 'DO'}
+PREFIX_LOOKUP = {v.value.lower(): SourceName[k].value
                  for k, v in NamespacePrefix.__members__.items()
                  if k in SourceName.__members__.keys()}
 
@@ -35,6 +35,7 @@ NAMESPACE_LOOKUP = {v.value.lower(): NamespacePrefix[k].value
 
 from disease.etl import NCIt  # noqa: E402 F401
 from disease.etl import Mondo  # noqa: E402 F401
+from disease.etl import DO  # noqa: E402 F401
 # Use to lookup class object from source name. Should be one key-value pair
 # for every functioning ETL class.
 SOURCES_CLASS_LOOKUP = {s.value.lower(): eval(s.value)

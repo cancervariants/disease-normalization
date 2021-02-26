@@ -1,14 +1,13 @@
 """Module to load disease data from Mondo Disease Ontology."""
-from .base import Base
+from .base import OWLBase
 import logging
 from disease import PROJECT_ROOT, PREFIX_LOOKUP
 from disease.database import Database
 from disease.schemas import Meta, SourceName, NamespacePrefix, Disease
 from pathlib import Path
 import requests
-from typing import Set, Dict
 import owlready2 as owl
-from rdflib.term import URIRef
+from typing import Dict, List
 
 
 logger = logging.getLogger('disease')
@@ -16,46 +15,48 @@ logger.setLevel(logging.DEBUG)
 
 
 MONDO_PREFIX_LOOKUP = {
-    "NCIT": NamespacePrefix.NCIT,
-    "DOID": NamespacePrefix.DO,
-    "OGMS": NamespacePrefix.OGMS,
-    "Orphanet": NamespacePrefix.ORPHANET,
-    "MESH": NamespacePrefix.MESH,
-    "EFO": NamespacePrefix.EFO,
-    "UMLS": NamespacePrefix.UMLS,
-    "UMLS_CUI": NamespacePrefix.UMLS,
-    "ICD9": NamespacePrefix.ICD9,
-    "ICD9CM": NamespacePrefix.ICD9CM,
-    "ICD10": NamespacePrefix.ICD10,
-    "ICD10CM": NamespacePrefix.ICD10CM,
-    "ICDO": NamespacePrefix.ICDO,
-    "IDO": NamespacePrefix.IDO,
-    "GARD": NamespacePrefix.GARD,
-    "OMIM": NamespacePrefix.OMIM,
-    "OMIMPS": NamespacePrefix.OMIMPS,
-    "KEGG": NamespacePrefix.KEGG,
-    "COHD": NamespacePrefix.COHD,
-    "HPO": NamespacePrefix.HPO,
-    "NIFSTD": NamespacePrefix.NIFSTD,
-    "MF": NamespacePrefix.MF,
-    "HP": NamespacePrefix.HPO,
-    "MedDRA": NamespacePrefix.MEDDRA,
-    "MEDDRA": NamespacePrefix.MEDDRA,
-    "ONCOTREE": NamespacePrefix.ONCOTREE,
-    "Wikipedia": NamespacePrefix.WIKIPEDIA,
-    "Wikidata": NamespacePrefix.WIKIDATA,
-    "MEDGEN": NamespacePrefix.MEDGEN,
-    "MP": NamespacePrefix.MP,
-    "PATO": NamespacePrefix.PATO,
+    # built-in sources
+    "NCIT": NamespacePrefix.NCIT.value,
+    "DOID": NamespacePrefix.DO.value,
+    # external sources
+    "COHD": NamespacePrefix.COHD.value,
+    "EFO": NamespacePrefix.EFO.value,
+    "GARD": NamespacePrefix.GARD.value,
+    "HP": NamespacePrefix.HPO.value,
+    "HPO": NamespacePrefix.HPO.value,
+    "ICD9": NamespacePrefix.ICD9.value,
+    "ICD9CM": NamespacePrefix.ICD9CM.value,
+    "ICD10": NamespacePrefix.ICD10.value,
+    "ICD10CM": NamespacePrefix.ICD10CM.value,
+    "ICDO": NamespacePrefix.ICDO.value,
+    "IDO": NamespacePrefix.IDO.value,
+    "KEGG": NamespacePrefix.KEGG.value,
+    "MedDRA": NamespacePrefix.MEDDRA.value,
+    "MEDDRA": NamespacePrefix.MEDDRA.value,
+    "MEDGEN": NamespacePrefix.MEDGEN.value,
+    "MESH": NamespacePrefix.MESH.value,
+    "MF": NamespacePrefix.MF.value,
+    "MP": NamespacePrefix.MP.value,
+    "NIFSTD": NamespacePrefix.NIFSTD.value,
+    "OGMS": NamespacePrefix.OGMS.value,
+    "OMIM": NamespacePrefix.OMIM.value,
+    "OMIMPS": NamespacePrefix.OMIMPS.value,
+    "ONCOTREE": NamespacePrefix.ONCOTREE.value,
+    "Orphanet": NamespacePrefix.ORPHANET.value,
+    "PATO": NamespacePrefix.PATO.value,
+    "UMLS": NamespacePrefix.UMLS.value,
+    "UMLS_CUI": NamespacePrefix.UMLS.value,
+    "Wikidata": NamespacePrefix.WIKIDATA.value,
+    "Wikipedia": NamespacePrefix.WIKIPEDIA.value,
 }
 
 
-class Mondo(Base):
+class Mondo(OWLBase):
     """Gather and load data from Mondo."""
 
     def __init__(self,
                  database: Database,
-                 src_dload_page: str = "https://mondo.monarchinitiative.org/pages/download/",  # noqa F401
+                 src_dload_page: str = "https://mondo.monarchinitiative.org/pages/download/",  # noqa: E501
                  src_url: str = "http://purl.obolibrary.org/obo/mondo.owl",
                  version: str = "20210129",
                  data_path: Path = PROJECT_ROOT / 'data' / 'mondo'):
@@ -71,12 +72,18 @@ class Mondo(Base):
         self._SRC_URL = src_url
         self._version = version
         self._data_path = data_path
+        self._processed_ids = []
 
-    def perform_etl(self):
-        """Public-facing method to initiate ETL procedures on given data."""
+    def perform_etl(self) -> List[str]:
+        """Public-facing method to initiate ETL procedures on given data.
+
+        :return: List of concept IDs that were added.
+        """
         self._extract_data()
         self._load_meta()
         self._transform_data()
+        self.database.flush_batch()
+        return self._processed_ids
 
     def _download_data(self):
         """Download Mondo thesaurus source file for loading into normalizer."""
@@ -92,19 +99,10 @@ class Mondo(Base):
                 handle.write(chunk)
         logger.info('Finished downloading Mondo Disease Ontology')
 
-    def _extract_data(self):
-        """Get Mondo source file."""
-        self._data_path.mkdir(exist_ok=True, parents=True)
-        dir_files = list(self._data_path.iterdir())
-        if len(dir_files) == 0:
-            self._download_data()
-            dir_files = list(self._data_path.iterdir())
-        self._data_file = sorted(dir_files)[-1]
-
     def _load_meta(self):
         """Load metadata"""
         metadata = Meta(data_license="CC BY 4.0",
-                        data_license_url="https://creativecommons.org/licenses/by/4.0/legalcode",  # noqa F401
+                        data_license_url="https://creativecommons.org/licenses/by/4.0/legalcode",  # noqa: E501
                         version=self._version,
                         data_url=self._SRC_DLOAD_PAGE,
                         rdp_url='http://reusabledata.org/monarch.html',
@@ -117,49 +115,34 @@ class Mondo(Base):
         params['src_name'] = SourceName.MONDO.value
         self.database.metadata.put_item(Item=params)
 
-    def _collect_subclasses(self, uri) -> Set[URIRef]:
-        """Retrieve URIs for all terms that are subclasses of given URI.
-
-        :param str uri: uri of superclass
-        :return: Set of URIs for all classes that are subclasses of it
-        """
-        graph = owl.default_world.as_rdflib_graph()
-        query = f"""
-        SELECT ?c WHERE {{
-        ?c rdfs:subClassOf* <{uri}>
-        }}
-        """
-        return {item.c for item in graph.query(query)}
-
     def _transform_data(self):
         """Gather and transform disease entities."""
-        mondo = owl.get_ontology(self._data_file.absolute().as_uri())
-        mondo.load()
+        mondo = owl.get_ontology(self._data_file.absolute().as_uri()).load()
 
         # gather constants/search materials
         disease_root = "http://purl.obolibrary.org/obo/MONDO_0000001"
-        disease_uris = self._collect_subclasses(disease_root)
+        disease_uris = self._get_subclasses(disease_root)
         peds_neoplasm_root = "http://purl.obolibrary.org/obo/MONDO_0006517"
-        peds_uris = {u.toPython() for u
-                     in self._collect_subclasses(peds_neoplasm_root)}
-        adult_onset_pattern = 'http://purl.obolibrary.org/obo/mondo/patterns/adult.yaml'  # noqa: E501
+        peds_uris = self._get_subclasses(peds_neoplasm_root)
 
         for uri in disease_uris:
             try:
                 disease = mondo.search(iri=uri)[0]
             except TypeError:
-                logger.error(f"Could not retrieve class for URI {uri}")
+                logger.error(f"Mondo.transform_data could not retrieve class "
+                             f"for URI {uri}")
                 continue
             try:
                 label = disease.label[0]
             except IndexError:
-                logger.debug(f"No label for concept {uri}")
+                logger.debug(f"No label for Mondo concept {uri}")
                 continue
 
+            aliases = list({d for d in disease.hasExactSynonym if d != label})
             params = {
                 'concept_id': disease.id[0].lower(),
                 'label': label,
-                'aliases': list({d for d in disease.hasExactSynonym if d != label}),  # noqa: E501
+                'aliases': aliases,
                 'xrefs': [],
                 'other_identifiers': []
             }
@@ -169,45 +152,45 @@ class Mondo(Base):
                 normed_prefix = MONDO_PREFIX_LOOKUP.get(prefix, None)
                 if not normed_prefix:
                     continue
-                other_id = f'{normed_prefix.value}:{id_no}'
+                other_id = f'{normed_prefix}:{id_no}'
 
-                if normed_prefix.value in PREFIX_LOOKUP:
+                if normed_prefix.lower() in PREFIX_LOOKUP:
                     params['other_identifiers'].append(other_id)
                 elif normed_prefix == NamespacePrefix.KEGG:
-                    other_id = f'{normed_prefix.value}:H{id_no}'
+                    other_id = f'{normed_prefix}:H{id_no}'
                     params['xrefs'].append(other_id)
                 else:
                     params['xrefs'].append(other_id)
 
             if disease.iri in peds_uris:
-                params['pediatric'] = True
-            else:
-                conforms_to = disease.conformsTo
-                if conforms_to and adult_onset_pattern in conforms_to:
-                    params['pediatric'] = False
+                params['pediatric_disease'] = True
 
             assert Disease(**params)  # check input validity
             self._load_disease(params)
 
     def _load_disease(self, disease: Dict):
-        """Load individual disease and associated references.
+        """Load individual disease and associated references. Stores disease
+        concept_id in `self._processed_ids` attribute.
 
         :param Dict disease: individual disease record to be loaded
         """
         concept_id = disease['concept_id']
-        aliases = disease['aliases']
+
+        aliases = {a.lower() for a in disease['aliases']}
         if aliases:
-            if len({a.casefold() for a in aliases}) > 20:
-                logger.debug(f'{concept_id} has > 20 aliases')
+            if len(aliases) > 20:
+                logger.debug(f'{concept_id} has >20 aliases')
                 del disease['aliases']
             else:
                 for alias in aliases:
                     self.database.add_ref_record(alias, concept_id, 'alias')
         else:
             del disease['aliases']
+
         for key in ('xrefs', 'other_identifiers'):
             if not disease[key]:
                 del disease[key]
 
         self.database.add_record(disease)
         self.database.add_ref_record(disease['label'], concept_id, 'label')
+        self._processed_ids.append(concept_id)
