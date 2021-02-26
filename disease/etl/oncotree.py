@@ -5,6 +5,8 @@ from disease import PROJECT_ROOT
 from disease.database import Database
 from pathlib import Path
 from typing import List
+import requests
+import json
 
 logger = logging.getLogger('disease')
 logger.setLevel(logging.DEBUG)
@@ -38,3 +40,28 @@ class OncoTree(Base):
         self._transform_data()
         self.database.flush_batch()
         return []
+
+    def _download_data(self):
+        """Download Oncotree source data for loading into normalizer."""
+        logger.info('Downloading OncoTree...')
+        # get version for latest stable release
+        versions_url = self._SRC_API_ROOT + 'versions'
+        versions = json.loads(requests.get(versions_url).text)
+        latest = [v['release_date'] for v in versions
+                  if v['api_identifier'] == 'oncotree_latest_stable'][0]
+        version = latest.replace('-', '_')
+
+        # download data
+        url = f'{self._SRC_API_ROOT}tumor_types.txt?version=oncotree_{version}'
+        try:
+            response = requests.get(url, stream=True)
+        except requests.exceptions.RequestException as e:
+            logger.error(f'OncoTree download failed: {e}')
+            raise e
+        filename = self._data_path / f'oncotree_{version}.txt'
+        handle = open(filename, 'wb')
+        for chunk in response.iter_content(chunk_size=512):
+            if chunk:
+                handle.write(chunk)
+        self._version = version
+        logger.info('Finished downloading OncoTree')
