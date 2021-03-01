@@ -92,13 +92,13 @@ def test_concept_id_match(oncotree, neuroblastoma, nsclc, ipn):
     actual_disease = response['records'][0].dict()
     compare_records(actual_disease, nsclc)
 
-    response = oncotree.search('oncotree:ipn')
+    response = oncotree.search('oncotree:icpn')
     assert response['match_type'] == MatchType.CONCEPT_ID
     assert len(response['records']) == 1
     actual_disease = response['records'][0].dict()
     compare_records(actual_disease, ipn)
 
-    response = oncotree.search('oncotree:IPN')
+    response = oncotree.search('oncotree:ICPN')
     assert response['match_type'] == MatchType.CONCEPT_ID
     assert len(response['records']) == 1
     actual_disease = response['records'][0].dict()
