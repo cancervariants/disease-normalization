@@ -34,6 +34,7 @@ def neuroblastoma():
         "other_identifiers": [
             "ncit:C3270",
             "DOID:769",
+            "oncotree:NBL",
         ],
         "xrefs": [
             "orphanet:635",
@@ -45,7 +46,6 @@ def neuroblastoma():
             "umls:CN205405",
             "efo:0000621",
             "icd:C74.9",
-            "oncotree:NBL",
             "mesh:D009447"
         ],
         "pediatric_disease": None,
