@@ -2,7 +2,7 @@
 import logging
 from .base import Base
 from disease import PROJECT_ROOT
-from disease.schemas import Meta, SourceName
+from disease.schemas import Meta, SourceName, NamespacePrefix, Disease
 from disease.database import Database
 from pathlib import Path
 from typing import List
@@ -29,12 +29,13 @@ class OncoTree(Base):
         self.database = database
         self._SRC_API_ROOT = src_api_root
         self._data_path = data_path
+        self._store_ids = False
 
     def perform_etl(self) -> List[str]:
         """Public-facing method to initiate ETL procedures on given data.
 
-        :return: empty set (because OncoTree IDs shouldn't be used to construct
-            merged concept groups)
+        :return: empty list (because OncoTree IDs shouldn't be used to
+            construct merged concept groups)
         """
         self._extract_data()
         self._load_meta()
@@ -46,14 +47,14 @@ class OncoTree(Base):
         """Download Oncotree source data for loading into normalizer."""
         logger.info('Downloading OncoTree...')
         # get version for latest stable release
-        versions_url = self._SRC_API_ROOT + 'versions'
+        versions_url = f"{self._SRC_API_ROOT}versions"
         versions = json.loads(requests.get(versions_url).text)
         latest = [v['release_date'] for v in versions
                   if v['api_identifier'] == 'oncotree_latest_stable'][0]
         version = latest.replace('-', '_')
 
         # download data
-        url = f'{self._SRC_API_ROOT}tumor_types.txt?version=oncotree_{version}'
+        url = f'{self._SRC_API_ROOT}tumorTypes/tree?version=oncotree_{version}'
         try:
             response = requests.get(url, stream=True)
         except requests.exceptions.RequestException as e:
@@ -82,3 +83,38 @@ class OncoTree(Base):
         params = dict(metadata)
         params['src_name'] = SourceName.ONCOTREE.value
         self.database.metadata.put_item(Item=params)
+
+    def _traverse_tree(self, disease_node):
+        """Traverse JSON tree and load diseases where possible.
+
+        :param Dict disease_node: node in tree containing info for individual
+            disease.
+        """
+        if disease_node.get('level', None) >= 2:
+            disease = {
+                "concept_id": f"{NamespacePrefix.ONCOTREE.value}:{disease_node['code']}",  # noqa: E501
+                "label": disease_node['name'],
+                "other_identifiers": [],
+            }
+            refs = disease_node.get('externalReferences', [])
+            for prefix, codes in refs.items():
+                if prefix == 'UMLS':
+                    normed_prefix = NamespacePrefix.UMLS.value
+                elif prefix == 'NCI':
+                    normed_prefix == NamespacePrefix.NCIT.value
+                else:
+                    raise Exception(f"Unrecognized prefix: {prefix}")
+                for code in codes:
+                    normed_id = f"{normed_prefix}:{code}"
+                    disease['other_identifiers'].append(normed_id)
+            assert Disease(**disease)
+            self._load_disease(disease)
+        if disease_node.get('children', None):
+            for child in disease_node['children'].values():
+                self._traverse_tree(child)
+
+    def _transform_data(self):
+        """Initiate OncoTree data transformation."""
+        with open(self._data_file, 'r') as f:
+            oncotree = json.load(f)
+        self._traverse_tree(oncotree['TISSUE'])
