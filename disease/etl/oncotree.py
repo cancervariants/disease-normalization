@@ -101,7 +101,7 @@ class OncoTree(Base):
                 if prefix == 'UMLS':
                     normed_prefix = NamespacePrefix.UMLS.value
                 elif prefix == 'NCI':
-                    normed_prefix == NamespacePrefix.NCIT.value
+                    normed_prefix = NamespacePrefix.NCIT.value
                 else:
                     raise Exception(f"Unrecognized prefix: {prefix}")
                 for code in codes:
