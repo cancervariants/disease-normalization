@@ -365,8 +365,10 @@ class QueryHandler:
             source_rank = 1
         elif src == SourceName.MONDO.value:
             source_rank = 2
-        elif src == SourceName.DO.value:
+        elif src == SourceName.ONCOTREE.value:
             source_rank = 3
+        elif src == SourceName.DO.value:
+            source_rank = 4
         else:
             logger.warning(f"query.record_order: Invalid source name for "
                            f"{record}")
