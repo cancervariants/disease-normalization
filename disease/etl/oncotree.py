@@ -26,10 +26,8 @@ class OncoTree(Base):
         :param str src_api_root: root of OncoTree API URL
         :param pathlib.Path data_path: path to local OncoTree data directory
         """
-        self.database = database
         self._SRC_API_ROOT = src_api_root
-        self._data_path = data_path
-        self._store_ids = False
+        super().__init__(database=database, data_path=data_path)
 
     def perform_etl(self) -> List[str]:
         """Public-facing method to initiate ETL procedures on given data.

@@ -33,6 +33,9 @@ NAMESPACE_LOOKUP = {v.value.lower(): NamespacePrefix[k].value
                     for k, v in SourceIDAfterNamespace.__members__.items()
                     if v.value != ''}
 
+# Use for checking whether to pull IDs for merge group generation
+SOURCES_FOR_MERGE = {SourceName.MONDO.value}
+
 from disease.etl import NCIt  # noqa: E402 F401
 from disease.etl import Mondo  # noqa: E402 F401
 from disease.etl import DO  # noqa: E402 F401
