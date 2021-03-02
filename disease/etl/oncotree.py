@@ -101,7 +101,8 @@ class OncoTree(Base):
                 elif prefix == 'NCI':
                     normed_prefix = NamespacePrefix.NCIT.value
                 else:
-                    raise Exception(f"Unrecognized prefix: {prefix}")
+                    logger.warning(f"Unrecognized prefix: {prefix}")
+                    continue
                 for code in codes:
                     normed_id = f"{normed_prefix}:{code}"
                     disease['other_identifiers'].append(normed_id)
