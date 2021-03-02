@@ -58,7 +58,7 @@ class OncoTree(Base):
         except requests.exceptions.RequestException as e:
             logger.error(f'OncoTree download failed: {e}')
             raise e
-        filename = self._data_path / f'oncotree_{version}.txt'
+        filename = self._data_path / f'oncotree_{version}.json'
         handle = open(filename, 'wb')
         for chunk in response.iter_content(chunk_size=512):
             if chunk:
