@@ -3,12 +3,12 @@ import logging
 from .base import OWLBase
 from disease import PROJECT_ROOT
 from disease.database import Database
-from disease.schemas import Meta, SourceName, NamespacePrefix, Disease
+from disease.schemas import Meta, SourceName, NamespacePrefix
 from pathlib import Path
 import requests
 import zipfile
 from os import remove, rename
-from typing import Set, Dict, List
+from typing import Set, List
 import owlready2 as owl
 from owlready2.entity import ThingClass
 import re
@@ -39,11 +39,12 @@ class NCIt(OWLBase):
         self._SRC_DIR = src_dir
         self._SRC_FNAME = src_fname
         self._data_path = data_path
+        self._store_ids = False
 
     def perform_etl(self) -> List[str]:
         """Public-facing method to initiate ETL procedures on given data.
 
-        :return: empty set (because NCIt IDs shouldn't be used to construct
+        :return: empty list (because NCIt IDs shouldn't be used to construct
             merged concept groups)
         """
         self._extract_data()
@@ -117,9 +118,7 @@ class NCIt(OWLBase):
             else:
                 logger.warning(f"No label for concept {concept_id}")
                 continue
-            aliases = disease_class.P90
-            if aliases and label in aliases:
-                aliases.remove(label)
+            aliases = [a for a in disease_class.P90 if a != label]
 
             xrefs = []
             if disease_class.P207:
@@ -143,25 +142,4 @@ class NCIt(OWLBase):
                 'aliases': aliases,
                 'xrefs': xrefs
             }
-            assert Disease(**disease)
             self._load_disease(disease)
-
-    def _load_disease(self, disease: Dict):
-        """Load individual disease record along with reference items.
-
-        :param Dict disease: disease record to load
-        """
-        aliases = disease['aliases']
-        concept_id = disease['concept_id']
-        if len({a.casefold() for a in aliases}) > 20:
-            logger.debug(f'{concept_id} has > 20 aliases')
-            del disease['aliases']
-        elif not aliases:
-            del disease['aliases']
-        else:
-            disease['aliases'] = list(set(aliases))
-            case_uq_aliases = {a.lower() for a in disease['aliases']}
-            for alias in case_uq_aliases:
-                self.database.add_ref_record(alias, concept_id, 'alias')
-        self.database.add_ref_record(disease['label'], concept_id, 'label')
-        self.database.add_record(disease)

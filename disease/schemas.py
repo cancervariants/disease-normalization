@@ -22,6 +22,7 @@ class SourceName(Enum):
     NCIT = "NCIt"
     MONDO = "Mondo"
     DO = "DO"
+    ONCOTREE = "OncoTree"
 
 
 class SourceIDAfterNamespace(Enum):
@@ -30,6 +31,7 @@ class SourceIDAfterNamespace(Enum):
     NCIT = "C"
     MONDO = ""
     DO = ""
+    ONCOTREE = ""
 
 
 class NamespacePrefix(Enum):
@@ -41,6 +43,7 @@ class NamespacePrefix(Enum):
     NCIT = "ncit"
     MONDO = "mondo"
     DO = "DOID"
+    ONCOTREE = "oncotree"
     # external sources
     COHD = "cohd"
     EFO = "efo"
@@ -63,7 +66,6 @@ class NamespacePrefix(Enum):
     OGMS = "ogms"
     OMIM = "omim"
     OMIMPS = "omimps"
-    ONCOTREE = "oncotree"
     ORPHANET = "orphanet"
     PATO = "pato"
     UMLS = "umls"
@@ -76,7 +78,8 @@ class SourcePriority(IntEnum):
 
     NCIT = 1
     MONDO = 2
-    DO = 3
+    ONCOTREE = 3
+    DO = 4
 
 
 class Disease(BaseModel):

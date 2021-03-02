@@ -37,5 +37,18 @@
       "share_alike": false,
       "attribution": false
     }
+  },
+  {
+    "src_name": "OncoTree",
+    "data_license": "CC BY 4.0",
+    "data_license_url": "https://creativecommons.org/licenses/by/4.0/legalcode",
+    "version": "2020_10_01",
+    "data_url": "http://oncotree.mskcc.org/#/home?tab=api",
+    "rdp_url": null,
+    "data_license_attributes": {
+      "non_commercial": false,
+      "share_alike": false,
+      "attribution": true
+    }
   }
 ]

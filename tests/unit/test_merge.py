@@ -54,8 +54,8 @@ def compare_merged_records(actual_record: Dict, fixture_record: Dict):
 def neuroblastoma():
     """Create neuroblastoma fixture."""
     return {
-        "label_and_type": "ncit:c3270|mondo:0005072|doid:769##merger",
-        "concept_id": "ncit:C3270|mondo:0005072|DOID:769",
+        "label_and_type": "ncit:c3270|mondo:0005072|oncotree:nbl|doid:769##merger",  # noqa: E501
+        "concept_id": "ncit:C3270|mondo:0005072|oncotree:NBL|DOID:769",
         "label": "Neuroblastoma",
         "aliases": [
             "neuroblastoma",
@@ -81,7 +81,6 @@ def neuroblastoma():
             "mesh:D009447",
             "meddra:10029260",
             "nifstd:birnlex_12631",
-            "oncotree:NBL",
             "orphanet:635",
             "umls:CN205405"
         ],
@@ -93,8 +92,8 @@ def neuroblastoma():
 def lnscc():
     """Create lung non small cell carcinoma fixture"""
     return {
-        "label_and_type": "ncit:c2926|mondo:0005233|doid:3908##merger",
-        "concept_id": "ncit:C2926|mondo:0005233|DOID:3908",
+        "label_and_type": "ncit:c2926|mondo:0005233|oncotree:nsclc|doid:3908##merger",  # noqa: E501
+        "concept_id": "ncit:C2926|mondo:0005233|oncotree:NSCLC|DOID:3908",
         "label": "Lung Non-Small Cell Carcinoma",
         "aliases": [
             "Non Small Cell Lung Cancer NOS",
@@ -119,7 +118,6 @@ def lnscc():
             "umls:C0007131",
             "mesh:D002289",
             "umls:C0007131",
-            "oncotree:NSCLC",
             "efo:0003060",
             "icd10:C34",
             "kegg.disease:05223",
@@ -212,10 +210,10 @@ def record_id_groups():
     """Fixture for concept ID group input."""
     return {
         'neuroblastoma': [
-            "ncit:C3270", "mondo:0005072", "DOID:769"
+            "ncit:C3270", "mondo:0005072", "DOID:769", "oncotree:NBL"
         ],
         'lnscc': [
-            "ncit:C2926", "mondo:0005233", "DOID:3908"
+            "ncit:C2926", "mondo:0005233", "DOID:3908", "oncotree:NSCLC"
         ],
         'richter': [
             "ncit:C35424", "mondo:0002083", "DOID:1703"
