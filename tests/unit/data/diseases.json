@@ -299,7 +299,6 @@
   {
     "label_and_type": "cystic teratoma of adults##alias",
     "item_type": "alias",
-    "item_type": "label",
     "concept_id": "mondo:0004099",
     "src_name": "Mondo"
   },
@@ -527,7 +526,7 @@
     "src_name": "NCIt"
   },
   {
-    "label_and_type": "peidatric liposarcoma##alias",
+    "label_and_type": "pediatric liposarcoma##alias",
     "item_type": "alias",
     "concept_id": "ncit:C8091",
     "src_name": "NCIt"
