@@ -370,6 +370,7 @@ class QueryHandler:
         else:
             logger.warning(f"query.record_order: Invalid source name for "
                            f"{record}")
+            source_rank = 4
         return (source_rank, record['concept_id'])
 
     def search_groups(self, query_str: str) -> Dict:
@@ -395,12 +396,18 @@ class QueryHandler:
             response = self._add_merged_meta(response)
             return response
 
+        non_merge_items = []
+
         # check concept ID match
         record = self.db.get_record_by_id(query_str, case_sensitive=False)
         if record:
             response['match_type'] = MatchType.CONCEPT_ID
-            response = self._add_merged_record(response, record['merge_ref'])
-            return response
+            if 'merge_ref' in record:
+                response = self._add_merged_record(response,
+                                                   record['merge_ref'])
+                return response
+            else:
+                non_merge_items.append(response)
 
         # check other match types
         for match_type in ['label', 'alias']:
@@ -414,10 +421,17 @@ class QueryHandler:
             for match in query_matches:
                 record = self.db.get_record_by_id(match['concept_id'], False)
                 if record:
-                    merge_ref = record['merge_ref']
-                    if merge_ref:
+                    if 'merge_ref' in record:
                         response['match_type'] = MatchType[match_type.upper()]
-                        return self._add_merged_record(response, merge_ref)
+                        return self._add_merged_record(response,
+                                                       record['merge_ref'])
+                    else:
+                        non_merge_items.append(record)
+
+        # check any recovered non-merged items
+        if non_merge_items:
+
+            pass  # TODO
 
         if not query_matches:
             response['match_type'] = MatchType.NO_MATCH
