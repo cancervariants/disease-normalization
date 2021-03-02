@@ -1,12 +1,5 @@
 """Defines packaging and distribution."""
-from setuptools import setup
+from setuptools import setup, find_packages
 
-setup(name='disease-normalization',
-      version='0.0.1',
-      description='VICC normalization routine for diseases',
-      url='https://github.com/cancervariants/disease-normalization',
-      author='VICC',
-      author_email='help@cancervariants.org',
-      license='MIT',
-      packages=['disease'],
+setup(packages=find_packages(),
       zip_safe=False)
