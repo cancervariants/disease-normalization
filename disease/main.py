@@ -1,4 +1,5 @@
 """Main application for FastAPI"""
+from disease import __version__
 from disease.query import QueryHandler, InvalidParameterException
 from disease.schemas import Service, NormalizationService
 from fastapi import FastAPI, HTTPException, Query
@@ -17,7 +18,7 @@ def custom_openapi():
         return app.openapi_schema
     openapi_schema = get_openapi(
         title="The VICC Disease Normalizer",
-        version="0.1.0",
+        version=__version__,
         openapi_version="3.0.3",
         description="Normalize disease terms.",
         routes=app.routes
