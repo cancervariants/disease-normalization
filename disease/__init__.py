@@ -3,7 +3,7 @@ from pathlib import Path
 import logging
 
 
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
+PROJECT_ROOT = Path(__file__).resolve().parents[0]
 
 logging.basicConfig(
     filename='disease.log',
