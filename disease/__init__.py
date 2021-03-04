@@ -5,12 +5,13 @@ import logging
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
-
 logging.basicConfig(
     filename='disease.log',
     format='[%(asctime)s] %(levelname)s : %(message)s')
 logger = logging.getLogger('disease')
 logger.setLevel(logging.DEBUG)
+
+__version__ = "0.1.2"
 
 
 from disease.schemas import SourceName, SourceIDAfterNamespace, NamespacePrefix  # noqa: E402, E501

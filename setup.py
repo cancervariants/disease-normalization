@@ -1,5 +1,5 @@
 """Defines packaging and distribution."""
-from setuptools import setup, find_packages
+from setuptools import setup
+from disease import __version__
 
-setup(packages=find_packages(),
-      zip_safe=False)
+setup(version=__version__)
