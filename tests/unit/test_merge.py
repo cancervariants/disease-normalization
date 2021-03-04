@@ -224,7 +224,7 @@ def record_id_groups():
         'teratoma': [
             "ncit:C9012", "mondo:0004099", "DOID:7079"
         ],
-        'mafd2': ["mondo:0010648", "DOID:0080221"]
+        'mafd2': ["mondo:0010648", "DOID:0080221"],
     }
 
 

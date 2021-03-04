@@ -325,17 +325,6 @@ class QueryHandler:
         response['meta_'] = sources_meta
         return response
 
-    def _format_merged_record(self, merged_record: Dict) -> Dict:
-        """Transform merged record (as served by DB) into response object
-        format.
-        :param Dict merged_record: merged record as returned by DB call
-        :return: formatted record
-        """
-        del merged_record['label_and_type']
-        merged_record['concept_ids'] = merged_record['concept_id'].split('|')
-        del merged_record['concept_id']
-        return merged_record
-
     def _add_merged_record(self, response: Dict, merge_ref: str) -> Dict:
         """Add referenced concept ID group to response object.
         :param Dict response: in-progress response object. Should have
@@ -350,7 +339,8 @@ class QueryHandler:
                            f"by way of query {response['query']}")
             response['match_type'] = MatchType.NO_MATCH
             return response
-        response['record'] = self._format_merged_record(merged_record)
+        merged_record['concept_ids'] = merged_record['concept_id'].split('|')
+        response['record'] = merged_record
         response = self._add_merged_meta(response)
         return response
 
@@ -393,12 +383,13 @@ class QueryHandler:
         record = self.db.get_record_by_id(query_str, case_sensitive=False,
                                           merge=True)
         if record:
+            record['concept_ids'] = record['concept_id'].split('|')
+            response['record'] = record
             response['match_type'] = MatchType.CONCEPT_ID
-            response['record'] = self._format_merged_record(record)
             response = self._add_merged_meta(response)
             return response
 
-        non_merge_items = []
+        non_merged_item = None
 
         # check concept ID match
         record = self.db.get_record_by_id(query_str, case_sensitive=False)
@@ -409,7 +400,7 @@ class QueryHandler:
                                                    record['merge_ref'])
                 return response
             else:
-                non_merge_items.append(response)
+                non_merged_item = (record, 'concept_id')
 
         # check other match types
         for match_type in ['label', 'alias']:
@@ -428,12 +419,17 @@ class QueryHandler:
                         return self._add_merged_record(response,
                                                        record['merge_ref'])
                     else:
-                        non_merge_items.append(record)
+                        if not non_merged_item:
+                            non_merged_item = (record, match_type)
 
-        # check any recovered non-merged items
-        if non_merge_items:
-
-            pass  # TODO
+        # if no successful match, try unmerged items
+        if non_merged_item:
+            record = non_merged_item[0]
+            record['concept_ids'] = [record['concept_id']]
+            response['record'] = non_merged_item[0]
+            response['match_type'] = MatchType[non_merged_item[1].upper()]
+            response = self._add_merged_meta(response)
+            return response
 
         if not query_matches:
             response['match_type'] = MatchType.NO_MATCH

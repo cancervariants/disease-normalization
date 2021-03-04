@@ -713,5 +713,28 @@
     "item_type": "label",
     "src_name": "OncoTree",
     "concept_id": "oncotree:ICPN"
+  },
+  {
+    "label_and_type": "ncit:C167370##identity",
+    "item_type": "identity",
+    "src_name": "NCIt",
+    "label": "Skin Myoepithelioma",
+    "concept_id": "ncit:C167370",
+    "aliases": ["Cutaneous Myoepithelioma"],
+    "other_identifiers": [],
+    "xrefs": [],
+    "pediatric_disease": null
+  },
+  {
+    "label_and_type": "skin myoepithelioma##label",
+    "item_type": "label",
+    "src_name": "NCIt",
+    "concept_id": "ncit:c167370"
+  },
+  {
+    "label_and_type": "Cutaneous Myoepithelioma#alias",
+    "item_type": "alias",
+    "src_name": "NCIt",
+    "concept_id": "ncit:c167370"
   }
 ]
