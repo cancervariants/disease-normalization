@@ -266,6 +266,27 @@ class MatchesListed(BaseModel):
             }
 
 
+class Extension(BaseModel):
+    """VRSATILE Extension class"""
+
+    type: str
+    name: str
+    value: Dict
+
+
+class ValueObjectDescriptor(BaseModel):
+    """VRSATILE VOD class"""
+
+    id: str
+    type: str
+    value: str  # TODO
+    label: str
+    description: Optional[str]
+    xrefs: Optional[List[str]]
+    alternate_labels: Optional[List[str]]
+    extensions: Optional[List[Extension]]
+
+
 class MergedMatch(BaseModel):
     """Represent merged concept in response to client."""
 
