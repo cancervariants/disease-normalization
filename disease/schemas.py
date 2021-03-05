@@ -267,47 +267,23 @@ class MatchesListed(BaseModel):
 
 
 class Extension(BaseModel):
-    """VRSATILE Extension class"""
+    """Value Object Descriptor Extension class."""
 
     type: str
     name: str
-    value: Dict
+    value: Any
 
 
 class ValueObjectDescriptor(BaseModel):
-    """VRSATILE VOD class"""
+    """VOD class."""
 
     id: str
     type: str
-    value: str  # TODO
+    value: Any
     label: str
-    description: Optional[str]
     xrefs: Optional[List[str]]
     alternate_labels: Optional[List[str]]
     extensions: Optional[List[Extension]]
-
-
-class MergedMatch(BaseModel):
-    """Represent merged concept in response to client."""
-
-    label: Optional[str]
-    concept_ids: List[str]
-    aliases: Optional[List[str]]
-    xrefs: Optional[List[str]]
-    pediatric_disease: Optional[bool]
-
-    class Config:
-        """Enables orm_mode"""
-
-        @staticmethod
-        def schema_extra(schema: Dict[str, Any],
-                         model: Type['MergedMatch']) -> None:
-            """Configure OpenAPI schema"""
-            if 'title' in schema.keys():
-                schema.pop('title', None)
-            for prop in schema.get('properties', {}).values():
-                prop.pop('title', None)
-            schema['example'] = {}  # TODO
 
 
 class NormalizationService(BaseModel):
@@ -316,7 +292,7 @@ class NormalizationService(BaseModel):
     query: str
     warnings: Optional[Dict]
     match_type: MatchType
-    record: Optional[MergedMatch]
+    record: Optional[ValueObjectDescriptor]
     meta_: Optional[Dict[SourceName, Meta]]
 
     class Config:
