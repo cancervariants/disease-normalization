@@ -212,6 +212,34 @@ def record_id_groups():
     }
 
 
+def compare_merged_records(actual, fixture):
+    """Verify correctness of merged DB record."""
+    assert actual['concept_id'] == fixture['concept_id']
+    assert ('other_ids' in actual) == ('other_ids' in fixture)
+    if 'other_ids' in actual:
+        assert set(actual['other_ids']) == set(fixture['other_ids'])
+
+    assert actual['label_and_type'] == fixture['label_and_type']
+    assert actual['item_type'] == fixture['item_type']
+
+    assert ('label' in actual) == ('label' in fixture)
+    if 'label' in actual or 'label' in fixture:
+        assert actual['label'] == fixture['label']
+
+    assert ('aliases' in actual) == ('aliases' in fixture)
+    if 'aliases' in actual or 'aliases' in fixture:
+        assert set(actual['aliases']) == set(fixture['aliases'])
+
+    assert ('xrefs' in actual) == ('xrefs' in fixture)
+    if 'xrefs' in actual or 'xrefs' in fixture:
+        assert set(actual['xrefs']) == set(fixture['xrefs'])
+
+    assert ('pediatric_disease' in actual) == \
+        ('pediatric_disease' in fixture)
+    if 'pediatric_disease' in actual or 'pediatric_disease' in fixture:
+        assert actual['pediatric_disease'] == fixture['pediatric_disease']
+
+
 def test_generate_merged_record(merge_handler, record_id_groups, neuroblastoma,
                                 lnscc, richter, ped_liposarcoma, teratoma,
                                 mafd2, compare_merged_records):

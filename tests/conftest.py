@@ -7,47 +7,6 @@ import pytest
 
 
 @pytest.fixture(scope='module')
-def compare_merged_records():
-    """Check that records are identical."""
-
-    def compare_merged_records(actual, fixture):
-        if 'concept_ids' in actual:  # record as displayed externally
-            assert 'concept_ids' in fixture
-            assert 'concept_id' not in actual and 'concept_id' not in fixture
-            assert set(actual['concept_ids']) == set(fixture['concept_ids'])
-        elif 'concept_id' in actual:  # record as stored internally
-            assert 'concept_id' in fixture
-            assert 'concept_ids' not in fixture
-            assert actual['concept_id'] == fixture['concept_id']
-            assert ('other_ids' in actual) == ('other_ids' in fixture)
-
-            assert actual['label_and_type'] == fixture['label_and_type']
-            assert actual['item_type'] == fixture['item_type']
-
-            if 'other_ids' in actual:
-                assert set(actual['other_ids']) == set(fixture['other_ids'])
-
-        assert ('label' in actual) == ('label' in fixture)
-        if 'label' in actual or 'label' in fixture:
-            assert actual['label'] == fixture['label']
-
-        assert ('aliases' in actual) == ('aliases' in fixture)
-        if 'aliases' in actual or 'aliases' in fixture:
-            assert set(actual['aliases']) == set(fixture['aliases'])
-
-        assert ('xrefs' in actual) == ('xrefs' in fixture)
-        if 'xrefs' in actual or 'xrefs' in fixture:
-            assert set(actual['xrefs']) == set(fixture['xrefs'])
-
-        assert ('pediatric_disease' in actual) == \
-            ('pediatric_disease' in fixture)
-        if 'pediatric_disease' in actual or 'pediatric_disease' in fixture:
-            assert actual['pediatric_disease'] == fixture['pediatric_disease']
-
-    return compare_merged_records
-
-
-@pytest.fixture(scope='module')
 def mock_database():
     """Return MockDatabase object."""
 

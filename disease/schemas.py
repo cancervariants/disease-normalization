@@ -292,7 +292,7 @@ class NormalizationService(BaseModel):
     query: str
     warnings: Optional[Dict]
     match_type: MatchType
-    record: Optional[ValueObjectDescriptor]
+    value_object_descriptor: Optional[ValueObjectDescriptor]
     meta_: Optional[Dict[SourceName, Meta]]
 
     class Config:

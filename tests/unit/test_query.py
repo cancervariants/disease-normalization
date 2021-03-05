@@ -20,9 +20,6 @@ def query_handler():
 
         def normalize(self, query_str):
             return self.query_handler.search_groups(query_str)
-            # response = self.query_handler.search_groups(query_str)
-            # print(response)
-            # return response
 
     return QueryGetter()
 
@@ -31,14 +28,19 @@ def query_handler():
 def neuroblastoma():
     """Create neuroblastoma fixture."""
     return {
-        "concept_ids": [
-            "ncit:C3270",
+        "id": "normalize:Neuroblastoma",
+        "type": "DiseaseDescriptor",
+        "value": {
+            "type": "Disease",
+            "disease_id": "ncit:C3270"
+        },
+        "label": "Neuroblastoma",
+        "xrefs": [
             "mondo:0005072",
             "oncotree:NBL",
             "DOID:769"
         ],
-        "label": "Neuroblastoma",
-        "aliases": [
+        "alternate_labels": [
             "neuroblastoma",
             "Neural Crest Tumor, Malignant",
             "Neuroblastoma (Schwannian Stroma-poor)",
@@ -50,23 +52,74 @@ def neuroblastoma():
             "neural Crest tumor, malignant",
             "neuroblastoma, malignant"
         ],
-        "xrefs": [
-            "umls:C0027819",
-            "icd.o:9500/3",
-            "efo:0000621",
-            "gard:7185",
-            "gard:0007185",
-            "icd:C74.9",
-            "icd.o:9500/3",
-            "icd.o:M9500/3",
-            "mesh:D009447",
-            "meddra:10029260",
-            "nifstd:birnlex_12631",
-            "orphanet:635",
-            "umls:CN205405"
-        ],
-        "pediatric": None
+        "extensions": [
+            {
+                "type": "Extension",
+                "name": "associated_with",
+                "value": [
+                    "umls:C0027819",
+                    "icd.o:9500/3",
+                    "efo:0000621",
+                    "gard:7185",
+                    "gard:0007185",
+                    "icd:C74.9",
+                    "icd.o:9500/3",
+                    "icd.o:M9500/3",
+                    "mesh:D009447",
+                    "meddra:10029260",
+                    "nifstd:birnlex_12631",
+                    "orphanet:635",
+                    "umls:CN205405"
+                ]
+            }
+        ]
+
     }
+
+
+def compare_VOD(actual, fixture):
+    """Verify correctness of returned VOD object against test fixture."""
+    assert actual['id'] == fixture['id']
+    assert actual['type'] == fixture['type']
+    assert actual['value'] == fixture['value']
+    assert actual['label'] == fixture['label']
+
+    assert ('xrefs' in actual) == ('xrefs' in fixture)
+    if 'xrefs' in actual:
+        assert set(actual['xrefs']) == set(fixture['xrefs'])
+
+    assert ('alternate_labels' in actual) == ('alternate_labels' in fixture)
+    if 'alternate_labels' in actual:
+        assert set(actual['alternate_labels']) == \
+            set(fixture['alternate_labels'])
+
+    def get_extension(extensions, name):
+        matches = [e for e in extensions if e['name'] == name]
+        if len(matches) > 1:
+            assert False
+        elif len(matches) == 1:
+            return matches[0]
+        else:
+            return None
+
+    assert ('extensions' in actual) == ('extensions' in fixture)
+    if 'extensions' in actual:
+        ext_actual = actual['extensions']
+        ext_fixture = fixture['extensions']
+
+        assoc_actual = get_extension(ext_actual, 'associated_with')
+        assoc_fixture = get_extension(ext_fixture, 'associated_with')
+        assert (assoc_actual is None) == (assoc_fixture is None)
+        if assoc_actual:
+            assert set(assoc_actual['value']) == set(assoc_fixture['value'])
+            assert assoc_actual['value']
+
+        ped_actual = get_extension(ext_actual, 'pediatric_disease')
+        ped_fixture = get_extension(ext_fixture, 'pediatric_disease')
+        assert (ped_actual is None) == (ped_fixture is None)
+        if ped_actual:
+            assert set(ped_actual['value']) == set(ped_fixture['value'])
+            assert ped_actual['value']
 
 
 @pytest.fixture(scope='module')
@@ -144,11 +197,16 @@ def test_query_specify_query_handlers(query_handler):
 
 
 def test_normalize_query(query_handler, neuroblastoma, compare_merged_records):
-    """Test that normalized endpoint correctly resolves queries."""
+    """Test that normalized endpoint correctly resolves queries, and utilizes
+    the VOD schema.
+    """
     response = query_handler.normalize('Neuroblastoma')
     assert response['match_type'] == MatchType.LABEL
-    assert len(response['meta_']) == 4
+    assert response['warnings'] is None
+
     compare_merged_records(response['record'], neuroblastoma)
+
+    assert len(response['meta_']) == 4
     assert 'NCIt' in response['meta_']
     assert 'DO' in response['meta_']
     assert 'Mondo' in response['meta_']
