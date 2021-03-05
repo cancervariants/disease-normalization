@@ -77,6 +77,49 @@ def neuroblastoma():
     }
 
 
+@pytest.fixture(scope='module')
+def skin_myo():
+    """Create a test fixture for skin myopithelioma"""
+    return {
+        "id": "normalize:Skin Myoepithelioma",
+        "type": "DiseaseDescriptor",
+        "value": {
+            "type": "Disease",
+            "disease_id": "ncit:C167370"
+        },
+        "label": "Skin Myoepithelioma",
+        "alternate_labels": ["Cutaneous Myoepithelioma"],
+    }
+
+
+@pytest.fixture(scope='module')
+def mafd2():
+    """Create a test fixture for major affective disorder 2. Query should not
+    include an `"xrefs"` field or a `"pediatric_disease"`
+    extension.
+    """
+    return {
+        "id": "normalize:MAFD2",
+        "type": "DiseaseDescriptor",
+        "value": {
+            "type": "Disease",
+            "disease_id": "mondo:0010648"
+        },
+        "label": "major affective disorder 2",
+        "alternate_labels": ["MAFD2"],
+        "extensions": [
+            {
+                "type": "Extension",
+                "name": "associated_with",
+                "value": [
+                    "omim:309200",
+                    "mesh:C564108"
+                ]
+            }
+        ]
+    }
+
+
 def compare_vod(actual, fixture):
     """Verify correctness of returned VOD object against test fixture."""
     assert actual['id'] == fixture['id']
@@ -120,18 +163,6 @@ def compare_vod(actual, fixture):
         if ped_actual:
             assert set(ped_actual['value']) == set(ped_fixture['value'])
             assert ped_actual['value']
-
-
-@pytest.fixture(scope='module')
-def skin_myo():
-    """Create a test fixture for skin myopithelioma"""
-    return {
-        "concept_ids": ["ncit:C167370"],
-        "label": "Skin Myoepithelioma",
-        "aliases": ["Cutaneous Myoepithelioma"],
-        "other_identifiers": [],
-        "xrefs": [],
-    }
 
 
 def test_query(query_handler):
@@ -196,21 +227,26 @@ def test_query_specify_query_handlers(query_handler):
                                     incl='mondo', excl='ncit')
 
 
-def test_normalize_query(query_handler, neuroblastoma):
+def test_normalize_query(query_handler, neuroblastoma, mafd2):
     """Test that normalized endpoint correctly resolves queries, and utilizes
     the VOD schema.
     """
     response = query_handler.normalize('Neuroblastoma')
     assert response['match_type'] == MatchType.LABEL
     assert response['warnings'] is None
-
     compare_vod(response['value_object_descriptor'], neuroblastoma)
-
     assert len(response['meta_']) == 4
     assert 'NCIt' in response['meta_']
     assert 'DO' in response['meta_']
     assert 'Mondo' in response['meta_']
-    assert 'Oncotree' in response['meta_']
+    assert 'OncoTree' in response['meta_']
+
+    response = query_handler.normalize('MAFD2')
+    assert response['match_type'] == MatchType.ALIAS
+    assert response['warnings'] is None
+    compare_vod(response['value_object_descriptor'], mafd2)
+    assert len(response['meta_']) == 1
+    assert 'Mondo' in response['meta_']
 
 
 def test_normalize_non_mondo(query_handler, skin_myo):
@@ -224,5 +260,7 @@ def test_normalize_non_mondo(query_handler, skin_myo):
     response = query_handler.normalize('Cutaneous Myoepithelioma')
     assert response['match_type'] == MatchType.ALIAS
     assert len(response['meta_']) == 1
-    compare_vod(response['value_object_descriptor'], skin_myo)
+    skin_myo_alias = skin_myo.copy()
+    skin_myo_alias['id'] = 'normalize:Cutaneous Myoepithelioma'
+    compare_vod(response['value_object_descriptor'], skin_myo_alias)
     assert 'NCIt' in response['meta_']
