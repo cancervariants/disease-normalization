@@ -20,8 +20,53 @@ def query_handler():
 
         def normalize(self, query_str):
             return self.query_handler.search_groups(query_str)
+            # response = self.query_handler.search_groups(query_str)
+            # print(response)
+            # return response
 
     return QueryGetter()
+
+
+@pytest.fixture(scope='module')
+def neuroblastoma():
+    """Create neuroblastoma fixture."""
+    return {
+        "concept_ids": [
+            "ncit:C3270",
+            "mondo:0005072",
+            "oncotree:NBL",
+            "DOID:769"
+        ],
+        "label": "Neuroblastoma",
+        "aliases": [
+            "neuroblastoma",
+            "Neural Crest Tumor, Malignant",
+            "Neuroblastoma (Schwannian Stroma-poor)",
+            "neuroblastoma (Schwannian Stroma-poor)",
+            "Neuroblastoma (Schwannian Stroma-Poor)",
+            "Neuroblastoma, NOS",
+            "NEUROBLASTOMA, MALIGNANT",
+            "Neuroblastoma (NBL)",
+            "neural Crest tumor, malignant",
+            "neuroblastoma, malignant"
+        ],
+        "xrefs": [
+            "umls:C0027819",
+            "icd.o:9500/3",
+            "efo:0000621",
+            "gard:7185",
+            "gard:0007185",
+            "icd:C74.9",
+            "icd.o:9500/3",
+            "icd.o:M9500/3",
+            "mesh:D009447",
+            "meddra:10029260",
+            "nifstd:birnlex_12631",
+            "orphanet:635",
+            "umls:CN205405"
+        ],
+        "pediatric": None
+    }
 
 
 @pytest.fixture(scope='module')
@@ -34,27 +79,6 @@ def skin_myo():
         "other_identifiers": [],
         "xrefs": [],
     }
-
-
-def compare_merged_records(actual_record, fixture_record):
-    """Check that records are identical."""
-    assert set(actual_record['concept_ids']) == \
-        set(fixture_record['concept_ids'])
-    assert ('label' in actual_record) == ('label' in fixture_record)
-    if 'label' in actual_record or 'label' in fixture_record:
-        assert actual_record['label'] == fixture_record['label']
-    assert ('aliases' in actual_record) == ('aliases' in fixture_record)
-    if 'aliases' in actual_record or 'aliases' in fixture_record:
-        assert set(actual_record['aliases']) == set(fixture_record['aliases'])
-    assert ('xrefs' in actual_record) == ('xrefs' in fixture_record)
-    if 'xrefs' in actual_record or 'xrefs' in fixture_record:
-        assert set(actual_record['xrefs']) == set(fixture_record['xrefs'])
-    assert ('pediatric_disease' in actual_record) == \
-        ('pediatric_disease' in fixture_record)
-    if 'pediatric_disease' in actual_record or \
-            'pediatric_disease' in fixture_record:
-        assert actual_record['pediatric_disease'] == \
-            fixture_record['pediatric_disease']
 
 
 def test_query(query_handler):
@@ -119,7 +143,19 @@ def test_query_specify_query_handlers(query_handler):
                                     incl='mondo', excl='ncit')
 
 
-def test_normalize_non_mondo(query_handler, skin_myo):
+def test_normalize_query(query_handler, neuroblastoma, compare_merged_records):
+    """Test that normalized endpoint correctly resolves queries."""
+    response = query_handler.normalize('Neuroblastoma')
+    assert response['match_type'] == MatchType.LABEL
+    assert len(response['meta_']) == 4
+    compare_merged_records(response['record'], neuroblastoma)
+    assert 'NCIt' in response['meta_']
+    assert 'DO' in response['meta_']
+    assert 'Mondo' in response['meta_']
+    assert 'Oncotree' in response['meta_']
+
+
+def test_normalize_non_mondo(query_handler, skin_myo, compare_merged_records):
     """Test that normalize endpoint returns records not in Mondo groups."""
     response = query_handler.normalize('Skin Myoepithelioma')
     assert response['match_type'] == MatchType.LABEL
