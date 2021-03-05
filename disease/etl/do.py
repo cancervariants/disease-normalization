@@ -3,11 +3,11 @@ import logging
 from .base import OWLBase
 from pathlib import Path
 from disease import PROJECT_ROOT, PREFIX_LOOKUP
-from disease.schemas import Meta, SourceName, NamespacePrefix, Disease
+from disease.schemas import Meta, SourceName, NamespacePrefix
 from disease.database import Database
 from datetime import datetime
 import owlready2 as owl
-from typing import Dict, List
+from typing import List
 
 
 logger = logging.getLogger('disease')
@@ -44,11 +44,10 @@ class DO(OWLBase):
         :param str src_url: URL for source data file
         :param pathlib.Path data_path: path to local DO data directory
         """
-        self.database = database
         self._SRC_DLOAD_PAGE = src_dload_page
         self._SRC_URL = src_url
-        self._data_path = data_path
         self._version = datetime.strftime(datetime.now(), "%Y%m%d")
+        super().__init__(database=database, data_path=data_path)
 
     def perform_etl(self) -> List[str]:
         """Public-facing method to initiate ETL procedures on given data.
@@ -118,28 +117,4 @@ class DO(OWLBase):
                 "other_identifiers": other_ids,
                 "xrefs": xrefs
             }
-            assert Disease(**disease)
             self._load_disease(disease)
-
-    def _load_disease(self, disease: Dict):
-        """Load individual disease record along with reference items.
-
-        :param Dict disease: disease record to load
-        """
-        concept_id = disease['concept_id']
-        aliases = disease['aliases']
-        if len({a.casefold() for a in aliases}) > 20:
-            logger.debug(f'{concept_id} has > 20 aliases')
-            del disease['aliases']
-        elif not aliases:
-            del disease['aliases']
-        else:
-            case_uq_aliases = {a.lower() for a in disease['aliases']}
-            for alias in case_uq_aliases:
-                self.database.add_ref_record(alias, concept_id, 'alias')
-        for key in ['other_identifiers', 'xrefs']:
-            if not disease[key]:
-                del disease[key]
-        self.database.add_ref_record(disease['label'], concept_id,
-                                     'label')
-        self.database.add_record(disease)

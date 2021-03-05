@@ -33,9 +33,13 @@ NAMESPACE_LOOKUP = {v.value.lower(): NamespacePrefix[k].value
                     for k, v in SourceIDAfterNamespace.__members__.items()
                     if v.value != ''}
 
+# Use for checking whether to pull IDs for merge group generation
+SOURCES_FOR_MERGE = {SourceName.MONDO.value}
+
 from disease.etl import NCIt  # noqa: E402 F401
 from disease.etl import Mondo  # noqa: E402 F401
 from disease.etl import DO  # noqa: E402 F401
+from disease.etl import OncoTree  # noqa: E402 F401
 # Use to lookup class object from source name. Should be one key-value pair
 # for every functioning ETL class.
 SOURCES_CLASS_LOOKUP = {s.value.lower(): eval(s.value)

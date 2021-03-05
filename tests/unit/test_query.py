@@ -26,7 +26,7 @@ def test_query(query_handler):
     assert resp['query'] == 'Neuroblastoma'
     matches = resp['source_matches']
     assert isinstance(matches, list)
-    assert len(matches) == 3
+    assert len(matches) == 4
     ncit = list(filter(lambda m: m['source'] == 'NCIt',
                        matches))[0]
     assert len(ncit['records']) == 1
@@ -47,14 +47,15 @@ def test_query_keyed(query_handler):
 def test_query_specify_query_handlers(query_handler):
     """Test inclusion and exclusion of sources in query."""
     # test full inclusion
-    sources = 'ncit,mondo,do'
+    sources = 'ncit,mondo,do,oncotree'
     resp = query_handler.normalize('Neuroblastoma', keyed=True,
                                    incl=sources, excl='')
     matches = resp['source_matches']
-    assert len(matches) == 3
+    assert len(matches) == 4
     assert 'NCIt' in matches
     assert 'Mondo' in matches
     assert 'DO' in matches
+    assert 'OncoTree' in matches
 
     # test full exclusion
     resp = query_handler.normalize('Neuroblastoma', keyed=True,

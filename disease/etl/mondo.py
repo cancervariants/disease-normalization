@@ -3,11 +3,11 @@ from .base import OWLBase
 import logging
 from disease import PROJECT_ROOT, PREFIX_LOOKUP
 from disease.database import Database
-from disease.schemas import Meta, SourceName, NamespacePrefix, Disease
+from disease.schemas import Meta, SourceName, NamespacePrefix
 from pathlib import Path
 import requests
 import owlready2 as owl
-from typing import Dict, List
+from typing import List
 
 
 logger = logging.getLogger('disease')
@@ -67,12 +67,10 @@ class Mondo(OWLBase):
         :param str src_url: direct URL to OWL file download
         :param pathlib.Path data_path: path to local Mondo data directory
         """
-        self.database = database
         self._SRC_DLOAD_PAGE = src_dload_page
         self._SRC_URL = src_url
         self._version = version
-        self._data_path = data_path
-        self._processed_ids = []
+        super().__init__(database=database, data_path=data_path)
 
     def perform_etl(self) -> List[str]:
         """Public-facing method to initiate ETL procedures on given data.
@@ -165,32 +163,4 @@ class Mondo(OWLBase):
             if disease.iri in peds_uris:
                 params['pediatric_disease'] = True
 
-            assert Disease(**params)  # check input validity
             self._load_disease(params)
-
-    def _load_disease(self, disease: Dict):
-        """Load individual disease and associated references. Stores disease
-        concept_id in `self._processed_ids` attribute.
-
-        :param Dict disease: individual disease record to be loaded
-        """
-        concept_id = disease['concept_id']
-
-        aliases = {a.lower() for a in disease['aliases']}
-        if aliases:
-            if len(aliases) > 20:
-                logger.debug(f'{concept_id} has >20 aliases')
-                del disease['aliases']
-            else:
-                for alias in aliases:
-                    self.database.add_ref_record(alias, concept_id, 'alias')
-        else:
-            del disease['aliases']
-
-        for key in ('xrefs', 'other_identifiers'):
-            if not disease[key]:
-                del disease[key]
-
-        self.database.add_record(disease)
-        self.database.add_ref_record(disease['label'], concept_id, 'label')
-        self._processed_ids.append(concept_id)
