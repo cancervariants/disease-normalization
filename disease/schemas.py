@@ -271,7 +271,7 @@ class Extension(BaseModel):
 
     type: str
     name: str
-    value: Any
+    value: Union[bool, List[str]]
 
 
 class ValueObjectDescriptor(BaseModel):
