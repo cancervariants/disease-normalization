@@ -242,7 +242,7 @@ def compare_merged_records(actual, fixture):
 
 def test_generate_merged_record(merge_handler, record_id_groups, neuroblastoma,
                                 lnscc, richter, ped_liposarcoma, teratoma,
-                                mafd2, compare_merged_records):
+                                mafd2):
     """Test generation of individual merged record."""
     neuroblastoma_ids = record_id_groups['neuroblastoma']
     response, r_ids = merge_handler.generate_merged_record(neuroblastoma_ids)
@@ -277,7 +277,7 @@ def test_generate_merged_record(merge_handler, record_id_groups, neuroblastoma,
 
 def test_create_merged_concepts(merge_handler, record_id_groups, neuroblastoma,
                                 lnscc, richter, ped_liposarcoma, teratoma,
-                                mafd2, compare_merged_records):
+                                mafd2):
     """Test end-to-end creation and upload of merged concepts."""
     mondo_ids = [
         "mondo:0005072",

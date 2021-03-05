@@ -77,7 +77,7 @@ def neuroblastoma():
     }
 
 
-def compare_VOD(actual, fixture):
+def compare_vod(actual, fixture):
     """Verify correctness of returned VOD object against test fixture."""
     assert actual['id'] == fixture['id']
     assert actual['type'] == fixture['type']
@@ -196,7 +196,7 @@ def test_query_specify_query_handlers(query_handler):
                                     incl='mondo', excl='ncit')
 
 
-def test_normalize_query(query_handler, neuroblastoma, compare_merged_records):
+def test_normalize_query(query_handler, neuroblastoma):
     """Test that normalized endpoint correctly resolves queries, and utilizes
     the VOD schema.
     """
@@ -204,7 +204,7 @@ def test_normalize_query(query_handler, neuroblastoma, compare_merged_records):
     assert response['match_type'] == MatchType.LABEL
     assert response['warnings'] is None
 
-    compare_merged_records(response['record'], neuroblastoma)
+    compare_vod(response['value_object_descriptor'], neuroblastoma)
 
     assert len(response['meta_']) == 4
     assert 'NCIt' in response['meta_']
@@ -213,16 +213,16 @@ def test_normalize_query(query_handler, neuroblastoma, compare_merged_records):
     assert 'Oncotree' in response['meta_']
 
 
-def test_normalize_non_mondo(query_handler, skin_myo, compare_merged_records):
+def test_normalize_non_mondo(query_handler, skin_myo):
     """Test that normalize endpoint returns records not in Mondo groups."""
     response = query_handler.normalize('Skin Myoepithelioma')
     assert response['match_type'] == MatchType.LABEL
     assert len(response['meta_']) == 1
-    compare_merged_records(response['record'], skin_myo)
+    compare_vod(response['value_object_descriptor'], skin_myo)
     assert 'NCIt' in response['meta_']
 
     response = query_handler.normalize('Cutaneous Myoepithelioma')
     assert response['match_type'] == MatchType.ALIAS
     assert len(response['meta_']) == 1
-    compare_merged_records(response['record'], skin_myo)
+    compare_vod(response['value_object_descriptor'], skin_myo)
     assert 'NCIt' in response['meta_']
