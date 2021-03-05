@@ -1,9 +1,12 @@
 """Pytest test config tools."""
 from disease.database import Database
-from disease import PROJECT_ROOT
 from typing import Dict, Any, Optional, List
 import json
 import pytest
+from pathlib import Path
+
+
+TEST_ROOT = Path(__file__).resolve().parents[2]
 
 
 @pytest.fixture(scope='module')
@@ -23,7 +26,7 @@ def mock_database():
             `self.updates` stores update requests, with the concept_id as the
             key and the updated attribute and new value as the value.
             """
-            infile = PROJECT_ROOT / '..' / 'tests' / 'unit' / 'data' / 'diseases.json'  # noqa: E501
+            infile = TEST_ROOT / '..' / 'tests' / 'unit' / 'data' / 'diseases.json'  # noqa: E501
             with open(infile, 'r') as f:
                 records_json = json.load(f)
             self.records = {}
@@ -33,7 +36,7 @@ def mock_database():
                 }
             self.added_records: Dict[str, Dict[Any, Any]] = {}
             self.updates: Dict[str, Dict[Any, Any]] = {}
-            meta = PROJECT_ROOT / '..' / 'tests' / 'unit' / 'data' / 'metadata.json'  # noqa: E501
+            meta = TEST_ROOT / '..' / 'tests' / 'unit' / 'data' / 'metadata.json'  # noqa: E501
             with open(meta, 'r') as f:
                 meta_json = json.load(f)
             self.cached_sources = {}
