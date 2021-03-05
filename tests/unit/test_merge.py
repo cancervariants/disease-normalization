@@ -74,6 +74,7 @@ def lnscc():
     return {
         "label_and_type": "ncit:c2926##merger",
         "concept_id": "ncit:C2926",
+        "other_ids": ["mondo:0005233", "oncotree:NSCLC", "DOID:3908"],
         "label": "Lung Non-Small Cell Carcinoma",
         "aliases": [
             "Non Small Cell Lung Cancer NOS",
@@ -113,6 +114,7 @@ def richter():
     return {
         "label_and_type": "ncit:c35424##merger",
         "concept_id": "ncit:C35424",
+        "other_ids": ["mondo:0002083", "DOID:1703"],
         "label": "Richter Syndrome",
         "aliases": [
             "Richter's Syndrome",
@@ -139,6 +141,7 @@ def ped_liposarcoma():
     return {
         "label_and_type": "ncit:c8091##merger",
         "concept_id": "ncit:C8091",
+        "other_ids": ["mondo:0003587", "DOID:5695"],
         "label": "Childhood Liposarcoma",
         "aliases": [
             "Liposarcoma",
@@ -158,6 +161,7 @@ def teratoma():
     return {
         "label_and_type": "ncit:c9012##merger",
         "concept_id": "ncit:C9012",
+        "other_ids": ["mondo:0004099", "DOID:7079"],
         "label": "Adult Cystic Teratoma",
         "aliases": ["Adult cystic teratoma", "cystic teratoma of adults"],
         "xrefs": ["icd.o:9080/0", "umls:C1368888"],
