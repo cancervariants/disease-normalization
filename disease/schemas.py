@@ -46,7 +46,7 @@ class NamespacePrefix(Enum):
     ONCOTREE = "oncotree"
     # external sources
     COHD = "cohd"
-    EFO = "efo"
+    FO = "efo"
     GARD = "gard"
     HPO = "HP"
     ICD9 = "icd9"
@@ -266,27 +266,24 @@ class MatchesListed(BaseModel):
             }
 
 
-class MergedMatch(BaseModel):
-    """Represent merged concept in response to client."""
+class Extension(BaseModel):
+    """Value Object Descriptor Extension class."""
 
-    label: Optional[str]
-    concept_ids: List[str]
-    aliases: Optional[List[str]]
+    type: str
+    name: str
+    value: Union[bool, List[str]]
+
+
+class ValueObjectDescriptor(BaseModel):
+    """VOD class."""
+
+    id: str
+    type: str
+    value: Any
+    label: str
     xrefs: Optional[List[str]]
-    pediatric_disease: Optional[bool]
-
-    class Config:
-        """Enables orm_mode"""
-
-        @staticmethod
-        def schema_extra(schema: Dict[str, Any],
-                         model: Type['MergedMatch']) -> None:
-            """Configure OpenAPI schema"""
-            if 'title' in schema.keys():
-                schema.pop('title', None)
-            for prop in schema.get('properties', {}).values():
-                prop.pop('title', None)
-            schema['example'] = {}  # TODO
+    alternate_labels: Optional[List[str]]
+    extensions: Optional[List[Extension]]
 
 
 class NormalizationService(BaseModel):
@@ -295,7 +292,7 @@ class NormalizationService(BaseModel):
     query: str
     warnings: Optional[Dict]
     match_type: MatchType
-    record: Optional[MergedMatch]
+    value_object_descriptor: Optional[ValueObjectDescriptor]
     meta_: Optional[Dict[SourceName, Meta]]
 
     class Config:
