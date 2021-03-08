@@ -3,7 +3,7 @@ disease records.
 """
 from typing import Any, Dict, Type, List, Optional, Union
 from enum import Enum, IntEnum
-from pydantic import BaseModel, StrictBool
+from pydantic import BaseModel, StrictBool, validator
 
 
 class MatchType(IntEnum):
@@ -266,6 +266,32 @@ class MatchesListed(BaseModel):
             }
 
 
+class DiseaseValue(BaseModel):
+    """Class for Disease Value within VOD."""
+
+    type: str = "Disease"
+    disease_id: str
+
+    @validator('type')
+    def check_type(cls, type_value):
+        """Check that `type` field has value 'Disease'"""
+        if type_value != "Disease":
+            raise ValueError("DiseaseValue.type must be 'Disease'")
+        return type_value
+
+    class Config:
+        """Configure model."""
+
+        @staticmethod
+        def schema_extra(schema: Dict[str, Any],
+                         model: Type['Extension']) -> None:
+            """Configure schema display."""
+            schema['example'] = {
+                "type": "Disease",
+                "disease_id": "ncit:C3211"
+            }
+
+
 class Extension(BaseModel):
     """Value Object Descriptor Extension class."""
 
@@ -299,7 +325,7 @@ class ValueObjectDescriptor(BaseModel):
 
     id: str
     type: str
-    value: Any
+    value: DiseaseValue
     label: str
     xrefs: Optional[List[str]]
     alternate_labels: Optional[List[str]]
