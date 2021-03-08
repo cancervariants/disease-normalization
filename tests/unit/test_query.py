@@ -146,7 +146,8 @@ def compare_vod(actual, fixture):
             return None
 
     print(actual.keys())
-    print(fixture.keys)()
+    print(actual)
+    print(fixture.keys())
     assert ('extensions' in actual) == ('extensions' in fixture)
     if 'extensions' in actual:
         ext_actual = actual['extensions']
