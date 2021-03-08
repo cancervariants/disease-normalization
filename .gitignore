@@ -160,3 +160,10 @@ dynamodb_local_latest/*
 # Build files
 Pipfile.lock
 pyproject.toml
+
+
+# Elastic Beanstalk items
+.ebextensions/
+EBSampleApp-Python.iml
+Procfile
+cron.yaml
