@@ -752,7 +752,7 @@
     "concept_id": "ncit:c167370"
   },
   {
-    "label_and_type": "cutaneous myoepithelioma#alias",
+    "label_and_type": "cutaneous myoepithelioma##alias",
     "item_type": "alias",
     "src_name": "NCIt",
     "concept_id": "ncit:c167370"
