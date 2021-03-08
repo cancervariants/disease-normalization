@@ -77,7 +77,8 @@ class Merge:
         scalars, assign from the highest-priority source where that attribute
         is non-null.
 
-        Priority is NCIt > Mondo > DO.
+        Priority is NCIt > Mondo > OncoTree> DO.
+
         :param Set record_id_set: group of concept IDs
         :return: completed merged drug object to be stored in DB, as well as
             a list of the IDs ultimately included in said record
@@ -101,21 +102,20 @@ class Merge:
         records.sort(key=record_order)
 
         merged_properties = {
-            'concept_id': None,
+            'concept_id': records[0]['concept_id'],
             'aliases': set(),
             'xrefs': set()
         }
+        if len(records) > 1:
+            merged_properties['other_ids'] = [r['concept_id'] for r
+                                              in records[1:]]
+
         set_fields = ['aliases', 'xrefs']
         scalar_fields = ['label', 'pediatric_disease']
         for record in records:
             for field in set_fields:
                 if field in record:
                     merged_properties[field] |= set(record[field])
-            if not merged_properties['concept_id']:
-                merged_properties['concept_id'] = record['concept_id']
-            else:
-                merged_properties['concept_id'] += f"|{record['concept_id']}"
-
             for field in scalar_fields:
                 if field not in merged_properties and field in record:
                     merged_properties[field] = record[field]
