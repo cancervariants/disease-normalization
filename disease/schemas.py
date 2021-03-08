@@ -46,7 +46,7 @@ class NamespacePrefix(Enum):
     ONCOTREE = "oncotree"
     # external sources
     COHD = "cohd"
-    FO = "efo"
+    EFO = "efo"
     GARD = "gard"
     HPO = "HP"
     ICD9 = "icd9"
