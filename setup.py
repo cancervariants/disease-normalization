@@ -2,4 +2,6 @@
 from setuptools import setup, find_packages
 from disease import __version__
 
-setup(version=__version__, packages=find_packages())
+setup(version=__version__,
+      packages=find_packages(),
+      zip_safe=False)
