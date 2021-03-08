@@ -459,7 +459,6 @@ class QueryHandler:
             match_type = MatchType[non_merged_match[1].upper()]
             response = self._add_vod(response, non_merged_match[0], query,
                                      match_type)
-            print(response['value_object_descriptor'].keys())
             return response
 
         if not query_matches:
