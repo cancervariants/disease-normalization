@@ -743,10 +743,7 @@
     "src_name": "NCIt",
     "label": "Skin Myoepithelioma",
     "concept_id": "ncit:C167370",
-    "aliases": ["Cutaneous Myoepithelioma"],
-    "other_identifiers": [],
-    "xrefs": [],
-    "pediatric_disease": null
+    "aliases": ["Cutaneous Myoepithelioma"]
   },
   {
     "label_and_type": "skin myoepithelioma##label",
