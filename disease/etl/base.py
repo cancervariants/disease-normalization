@@ -1,9 +1,11 @@
 """A base class for extraction, transformation, and loading of data."""
 from abc import ABC, abstractmethod
+from disease import SOURCES_FOR_MERGE
 from disease.database import Database
 from disease.schemas import Disease
 import owlready2 as owl
 from typing import Set, Dict, List
+from pathlib import Path
 import logging
 
 logger = logging.getLogger('disease')
@@ -13,9 +15,13 @@ logger.setLevel(logging.DEBUG)
 class Base(ABC):
     """The ETL base class."""
 
-    def __init__(self, database: Database):
+    def __init__(self, database: Database, data_path: Path):
         """Extract from sources."""
         self.database = database
+        self._data_path = data_path
+        self._store_ids = self.__class__.__name__ in SOURCES_FOR_MERGE
+        if self._store_ids:
+            self._processed_ids = []
 
     @abstractmethod
     def perform_etl(self) -> List:

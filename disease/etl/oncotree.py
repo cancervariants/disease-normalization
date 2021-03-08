@@ -26,10 +26,8 @@ class OncoTree(Base):
         :param str src_api_root: root of OncoTree API URL
         :param pathlib.Path data_path: path to local OncoTree data directory
         """
-        self.database = database
         self._SRC_API_ROOT = src_api_root
-        self._data_path = data_path
-        self._store_ids = False
+        super().__init__(database=database, data_path=data_path)
 
     def perform_etl(self) -> List[str]:
         """Public-facing method to initiate ETL procedures on given data.
@@ -60,7 +58,7 @@ class OncoTree(Base):
         except requests.exceptions.RequestException as e:
             logger.error(f'OncoTree download failed: {e}')
             raise e
-        filename = self._data_path / f'oncotree_{version}.txt'
+        filename = self._data_path / f'oncotree_{version}.json'
         handle = open(filename, 'wb')
         for chunk in response.iter_content(chunk_size=512):
             if chunk:
@@ -103,7 +101,8 @@ class OncoTree(Base):
                 elif prefix == 'NCI':
                     normed_prefix = NamespacePrefix.NCIT.value
                 else:
-                    raise Exception(f"Unrecognized prefix: {prefix}")
+                    logger.warning(f"Unrecognized prefix: {prefix}")
+                    continue
                 for code in codes:
                     normed_id = f"{normed_prefix}:{code}"
                     disease['other_identifiers'].append(normed_id)

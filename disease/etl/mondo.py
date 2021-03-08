@@ -67,13 +67,10 @@ class Mondo(OWLBase):
         :param str src_url: direct URL to OWL file download
         :param pathlib.Path data_path: path to local Mondo data directory
         """
-        self.database = database
         self._SRC_DLOAD_PAGE = src_dload_page
         self._SRC_URL = src_url
         self._version = version
-        self._data_path = data_path
-        self._processed_ids = []
-        self._store_ids = True
+        super().__init__(database=database, data_path=data_path)
 
     def perform_etl(self) -> List[str]:
         """Public-facing method to initiate ETL procedures on given data.

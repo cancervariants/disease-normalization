@@ -9,7 +9,7 @@ For a development install, we recommend using Pipenv. See the
 [pipenv docs](https://pipenv-fork.readthedocs.io/en/latest/#install-pipenv-today)
 for direction on installing pipenv in your compute environment.
 
-Once installed, from the project root dir, just run:
+Once installed, from the project root dir, run:
 
 ```shell script
 pipenv sync

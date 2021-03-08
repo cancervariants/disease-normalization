@@ -35,11 +35,9 @@ class NCIt(OWLBase):
         :param str src_fname: filename for source file within source directory
         :param pathlib.Path data_path: path to local NCIt data directory
         """
-        self.database = database
         self._SRC_DIR = src_dir
         self._SRC_FNAME = src_fname
-        self._data_path = data_path
-        self._store_ids = False
+        super().__init__(database=database, data_path=data_path)
 
     def perform_etl(self) -> List[str]:
         """Public-facing method to initiate ETL procedures on given data.

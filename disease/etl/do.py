@@ -44,12 +44,10 @@ class DO(OWLBase):
         :param str src_url: URL for source data file
         :param pathlib.Path data_path: path to local DO data directory
         """
-        self.database = database
         self._SRC_DLOAD_PAGE = src_dload_page
         self._SRC_URL = src_url
-        self._data_path = data_path
         self._version = datetime.strftime(datetime.now(), "%Y%m%d")
-        self._store_ids = False
+        super().__init__(database=database, data_path=data_path)
 
     def perform_etl(self) -> List[str]:
         """Public-facing method to initiate ETL procedures on given data.
