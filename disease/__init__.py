@@ -13,7 +13,7 @@ logger = logging.getLogger('disease')
 logger.setLevel(logging.DEBUG)
 
 
-__version__ = "0.1.2"
+__version__ = "0.1.1"
 
 
 from disease.schemas import SourceName, SourceIDAfterNamespace, NamespacePrefix  # noqa: E402, E501
