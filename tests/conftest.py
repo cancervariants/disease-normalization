@@ -5,8 +5,13 @@ import json
 import pytest
 from pathlib import Path
 
-
 TEST_ROOT = Path(__file__).resolve().parents[1]
+
+
+@pytest.fixture(scope='module')
+def provide_root():
+    """Provide TEST_ROOT value to test cases."""
+    return TEST_ROOT
 
 
 @pytest.fixture(scope='module')

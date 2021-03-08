@@ -294,6 +294,7 @@ def test_create_merged_concepts(merge_handler, record_id_groups, neuroblastoma,
     assert len(added_records) == 6
     neuroblastoma_id = neuroblastoma['concept_id']
     assert neuroblastoma_id in added_records
+    print(added_records[neuroblastoma_id].keys())
     compare_merged_records(added_records[neuroblastoma_id],
                            neuroblastoma)
     lnscc_id = lnscc['concept_id']
