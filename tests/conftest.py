@@ -8,7 +8,7 @@ import pytest  # noqa
 from pathlib import Path  # noqa
 
 
-TEST_ROOT = Path(__file__).resolve().parents[2]
+TEST_ROOT = Path(__file__).resolve().parents[1]
 
 
 @pytest.fixture(scope='module')
@@ -28,7 +28,7 @@ def mock_database():
             `self.updates` stores update requests, with the concept_id as the
             key and the updated attribute and new value as the value.
             """
-            infile = TEST_ROOT / '..' / 'tests' / 'unit' / 'data' / 'diseases.json'  # noqa: E501
+            infile = TEST_ROOT / 'tests' / 'unit' / 'data' / 'diseases.json'  # noqa: E501
             with open(infile, 'r') as f:
                 records_json = json.load(f)
             self.records = {}
@@ -38,7 +38,7 @@ def mock_database():
                 }
             self.added_records: Dict[str, Dict[Any, Any]] = {}
             self.updates: Dict[str, Dict[Any, Any]] = {}
-            meta = TEST_ROOT / '..' / 'tests' / 'unit' / 'data' / 'metadata.json'  # noqa: E501
+            meta = TEST_ROOT / 'tests' / 'unit' / 'data' / 'metadata.json'  # noqa: E501
             with open(meta, 'r') as f:
                 meta_json = json.load(f)
             self.cached_sources = {}
