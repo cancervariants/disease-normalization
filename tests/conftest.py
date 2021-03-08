@@ -1,9 +1,9 @@
 """Pytest test config tools."""
-from disease.database import Database  # noqa
-from typing import Dict, Any, Optional, List  # noqa
-import json  # noqa
-import pytest  # noqa
-from pathlib import Path  # noqa
+from disease.database import Database
+from typing import Dict, Any, Optional, List
+import json
+import pytest
+from pathlib import Path
 
 
 TEST_ROOT = Path(__file__).resolve().parents[1]
