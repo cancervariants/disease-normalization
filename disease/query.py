@@ -342,7 +342,8 @@ class QueryHandler:
             vod['xrefs'] = record['other_ids']
         if 'aliases' in record:
             vod['alternate_labels'] = record['aliases']
-        if 'pediatric_disease' in record:
+        if 'pediatric_disease' in record and \
+                record['pediatric_disease'] is not None:
             vod['extensions'].append({
                 'type': 'Extension',
                 'name': 'pediatric_disease',
