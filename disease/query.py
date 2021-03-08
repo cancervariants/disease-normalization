@@ -434,6 +434,7 @@ class QueryHandler:
                              for m in query_matches]
             query_matches.sort(key=self._record_order)
 
+            print(query_matches)
             # attempt merge ref resolution until successful
             for match in query_matches:
                 record = self.db.get_record_by_id(match['concept_id'], False)
