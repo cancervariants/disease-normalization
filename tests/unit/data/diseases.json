@@ -679,8 +679,8 @@
     "concept_id": "mondo:0010648"
   },
   {
-    "label_and_type": "mafd2##label",
-    "item_type": "label",
+    "label_and_type": "mafd2##alias",
+    "item_type": "alias",
     "src_name": "Mondo",
     "concept_id": "mondo:0010648"
   },
