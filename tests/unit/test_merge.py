@@ -220,7 +220,6 @@ def compare_merged_records(actual, fixture):
         assert set(actual['other_ids']) == set(fixture['other_ids'])
 
     assert actual['label_and_type'] == fixture['label_and_type']
-    assert actual['item_type'] == fixture['item_type']
 
     assert ('label' in actual) == ('label' in fixture)
     if 'label' in actual or 'label' in fixture:
@@ -294,7 +293,6 @@ def test_create_merged_concepts(merge_handler, record_id_groups, neuroblastoma,
     assert len(added_records) == 6
     neuroblastoma_id = neuroblastoma['concept_id']
     assert neuroblastoma_id in added_records
-    print(added_records[neuroblastoma_id].keys())
     compare_merged_records(added_records[neuroblastoma_id],
                            neuroblastoma)
     lnscc_id = lnscc['concept_id']
