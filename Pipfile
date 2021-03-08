@@ -4,7 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [dev-packages]
-disease-normalization = {editable = true, path = "."}
+disease-normalizer = {editable = true, path = "."}
 pytest = "*"
 pytest-cov = "*"
 flake8 = "*"
