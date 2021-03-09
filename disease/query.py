@@ -308,7 +308,7 @@ class QueryHandler:
         sources_meta = {}
         vod = response['value_object_descriptor']
         ids = [vod['value']['disease_id']]
-        other_ids = vod.get('xrefs', None)
+        other_ids = vod.get('xrefs', [])
         if other_ids:
             ids += other_ids
         for concept_id in ids:
@@ -383,6 +383,19 @@ class QueryHandler:
             source_rank = 4
         return (source_rank, record['concept_id'])
 
+    def _handle_failed_merge_ref(self, record, response, query) -> Dict:
+        """Log + fill out response for a failed merge reference lookup.
+
+        :param Dict record: record containing failed merge_ref
+        :param Dict response: in-progress response object
+        :param str query: original query value
+        :return: response with no match
+        """
+        logger.error(f"Merge ref lookup failed for ref {record['merge_ref']} "
+                     f"in record {record['concept_id']} from query {query}")
+        response['match_type'] = MatchType.NO_MATCH
+        return response
+
     def search_groups(self, query: str) -> Dict:
         """Return normalized concept for given search term.
         :param str query: string to search against
@@ -414,14 +427,11 @@ class QueryHandler:
                                                  case_sensitive=False,
                                                  merge=True)
                 if merge is None:
-                    logger.error(f"Merge ref lookup failed for ref "
-                                 f"{record['merge_ref']} in record "
-                                 f"{record['concept_id']} from query"
-                                 f"{query_str}")
-                    response['match_type'] = MatchType.NO_MATCH
-                    return response
-                return self._add_vod(response, merge, query,
-                                     MatchType.CONCEPT_ID)
+                    return self._handle_failed_merge_ref(record, response,
+                                                         query_str)
+                else:
+                    return self._add_vod(response, merge, query,
+                                         MatchType.CONCEPT_ID)
             else:
                 non_merged_match = (record, 'concept_id')
 
@@ -443,14 +453,12 @@ class QueryHandler:
                                                          case_sensitive=False,
                                                          merge=True)
                         if merge is None:
-                            logger.error(f"Merge ref lookup failed for ref"
-                                         f"{record['merge_ref']} in record"
-                                         f"{record['concept_id']} from query"
-                                         f"{query_str}")
-                            response['match_type'] = MatchType.NO_MATCH
-                            return response
-                        return self._add_vod(response, merge, query,
-                                             MatchType[match_type.upper()])
+                            return self._handle_failed_merge_ref(record,
+                                                                 response,
+                                                                 query_str)
+                        else:
+                            return self._add_vod(response, merge, query,
+                                                 MatchType[match_type.upper()])
                     else:
                         if not non_merged_match:
                             non_merged_match = (record, match_type)
