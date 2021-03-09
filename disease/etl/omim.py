@@ -12,7 +12,18 @@ logger.setLevel(logging.DEBUG)
 
 
 class OMIM(Base):
-    """Gather and load data from OncoTree."""
+    """Gather and load data from OMIM.
+
+    MIM number prefix:
+    ------------------
+    Asterisk (*)  Gene
+    Plus (+)  Gene and phenotype, combined
+    Number Sign (#)  Phenotype, molecular basis known
+    Percent (%)  Phenotype or locus, molecular basis unknown
+    NULL (<null>)  Other, mainly phenotypes with suspected mendelian basis
+    Caret (^)  Entry has been removed from the database or moved to another
+    entry
+    """
 
     def __init__(self,
                  database: Database,
@@ -61,3 +72,10 @@ class OMIM(Base):
         params = dict(metadata)
         params['src_name'] = SourceName.OMIM.value
         self.database.metadata.put_item(Item=params)
+
+    def _transform_data(self):
+        """Modulate data and prepare for loading."""
+        with open(self._data_file, 'r') as f:
+            rows = [[g for g in f.split('\t')if g and not g == '\n']
+                    for f in f.readlines() if not f.startswith('#')]
+        return rows
