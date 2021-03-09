@@ -28,7 +28,7 @@ def query_handler():
 def neuroblastoma():
     """Create neuroblastoma fixture."""
     return {
-        "id": "normalize:Neuroblastoma",
+        "id": "normalize.disease:Neuroblastoma",
         "type": "DiseaseDescriptor",
         "value": {
             "type": "Disease",
@@ -81,7 +81,7 @@ def neuroblastoma():
 def skin_myo():
     """Create a test fixture for skin myopithelioma"""
     return {
-        "id": "normalize:Skin Myoepithelioma",
+        "id": "normalize.disease:Skin Myoepithelioma",
         "type": "DiseaseDescriptor",
         "value": {
             "type": "Disease",
@@ -99,7 +99,7 @@ def mafd2():
     extension.
     """
     return {
-        "id": "normalize:MAFD2",
+        "id": "normalize.disease:MAFD2",
         "type": "DiseaseDescriptor",
         "value": {
             "type": "Disease",
@@ -261,6 +261,6 @@ def test_normalize_non_mondo(query_handler, skin_myo):
     assert response['match_type'] == MatchType.ALIAS
     assert len(response['meta_']) == 1
     skin_myo_alias = skin_myo.copy()
-    skin_myo_alias['id'] = 'normalize:Cutaneous Myoepithelioma'
+    skin_myo_alias['id'] = 'normalize.disease:Cutaneous Myoepithelioma'
     compare_vod(response['value_object_descriptor'], skin_myo_alias)
     assert 'NCIt' in response['meta_']
