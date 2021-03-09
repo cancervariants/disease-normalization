@@ -2,7 +2,7 @@
 import logging
 from .base import Base
 from disease import PROJECT_ROOT, DownloadException
-from disease.schemas import Meta, SourceName
+from disease.schemas import Meta, SourceName, Disease, NamespacePrefix
 from disease.database import Database
 from pathlib import Path
 from typing import List
@@ -16,13 +16,13 @@ class OMIM(Base):
 
     MIM number prefix:
     ------------------
-    Asterisk (*)  Gene
-    Plus (+)  Gene and phenotype, combined
+    Asterisk (*)  Gene (exclude)
+    Plus (+)  Gene and phenotype, combined  (exclude)
     Number Sign (#)  Phenotype, molecular basis known
     Percent (%)  Phenotype or locus, molecular basis unknown
     NULL (<null>)  Other, mainly phenotypes with suspected mendelian basis
     Caret (^)  Entry has been removed from the database or moved to another
-    entry
+    entry (exclude)
     """
 
     def __init__(self,
@@ -76,6 +76,32 @@ class OMIM(Base):
     def _transform_data(self):
         """Modulate data and prepare for loading."""
         with open(self._data_file, 'r') as f:
-            rows = [[g for g in f.split('\t')if g and not g == '\n']
-                    for f in f.readlines() if not f.startswith('#')]
-        return rows
+            rows = f.readlines()
+        rows = [r.rstrip() for r in rows if not r.startswith('#')]
+        rows = [[g for g in r.split('\t')] for r in rows]
+        rows = [r for r in rows if r[0] not in ('Asterisk', 'Caret', 'Plus')]
+        for row in rows:
+            disease = {
+                'concept_id': f'{NamespacePrefix.OMIM.value}:row[1]',
+                'aliases': []
+            }
+            aliases = {}
+
+            label_item = row[2]
+            if ';' in label_item:
+                label_split = label_item.split(';')
+                disease['label'] = label_split[0]
+                aliases.add(label_split[1])
+            else:
+                disease['label'] = row[2]
+
+            if len(row) > 3:
+                aliases |= {title for title in row[3].split(';') if title}
+            if len(row) > 4:
+                aliases |= {title for title in row[4].split(';') if title}
+            aliases = {alias[:-10] if alias.endswith(', INCLUDED') else alias
+                       for alias in aliases}
+            disease['aliases'] = list(aliases)
+
+            assert Disease(**disease)
+            self._load_disease(disease)
