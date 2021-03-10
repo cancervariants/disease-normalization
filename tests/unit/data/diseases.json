@@ -884,5 +884,31 @@
     "item_type": "label",
     "src_name": "OMIM",
     "concept_id": "omim:613065"
+  },
+  {
+    "label_and_type": "omim:247640##identity",
+    "item_type": "identity",
+    "src_name": "OMIM",
+    "concept_id": "omim:247640",
+    "label": "LYMPHOBLASTIC LEUKEMIA, ACUTE, WITH LYMPHOMATOUS FEATURES",
+    "aliases": ["LALL", "LYMPHOMATOUS ALL"]
+  },
+  {
+    "label_and_type": "lymphomatous all##alias",
+    "item_type": "alias",
+    "src_name": "OMIM",
+    "concept_id": "omim:247640"
+  },
+  {
+    "label_and_type": "lall##alias",
+    "item_type": "alias",
+    "src_name": "OMIM",
+    "concept_id": "omim:247640"
+  },
+  {
+    "label_and_type": "lymphoblastic leukemia, acute, with lymphomatous features##label",
+    "item_type": "label",
+    "src_name": "OMIM",
+    "concept_id": "omim:247640"
   }
 ]
