@@ -2,7 +2,6 @@
 import pytest
 from disease.schemas import MatchType
 from disease.query import QueryHandler
-from typing import Dict
 
 
 @pytest.fixture(scope='module')
@@ -65,24 +64,8 @@ def richter():
     }
 
 
-def compare_records(actual_record: Dict, fixture_record: Dict):
-    """Check that identity records are identical."""
-    assert actual_record['concept_id'] == fixture_record['concept_id']
-    assert ('label' in actual_record) == ('label' in fixture_record)
-    if 'label' in actual_record or 'label' in fixture_record:
-        assert actual_record['label'] == fixture_record['label']
-    assert ('aliases' in actual_record) == ('aliases' in fixture_record)
-    if 'aliases' in actual_record or 'aliases' in fixture_record:
-        assert set(actual_record['aliases']) == set(fixture_record['aliases'])
-    assert ('other_identifiers' in actual_record) == ('other_identifiers' in fixture_record)  # noqa: E501
-    if 'other_identifiers' in actual_record or 'other_identifiers' in fixture_record:  # noqa: E501
-        assert set(actual_record['other_identifiers']) == set(fixture_record['other_identifiers'])  # noqa: E501
-    assert ('xrefs' in actual_record) == ('xrefs' in fixture_record)
-    if 'xrefs' in actual_record or 'xrefs' in fixture_record:
-        assert set(actual_record['xrefs']) == set(fixture_record['xrefs'])
-
-
-def test_concept_id_match(do, neuroblastoma, pediatric_liposarcoma, richter):
+def test_concept_id_match(do, neuroblastoma, pediatric_liposarcoma, richter,
+                          compare_records):
     """Test that concept ID search resolves to correct record"""
     import boto3
     from boto3.dynamodb.conditions import Key
@@ -111,7 +94,8 @@ def test_concept_id_match(do, neuroblastoma, pediatric_liposarcoma, richter):
     assert response['match_type'] == MatchType.NO_MATCH
 
 
-def test_label_match(do, neuroblastoma, pediatric_liposarcoma):
+def test_label_match(do, neuroblastoma, pediatric_liposarcoma,
+                     compare_records):
     """Test that label searches resolve to correct records."""
     response = do.search('pediatric liposarcoma')
     assert response['match_type'] == MatchType.LABEL
@@ -126,7 +110,7 @@ def test_label_match(do, neuroblastoma, pediatric_liposarcoma):
     compare_records(actual_disease, neuroblastoma)
 
 
-def test_alias_match(do, richter):
+def test_alias_match(do, richter, compare_records):
     """Test that alias searches resolve to correct records."""
     response = do.search('Richter Syndrome')
     assert response['match_type'] == MatchType.ALIAS

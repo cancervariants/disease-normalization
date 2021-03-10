@@ -2,7 +2,6 @@
 import pytest
 from disease.schemas import MatchType
 from disease.query import QueryHandler
-from typing import Dict
 
 
 @pytest.fixture(scope='module')
@@ -66,24 +65,7 @@ def nsclc():
     }
 
 
-def compare_records(actual_record: Dict, fixture_record: Dict):
-    """Check that identity records are identical."""
-    assert actual_record['concept_id'] == fixture_record['concept_id']
-    assert ('label' in actual_record) == ('label' in fixture_record)
-    if 'label' in actual_record or 'label' in fixture_record:
-        assert actual_record['label'] == fixture_record['label']
-    assert ('aliases' in actual_record) == ('aliases' in fixture_record)
-    if 'aliases' in actual_record or 'aliases' in fixture_record:
-        assert set(actual_record['aliases']) == set(fixture_record['aliases'])
-    assert ('other_identifiers' in actual_record) == ('other_identifiers' in fixture_record)  # noqa: E501
-    if 'other_identifiers' in actual_record or 'other_identifiers' in fixture_record:  # noqa: E501
-        assert set(actual_record['other_identifiers']) == set(fixture_record['other_identifiers'])  # noqa: E501
-    assert ('xrefs' in actual_record) == ('xrefs' in fixture_record)
-    if 'xrefs' in actual_record or 'xrefs' in fixture_record:
-        assert set(actual_record['xrefs']) == set(fixture_record['xrefs'])
-
-
-def test_concept_id_match(ncit, neuroblastoma, nsclc):
+def test_concept_id_match(ncit, neuroblastoma, nsclc, compare_records):
     """Test that concept ID search resolves to correct record"""
     response = ncit.search('ncit:C3270')
     assert response['match_type'] == MatchType.CONCEPT_ID
@@ -113,7 +95,7 @@ def test_concept_id_match(ncit, neuroblastoma, nsclc):
     assert response['match_type'] == MatchType.NO_MATCH
 
 
-def test_label_match(ncit, neuroblastoma, nsclc):
+def test_label_match(ncit, neuroblastoma, nsclc, compare_records):
     """Test that label search resolves to correct record."""
     response = ncit.search('Neuroblastoma')
     assert response['match_type'] == MatchType.LABEL
@@ -137,7 +119,7 @@ def test_label_match(ncit, neuroblastoma, nsclc):
     assert response['match_type'] == MatchType.NO_MATCH
 
 
-def test_alias_match(ncit, neuroblastoma, nsclc):
+def test_alias_match(ncit, neuroblastoma, nsclc, compare_records):
     """Test that alias search resolves to correct record."""
     response = ncit.search('neuroblastoma, nos')
     assert response['match_type'] == MatchType.ALIAS

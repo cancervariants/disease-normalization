@@ -2,7 +2,6 @@
 import pytest
 from disease.schemas import MatchType
 from disease.query import QueryHandler
-from typing import Dict
 
 
 @pytest.fixture(scope='module')
@@ -108,27 +107,8 @@ def cystic_teratoma_adult():
     }
 
 
-def compare_records(actual_record: Dict, fixture_record: Dict):
-    """Check that identity records are identical."""
-    assert actual_record['concept_id'] == fixture_record['concept_id']
-    assert ('label' in actual_record) == ('label' in fixture_record)
-    if 'label' in actual_record or 'label' in fixture_record:
-        assert actual_record['label'] == fixture_record['label']
-    assert ('aliases' in actual_record) == ('aliases' in fixture_record)
-    if 'aliases' in actual_record or 'aliases' in fixture_record:
-        assert set(actual_record['aliases']) == set(fixture_record['aliases'])
-    assert ('other_identifiers' in actual_record) == ('other_identifiers' in fixture_record)  # noqa: E501
-    if 'other_identifiers' in actual_record or 'other_identifiers' in fixture_record:  # noqa: E501
-        assert set(actual_record['other_identifiers']) == set(fixture_record['other_identifiers'])  # noqa: E501
-    assert ('xrefs' in actual_record) == ('xrefs' in fixture_record)
-    if 'xrefs' in actual_record or 'xrefs' in fixture_record:
-        assert set(actual_record['xrefs']) == set(fixture_record['xrefs'])
-    assert actual_record['pediatric_disease'] is \
-        fixture_record['pediatric_disease']
-
-
 def test_concept_id_match(mondo, neuroblastoma, richter_syndrome,
-                          pediatric_liposarcoma):
+                          pediatric_liposarcoma, compare_records):
     """Test that concept ID search resolves to correct record"""
     response = mondo.search('mondo:0005072')
     assert response['match_type'] == MatchType.CONCEPT_ID
@@ -159,7 +139,8 @@ def test_concept_id_match(mondo, neuroblastoma, richter_syndrome,
 
 
 def test_label_match(mondo, neuroblastoma, richter_syndrome,
-                     pediatric_liposarcoma, cystic_teratoma_adult):
+                     pediatric_liposarcoma, cystic_teratoma_adult,
+                     compare_records):
     """Test that label search resolves to correct record."""
     response = mondo.search('Neuroblastoma')
     assert response['match_type'] == MatchType.LABEL
@@ -192,7 +173,7 @@ def test_label_match(mondo, neuroblastoma, richter_syndrome,
     compare_records(actual_disease, cystic_teratoma_adult)
 
 
-def test_alias_match(mondo, neuroblastoma, richter_syndrome):
+def test_alias_match(mondo, neuroblastoma, richter_syndrome, compare_records):
     """Test that alias search resolves to correct record."""
     response = mondo.search('neuroblastoma, malignant')
     assert response['match_type'] == MatchType.ALIAS
