@@ -391,6 +391,18 @@
     ]
   },
   {
+    "label_and_type": "ncit:c2926##other_id",
+    "item_type": "other_id",
+    "src_name": "Mondo",
+    "concept_id": "mondo:0005233"
+  },
+  {
+    "label_and_type": "oncotree:nsclc##other_id",
+    "item_type": "other_id",
+    "src_name": "Mondo",
+    "concept_id": "mondo:0005233"
+  },
+  {
     "label_and_type": "non-small cell lung carcinoma##label",
     "item_type": "label",
     "concept_id": "mondo:0005233",

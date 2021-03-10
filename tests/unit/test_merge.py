@@ -100,7 +100,7 @@ def lnscc():
             "mesh:D002289",
             "umls:C0007131",
             "efo:0003060",
-            "icd10:C34",
+            "icd:C34",
             "kegg.disease:05223",
             "HP:0030358"
         ],

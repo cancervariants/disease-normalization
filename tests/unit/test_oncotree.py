@@ -26,8 +26,8 @@ def neuroblastoma():
         "label": "Neuroblastoma",
         "concept_id": "oncotree:NBL",
         "aliases": [],
-        "other_identifiers": ["umls:C0027819", "ncit:C3270"],
-        "xrefs": [],
+        "other_identifiers": ["ncit:C3270"],
+        "xrefs": ["umls:C0027819"],
         "pediatric_disease": None
     }
 
@@ -39,8 +39,8 @@ def nsclc():
         "label": "Non-Small Cell Lung Cancer",
         "concept_id": "oncotree:NSCLC",
         "aliases": [],
-        "other_identifiers": ["umls:C0007131", "ncit:C2926"],
-        "xrefs": [],
+        "other_identifiers": ["ncit:C2926"],
+        "xrefs": ["umls:C0007131"],
         "pediatric_disease": None
     }
 
