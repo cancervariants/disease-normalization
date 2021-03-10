@@ -689,8 +689,9 @@
     "item_type": "merger",
     "concept_id": "mondo:0010648",
     "label": "major affective disorder 2",
-    "aliases": ["MAFD2"],
-    "xrefs": ["mesh:C564108", "omim:309200"]
+    "aliases": ["MDI","MDX","MANIC-DEPRESSIVE ILLNESS","BPAD","MAFD2","BIPOLAR AFFECTIVE DISORDER","MANIC-DEPRESSIVE PSYCHOSIS, X-LINKED"],
+    "other_ids": ["omim:309200"],
+    "xrefs": ["mesh:C564108"]
   },
   {
     "label_and_type": "oncotree:nbl##identity",
