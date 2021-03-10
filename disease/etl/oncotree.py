@@ -93,19 +93,23 @@ class OncoTree(Base):
                 "concept_id": f"{NamespacePrefix.ONCOTREE.value}:{disease_node['code']}",  # noqa: E501
                 "label": disease_node['name'],
                 "other_identifiers": [],
+                "xrefs": [],
             }
             refs = disease_node.get('externalReferences', [])
             for prefix, codes in refs.items():
                 if prefix == 'UMLS':
                     normed_prefix = NamespacePrefix.UMLS.value
+                    for code in codes:
+                        normed_id = f"{normed_prefix}:{code}"
+                        disease['other_identifiers'].append(normed_id)
                 elif prefix == 'NCI':
                     normed_prefix = NamespacePrefix.NCIT.value
+                    for code in codes:
+                        normed_id = f"{normed_prefix}:{code}"
+                        disease['xrefs'].append(normed_id)
                 else:
                     logger.warning(f"Unrecognized prefix: {prefix}")
                     continue
-                for code in codes:
-                    normed_id = f"{normed_prefix}:{code}"
-                    disease['other_identifiers'].append(normed_id)
             assert Disease(**disease)
             self._load_disease(disease)
         if disease_node.get('children', None):
