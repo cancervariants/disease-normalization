@@ -756,5 +756,133 @@
     "item_type": "alias",
     "src_name": "NCIt",
     "concept_id": "ncit:c167370"
+  },
+  {
+    "label_and_type": "omim:309200##identity",
+    "item_type": "identity",
+    "src_name": "OMIM",
+    "concept_id": "omim:309200",
+    "label": "MAJOR AFFECTIVE DISORDER 2",
+    "aliases": [
+      "MAFD2",
+      "MANIC-DEPRESSIVE ILLNESS",
+      "MDI",
+      "MANIC-DEPRESSIVE PSYCHOSIS, X-LINKED",
+      "MDX",
+      "BIPOLAR AFFECTIVE DISORDER",
+      "BPAD"
+    ]
+  },
+  {
+    "label_and_type": "major affective disorder 2##label",
+    "item_type": "label",
+    "src_name": "OMIM",
+    "concept_id": "omim:309200"
+  },
+  {
+    "label_and_type": "mafd2##alias",
+    "item_type": "alias",
+    "src_name": "OMIM",
+    "concept_id": "omim:309200"
+  },
+  {
+    "label_and_type": "manic-depressive illness##alias",
+    "item_type": "alias",
+    "src_name": "OMIM",
+    "concept_id": "omim:309200"
+  },
+  {
+    "label_and_type": "bpad##alias",
+    "item_type": "alias",
+    "src_name": "OMIM",
+    "concept_id": "omim:309200"
+  },
+  {
+    "label_and_type": "bipolar affective disorder##alias",
+    "item_type": "alias",
+    "src_name": "OMIM",
+    "concept_id": "omim:309200"
+  },
+  {
+    "label_and_type": "mdx##alias",
+    "item_type": "alias",
+    "src_name": "OMIM",
+    "concept_id": "omim:309200"
+  },
+  {
+    "label_and_type": "manic-depressive psychosis, x-linked##alias",
+    "item_type": "alias",
+    "src_name": "OMIM",
+    "concept_id": "omim:309200"
+  },
+  {
+    "label_and_type": "mdi##alias",
+    "item_type": "alias",
+    "src_name": "OMIM",
+    "concept_id": "omim:309200"
+  },
+  {
+    "label_and_type": "omim:613065##identity",
+    "item_type": "identity",
+    "src_name": "OMIM",
+    "concept_id": "omim:613065",
+    "label": "LEUKEMIA, ACUTE LYMPHOBLASTIC",
+    "aliases": [
+      "ALL",
+      "LEUKEMIA, ACUTE LYMPHOBLASTIC, SUSCEPTIBILITY TO, 1",
+      "ALL1",
+      "LEUKEMIA, ACUTE LYMPHOCYTIC, SUSCEPTIBILITY TO, 1",
+      "LEUKEMIA, B-CELL ACUTE LYMPHOBLASTIC, SUSCEPTIBILITY TO",
+      "LEUKEMIA, T-CELL ACUTE LYMPHOBLASTIC, SUSCEPTIBILITY TO",
+      "LEUKEMIA, ACUTE LYMPHOBLASTIC, B-HYPERDIPLOID, SUSCEPTIBILITY TO"
+    ]
+  },
+  {
+    "label_and_type": "leukemia, acute lymphoblastic, b-hyperdiploid, susceptibility to##alias",
+    "item_type": "alias",
+    "src_name": "OMIM",
+    "concept_id": "omim:613065"
+  },
+  {
+    "label_and_type": "leukemia, t-cell acute lymphoblastic, susceptibility to##alias",
+    "item_type": "alias",
+    "src_name": "OMIM",
+    "concept_id": "omim:613065"
+  },
+  {
+    "label_and_type": "leukemia, b-cell acute lymphoblastic, susceptibility to##alias",
+    "item_type": "alias",
+    "src_name": "OMIM",
+    "concept_id": "omim:613065"
+  },
+  {
+    "label_and_type": "leukemia, acute lymphocytic, susceptibility to, 1##alias",
+    "item_type": "alias",
+    "src_name": "OMIM",
+    "concept_id": "omim:613065"
+  },
+  {
+    "label_and_type": "all1##alias",
+    "item_type": "alias",
+    "src_name": "OMIM",
+    "concept_id": "omim:613065"
+  },
+  {
+    "label_and_type": "leukemia, acute lymphoblastic, susceptibility to, 1##alias",
+    "item_type": "alias",
+    "src_name": "OMIM",
+    "concept_id": "omim:613065"
+  },
+  {
+    "label_and_type": "all##alias",
+    "item_type": "alias",
+    "src_name": "OMIM",
+    "concept_id": "omim:613065"
+  },
+  {
+    "label_and_type": "leukemia, acute lymphoblastic##label",
+    "item_type": "label",
+    "src_name": "OMIM",
+    "concept_id": "omim:613065"
   }
 ]
