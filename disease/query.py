@@ -6,6 +6,7 @@ from disease import NAMESPACE_LOOKUP, PREFIX_LOOKUP, SOURCES_LOWER_LOOKUP
 from disease.database import Database
 from disease.schemas import Disease, Meta, MatchType, SourceName
 from botocore.exceptions import ClientError
+from urllib.parse import quote
 
 
 class InvalidParameterException(Exception):
@@ -329,7 +330,7 @@ class QueryHandler:
         :return: completed response object ready to return to user
         """
         vod = {
-            'id': f'normalize:{query}',
+            'id': f'normalize:{quote(query)}',
             'type': 'DiseaseDescriptor',
             'value': {
                 'type': 'Disease',

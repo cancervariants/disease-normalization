@@ -265,13 +265,15 @@ def test_normalize_non_mondo(query_handler, skin_myo):
     response = query_handler.normalize('Skin Myoepithelioma')
     assert response['match_type'] == MatchType.LABEL
     assert len(response['meta_']) == 1
-    compare_vod(response['value_object_descriptor'], skin_myo)
+    skin_myo_alias = skin_myo.copy()
+    skin_myo_alias['id'] = 'normalize:Skin%20Myoepithelioma'
+    compare_vod(response['value_object_descriptor'], skin_myo_alias)
     assert 'NCIt' in response['meta_']
 
     response = query_handler.normalize('Cutaneous Myoepithelioma')
     assert response['match_type'] == MatchType.ALIAS
     assert len(response['meta_']) == 1
     skin_myo_alias = skin_myo.copy()
-    skin_myo_alias['id'] = 'normalize:Cutaneous Myoepithelioma'
+    skin_myo_alias['id'] = 'normalize:Cutaneous%20Myoepithelioma'
     compare_vod(response['value_object_descriptor'], skin_myo_alias)
     assert 'NCIt' in response['meta_']
