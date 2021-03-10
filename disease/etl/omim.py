@@ -82,7 +82,7 @@ class OMIM(Base):
         rows = [r for r in rows if r[0] not in ('Asterisk', 'Caret', 'Plus')]
         for row in rows:
             disease = {
-                'concept_id': f'{NamespacePrefix.OMIM.value}:row[1]',
+                'concept_id': f'{NamespacePrefix.OMIM.value}:{row[1]}',
             }
             aliases = set()
 
@@ -95,12 +95,12 @@ class OMIM(Base):
                 disease['label'] = row[2]
 
             if len(row) > 3:
-                aliases |= {title for title in row[3].split(';') if title}
+                aliases |= {t for t in row[3].split(';') if t}
             if len(row) > 4:
-                aliases |= {title for title in row[4].split(';') if title}
+                aliases |= {t for t in row[4].split(';') if t}
             aliases = {alias[:-10] if alias.endswith(', INCLUDED') else alias
                        for alias in aliases}
-            disease['aliases'] = list(aliases)
+            disease['aliases'] = [a.lstrip() for a in aliases]
 
             assert Disease(**disease)
             self._load_disease(disease)
