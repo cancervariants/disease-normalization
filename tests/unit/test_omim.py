@@ -180,7 +180,7 @@ def test_meta(omim):
     assert response['meta_'].data_license == 'custom'
     assert response['meta_'].data_license_url == \
         'https://omim.org/help/agreement'
-    assert response['meta_'].version == '20210129'
+    assert response['meta_'].version == '20210304'
     assert response['meta_'].data_url == 'https://www.omim.org/downloads'
     assert response['meta_'].rdp_url == 'http://reusabledata.org/omim.html'
     assert response['meta_'].data_license_attributes == {
