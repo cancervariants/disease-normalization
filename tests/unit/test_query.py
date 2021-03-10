@@ -107,12 +107,14 @@ def mafd2():
         },
         "label": "major affective disorder 2",
         "alternate_labels": ["MAFD2"],
+        "xrefs": [
+            "omim:309200"
+        ],
         "extensions": [
             {
                 "type": "Extension",
                 "name": "associated_with",
                 "value": [
-                    "omim:309200",
                     "mesh:C564108"
                 ]
             }
@@ -171,7 +173,7 @@ def test_query(query_handler):
     assert resp['query'] == 'Neuroblastoma'
     matches = resp['source_matches']
     assert isinstance(matches, list)
-    assert len(matches) == 4
+    assert len(matches) == 5
     ncit = list(filter(lambda m: m['source'] == 'NCIt',
                        matches))[0]
     assert len(ncit['records']) == 1
@@ -192,15 +194,16 @@ def test_query_keyed(query_handler):
 def test_query_specify_query_handlers(query_handler):
     """Test inclusion and exclusion of sources in query."""
     # test full inclusion
-    sources = 'ncit,mondo,do,oncotree'
+    sources = 'ncit,mondo,do,oncotree,omim'
     resp = query_handler.search('Neuroblastoma', keyed=True,
                                 incl=sources, excl='')
     matches = resp['source_matches']
-    assert len(matches) == 4
+    assert len(matches) == 5
     assert 'NCIt' in matches
     assert 'Mondo' in matches
     assert 'DO' in matches
     assert 'OncoTree' in matches
+    assert 'OMIM' in matches
 
     # test full exclusion
     resp = query_handler.search('Neuroblastoma', keyed=True,
