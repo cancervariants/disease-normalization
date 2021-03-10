@@ -59,8 +59,8 @@ class OMIM(Base):
 
     def _load_meta(self):
         """Load source metadata."""
-        metadata = Meta(data_license="CC BY 4.0",
-                        data_license_url="https://creativecommons.org/licenses/by/4.0/legalcode",  # noqa F401
+        metadata = Meta(data_license="custom",
+                        data_license_url="https://omim.org/help/agreement",
                         version=self._data_file.stem.split('_', 1)[1],
                         data_url=self._SRC_URL,
                         rdp_url='http://reusabledata.org/omim.html',

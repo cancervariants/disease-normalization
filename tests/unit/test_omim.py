@@ -172,3 +172,19 @@ def test_alias_match(omim, mafd2, acute_ll, lall, compare_records):
     assert len(response['records']) == 1
     actual_disease = response['records'][0].dict()
     compare_records(actual_disease, lall)
+
+
+def test_meta(omim):
+    """Test that meta field is correct."""
+    response = omim.search('irrelevant-search-string')
+    assert response['meta_'].data_license == 'custom'
+    assert response['meta_'].data_license_url == \
+        'https://omim.org/help/agreement'
+    assert response['meta_'].version == '20210129'
+    assert response['meta_'].data_url == 'https://www.omim.org/downloads'
+    assert response['meta_'].rdp_url == 'http://reusabledata.org/omim.html'
+    assert response['meta_'].data_license_attributes == {
+        "non_commercial": False,
+        "share_alike": True,
+        "attribution": True
+    }
