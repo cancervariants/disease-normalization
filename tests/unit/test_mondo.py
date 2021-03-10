@@ -107,6 +107,34 @@ def cystic_teratoma_adult():
     }
 
 
+@pytest.fixture(scope="module")
+def nsclc():
+    """Construct a test fixture for non small cell lung cancer."""
+    return {
+        "concept_id": "mondo:0005233",
+        "label": "non-small cell lung carcinoma (disease)",
+        "aliases": [
+            "NSCLC - non-small cell lung cancer",
+            "non-small cell lung carcinoma",
+            "non-small cell carcinoma of lung",
+            "non-small cell carcinoma of the lung",
+            "non-small cell cancer of lung",
+            "non-small cell lung cancer",
+            "non-small cell cancer of the lung",
+            "NSCLC"
+        ],
+        "other_identifiers": ["ncit:C2926", "oncotree:NSCLC", "DOID:3908"],
+        "xrefs": [
+            "mesh:D002289",
+            "umls:C0007131",
+            "icd:C34",
+            "efo:0003060",
+            "kegg.disease:05223",
+            "HP:0030358"
+        ]
+    }
+
+
 def test_concept_id_match(mondo, neuroblastoma, richter_syndrome,
                           pediatric_liposarcoma, compare_records):
     """Test that concept ID search resolves to correct record"""
@@ -213,6 +241,34 @@ def test_alias_match(mondo, neuroblastoma, richter_syndrome, compare_records):
 
     response = mondo.search("neuroblastoma Schwannian Stroma-poor")
     assert response['match_type'] == MatchType.NO_MATCH
+
+
+def test_other_id_match(mondo, neuroblastoma, richter_syndrome,
+                        pediatric_liposarcoma, nsclc, compare_records):
+    """Test that other_id search resolves to correct record."""
+    response = mondo.search('DOID:769')
+    assert response['match_type'] == MatchType.OTHER_ID
+    assert len(response['records']) == 1
+    actual_disease = response['records'][0].dict()
+    compare_records(actual_disease, neuroblastoma)
+
+    response = mondo.search('ncit:c8091')
+    assert response['match_type'] == MatchType.OTHER_ID
+    assert len(response['records']) == 1
+    actual_disease = response['records'][0].dict()
+    compare_records(actual_disease, pediatric_liposarcoma)
+
+    response = mondo.search('oncotree:NSCLC')
+    assert response['match_type'] == MatchType.OTHER_ID
+    assert len(response['records']) == 1
+    actual_disease = response['records'][0].dict()
+    compare_records(actual_disease, nsclc)
+
+    response = mondo.search("ncit:C2926")
+    assert response['match_type'] == MatchType.OTHER_ID
+    assert len(response['records']) == 1
+    actual_disease = response['records'][0].dict()
+    compare_records(actual_disease, nsclc)
 
 
 def test_meta(mondo):

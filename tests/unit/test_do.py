@@ -117,3 +117,19 @@ def test_alias_match(do, richter, compare_records):
     assert len(response['records']) == 1
     actual_disease = response['records'][0].dict()
     compare_records(actual_disease, richter)
+
+
+def test_other_id_match(do, neuroblastoma, pediatric_liposarcoma,
+                        compare_records):
+    """Test that other_id search resolves to correct records."""
+    response = do.search('ncit:C3270')
+    assert response['match_type'] == MatchType.OTHER_ID
+    assert len(response['records']) == 1
+    actual_disease = response['records'][0].dict()
+    compare_records(actual_disease, neuroblastoma)
+
+    response = do.search('NCIT:C8091')
+    assert response['match_type'] == MatchType.OTHER_ID
+    assert len(response['records']) == 1
+    actual_disease = response['records'][0].dict()
+    compare_records(actual_disease, pediatric_liposarcoma)

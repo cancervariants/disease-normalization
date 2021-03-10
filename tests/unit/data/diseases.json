@@ -162,6 +162,12 @@
     ]
   },
   {
+    "label_and_type": "doid:769##other_id",
+    "item_type": "other_id",
+    "src_name": "Mondo",
+    "concept_id": "mondo:0005072"
+  },
+  {
     "label_and_type": "neuroblastoma##label",
     "item_type": "label",
     "concept_id": "mondo:0005072",
@@ -237,6 +243,12 @@
     "src_name": "Mondo"
   },
   {
+    "label_and_type": "ncit:c8091##other_id",
+    "item_type": "other_id",
+    "src_name": "Mondo",
+    "concept_id": "mondo:0003587"
+  },
+  {
     "label_and_type": "pediatric liposarcoma##label",
     "item_type": "label",
     "concept_id": "mondo:0003587",
@@ -295,6 +307,12 @@
     ]
   },
   {
+    "label_and_type": "ncit:c3270##other_id",
+    "item_type": "other_id",
+    "concept_id": "DOID:769",
+    "src_name": "DO"
+  },
+  {
     "label_and_type": "neuroblastoma##label",
     "item_type": "label",
     "concept_id": "DOID:769",
@@ -309,6 +327,12 @@
     "other_identifiers": ["ncit:C8091"],
     "xrefs": ["umls:C0279984"],
     "src_name": "DO"
+  },
+  {
+    "label_and_type": "ncit:c8091##other_id",
+    "concept_id": "DOID:5695",
+    "src_name": "DO",
+    "item_type": "other_id"
   },
   {
     "label_and_type": "pediatric liposarcoma##label",
@@ -345,7 +369,7 @@
     "src_name": "Mondo",
     "merge_ref": "ncit:c2926",
     "concept_id": "mondo:0005233",
-    "label": "non-small cell lung carcinoma",
+    "label": "non-small cell lung carcinoma (disease)",
     "aliases": [
       "NSCLC - non-small cell lung cancer",
       "non-small cell lung carcinoma",
@@ -361,7 +385,7 @@
       "mesh:D002289",
       "umls:C0007131",
       "efo:0003060",
-      "icd10:C34",
+      "icd:C34",
       "kegg.disease:05223",
       "HP:0030358"
     ]
@@ -701,8 +725,8 @@
     "label": "Neuroblastoma",
     "concept_id": "oncotree:NBL",
     "aliases": [],
-    "other_identifiers": ["umls:C0027819", "ncit:C3270"],
-    "xrefs": []
+    "other_identifiers": ["ncit:C3270"],
+    "xrefs": ["umls:C0027819"]
   },
   {
     "label_and_type": "neuroblastoma##label",
@@ -717,7 +741,8 @@
     "merge_ref": "ncit:c2926",
     "label": "Non-Small Cell Lung Cancer",
     "concept_id": "oncotree:NSCLC",
-    "other_identifiers": ["umls:C0007131", "ncit:C2926"]
+    "other_identifiers": ["ncit:C2926"],
+    "xrefs": ["umls:C0007131"]
   },
   {
     "label_and_type": "non-small cell lung cancer##label",
