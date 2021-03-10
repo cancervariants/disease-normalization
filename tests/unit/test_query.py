@@ -95,8 +95,7 @@ def skin_myo():
 @pytest.fixture(scope='module')
 def mafd2():
     """Create a test fixture for major affective disorder 2. Query should not
-    include an `"xrefs"` field or a `"pediatric_disease"`
-    extension.
+    include a "pediatric_disease" Extension object.
     """
     return {
         "id": "normalize:MAFD2",
@@ -106,7 +105,16 @@ def mafd2():
             "disease_id": "mondo:0010648"
         },
         "label": "major affective disorder 2",
-        "alternate_labels": ["MAFD2"],
+        "alternate_labels": [
+            "MAFD2",
+            "MDI",
+            "MDX",
+            "MANIC-DEPRESSIVE ILLNESS",
+            "BPAD",
+            "MAFD2",
+            "BIPOLAR AFFECTIVE DISORDER",
+            "MANIC-DEPRESSIVE PSYCHOSIS, X-LINKED"
+        ],
         "xrefs": [
             "omim:309200"
         ],
@@ -248,7 +256,7 @@ def test_normalize_query(query_handler, neuroblastoma, mafd2):
     assert response['match_type'] == MatchType.ALIAS
     assert response['warnings'] is None
     compare_vod(response['value_object_descriptor'], mafd2)
-    assert len(response['meta_']) == 1
+    assert len(response['meta_']) == 2
     assert 'Mondo' in response['meta_']
 
 

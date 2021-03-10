@@ -761,6 +761,7 @@
     "label_and_type": "omim:309200##identity",
     "item_type": "identity",
     "src_name": "OMIM",
+    "merge_ref": "mondo:0010648",
     "concept_id": "omim:309200",
     "label": "MAJOR AFFECTIVE DISORDER 2",
     "aliases": [
@@ -825,6 +826,7 @@
     "label_and_type": "omim:613065##identity",
     "item_type": "identity",
     "src_name": "OMIM",
+    "merge_ref": "mondo:0013108",
     "concept_id": "omim:613065",
     "label": "LEUKEMIA, ACUTE LYMPHOBLASTIC",
     "aliases": [
@@ -889,6 +891,7 @@
     "label_and_type": "omim:247640##identity",
     "item_type": "identity",
     "src_name": "OMIM",
+    "merge_ref": "mondo:0009539",
     "concept_id": "omim:247640",
     "label": "LYMPHOBLASTIC LEUKEMIA, ACUTE, WITH LYMPHOMATOUS FEATURES",
     "aliases": ["LALL", "LYMPHOMATOUS ALL"]
@@ -910,5 +913,45 @@
     "item_type": "label",
     "src_name": "OMIM",
     "concept_id": "omim:247640"
+  },
+  {
+    "label_and_type": "mondo:0009539##identity",
+    "item_type": "identity",
+    "src_name": "Mondo",
+    "merge_ref": "mondo:0009539",
+    "label": "lymphoblastic leukemia, acute, with lymphomatous features",
+    "concept_id": "mondo:0009539",
+    "other_identifiers": ["omim:247640"],
+    "xrefs": ["mesh:C565429", "umls:C1855472"]
+  },
+  {
+    "label_and_type": "lymphoblastic leukemia, acute, with lymphomatous features##label",
+    "item_type": "label",
+    "src_name": "Mondo",
+    "concept_id": "mondo:0009539"
+  },
+  {
+    "label_and_type": "mondo:0009539##merger",
+    "item_type": "merger",
+    "label": "lymphoblastic leukemia, acute, with lymphomatous features",
+    "other_identifiers": ["omim:247640"],
+    "aliases": ["LYMPHOMATOUS ALL", "LALL"],
+    "xrefs": ["umls:C1855472", "mesh:C565429"]
+  },
+  {
+    "label_and_type": "mondo:0013108##identity",
+    "item_type": "identity",
+    "merge_ref": "mondo:0013108",
+    "src_name": "Mondo",
+    "concept_id": "mondo:0013108",
+    "label": "leukemia, acute lymphocytic, susceptibility to, 1",
+    "other_identifiers": ["omim:613065"],
+    "xrefs": ["umls:C2751595"]
+  },
+  {
+    "label_and_type": "leukemia, acute lymphocytic, susceptibility to, 1##label",
+    "item_type": "label",
+    "concept_id": "mondo:0013108",
+    "src_name": "Mondo"
   }
 ]
