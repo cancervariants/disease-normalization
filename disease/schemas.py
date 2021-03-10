@@ -23,6 +23,7 @@ class SourceName(Enum):
     MONDO = "Mondo"
     DO = "DO"
     ONCOTREE = "OncoTree"
+    OMIM = "OMIM"
 
 
 class SourceIDAfterNamespace(Enum):
