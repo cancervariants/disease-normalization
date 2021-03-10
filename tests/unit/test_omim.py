@@ -14,8 +14,8 @@ def omim():
 
         def search(self, query_str):
             response = self.query_handler.search_sources(query_str, keyed=True,
-                                                         incl='ncit')
-            return response['source_matches']['NCIt']
+                                                         incl='omim')
+            return response['source_matches']['OMIM']
     return QueryGetter()
 
 
@@ -33,7 +33,10 @@ def mafd2():
             "MDX",
             "BIPOLAR AFFECTIVE DISORDER",
             "BPAD"
-        ]
+        ],
+        "other_identifiers": [],
+        "xrefs": [],
+        "pediatric_disease": None,
     }
 
 
@@ -51,7 +54,10 @@ def acute_ll():
             "LEUKEMIA, B-CELL ACUTE LYMPHOBLASTIC, SUSCEPTIBILITY TO",
             "LEUKEMIA, T-CELL ACUTE LYMPHOBLASTIC, SUSCEPTIBILITY TO",
             "LEUKEMIA, ACUTE LYMPHOBLASTIC, B-HYPERDIPLOID, SUSCEPTIBILITY TO"
-        ]
+        ],
+        "other_identifiers": [],
+        "xrefs": [],
+        "pediatric_disease": None,
     }
 
 
@@ -64,27 +70,27 @@ def lall():
         "aliases": [
             "LALL",
             "LYMPHOMATOUS ALL"
-        ]
+        ],
+        "other_identifiers": [],
+        "xrefs": [],
+        "pediatric_disease": None,
     }
 
 
-def test_concept_id_match(omim, mafd2, acute_ll, lall, provide_comparator):
+def test_concept_id_match(omim, mafd2, acute_ll, lall, compare_records):
     """Test concept ID search resolution."""
-    compare_records = provide_comparator()
     response = omim.search('omim:309200')
     assert response['match_type'] == MatchType.CONCEPT_ID
     assert len(response['records']) == 1
     actual_disease = response['records'][0].dict()
     compare_records(actual_disease, mafd2)
 
-    compare_records = provide_comparator()
     response = omim.search('omim:613065')
     assert response['match_type'] == MatchType.CONCEPT_ID
     assert len(response['records']) == 1
     actual_disease = response['records'][0].dict()
     compare_records(actual_disease, acute_ll)
 
-    compare_records = provide_comparator()
     response = omim.search('omim:247640')
     assert response['match_type'] == MatchType.CONCEPT_ID
     assert len(response['records']) == 1
@@ -92,6 +98,6 @@ def test_concept_id_match(omim, mafd2, acute_ll, lall, provide_comparator):
     compare_records(actual_disease, lall)
 
 
-def test_label_match(omim, mafd2, acute_ll, lall, provide_comparator):
+def test_label_match(omim, mafd2, acute_ll, lall, compare_records):
     """Test label search resolution."""
     pass
