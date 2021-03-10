@@ -83,9 +83,8 @@ class OMIM(Base):
         for row in rows:
             disease = {
                 'concept_id': f'{NamespacePrefix.OMIM.value}:row[1]',
-                'aliases': []
             }
-            aliases = {}
+            aliases = set()
 
             label_item = row[2]
             if ';' in label_item:
