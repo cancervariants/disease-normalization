@@ -72,7 +72,7 @@ class QueryHandler:
         :param Dict[str, Dict] response: in-progress response object to return
             to client
         :param Dict item: Item retrieved from DynamoDB
-        :param MatchType match_type: type of query match
+        :param str match_type: type of query match
         :return: Tuple containing updated response object, and string
             containing name of the source of the match
         """
@@ -178,7 +178,7 @@ class QueryHandler:
         :param Dict resp: in-progress response object to return to client
         :param Set[str] sources: remaining unmatched sources
         :param str match_type: Match type to check for. Should be one of
-            {'label', 'alias'}
+            {'label', 'alias', 'other_id'}
         :return: Tuple with updated resp object and updated set of unmatched
                  sources
         """
@@ -214,7 +214,7 @@ class QueryHandler:
         if len(sources) == 0:
             return response
 
-        match_types = ['label', 'trade_name', 'alias']
+        match_types = ['label', 'alias', 'other_id']
         for match_type in match_types:
             (response, sources) = self._check_match_type(query, response,
                                                          sources, match_type)
@@ -427,7 +427,7 @@ class QueryHandler:
                 non_merged_match = (record, 'concept_id')
 
         # check other match types
-        for match_type in ['label', 'alias']:
+        for match_type in ['label', 'alias', 'other_id']:
             # get matches list for match tier
             query_matches = self.db.get_records_by_type(query_str, match_type)
             query_matches = [self.db.get_record_by_id(m['concept_id'],
