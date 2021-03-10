@@ -100,4 +100,75 @@ def test_concept_id_match(omim, mafd2, acute_ll, lall, compare_records):
 
 def test_label_match(omim, mafd2, acute_ll, lall, compare_records):
     """Test label search resolution."""
-    pass
+    response = omim.search('MAJOR AFFECTIVE DISORDER 2')
+    assert response['match_type'] == MatchType.LABEL
+    assert len(response['records']) == 1
+    actual_disease = response['records'][0].dict()
+    compare_records(actual_disease, mafd2)
+
+    response = omim.search('LEUKEMIA, ACUTE LYMPHOBLASTIC')
+    assert response['match_type'] == MatchType.LABEL
+    assert len(response['records']) == 1
+    actual_disease = response['records'][0].dict()
+    compare_records(actual_disease, acute_ll)
+
+    response = omim.search('lymphoblastic leukemia, acute, with lymphomatous features')  # noqa: E501
+    assert response['match_type'] == MatchType.LABEL
+    assert len(response['records']) == 1
+    actual_disease = response['records'][0].dict()
+    compare_records(actual_disease, lall)
+
+
+def test_alias_match(omim, mafd2, acute_ll, lall, compare_records):
+    """Test alias search resolution."""
+    response = omim.search('bipolar affective disorder')
+    assert response['match_type'] == MatchType.ALIAS
+    assert len(response['records']) >= 1
+    for record in response['records']:
+        if record.label == 'MAJOR AFFECTIVE DISORDER 2':
+            actual_disease = record.dict()
+    compare_records(actual_disease, mafd2)
+
+    response = omim.search('bpad')
+    assert response['match_type'] == MatchType.ALIAS
+    assert len(response['records']) >= 1
+    for record in response['records']:
+        if record.label == 'MAJOR AFFECTIVE DISORDER 2':
+            actual_disease = record.dict()
+    compare_records(actual_disease, mafd2)
+
+    response = omim.search('mafd2')
+    assert response['match_type'] == MatchType.ALIAS
+    assert len(response['records']) == 1
+    actual_disease = response['records'][0].dict()
+    compare_records(actual_disease, mafd2)
+
+    response = omim.search('all')
+    assert response['match_type'] == MatchType.ALIAS
+    assert len(response['records']) == 1
+    actual_disease = response['records'][0].dict()
+    compare_records(actual_disease, acute_ll)
+
+    response = omim.search('LEUKEMIA, ACUTE LYMPHOCYTIC, SUSCEPTIBILITY TO, 1')
+    assert response['match_type'] == MatchType.ALIAS
+    assert len(response['records']) == 1
+    actual_disease = response['records'][0].dict()
+    compare_records(actual_disease, acute_ll)
+
+    response = omim.search('LEUKEMIA, B-CELL ACUTE LYMPHOBLASTIC, SUSCEPTIBILITY TO')  # noqa: E501
+    assert response['match_type'] == MatchType.ALIAS
+    assert len(response['records']) == 1
+    actual_disease = response['records'][0].dict()
+    compare_records(actual_disease, acute_ll)
+
+    response = omim.search('lymphomatous all')
+    assert response['match_type'] == MatchType.ALIAS
+    assert len(response['records']) == 1
+    actual_disease = response['records'][0].dict()
+    compare_records(actual_disease, lall)
+
+    response = omim.search('lall')
+    assert response['match_type'] == MatchType.ALIAS
+    assert len(response['records']) == 1
+    actual_disease = response['records'][0].dict()
+    compare_records(actual_disease, lall)
