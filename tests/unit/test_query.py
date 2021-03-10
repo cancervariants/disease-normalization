@@ -137,11 +137,11 @@ def compare_vod(actual, fixture):
     assert actual['value'] == fixture['value']
     assert actual['label'] == fixture['label']
 
-    assert ('xrefs' in actual) == ('xrefs' in fixture)
+    assert ('xrefs' in actual.keys()) == ('xrefs' in fixture.keys())
     if 'xrefs' in actual:
         assert set(actual['xrefs']) == set(fixture['xrefs'])
 
-    assert ('alternate_labels' in actual) == ('alternate_labels' in fixture)
+    assert ('alternate_labels' in actual.keys()) == ('alternate_labels' in fixture.keys())  # noqa: E501
     if 'alternate_labels' in actual:
         assert set(actual['alternate_labels']) == \
             set(fixture['alternate_labels'])
@@ -155,7 +155,7 @@ def compare_vod(actual, fixture):
         else:
             return None
 
-    assert ('extensions' in actual) == ('extensions' in fixture)
+    assert ('extensions' in actual.keys()) == ('extensions' in fixture.keys())  # noqa: E501
     if 'extensions' in actual:
         ext_actual = actual['extensions']
         ext_fixture = fixture['extensions']

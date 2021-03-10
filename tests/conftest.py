@@ -14,18 +14,16 @@ def compare_records():
     def compare_records(actual_record: Dict, fixture_record: Dict):
         """Check that identity records are identical."""
         assert actual_record['concept_id'] == fixture_record['concept_id']
-        assert ('label' in actual_record) == ('label' in fixture_record)
+        assert ('label' in actual_record.keys()) == ('label' in fixture_record.keys())  # noqa: E501
         if 'label' in actual_record or 'label' in fixture_record:
             assert actual_record['label'] == fixture_record['label']
-        assert ('aliases' in actual_record) == ('aliases' in fixture_record)
+        assert ('aliases' in actual_record.keys()) == ('aliases' in fixture_record.keys())  # noqa: E501
         if 'aliases' in actual_record or 'aliases' in fixture_record:
             assert set(actual_record['aliases']) == set(fixture_record['aliases'])  # noqa: E501
-        print(actual_record.keys())
-        print(fixture_record.keys())
-        assert ('other_identifiers' in actual_record) == ('other_identifiers' in fixture_record)  # noqa: E501
+        assert ('other_identifiers' in actual_record.keys()) == ('other_identifiers' in fixture_record.keys())  # noqa: E501
         if 'other_identifiers' in actual_record or 'other_identifiers' in fixture_record:  # noqa: E501
             assert set(actual_record['other_identifiers']) == set(fixture_record['other_identifiers'])  # noqa: E501
-        assert ('xrefs' in actual_record) == ('xrefs' in fixture_record)
+        assert ('xrefs' in actual_record.keys()) == ('xrefs' in fixture_record.keys())  # noqa: E501
         if 'xrefs' in actual_record or 'xrefs' in fixture_record:
             assert set(actual_record['xrefs']) == set(fixture_record['xrefs'])
     return compare_records
