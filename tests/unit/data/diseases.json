@@ -934,6 +934,7 @@
     "label_and_type": "mondo:0009539##merger",
     "item_type": "merger",
     "label": "lymphoblastic leukemia, acute, with lymphomatous features",
+    "concept_id": "mondo:0009539",
     "other_identifiers": ["omim:247640"],
     "aliases": ["LYMPHOMATOUS ALL", "LALL"],
     "xrefs": ["umls:C1855472", "mesh:C565429"]
