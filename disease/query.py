@@ -367,7 +367,6 @@ class QueryHandler:
         :param Dict record: individual record item in iterable to sort
         :return: tuple with rank value and concept ID
         """
-        # TODO reevaluate/update
         src = record['src_name']
         if src == SourceName.NCIT.value:
             source_rank = 1
@@ -375,8 +374,10 @@ class QueryHandler:
             source_rank = 2
         elif src == SourceName.ONCOTREE.value:
             source_rank = 3
-        elif src == SourceName.DO.value:
+        elif src == SourceName.OMIM.value:
             source_rank = 4
+        elif src == SourceName.DO.value:
+            source_rank = 5
         else:
             logger.warning(f"query.record_order: Invalid source name for "
                            f"{record}")
