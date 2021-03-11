@@ -22,28 +22,30 @@ class Database:
         :param str db_url: database endpoint URL to connect to
         :param str region_name: AWS region name to use
         """
-        if db_url:
+        if 'DISEASE_NORM_PROD' in environ.keys():
             boto_params = {
-                'region_name': region_name,
-                'endpoint_url': db_url
+                'region_name': region_name
             }
-        elif 'DISEASE_NORM_DB_URL' in environ.keys():
-            boto_params = {
-                'region_name': region_name,
-                'endpoint_url': environ['DISEASE_NORM_DB_URL']
-            }
-        else:
-            if 'DISEASE_NORM_PROD' not in environ \
-                    or environ['DISEASE_NORM_PROD'] == 'false':
-                if click.confirm("Are you sure you want to update "
-                                 "the production database?", default=False):
-                    click.echo("Updating the production database...")
+            if 'DISEASE_NORM_EB_PROD' not in environ.keys():
+                # EB Instance should not have to confirm.
+                # This is used only for using production via CLI
+                if click.confirm("Are you sure you want to use the "
+                                 "production database?", default=False):
+                    click.echo("***PRODUCTION DATABASE IN USE***")
                 else:
                     click.echo("Exiting.")
                     sys.exit()
-
+        else:
+            if db_url:
+                endpoint_url = db_url
+            elif 'DISEASE_NORM_DB_URL' in environ.keys():
+                endpoint_url = environ['DISEASE_NORM_DB_URL']
+            else:
+                endpoint_url = 'http://localhost:8000'
+            click.echo(f"***Using Database Endpoint: {endpoint_url}***")
             boto_params = {
-                'region_name': region_name
+                'region_name': region_name,
+                'endpoint_url': endpoint_url
             }
         self.dynamodb = boto3.resource('dynamodb', **boto_params)
         self.dynamodb_client = boto3.client('dynamodb', **boto_params)
