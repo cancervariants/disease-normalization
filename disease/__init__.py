@@ -3,7 +3,7 @@ from pathlib import Path
 import logging
 
 
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
+PROJECT_ROOT = Path(__file__).resolve().parents[0]
 
 
 logging.basicConfig(
@@ -13,7 +13,9 @@ logger = logging.getLogger('disease')
 logger.setLevel(logging.DEBUG)
 
 
-from disease.schemas import SourceName, SourceIDAfterNamespace, NamespacePrefix  # noqa: E402, E501
+__version__ = "0.1.1"  # remember to update setup.cfg as well!
+
+from disease.schemas import SourceName, SourceIDAfterNamespace, NamespacePrefix  # noqa
 # use to lookup source name from lower-case string
 # technically the same as PREFIX_LOOKUP, but source namespace prefixes
 # sometimes differ from their names

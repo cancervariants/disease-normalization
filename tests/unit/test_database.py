@@ -1,14 +1,15 @@
 """Test DynamoDB"""
 import pytest
 from disease.database import Database
-from disease import PROJECT_ROOT
 import json
 import os
 
 
 @pytest.fixture(scope='module')
-def db():
+def db(provide_root):
     """Create a DynamoDB test fixture."""
+    TEST_ROOT = provide_root
+
     class DB:
         def __init__(self):
             self.db = Database()
@@ -16,16 +17,16 @@ def db():
                 self.load_test_data()
 
         def load_test_data(self):
-            with open(f'{PROJECT_ROOT}/tests/unit/'
-                      f'data/diseases.json', 'r') as f:
+            with open(TEST_ROOT / 'tests' / 'unit' / 'data' / 'diseases.json',
+                      'r') as f:
                 diseases = json.load(f)
                 with self.db.diseases.batch_writer() as batch:
                     for disease in diseases:
                         batch.put_item(Item=disease)
                 f.close()
 
-            with open(f'{PROJECT_ROOT}/tests/unit/'
-                      f'data/metadata.json', 'r') as f:
+            with open(TEST_ROOT / 'tests' / 'unit' / 'data' / 'metadata.json',
+                      'r') as f:
                 metadata = json.load(f)
                 with self.db.metadata.batch_writer() as batch:
                     for m in metadata:
