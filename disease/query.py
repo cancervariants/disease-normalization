@@ -308,10 +308,7 @@ class QueryHandler:
         """
         sources_meta = {}
         vod = response['value_object_descriptor']
-        ids = [vod['value']['disease_id']]
-        other_ids = vod.get('xrefs', None)
-        if other_ids:
-            ids += other_ids
+        ids = [vod['value']['disease_id']] + vod.get('xrefs', [])
         for concept_id in ids:
             prefix = concept_id.split(':')[0]
             src_name = PREFIX_LOOKUP[prefix.lower()]
