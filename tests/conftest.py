@@ -30,12 +30,6 @@ def compare_records():
 
 
 @pytest.fixture(scope='module')
-def provide_root():
-    """Provide TEST_ROOT value to test cases."""
-    return TEST_ROOT
-
-
-@pytest.fixture(scope='module')
 def mock_database():
     """Return MockDatabase object."""
 
@@ -74,7 +68,7 @@ def mock_database():
                              case_sensitive: bool = True,
                              merge: bool = False) -> Optional[Dict]:
             """Fetch record corresponding to provided concept ID.
-            :param str concept_id: concept ID for disease record
+            :param str record_id: concept ID for disease record
             :param bool case_sensitive: if true, performs exact lookup, which
                 is more efficient. Otherwise, performs filter operation, which
                 doesn't require correct casing.
@@ -114,7 +108,7 @@ def mock_database():
             else:
                 return []
 
-        def add_record(self, record: Dict, record_type: str):
+        def add_record(self, record: Dict, record_type: str = "identity"):
             """Store add record request sent to database.
             :param Dict record: record (of any type) to upload. Must include
                 `concept_id` key. If record is of the `identity` type, the
@@ -127,8 +121,8 @@ def mock_database():
                           new_value: Any):
             """Store update request sent to database.
             :param str concept_id: record to update
-            :param str field: name of field to update
-            :parm str new_value: new value
+            :param str attribute: name of field to update
+            :param Any new_value: new value
             """
             assert f'{concept_id.lower()}##identity' in self.records
             self.updates[concept_id] = {attribute: new_value}

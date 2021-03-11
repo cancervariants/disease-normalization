@@ -124,6 +124,7 @@ def test_alias_match(omim, mafd2, acute_ll, lall, compare_records):
     response = omim.search('bipolar affective disorder')
     assert response['match_type'] == MatchType.ALIAS
     assert len(response['records']) >= 1
+    actual_disease = None
     for record in response['records']:
         if record.label == 'MAJOR AFFECTIVE DISORDER 2':
             actual_disease = record.dict()
@@ -132,6 +133,7 @@ def test_alias_match(omim, mafd2, acute_ll, lall, compare_records):
     response = omim.search('bpad')
     assert response['match_type'] == MatchType.ALIAS
     assert len(response['records']) >= 1
+    actual_disease = None
     for record in response['records']:
         if record.label == 'MAJOR AFFECTIVE DISORDER 2':
             actual_disease = record.dict()

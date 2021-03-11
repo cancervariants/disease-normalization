@@ -223,7 +223,7 @@ class Database:
                          f"{e.response['Error']['Message']}")
             return []
 
-    def add_record(self, record: Dict, record_type="identity"):
+    def add_record(self, record: Dict, record_type: str = "identity"):
         """Add new record to database.
 
         :param Dict record: record to upload
