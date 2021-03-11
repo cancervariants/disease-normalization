@@ -28,7 +28,7 @@ def query_handler():
 def neuroblastoma():
     """Create neuroblastoma fixture."""
     return {
-        "id": "normalize:Neuroblastoma",
+        "id": "normalize.disease:Neuroblastoma",
         "type": "DiseaseDescriptor",
         "value": {
             "type": "Disease",
@@ -81,7 +81,7 @@ def neuroblastoma():
 def skin_myo():
     """Create a test fixture for skin myopithelioma"""
     return {
-        "id": "normalize:Skin Myoepithelioma",
+        "id": "normalize.disease:Skin Myoepithelioma",
         "type": "DiseaseDescriptor",
         "value": {
             "type": "Disease",
@@ -98,7 +98,7 @@ def mafd2():
     include a "pediatric_disease" Extension object.
     """
     return {
-        "id": "normalize:MAFD2",
+        "id": "normalize.disease:MAFD2",
         "type": "DiseaseDescriptor",
         "value": {
             "type": "Disease",
@@ -266,7 +266,7 @@ def test_normalize_non_mondo(query_handler, skin_myo):
     assert response['match_type'] == MatchType.LABEL
     assert len(response['meta_']) == 1
     skin_myo_alias = skin_myo.copy()
-    skin_myo_alias['id'] = 'normalize:Skin%20Myoepithelioma'
+    skin_myo_alias['id'] = 'normalize.disease:Skin%20Myoepithelioma'
     compare_vod(response['value_object_descriptor'], skin_myo_alias)
     assert 'NCIt' in response['meta_']
 
@@ -274,6 +274,6 @@ def test_normalize_non_mondo(query_handler, skin_myo):
     assert response['match_type'] == MatchType.ALIAS
     assert len(response['meta_']) == 1
     skin_myo_alias = skin_myo.copy()
-    skin_myo_alias['id'] = 'normalize:Cutaneous%20Myoepithelioma'
+    skin_myo_alias['id'] = 'normalize.disease:Cutaneous%20Myoepithelioma'
     compare_vod(response['value_object_descriptor'], skin_myo_alias)
     assert 'NCIt' in response['meta_']
