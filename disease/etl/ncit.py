@@ -10,7 +10,6 @@ import zipfile
 from os import remove, rename
 from typing import Set, List
 import owlready2 as owl
-from owlready2.entity import ThingClass
 import re
 
 
@@ -89,12 +88,12 @@ class NCIt(OWLBase):
         params['src_name'] = SourceName.NCIT.value
         self.database.metadata.put_item(Item=params)
 
-    def _get_disease_classes(self) -> Set[ThingClass]:
+    def _get_disease_classes(self) -> Set[str]:
         """Get all nodes with semantic_type 'Neoplastic Process' or 'Disease
         or Syndrome'.
 
         :return: uq_nodes with additions from above types added
-        :rtype: Set[owlready2.entity.ThingClass]
+        :rtype: Set[str]
         """
         p106 = "http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#P106"
         neopl = self._get_by_property_value(p106, "Neoplastic Process")

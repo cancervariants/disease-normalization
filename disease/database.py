@@ -48,7 +48,7 @@ class Database:
         self.dynamodb = boto3.resource('dynamodb', **boto_params)
         self.dynamodb_client = boto3.client('dynamodb', **boto_params)
 
-        # create tables if nonexistant if not connecting to remote database
+        # create tables if nonexistent if not connecting to remote database
         if db_url or 'DISEASE_NORM_DB_URL' in environ.keys():
             existing_tables = self.dynamodb_client.list_tables()['TableNames']
             self.create_diseases_table(existing_tables)
@@ -242,7 +242,7 @@ class Database:
                          f"{e.response['Error']['Message']}")
 
     def add_ref_record(self, term: str, concept_id: str, ref_type: str):
-        """Add auxilliary/reference record to database.
+        """Add auxiliary/reference record to database.
 
         :param str term: referent term
         :param str concept_id: concept ID to refer to
@@ -268,7 +268,7 @@ class Database:
 
         :param str concept_id: record to update
         :param str field: name of field to update
-        :parm str new_value: new value
+        :param str new_value: new value
         """
         key = {
             'label_and_type': f'{concept_id.lower()}##identity',

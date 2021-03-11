@@ -31,6 +31,10 @@ class Base(ABC):
         """
         raise NotImplementedError
 
+    def _download_data(self):
+        """Download source data."""
+        raise NotImplementedError
+
     def _extract_data(self):
         """Get source file from data directory."""
         self._data_path.mkdir(exist_ok=True, parents=True)

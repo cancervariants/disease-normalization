@@ -1,6 +1,6 @@
 """This module provides methods for handling queries."""
 import re
-from typing import List, Dict, Set, Optional
+from typing import Dict, Set, Optional
 from uvicorn.config import logger
 from disease import NAMESPACE_LOOKUP, PREFIX_LOOKUP, SOURCES_LOWER_LOOKUP
 from disease.database import Database
@@ -98,7 +98,7 @@ class QueryHandler:
         elif matches[src_name]['match_type'] == MatchType[match_type.upper()]:
             matches[src_name]['records'].append(disease)
 
-        return (response, src_name)
+        return response, src_name
 
     def _fetch_records(self,
                        response: Dict[str, Dict],
@@ -124,7 +124,7 @@ class QueryHandler:
                 matched_sources.add(src)
             except ClientError as e:
                 logger.error(e.response['Error']['Message'])
-        return (response, matched_sources)
+        return response, matched_sources
 
     def _fill_no_matches(self, resp: Dict[str, Dict]) -> Dict:
         """Fill all empty source_matches slots with NO_MATCH results.
@@ -167,7 +167,7 @@ class QueryHandler:
             (resp, src_name) = self._add_record(resp, item,
                                                 MatchType.CONCEPT_ID.name)
             sources = sources - {src_name}
-        return (resp, sources)
+        return resp, sources
 
     def _check_match_type(self,
                           query: str,
@@ -189,7 +189,7 @@ class QueryHandler:
             (resp, matched_srcs) = self._fetch_records(resp, concept_ids,
                                                        match_type)
             sources = sources - matched_srcs
-        return (resp, sources)
+        return resp, sources
 
     def _response_keyed(self, query: str, sources: Set[str]) -> Dict:
         """Return response as dict where key is source name and value
@@ -225,11 +225,11 @@ class QueryHandler:
         # remaining sources get no match
         return self._fill_no_matches(response)
 
-    def _response_list(self, query: str, sources: List[str]) -> Dict:
+    def _response_list(self, query: str, sources: Set[str]) -> Dict:
         """Return response as list, where the first key-value in each item
         is the source name. Corresponds to `keyed=false` API parameter.
         :param str query: string to match against
-        :param List[str] sources: sources to match from
+        :param Set[str] sources: sources to match from
         :return: Completed response object to return to client
         """
         response_dict = self._response_keyed(query, sources)
@@ -303,8 +303,9 @@ class QueryHandler:
 
     def _add_merged_meta(self, response: Dict) -> Dict:
         """Add source metadata to response object.
+
         :param Dict response: in-progress response object
-        :return: completed resopnse object.
+        :return: completed response object.
         """
         sources_meta = {}
         vod = response['value_object_descriptor']
@@ -320,6 +321,7 @@ class QueryHandler:
     def _add_vod(self, response: Dict, record: Dict, query: str,
                  match_type: MatchType) -> Dict:
         """Format received DB record as VOD and update response object.
+
         :param Dict response: in-progress response object
         :param Dict record: record as stored in DB
         :param str query: query string from user request
@@ -362,6 +364,7 @@ class QueryHandler:
 
     def _record_order(self, record: Dict) -> (int, str):
         """Construct priority order for matching. Only called by sort().
+
         :param Dict record: individual record item in iterable to sort
         :return: tuple with rank value and concept ID
         """
@@ -380,7 +383,7 @@ class QueryHandler:
             logger.warning(f"query.record_order: Invalid source name for "
                            f"{record}")
             source_rank = 4
-        return (source_rank, record['concept_id'])
+        return source_rank, record['concept_id']
 
     def _handle_failed_merge_ref(self, record, response, query) -> Dict:
         """Log + fill out response for a failed merge reference lookup.

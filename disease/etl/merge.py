@@ -21,11 +21,11 @@ class Merge:
         self._database = database
         self._groups = []  # list of tuples: (mondo_concept_id, set_of_ids)
 
-    def create_merged_concepts(self, record_ids: Set[str]):
+    def create_merged_concepts(self, record_ids: List[str]):
         """Create concept groups, generate merged concept records, and
         update database.
 
-        :param Set[str] record_ids: concept identifiers from which groups
+        :param List[str] record_ids: concept identifiers from which groups
             should be generated.
         """
         # build groups
@@ -98,7 +98,7 @@ class Merge:
             """Provide priority values of concepts for sort function."""
             src = record['src_name'].upper()
             source_rank = SourcePriority[src].value
-            return (source_rank, record['concept_id'])
+            return source_rank, record['concept_id']
         records.sort(key=record_order)
 
         merged_properties = {
@@ -129,4 +129,4 @@ class Merge:
 
         merged_properties['label_and_type'] = \
             f'{merged_properties["concept_id"].lower()}##merger'
-        return (merged_properties, final_ids)
+        return merged_properties, final_ids
