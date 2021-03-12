@@ -61,9 +61,9 @@ To change the port, simply add `-port value`.
 
 The sources we currently use are: OncoTree, OMIM, Disease Ontology, and Mondo.
 
-The application can retrieve input data for all sources but OMIM, for which a source file must be manually placed in the `disease-normalization/data/omim` folder. The OMIM file (`mimTitles.txt`) should be renamed according to the convention `omim_YYYYMMDD.tsv`, where `YYYYMMDD` indicates the date that the file was generated.
+The application will automatically retrieve input data for all sources but OMIM, for which a source file must be manually acquired and placed in the `disease/data/omim` folder within the library root. In order to access OMIM data, users must submit a request [here](https://www.omim.org/downloads). Once approved, the relevant OMIM file (`mimTitles.txt`) should be renamed according to the convention `omim_YYYYMMDD.tsv`, where `YYYYMMDD` indicates the date that the file was generated, and placed in the appropriate location.
 
-To update one source, simply set `--normalizer` to the source you wish to update.
+To update one source, simply set `--normalizer` to the source you wish to update. Accepted source names are `DO` (for Disease Ontology), `Mondo`, `OncoTree`, and `OMIM`.
 
 From the project root, run the following to update the Mondo source:
 
@@ -72,6 +72,10 @@ python3 -m disease.cli --normalizer="Mondo"
 ```
 
 To update multiple sources, you can use the `normalizer` flag with the source names separated by spaces.
+
+```commandline
+python3 -m disease.cli --normalizer="Mondo OMIM DO"
+```
 
 #### Update all sources
 
