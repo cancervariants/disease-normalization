@@ -58,7 +58,7 @@ class OMIM(Base):
                         data_url=self._SRC_URL,
                         rdp_url='http://reusabledata.org/omim.html',
                         data_license_attributes={
-                            'non_commercial': False,  # TODO double-check
+                            'non_commercial': False,
                             'share_alike': True,
                             'attribution': True
                         })
