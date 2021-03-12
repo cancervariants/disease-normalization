@@ -50,7 +50,7 @@ class Database:
         self.dynamodb = boto3.resource('dynamodb', **boto_params)
         self.dynamodb_client = boto3.client('dynamodb', **boto_params)
 
-        # create tables if nonexistant if not connecting to remote database
+        # Table creation for local database
         if 'DISEASE_NORM_PROD' not in environ.keys():
             existing_tables = self.dynamodb_client.list_tables()['TableNames']
             self.create_diseases_table(existing_tables)

@@ -147,7 +147,8 @@ cython_debug/
 pytest.ini
 
 # ignore data dir
-disease/data/
+data/*
+disease/data/*
 
 # IDE materials
 .idea/
