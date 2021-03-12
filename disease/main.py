@@ -27,7 +27,7 @@ def custom_openapi():
 #        "name": "Name-of-license",
 #        "url": "http://www.to-be-determined.com"
 #    }
-    openapi_schema['info']['contact'] = {  # TODO
+    openapi_schema['info']['contact'] = {
         "name": "Alex H. Wagner",
         "email": "Alex.Wagner@nationwidechildrens.org"
     }

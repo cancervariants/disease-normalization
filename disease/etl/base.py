@@ -31,6 +31,10 @@ class Base(ABC):
         """
         raise NotImplementedError
 
+    def _download_data(self):
+        """Download source data."""
+        raise NotImplementedError
+
     def _extract_data(self):
         """Get source file from data directory."""
         self._data_path.mkdir(exist_ok=True, parents=True)
@@ -69,7 +73,16 @@ class Base(ABC):
                     for al in aliases_lower:
                         self.database.add_ref_record(al, concept_id, 'alias')
 
-        for field in ('other_identifiers', 'xrefs', 'pediatric_disease'):
+        if 'other_identifiers' in disease:
+            other_ids = disease['other_identifiers']
+            if other_ids == [] or other_ids is None:
+                del disease['other_identifiers']
+            else:
+                for other_id in other_ids:
+                    self.database.add_ref_record(other_id, concept_id,
+                                                 'other_id')
+
+        for field in ('xrefs', 'pediatric_disease'):
             if field in disease and (disease[field] is None or  # noqa: W504
                                      disease[field] is []):
                 del disease[field]

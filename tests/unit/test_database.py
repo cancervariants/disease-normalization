@@ -3,12 +3,12 @@ import pytest
 from disease.database import Database
 import json
 import os
+from tests.conftest import TEST_ROOT
 
 
 @pytest.fixture(scope='module')
-def db(provide_root):
+def db():
     """Create a DynamoDB test fixture."""
-    TEST_ROOT = provide_root
 
     class DB:
         def __init__(self):

@@ -15,7 +15,16 @@ logger.setLevel(logging.DEBUG)
 
 __version__ = "0.1.1"  # remember to update setup.cfg as well!
 
-from disease.schemas import SourceName, SourceIDAfterNamespace, NamespacePrefix  # noqa
+
+class DownloadException(Exception):
+    """Exception for failures relating to source file downloads."""
+
+    def __init__(self, *args, **kwargs):
+        """Initialize exception."""
+        super().__init__(*args, **kwargs)
+
+
+from disease.schemas import SourceName, SourceIDAfterNamespace, NamespacePrefix  # noqa: E402 E501
 # use to lookup source name from lower-case string
 # technically the same as PREFIX_LOOKUP, but source namespace prefixes
 # sometimes differ from their names
@@ -42,6 +51,7 @@ from disease.etl import NCIt  # noqa: E402 F401
 from disease.etl import Mondo  # noqa: E402 F401
 from disease.etl import DO  # noqa: E402 F401
 from disease.etl import OncoTree  # noqa: E402 F401
+from disease.etl import OMIM  # noqa: E402 F401
 # Use to lookup class object from source name. Should be one key-value pair
 # for every functioning ETL class.
 SOURCES_CLASS_LOOKUP = {s.value.lower(): eval(s.value)

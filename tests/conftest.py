@@ -9,9 +9,24 @@ TEST_ROOT = Path(__file__).resolve().parents[1]
 
 
 @pytest.fixture(scope='module')
-def provide_root():
-    """Provide TEST_ROOT value to test cases."""
-    return TEST_ROOT
+def compare_records():
+    """Provide compare_records method to test classes"""
+    def compare_records(actual_record: Dict, fixture_record: Dict):
+        """Check that identity records are identical."""
+        assert actual_record['concept_id'] == fixture_record['concept_id']
+        assert ('label' in actual_record.keys()) == ('label' in fixture_record.keys())  # noqa: E501
+        if 'label' in actual_record or 'label' in fixture_record:
+            assert actual_record['label'] == fixture_record['label']
+        assert ('aliases' in actual_record.keys()) == ('aliases' in fixture_record.keys())  # noqa: E501
+        if 'aliases' in actual_record or 'aliases' in fixture_record:
+            assert set(actual_record['aliases']) == set(fixture_record['aliases'])  # noqa: E501
+        assert ('other_identifiers' in actual_record.keys()) == ('other_identifiers' in fixture_record.keys())  # noqa: E501
+        if 'other_identifiers' in actual_record or 'other_identifiers' in fixture_record:  # noqa: E501
+            assert set(actual_record['other_identifiers']) == set(fixture_record['other_identifiers'])  # noqa: E501
+        assert ('xrefs' in actual_record.keys()) == ('xrefs' in fixture_record.keys())  # noqa: E501
+        if 'xrefs' in actual_record or 'xrefs' in fixture_record:
+            assert set(actual_record['xrefs']) == set(fixture_record['xrefs'])
+    return compare_records
 
 
 @pytest.fixture(scope='module')
@@ -53,7 +68,7 @@ def mock_database():
                              case_sensitive: bool = True,
                              merge: bool = False) -> Optional[Dict]:
             """Fetch record corresponding to provided concept ID.
-            :param str concept_id: concept ID for disease record
+            :param str record_id: concept ID for disease record
             :param bool case_sensitive: if true, performs exact lookup, which
                 is more efficient. Otherwise, performs filter operation, which
                 doesn't require correct casing.
@@ -64,16 +79,16 @@ def mock_database():
                 label_and_type = f'{record_id.lower()}##merger'
             else:
                 label_and_type = f'{record_id.lower()}##identity'
-            record_lookup = self.records.get(label_and_type, None)
-            if record_lookup:
+            record_lookup_sk = self.records.get(label_and_type)
+            if record_lookup_sk:
                 if case_sensitive:
-                    record = record_lookup.get(record_id, None)
+                    record = record_lookup_sk.get(record_id)
                     if record:
                         return record.copy()
                     else:
                         return None
-                elif record_lookup.values():
-                    return list(record_lookup.values())[0].copy()
+                elif record_lookup_sk.values():
+                    return list(record_lookup_sk.values())[0].copy()
             return None
 
         def get_records_by_type(self, query: str,
@@ -93,22 +108,7 @@ def mock_database():
             else:
                 return []
 
-        def get_merged_record(self, merge_ref) -> Optional[Dict]:
-            """Fetch merged record from given reference.
-            :param str merge_ref: key for merged record, formated as a string
-                of grouped concept IDs separated by vertical bars, ending with
-                `##merger`. Must be correctly-cased.
-            :return: complete merged record if lookup successful, None
-                otherwise
-            """
-            record_lookup = self.records.get(merge_ref, None)
-            if record_lookup:
-                vals = list(record_lookup.values())
-                if vals:
-                    return vals[0].copy()
-            return None
-
-        def add_record(self, record: Dict, record_type: str):
+        def add_record(self, record: Dict, record_type: str = "identity"):
             """Store add record request sent to database.
             :param Dict record: record (of any type) to upload. Must include
                 `concept_id` key. If record is of the `identity` type, the
@@ -121,8 +121,8 @@ def mock_database():
                           new_value: Any):
             """Store update request sent to database.
             :param str concept_id: record to update
-            :param str field: name of field to update
-            :parm str new_value: new value
+            :param str attribute: name of field to update
+            :param Any new_value: new value
             """
             assert f'{concept_id.lower()}##identity' in self.records
             self.updates[concept_id] = {attribute: new_value}

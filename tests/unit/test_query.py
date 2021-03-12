@@ -95,8 +95,7 @@ def skin_myo():
 @pytest.fixture(scope='module')
 def mafd2():
     """Create a test fixture for major affective disorder 2. Query should not
-    include an `"xrefs"` field or a `"pediatric_disease"`
-    extension.
+    include a "pediatric_disease" Extension object.
     """
     return {
         "id": "normalize.disease:MAFD2",
@@ -106,13 +105,24 @@ def mafd2():
             "disease_id": "mondo:0010648"
         },
         "label": "major affective disorder 2",
-        "alternate_labels": ["MAFD2"],
+        "alternate_labels": [
+            "MAFD2",
+            "MDI",
+            "MDX",
+            "MANIC-DEPRESSIVE ILLNESS",
+            "BPAD",
+            "MAFD2",
+            "BIPOLAR AFFECTIVE DISORDER",
+            "MANIC-DEPRESSIVE PSYCHOSIS, X-LINKED"
+        ],
+        "xrefs": [
+            "omim:309200"
+        ],
         "extensions": [
             {
                 "type": "Extension",
                 "name": "associated_with",
                 "value": [
-                    "omim:309200",
                     "mesh:C564108"
                 ]
             }
@@ -127,11 +137,11 @@ def compare_vod(actual, fixture):
     assert actual['value'] == fixture['value']
     assert actual['label'] == fixture['label']
 
-    assert ('xrefs' in actual) == ('xrefs' in fixture)
+    assert ('xrefs' in actual.keys()) == ('xrefs' in fixture.keys())
     if 'xrefs' in actual:
         assert set(actual['xrefs']) == set(fixture['xrefs'])
 
-    assert ('alternate_labels' in actual) == ('alternate_labels' in fixture)
+    assert ('alternate_labels' in actual.keys()) == ('alternate_labels' in fixture.keys())  # noqa: E501
     if 'alternate_labels' in actual:
         assert set(actual['alternate_labels']) == \
             set(fixture['alternate_labels'])
@@ -145,7 +155,7 @@ def compare_vod(actual, fixture):
         else:
             return None
 
-    assert ('extensions' in actual) == ('extensions' in fixture)
+    assert ('extensions' in actual.keys()) == ('extensions' in fixture.keys())  # noqa: E501
     if 'extensions' in actual:
         ext_actual = actual['extensions']
         ext_fixture = fixture['extensions']
@@ -171,7 +181,7 @@ def test_query(query_handler):
     assert resp['query'] == 'Neuroblastoma'
     matches = resp['source_matches']
     assert isinstance(matches, list)
-    assert len(matches) == 4
+    assert len(matches) == 5
     ncit = list(filter(lambda m: m['source'] == 'NCIt',
                        matches))[0]
     assert len(ncit['records']) == 1
@@ -192,15 +202,16 @@ def test_query_keyed(query_handler):
 def test_query_specify_query_handlers(query_handler):
     """Test inclusion and exclusion of sources in query."""
     # test full inclusion
-    sources = 'ncit,mondo,do,oncotree'
+    sources = 'ncit,mondo,do,oncotree,omim'
     resp = query_handler.search('Neuroblastoma', keyed=True,
                                 incl=sources, excl='')
     matches = resp['source_matches']
-    assert len(matches) == 4
+    assert len(matches) == 5
     assert 'NCIt' in matches
     assert 'Mondo' in matches
     assert 'DO' in matches
     assert 'OncoTree' in matches
+    assert 'OMIM' in matches
 
     # test full exclusion
     resp = query_handler.search('Neuroblastoma', keyed=True,
@@ -245,7 +256,7 @@ def test_normalize_query(query_handler, neuroblastoma, mafd2):
     assert response['match_type'] == MatchType.ALIAS
     assert response['warnings'] is None
     compare_vod(response['value_object_descriptor'], mafd2)
-    assert len(response['meta_']) == 1
+    assert len(response['meta_']) == 2
     assert 'Mondo' in response['meta_']
 
 
@@ -254,13 +265,15 @@ def test_normalize_non_mondo(query_handler, skin_myo):
     response = query_handler.normalize('Skin Myoepithelioma')
     assert response['match_type'] == MatchType.LABEL
     assert len(response['meta_']) == 1
-    compare_vod(response['value_object_descriptor'], skin_myo)
+    skin_myo_alias = skin_myo.copy()
+    skin_myo_alias['id'] = 'normalize.disease:Skin%20Myoepithelioma'
+    compare_vod(response['value_object_descriptor'], skin_myo_alias)
     assert 'NCIt' in response['meta_']
 
     response = query_handler.normalize('Cutaneous Myoepithelioma')
     assert response['match_type'] == MatchType.ALIAS
     assert len(response['meta_']) == 1
     skin_myo_alias = skin_myo.copy()
-    skin_myo_alias['id'] = 'normalize.disease:Cutaneous Myoepithelioma'
+    skin_myo_alias['id'] = 'normalize.disease:Cutaneous%20Myoepithelioma'
     compare_vod(response['value_object_descriptor'], skin_myo_alias)
     assert 'NCIt' in response['meta_']

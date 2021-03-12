@@ -225,7 +225,7 @@ class Database:
                          f"{e.response['Error']['Message']}")
             return []
 
-    def add_record(self, record: Dict, record_type="identity"):
+    def add_record(self, record: Dict, record_type: str = "identity"):
         """Add new record to database.
 
         :param Dict record: record to upload
@@ -244,11 +244,11 @@ class Database:
                          f"{e.response['Error']['Message']}")
 
     def add_ref_record(self, term: str, concept_id: str, ref_type: str):
-        """Add auxilliary/reference record to database.
+        """Add auxiliary/reference record to database.
 
         :param str term: referent term
         :param str concept_id: concept ID to refer to
-        :param str ref_type: one of ('alias', 'label')
+        :param str ref_type: one of ('alias', 'label', 'other_id')
         """
         label_and_type = f'{term.lower()}##{ref_type}'
         src_name = PREFIX_LOOKUP[concept_id.split(':')[0].lower()]
@@ -270,7 +270,7 @@ class Database:
 
         :param str concept_id: record to update
         :param str field: name of field to update
-        :parm str new_value: new value
+        :param str new_value: new value
         """
         key = {
             'label_and_type': f'{concept_id.lower()}##identity',

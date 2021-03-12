@@ -2,7 +2,6 @@
 import pytest
 from disease.schemas import MatchType
 from disease.query import QueryHandler
-from typing import Dict
 
 
 @pytest.fixture(scope='module')
@@ -27,8 +26,8 @@ def neuroblastoma():
         "label": "Neuroblastoma",
         "concept_id": "oncotree:NBL",
         "aliases": [],
-        "other_identifiers": ["umls:C0027819", "ncit:C3270"],
-        "xrefs": [],
+        "other_identifiers": ["ncit:C3270"],
+        "xrefs": ["umls:C0027819"],
         "pediatric_disease": None
     }
 
@@ -40,8 +39,8 @@ def nsclc():
         "label": "Non-Small Cell Lung Cancer",
         "concept_id": "oncotree:NSCLC",
         "aliases": [],
-        "other_identifiers": ["umls:C0007131", "ncit:C2926"],
-        "xrefs": [],
+        "other_identifiers": ["ncit:C2926"],
+        "xrefs": ["umls:C0007131"],
         "pediatric_disease": None
     }
 
@@ -59,26 +58,8 @@ def ipn():
     }
 
 
-def compare_records(actual_record: Dict, fixture_record: Dict):
-    """Check that identity records are identical."""
-    assert actual_record['concept_id'] == fixture_record['concept_id']
-    assert ('label' in actual_record) == ('label' in fixture_record)
-    if 'label' in actual_record or 'label' in fixture_record:
-        assert actual_record['label'] == fixture_record['label']
-    assert ('aliases' in actual_record) == ('aliases' in fixture_record)
-    if 'aliases' in actual_record or 'aliases' in fixture_record:
-        assert set(actual_record['aliases']) == set(fixture_record['aliases'])
-    assert ('other_identifiers' in actual_record) == ('other_identifiers' in fixture_record)  # noqa: E501
-    if 'other_identifiers' in actual_record or 'other_identifiers' in fixture_record:  # noqa: E501
-        assert set(actual_record['other_identifiers']) == set(fixture_record['other_identifiers'])  # noqa: E501
-    assert ('xrefs' in actual_record) == ('xrefs' in fixture_record)
-    if 'xrefs' in actual_record or 'xrefs' in fixture_record:
-        assert set(actual_record['xrefs']) == set(fixture_record['xrefs'])
-    assert actual_record['pediatric_disease'] is \
-        fixture_record['pediatric_disease']
-
-
-def test_concept_id_match(oncotree, neuroblastoma, nsclc, ipn):
+def test_concept_id_match(oncotree, neuroblastoma, nsclc, ipn,
+                          compare_records):
     """Test that concept ID search resolves to correct record"""
     response = oncotree.search('oncotree:NBL')
     assert response['match_type'] == MatchType.CONCEPT_ID
@@ -108,7 +89,7 @@ def test_concept_id_match(oncotree, neuroblastoma, nsclc, ipn):
     assert response['match_type'] == MatchType.NO_MATCH
 
 
-def test_label_match(oncotree, neuroblastoma, nsclc, ipn):
+def test_label_match(oncotree, neuroblastoma, nsclc, ipn, compare_records):
     """Test that label search resolves to correct record."""
     response = oncotree.search('Neuroblastoma')
     assert response['match_type'] == MatchType.LABEL

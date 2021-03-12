@@ -50,5 +50,18 @@
       "share_alike": false,
       "attribution": true
     }
+  },
+  {
+    "src_name": "OMIM",
+    "data_license": "custom",
+    "data_license_url": "https://omim.org/help/agreement",
+    "version": "20210304",
+    "data_url": "https://www.omim.org/downloads",
+    "rdp_url": "http://reusabledata.org/omim.html",
+    "data_license_attributes": {
+      "non_commercial": false,
+      "attribution": true,
+      "share_alike": true
+    }
   }
 ]
