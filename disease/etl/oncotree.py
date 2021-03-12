@@ -101,12 +101,12 @@ class OncoTree(Base):
                     normed_prefix = NamespacePrefix.UMLS.value
                     for code in codes:
                         normed_id = f"{normed_prefix}:{code}"
-                        disease['other_identifiers'].append(normed_id)
+                        disease['xrefs'].append(normed_id)
                 elif prefix == 'NCI':
                     normed_prefix = NamespacePrefix.NCIT.value
                     for code in codes:
                         normed_id = f"{normed_prefix}:{code}"
-                        disease['xrefs'].append(normed_id)
+                        disease['other_identifiers'].append(normed_id)
                 else:
                     logger.warning(f"Unrecognized prefix: {prefix}")
                     continue
