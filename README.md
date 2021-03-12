@@ -59,7 +59,9 @@ To change the port, simply add `-port value`.
 
 #### Update source(s)
 
-The sources we currently use are: OncoTree, OMIM, Disease Ontology, and Mondo. The application can acquire input data for all sources but OMIM, which must be manually placed in the `disease-normalization/data/omim` folder. The OMIM source file should be named according to the convention `omim_YYYYMMDD.tsv`, where `YYYYMMDD` indicates the date that the input file was generated.
+The sources we currently use are: OncoTree, OMIM, Disease Ontology, and Mondo.
+
+The application can retrieve input data for all sources but OMIM, for which a source file must be manually placed in the `disease-normalization/data/omim` folder. The OMIM file (`mimTitles.txt`) should be renamed according to the convention `omim_YYYYMMDD.tsv`, where `YYYYMMDD` indicates the date that the file was generated.
 
 To update one source, simply set `--normalizer` to the source you wish to update.
 
