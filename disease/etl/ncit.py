@@ -65,6 +65,7 @@ class NCIt(OWLBase):
         for chunk in response.iter_content(chunk_size=512):
             if chunk:
                 handle.write(chunk)
+        handle.close()
         with zipfile.ZipFile(zip_path, 'r') as zip_ref:
             zip_ref.extractall(self._data_path)
         remove(zip_path)

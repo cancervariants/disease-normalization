@@ -8,6 +8,7 @@ from disease.etl.merge import Merge
 from botocore.exceptions import ClientError
 from boto3.dynamodb.conditions import Key
 from timeit import default_timer as timer
+from os import environ
 
 
 class CLI:
@@ -19,9 +20,9 @@ class CLI:
         help="The source(s) you wish to update separated by spaces."
     )
     @click.option(
-        '--dev',
+        '--prod',
         is_flag=True,
-        help="Working in development environment on localhost port 8000."
+        help="Working in production environment."
     )
     @click.option(
         '--db_url',
@@ -38,15 +39,20 @@ class CLI:
         help='Update concepts for normalize endpoint. Must select either'
              '--update_all or include Mondo as a normalizer source argument.'
     )
-    def update_normalizer_db(normalizer, dev, db_url, update_all,
+    def update_normalizer_db(normalizer, prod, db_url, update_all,
                              update_merged):
         """Update select normalizer source(s) in the disease database."""
-        if dev:
-            db: Database = Database(db_url='http://localhost:8000')
-        elif db_url:
-            db: Database = Database(db_url=db_url)
-        else:
+        if prod:
+            environ['DISEASE_NORM_PROD'] = "TRUE"
             db: Database = Database()
+        else:
+            if db_url:
+                endpoint_url = db_url
+            elif 'DISEASE_NORM_DB_URL' in environ.keys():
+                endpoint_url = environ['DISEASE_NORM_DB_URL']
+            else:
+                endpoint_url = 'http://localhost:8000'
+            db: Database = Database(db_url=endpoint_url)
 
         if update_all:
             normalizers = list(src for src in SOURCES_CLASS_LOOKUP)
