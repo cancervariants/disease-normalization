@@ -40,7 +40,7 @@ class OMIM(Base):
             raise DownloadException(f"Could not access OMIM data - see README "
                                     f"for details. Input data must be "
                                     f"manually placed in "
-                                    f"{PROJECT_ROOT}/disease/data/omim")
+                                    f"{self._data_path.absolute().as_uri()}")
         self._load_meta()
         self._transform_data()
         self.database.flush_batch()
