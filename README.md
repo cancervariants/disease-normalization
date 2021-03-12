@@ -9,14 +9,15 @@ For a development install, we recommend using Pipenv. See the
 [pipenv docs](https://pipenv-fork.readthedocs.io/en/latest/#install-pipenv-today)
 for direction on installing pipenv in your compute environment.
 
-Once installed, from the project root dir, run:
+Once installed, from the project root dir, just run:
 
 ```commandline
 pipenv sync
 ```
 
-### Data files
-If source data files aren't found in the expected subdirectories (within `data/` by default), the application will attempt to download them directly.
+### Deploying DynamoDB Locally
+
+We use Amazon DynamoDB for our database. To deploy locally, follow [these instructions](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DynamoDBLocal.DownloadingAndRunning.html).
 
 ### Init coding style tests
 
@@ -33,7 +34,7 @@ This ensures:
 
 Before first commit run:
 
-```
+```commandline
 pre-commit install
 ```
 
@@ -42,7 +43,7 @@ pre-commit install
 
 Running unit tests is as easy as pytest.
 
-```
+```commandline
 pipenv run pytest
 ```
 
@@ -57,21 +58,22 @@ java -Djava.library.path=./DynamoDBLocal_lib -jar DynamoDBLocal.jar -sharedDb
 To change the port, simply add `-port value`.
 
 #### Update source(s)
-The sources we currently use are:  NCIt, Mondo, DO, and OncoTree.
 
-To update one source, simply set `--normalizer` to the source you wish to update. 
+The sources we currently use are: OncoTree, OMIM, Disease Ontology, and Mondo. The application can acquire input data for all sources but OMIM, which must be manually placed in the `disease-normalization/data/omim` folder. The OMIM source file should be named according to the convention `omim_YYYYMMDD.tsv`, where `YYYYMMDD` indicates the date that the input file was generated.
 
-From the project root, run the following to update the NCIt source:
+To update one source, simply set `--normalizer` to the source you wish to update.
+
+From the project root, run the following to update the Mondo source:
 
 ```commandline
-python3 -m disease.cli --normalizer="ncit"
+python3 -m disease.cli --normalizer="Mondo"
 ```
 
 To update multiple sources, you can use the `normalizer` flag with the source names separated by spaces.
 
 #### Update all sources
 
-To update all sources, use the `--update_all` flag. 
+To update all sources, use the `--update_all` flag.
 
 From the project root, run the following to update all sources:
 
@@ -80,10 +82,13 @@ python3 -m disease.cli --update_all
 ```
 
 #### Specifying the database URL endpoint
+
 The default URL endpoint is `http://localhost:8000`.
+
 There are two different ways to specify the database URL endpoint.
 
 The first way is to set the `--db_url` flag to the URL endpoint.
+
 ```commandline
 python3 -m disease.cli --update_all --db_url="http://localhost:8001"
 ```
@@ -98,8 +103,8 @@ python3 -m disease.cli --update_all
 
 From the project root, run the following:
 
-```shell script
- uvicorn main:app --reload
+```commandline
+uvicorn disease.main:app --reload
 ```
 
 Next, view the OpenAPI docs on your local machine:

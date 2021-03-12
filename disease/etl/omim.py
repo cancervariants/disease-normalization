@@ -12,18 +12,7 @@ logger.setLevel(logging.DEBUG)
 
 
 class OMIM(Base):
-    """Gather and load data from OMIM.
-
-    MIM number prefix:
-    ------------------
-    Asterisk (*)  Gene (exclude)
-    Plus (+)  Gene and phenotype, combined  (exclude)
-    Number Sign (#)  Phenotype, molecular basis known
-    Percent (%)  Phenotype or locus, molecular basis unknown
-    NULL (<null>)  Other, mainly phenotypes with suspected mendelian basis
-    Caret (^)  Entry has been removed from the database or moved to another
-    entry (exclude)
-    """
+    """Gather and load data from OMIM."""
 
     def __init__(self,
                  database: Database,
@@ -48,6 +37,10 @@ class OMIM(Base):
         except DownloadException:
             logger.error("OMIM data extraction failed: input file must be "
                          "manually placed in data directory.")
+            raise DownloadException(f"Could not access OMIM data - see README "
+                                    f"for details. Input data must be "
+                                    f"manually placed in "
+                                    f"{PROJECT_ROOT}/disease/data/omim")
         self._load_meta()
         self._transform_data()
         self.database.flush_batch()
