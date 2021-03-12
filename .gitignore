@@ -148,7 +148,7 @@ pytest.ini
 
 # ignore data dir
 data/*
-disease/data/
+disease/data/*
 
 # IDE materials
 .idea/
@@ -161,3 +161,10 @@ dynamodb_local_latest/*
 # Build files
 Pipfile.lock
 pyproject.toml
+
+
+# Elastic Beanstalk items
+.ebextensions/
+EBSampleApp-Python.iml
+Procfile
+cron.yaml

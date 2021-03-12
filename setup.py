@@ -1,5 +1,4 @@
 """Defines packaging and distribution."""
-from setuptools import setup, find_packages
+from setuptools import setup
 
-setup(packages=find_packages(),
-      zip_safe=False)
+setup()

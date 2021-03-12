@@ -1,7 +1,6 @@
 """Test merged record generation."""
 import pytest
 from disease.etl.merge import Merge
-from typing import Dict
 
 
 @pytest.fixture(scope='module')
@@ -29,33 +28,14 @@ def merge_handler(mock_database):
     return MergeHandler()
 
 
-def compare_merged_records(actual_record: Dict, fixture_record: Dict):
-    """Check that records are identical."""
-    assert actual_record['concept_id'] == fixture_record['concept_id']
-    assert actual_record['label_and_type'] == fixture_record['label_and_type']
-    assert ('label' in actual_record) == ('label' in fixture_record)
-    if 'label' in actual_record or 'label' in fixture_record:
-        assert actual_record['label'] == fixture_record['label']
-    assert ('aliases' in actual_record) == ('aliases' in fixture_record)
-    if 'aliases' in actual_record or 'aliases' in fixture_record:
-        assert set(actual_record['aliases']) == set(fixture_record['aliases'])
-    assert ('xrefs' in actual_record) == ('xrefs' in fixture_record)
-    if 'xrefs' in actual_record or 'xrefs' in fixture_record:
-        assert set(actual_record['xrefs']) == set(fixture_record['xrefs'])
-    assert ('pediatric_disease' in actual_record) == \
-        ('pediatric_disease' in fixture_record)
-    if 'pediatric_disease' in actual_record or \
-            'pediatric_disease' in fixture_record:
-        assert actual_record['pediatric_disease'] == \
-            fixture_record['pediatric_disease']
-
-
 @pytest.fixture(scope='module')
 def neuroblastoma():
     """Create neuroblastoma fixture."""
     return {
-        "label_and_type": "ncit:c3270|mondo:0005072|oncotree:nbl|doid:769##merger",  # noqa: E501
-        "concept_id": "ncit:C3270|mondo:0005072|oncotree:NBL|DOID:769",
+        "label_and_type": "ncit:c3270##merger",
+        "concept_id": "ncit:C3270",
+        "item_type": "merger",
+        "other_ids": ["mondo:0005072", "oncotree:NBL", "DOID:769"],
         "label": "Neuroblastoma",
         "aliases": [
             "neuroblastoma",
@@ -92,8 +72,9 @@ def neuroblastoma():
 def lnscc():
     """Create lung non small cell carcinoma fixture"""
     return {
-        "label_and_type": "ncit:c2926|mondo:0005233|oncotree:nsclc|doid:3908##merger",  # noqa: E501
-        "concept_id": "ncit:C2926|mondo:0005233|oncotree:NSCLC|DOID:3908",
+        "label_and_type": "ncit:c2926##merger",
+        "concept_id": "ncit:C2926",
+        "other_ids": ["mondo:0005233", "oncotree:NSCLC", "DOID:3908"],
         "label": "Lung Non-Small Cell Carcinoma",
         "aliases": [
             "Non Small Cell Lung Cancer NOS",
@@ -131,8 +112,9 @@ def lnscc():
 def richter():
     """Create Richter Syndrome fixture"""
     return {
-        "label_and_type": "ncit:c35424|mondo:0002083|doid:1703##merger",
-        "concept_id": "ncit:C35424|mondo:0002083|DOID:1703",
+        "label_and_type": "ncit:c35424##merger",
+        "concept_id": "ncit:C35424",
+        "other_ids": ["mondo:0002083", "DOID:1703"],
         "label": "Richter Syndrome",
         "aliases": [
             "Richter's Syndrome",
@@ -157,8 +139,9 @@ def richter():
 def ped_liposarcoma():
     """Create pediatric liposarcoma fixture."""
     return {
-        "label_and_type": "ncit:c8091|mondo:0003587|doid:5695##merger",
-        "concept_id": "ncit:C8091|mondo:0003587|DOID:5695",
+        "label_and_type": "ncit:c8091##merger",
+        "concept_id": "ncit:C8091",
+        "other_ids": ["mondo:0003587", "DOID:5695"],
         "label": "Childhood Liposarcoma",
         "aliases": [
             "Liposarcoma",
@@ -176,8 +159,9 @@ def ped_liposarcoma():
 def teratoma():
     """Create fixture for adult cystic teratoma."""
     return {
-        "label_and_type": "ncit:c9012|mondo:0004099|doid:7079##merger",
-        "concept_id": "ncit:C9012|mondo:0004099|DOID:7079",
+        "label_and_type": "ncit:c9012##merger",
+        "concept_id": "ncit:C9012",
+        "other_ids": ["mondo:0004099", "DOID:7079"],
         "label": "Adult Cystic Teratoma",
         "aliases": ["Adult cystic teratoma", "cystic teratoma of adults"],
         "xrefs": ["icd.o:9080/0", "umls:C1368888"],
@@ -224,8 +208,35 @@ def record_id_groups():
         'teratoma': [
             "ncit:C9012", "mondo:0004099", "DOID:7079"
         ],
-        'mafd2': ["mondo:0010648", "DOID:0080221"]
+        'mafd2': ["mondo:0010648", "DOID:0080221"],
     }
+
+
+def compare_merged_records(actual, fixture):
+    """Verify correctness of merged DB record."""
+    assert actual['concept_id'] == fixture['concept_id']
+    assert ('other_ids' in actual) == ('other_ids' in fixture)
+    if 'other_ids' in actual:
+        assert set(actual['other_ids']) == set(fixture['other_ids'])
+
+    assert actual['label_and_type'] == fixture['label_and_type']
+
+    assert ('label' in actual) == ('label' in fixture)
+    if 'label' in actual or 'label' in fixture:
+        assert actual['label'] == fixture['label']
+
+    assert ('aliases' in actual) == ('aliases' in fixture)
+    if 'aliases' in actual or 'aliases' in fixture:
+        assert set(actual['aliases']) == set(fixture['aliases'])
+
+    assert ('xrefs' in actual) == ('xrefs' in fixture)
+    if 'xrefs' in actual or 'xrefs' in fixture:
+        assert set(actual['xrefs']) == set(fixture['xrefs'])
+
+    assert ('pediatric_disease' in actual) == \
+        ('pediatric_disease' in fixture)
+    if 'pediatric_disease' in actual or 'pediatric_disease' in fixture:
+        assert actual['pediatric_disease'] == fixture['pediatric_disease']
 
 
 def test_generate_merged_record(merge_handler, record_id_groups, neuroblastoma,

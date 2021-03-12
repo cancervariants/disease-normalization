@@ -50,7 +50,7 @@ class Database:
         self.dynamodb = boto3.resource('dynamodb', **boto_params)
         self.dynamodb_client = boto3.client('dynamodb', **boto_params)
 
-        # create tables if nonexistant if not connecting to remote database
+        # Table creation for local database
         if 'DISEASE_NORM_PROD' not in environ.keys():
             existing_tables = self.dynamodb_client.list_tables()['TableNames']
             self.create_diseases_table(existing_tables)
@@ -175,6 +175,8 @@ class Database:
         :param bool case_sensitive: if true, performs exact lookup, which is
             more efficient. Otherwise, performs filter operation, which
             doesn't require correct casing.
+        :param bool merge: if true, look for merged record; look for identity
+            record otherwise.
         :return: complete disease record, if match is found; None otherwise
         """
         try:
@@ -222,27 +224,6 @@ class Database:
                          f"search term {query}: "
                          f"{e.response['Error']['Message']}")
             return []
-
-    def get_merged_record(self, merge_ref) -> Optional[Dict]:
-        """Fetch merged record from given reference.
-        :param str merge_ref: key for merged record, formated as a string
-            of grouped concept IDs separated by vertical bars, ending with
-            `##merger`. Must be correctly-cased.
-        :return: complete merged record if lookup successful, None otherwise
-        """
-        try:
-            match = self.diseases.get_item(Key={
-                'label_and_type': merge_ref.lower(),
-                'concept_id': merge_ref
-            })
-            return match['Item']
-        except ClientError as e:
-            logger.error("boto3 client error in "
-                         "`database.get_merged_record()`: "
-                         f"{e.response['Error']['Message']}")
-            return None
-        except KeyError:
-            return None
 
     def add_record(self, record: Dict, record_type="identity"):
         """Add new record to database.

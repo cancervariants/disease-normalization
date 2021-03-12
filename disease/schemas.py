@@ -3,7 +3,7 @@ disease records.
 """
 from typing import Any, Dict, Type, List, Optional, Union
 from enum import Enum, IntEnum
-from pydantic import BaseModel, StrictBool
+from pydantic import BaseModel, StrictBool, validator
 
 
 class MatchType(IntEnum):
@@ -266,27 +266,118 @@ class MatchesListed(BaseModel):
             }
 
 
-class MergedMatch(BaseModel):
-    """Represent merged concept in response to client."""
+class DiseaseValue(BaseModel):
+    """Class for Disease Value within VOD."""
 
-    label: Optional[str]
-    concept_ids: List[str]
-    aliases: Optional[List[str]]
-    xrefs: Optional[List[str]]
-    pediatric_disease: Optional[bool]
+    type: str = "Disease"
+    disease_id: str
+
+    @validator('type')
+    def check_type(cls, type_value):
+        """Check that `type` field has value 'Disease'"""
+        if type_value != "Disease":
+            raise ValueError("DiseaseValue.type must be 'Disease'")
+        return type_value
 
     class Config:
-        """Enables orm_mode"""
+        """Configure model."""
 
         @staticmethod
         def schema_extra(schema: Dict[str, Any],
-                         model: Type['MergedMatch']) -> None:
-            """Configure OpenAPI schema"""
-            if 'title' in schema.keys():
-                schema.pop('title', None)
-            for prop in schema.get('properties', {}).values():
-                prop.pop('title', None)
-            schema['example'] = {}  # TODO
+                         model: Type['Extension']) -> None:
+            """Configure schema display."""
+            schema['example'] = {
+                "type": "Disease",
+                "disease_id": "ncit:C3211"
+            }
+
+
+class Extension(BaseModel):
+    """Value Object Descriptor Extension class."""
+
+    type: str
+    name: str
+    value: Union[bool, List[str]]
+
+    class Config:
+        """Configure model."""
+
+        @staticmethod
+        def schema_extra(schema: Dict[str, Any],
+                         model: Type['Extension']) -> None:
+            """Configure schema display."""
+            schema['example'] = {
+                "type": "Extension",
+                "name": "associated_with",
+                "value": [
+                    "icd:C95.90",
+                    "mesh:D007938",
+                    "icd9:207.80",
+                    "icd9.cm:208",
+                    "umls:C0023418",
+                    "icd10.cm:C95.90"
+                ]
+            }
+
+
+class ValueObjectDescriptor(BaseModel):
+    """VOD class."""
+
+    id: str
+    type: str
+    value: DiseaseValue
+    label: str
+    xrefs: Optional[List[str]]
+    alternate_labels: Optional[List[str]]
+    extensions: Optional[List[Extension]]
+
+    class Config:
+        """Configure model."""
+
+        @staticmethod
+        def schema_extra(schema: Dict[str, Any],
+                         model: Type['Extension']) -> None:
+            """Configure schema display."""
+            schema['example'] = {
+                "id": "normalize:non-hodgkin's lymphoma",
+                "type": "DiseaseDescriptor",
+                "value": {
+                    "type": "Disease",
+                    "disease_id": "ncit:C3211"
+                },
+                "label": "Non-Hodgkin Lymphoma",
+                "xrefs": [
+                    "mondo:0018908",
+                    "oncotree:NHL",
+                    "DOID:0060060"
+                ],
+                "alternate_labels": [
+                    "NHL",
+                    "non-Hodgkin's lymphoma",
+                    "non-Hodgkin's lymphoma (NHL)",
+                    "NHL, NOS",
+                    "non-Hodgkins lymphoma",
+                    "Non-Hodgkin's Lymphoma (NHL)",
+                    "non-Hodgkin lymphoma",
+                    "Non-Hodgkin's Lymphoma",
+                    "Non-Hodgkin lymphoma, NOS"
+                ],
+                "extensions": [
+                    {
+                        "type": "Extension",
+                        "name": "associated_with",
+                        "value": [
+                            "icd.o:9591/3",
+                            "umls:C0024305",
+                            "omim:605027",
+                            "orphanet:547",
+                            "efo:0005952",
+                            "meddra:10029547",
+                            "mesh:D008228"
+                        ]
+                    }
+                ]
+            }
 
 
 class NormalizationService(BaseModel):
@@ -295,11 +386,11 @@ class NormalizationService(BaseModel):
     query: str
     warnings: Optional[Dict]
     match_type: MatchType
-    record: Optional[MergedMatch]
+    value_object_descriptor: Optional[ValueObjectDescriptor]
     meta_: Optional[Dict[SourceName, Meta]]
 
     class Config:
-        """Enables orm_mode"""
+        """Configure model."""
 
         @staticmethod
         def schema_extra(schema: Dict[str, Any],
@@ -309,7 +400,81 @@ class NormalizationService(BaseModel):
                 schema.pop('title', None)
             for prop in schema.get('properties', {}).values():
                 prop.pop('title', None)
-            schema['example'] = {}  # TODO
+            schema['example'] = {
+                "query": "childhood leukemia",
+                "warnings": None,
+                "match_type": 80,
+                "value_object_descriptor": {
+                    "id": "normalize:childhood leukemia",
+                    "type": "DiseaseDescriptor",
+                    "value": {
+                        "type": "Disease",
+                        "disease_id": "ncit:C4989"
+                    },
+                    "label": "Childhood Leukemia",
+                    "xrefs": [
+                        "mondo:0004355",
+                        "DOID:7757"
+                    ],
+                    "alternate_labels": [
+                        "childhood leukemia (disease)",
+                        "leukemia",
+                        "pediatric leukemia (disease)",
+                        "Leukemia",
+                        "leukemia (disease) of childhood"
+                    ],
+                    "extensions": [
+                        {
+                            "type": "Extension",
+                            "name": "pediatric_disease",
+                            "value": True
+                        },
+                        {
+                            "type": "Extension",
+                            "name": "associated_with",
+                            "value": ["umls:C1332977"]
+                        }
+                    ]
+                },
+                "meta_": {
+                    "NCIt": {
+                        "data_license": "CC BY 4.0",
+                        "data_license_url": "https://creativecommons.org/licenses/by/4.0/legalcode",  # noqa: E501
+                        "version": "21.01d",
+                        "data_url": "https://evs.nci.nih.gov/ftp1/NCI_Thesaurus/archive/21.01d_Release/",  # noqa: E501
+                        "rdp_url": "http://reusabledata.org/ncit.html",
+                        "data_license_attributes": {
+                            "non_commercial": False,
+                            "attribution": True,
+                            "share_alike": False
+                        }
+                    },
+                    "Mondo": {
+                        "data_license": "CC BY 4.0",
+                        "data_license_url": "https://creativecommons.org/licenses/by/4.0/legalcode",  # noqa: E501
+                        "version": "20210129",
+                        "data_url": "https://mondo.monarchinitiative.org/pages/download/",  # noqa: E501
+                        "rdp_url": "http://reusabledata.org/monarch.html",
+                        "data_license_attributes": {
+                            "non_commercial": False,
+                            "attribution": True,
+                            "share_alike": False
+                        }
+                    },
+                    "DO": {
+                        "data_license": "CC0 1.0",
+                        "data_license_url": "https://creativecommons.org/publicdomain/zero/1.0/legalcode",  # noqa: E501
+                        "version": "20210305",
+                        "data_url": "http://www.obofoundry.org/ontology/doid.html",  # noqa: E501
+                        "rdp_url": None,
+                        "data_license_attributes": {
+                            "non_commercial": False,
+                            "attribution": False,
+                            "share_alike": False
+                        }
+                    }
+                }
+            }
 
 
 class Service(BaseModel):
