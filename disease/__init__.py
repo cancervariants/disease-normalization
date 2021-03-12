@@ -13,7 +13,7 @@ logger = logging.getLogger('disease')
 logger.setLevel(logging.DEBUG)
 
 
-__version__ = "0.1.1"  # remember to update setup.cfg as well!
+__version__ = "0.2.0"  # remember to update setup.cfg as well!
 
 
 class DownloadException(Exception):
