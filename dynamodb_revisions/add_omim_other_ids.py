@@ -65,9 +65,8 @@ def update_identities():
                                  other_ids)
 
             # add other_id lookup
-            if other_ids:
-                for other_id in {i.lower() for i in other_ids}:
-                    db.add_ref_record(other_id, concept_id, 'other_id')
+            for other_id in other_ids:
+                db.add_ref_record(other_id, concept_id, 'other_id')
 
             # fix merge ref ID
             merge_ref = record.get('merge_ref')
