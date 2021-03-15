@@ -22,25 +22,25 @@ def update_identities():
             response = db.dynamodb_client.scan(
                 TableName=db.diseases.name,
                 ExclusiveStartKey=last_evaluated_key,
-                FilterExpression='item_type <> :item_type',
+                FilterExpression='item_type = :item_type and src_name <> :src_name',  # noqa: E501
                 ExpressionAttributeValues={
-                    ':item_type': {'S': 'identity'}
+                    ':item_type': {'S': 'identity'},
+                    ':src_name': {'S': 'OMIM'}
                 }
             )
         else:
             response = db.dynamodb_client.scan(
                 TableName=db.diseases.name,
-                FilterExpression='item_type <> :item_type',
+                FilterExpression='item_type = :item_type and src_name <> :src_name',  # noqa: E501
                 ExpressionAttributeValues={
-                    ':item_type': {'S': 'identity'}
+                    ':item_type': {'S': 'identity'},
+                    ':src_name': {'S': 'OMIM'}
                 }
             )
         last_evaluated_key = response.get('LastEvaluatedKey')
         records = response['Items']
 
         for record in records:
-            if record['src_name'] == 'OMIM':
-                continue
             concept_id = record['concept_id']
 
             # move OMIM refs from xrefs to other_ids
@@ -85,7 +85,7 @@ def replace_merged():
             response = db.dynamodb_client.scan(
                 TableName=db.diseases.name,
                 ExclusiveStartKey=last_evaluated_key,
-                FilterExpression='item_type <> :item_type',
+                FilterExpression='item_type = :item_type',
                 ExpressionAttributeValues={
                     ':item_type': {'S': 'merger'}
                 }
@@ -93,7 +93,7 @@ def replace_merged():
         else:
             response = db.dynamodb_client.scan(
                 TableName=db.diseases.name,
-                FilterExpression='item_type <> :item_type',
+                FilterExpression='item_type = :item_type',
                 ExpressionAttributeValues={
                     ':item_type': {'S': 'merger'}
                 }
