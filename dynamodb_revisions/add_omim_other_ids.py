@@ -39,6 +39,8 @@ def update_identities():
         records = response['Items']
 
         for record in records:
+            if record['src_name'] == 'OMIM':
+                continue
             concept_id = record['concept_id']
 
             # move OMIM refs from xrefs to other_ids
