@@ -71,7 +71,7 @@ class CLI:
             if len(non_sources) != 0:
                 raise Exception(f"Not valid source(s): {non_sources}")
 
-            if update_merged and 'Mondo' not in normalizers:
+            if update_merged and 'mondo' not in normalizers:
                 CLI()._help_msg()
 
             CLI()._update_normalizers(normalizers, db, update_merged)
