@@ -36,12 +36,12 @@ class CLI:
     @click.option(
         '--update_merged',
         is_flag=True,
-        help='Update concepts for normalize endpoint. Must select either'
+        help='Update concepts for normalize endpoint. Must select either '
              '--update_all or include Mondo as a normalizer source argument.'
     )
     def update_normalizer_db(normalizer, prod, db_url, update_all,
                              update_merged):
-        """Update select normalizer source(s) in the disease database."""
+        """Update select source(s) in the Disease Normalizer database."""
         if prod:
             environ['DISEASE_NORM_PROD'] = "TRUE"
             db: Database = Database()
@@ -58,12 +58,12 @@ class CLI:
             normalizers = list(src for src in SOURCES_CLASS_LOOKUP)
             CLI()._update_normalizers(normalizers, db, update_merged)
         elif not normalizer:
-            CLI()._help_msg()
+            CLI()._help_msg("Must provide 1 or more source names, or use `--update_all` parameter")  # noqa: E501
         else:
             normalizers = normalizer.lower().split()
 
             if len(normalizers) == 0:
-                CLI()._help_msg()
+                CLI()._help_msg("Must provide 1 or more source names, or use `--update_all` parameter")  # noqa: E501
 
             non_sources = set(normalizers) - {src for src
                                               in SOURCES_LOWER_LOOKUP}
@@ -72,15 +72,14 @@ class CLI:
                 raise Exception(f"Not valid source(s): {non_sources}")
 
             if update_merged and 'mondo' not in normalizers:
-                CLI()._help_msg()
+                CLI()._help_msg("Must include Mondo in sources to update for `--update_merged`")  # noqa: E501
 
             CLI()._update_normalizers(normalizers, db, update_merged)
 
-    def _help_msg(self):
+    def _help_msg(self, message):
         """Display help message."""
         ctx = click.get_current_context()
-        click.echo(
-            "Must either enter 1 or more sources, or use `--update_all` parameter")  # noqa: E501
+        click.echo(message)
         click.echo(ctx.get_help())
         ctx.exit()
 
