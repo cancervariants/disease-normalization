@@ -22,11 +22,13 @@ class Database:
         :param str db_url: database endpoint URL to connect to
         :param str region_name: AWS region name to use
         """
-        if 'DISEASE_NORM_PROD' in environ.keys():
+        env_keys = environ.keys()
+        if 'DISEASE_NORM_PROD' in env_keys or \
+                'DISEASE_NORM_EB_PROD' in env_keys:
             boto_params = {
                 'region_name': region_name
             }
-            if 'DISEASE_NORM_EB_PROD' not in environ.keys():
+            if 'DISEASE_NORM_EB_PROD' not in env_keys:
                 # EB Instance should not have to confirm.
                 # This is used only for using production via CLI
                 if click.confirm("Are you sure you want to use the "
@@ -38,7 +40,7 @@ class Database:
         else:
             if db_url:
                 endpoint_url = db_url
-            elif 'DISEASE_NORM_DB_URL' in environ.keys():
+            elif 'DISEASE_NORM_DB_URL' in env_keys:
                 endpoint_url = environ['DISEASE_NORM_DB_URL']
             else:
                 endpoint_url = 'http://localhost:8000'
@@ -51,7 +53,7 @@ class Database:
         self.dynamodb_client = boto3.client('dynamodb', **boto_params)
 
         # Table creation for local database
-        if 'DISEASE_NORM_PROD' not in environ.keys():
+        if 'DISEASE_NORM_PROD' not in env_keys:
             existing_tables = self.dynamodb_client.list_tables()['TableNames']
             self.create_diseases_table(existing_tables)
             self.create_meta_data_table(existing_tables)
