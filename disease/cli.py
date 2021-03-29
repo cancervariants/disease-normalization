@@ -69,7 +69,9 @@ class CLI:
                                               in SOURCES_LOWER_LOOKUP}
 
             if len(non_sources) != 0:
-                raise Exception(f"Not valid source(s): {non_sources}")
+                raise Exception(f"Not valid source(s): {non_sources}. \n"
+                                f"Legal sources are "
+                                f"{list(SOURCES_LOWER_LOOKUP.values())}.")
 
             if update_merged and 'mondo' not in normalizers:
                 CLI()._help_msg("Must include Mondo in sources to update for `--update_merged`")  # noqa: E501
