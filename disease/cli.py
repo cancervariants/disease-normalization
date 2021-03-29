@@ -41,7 +41,7 @@ class CLI:
     )
     def update_normalizer_db(normalizer, prod, db_url, update_all,
                              update_merged):
-        """Update select source(s) in the Disease Normalizer database."""
+        """Update selected source(s) in the Disease Normalizer database."""
         if prod:
             environ['DISEASE_NORM_PROD'] = "TRUE"
             db: Database = Database()
