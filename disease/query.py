@@ -2,7 +2,7 @@
 import re
 from typing import Dict, Set, Optional
 from uvicorn.config import logger
-from disease import NAMESPACE_LOOKUP, PREFIX_LOOKUP
+from disease import NAMESPACE_LOOKUP, PREFIX_LOOKUP, SOURCES_LOWER_LOOKUP
 from disease.database import Database
 from disease.schemas import Disease, Meta, MatchType, SourceName
 from botocore.exceptions import ClientError
@@ -261,7 +261,7 @@ class QueryHandler:
             provided, or if invalid source names are given.
         """
         sources = dict()
-        for k, v in PREFIX_LOOKUP.items():
+        for k, v in SOURCES_LOWER_LOOKUP.items():
             if self.db.metadata.get_item(Key={'src_name': v}).get('Item'):
                 sources[k] = v
         if not incl and not excl:
