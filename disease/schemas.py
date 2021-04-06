@@ -386,7 +386,7 @@ class ValueObjectDescriptor(BaseModel):
 
 
 class ServiceMeta(BaseModel):
-    """Metadata regarding the therapy-normalization service."""
+    """Metadata regarding the disease-normalization service."""
 
     name = "disease-normalizer"
     version: str
