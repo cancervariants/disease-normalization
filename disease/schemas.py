@@ -438,7 +438,7 @@ class NormalizationService(BaseModel):
                 "warnings": None,
                 "match_type": 80,
                 "value_object_descriptor": {
-                    "id": "normalize:childhood leukemia",
+                    "id": "normalize:childhood%20leukemia",
                     "type": "DiseaseDescriptor",
                     "value": {
                         "type": "Disease",
