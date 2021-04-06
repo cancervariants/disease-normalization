@@ -164,14 +164,14 @@ def test_alias_match(ncit, neuroblastoma, nsclc, compare_records):
 def test_meta(ncit):
     """Test that meta field is correct."""
     response = ncit.search('neuroblastoma')
-    assert response['meta_'].data_license == 'CC BY 4.0'
-    assert response['meta_'].data_license_url == \
+    assert response['source_meta_'].data_license == 'CC BY 4.0'
+    assert response['source_meta_'].data_license_url == \
         'https://creativecommons.org/licenses/by/4.0/legalcode'
-    assert response['meta_'].version == '21.01d'
-    assert response['meta_'].data_url == \
+    assert response['source_meta_'].version == '21.01d'
+    assert response['source_meta_'].data_url == \
         "https://evs.nci.nih.gov/ftp1/NCI_Thesaurus/archive/21.01d_Release/"  # noqa: E501
-    assert response['meta_'].rdp_url == 'http://reusabledata.org/ncit.html'  # noqa: E501
-    assert response['meta_'].data_license_attributes == {
+    assert response['source_meta_'].rdp_url == 'http://reusabledata.org/ncit.html'  # noqa: E501
+    assert response['source_meta_'].data_license_attributes == {
         "non_commercial": False,
         "share_alike": False,
         "attribution": True

@@ -2,6 +2,7 @@
 from disease.query import QueryHandler, InvalidParameterException
 from disease.schemas import MatchType
 import pytest
+from datetime import datetime
 
 
 @pytest.fixture(scope='module')
@@ -246,34 +247,53 @@ def test_normalize_query(query_handler, neuroblastoma, mafd2):
     assert response['match_type'] == MatchType.LABEL
     assert response['warnings'] is None
     compare_vod(response['value_object_descriptor'], neuroblastoma)
-    assert len(response['meta_']) == 4
-    assert 'NCIt' in response['meta_']
-    assert 'DO' in response['meta_']
-    assert 'Mondo' in response['meta_']
-    assert 'OncoTree' in response['meta_']
+    assert len(response['source_meta_']) == 4
+    assert 'NCIt' in response['source_meta_']
+    assert 'DO' in response['source_meta_']
+    assert 'Mondo' in response['source_meta_']
+    assert 'OncoTree' in response['source_meta_']
 
     response = query_handler.normalize('MAFD2')
     assert response['match_type'] == MatchType.ALIAS
     assert response['warnings'] is None
     compare_vod(response['value_object_descriptor'], mafd2)
-    assert len(response['meta_']) == 2
-    assert 'Mondo' in response['meta_']
+    assert len(response['source_meta_']) == 2
+    assert 'Mondo' in response['source_meta_']
 
 
 def test_normalize_non_mondo(query_handler, skin_myo):
     """Test that normalize endpoint returns records not in Mondo groups."""
     response = query_handler.normalize('Skin Myoepithelioma')
     assert response['match_type'] == MatchType.LABEL
-    assert len(response['meta_']) == 1
+    assert len(response['source_meta_']) == 1
     skin_myo_alias = skin_myo.copy()
     skin_myo_alias['id'] = 'normalize.disease:Skin%20Myoepithelioma'
     compare_vod(response['value_object_descriptor'], skin_myo_alias)
-    assert 'NCIt' in response['meta_']
+    assert 'NCIt' in response['source_meta_']
 
     response = query_handler.normalize('Cutaneous Myoepithelioma')
     assert response['match_type'] == MatchType.ALIAS
-    assert len(response['meta_']) == 1
+    assert len(response['source_meta_']) == 1
     skin_myo_alias = skin_myo.copy()
     skin_myo_alias['id'] = 'normalize.disease:Cutaneous%20Myoepithelioma'
     compare_vod(response['value_object_descriptor'], skin_myo_alias)
-    assert 'NCIt' in response['meta_']
+    assert 'NCIt' in response['source_meta_']
+
+
+def test_service_meta(query_handler):
+    """Test service meta info in response."""
+    test_query = "glioma"
+
+    response = query_handler.search(test_query)
+    service_meta = response['service_meta_']
+    assert service_meta.name == "disease-normalizer"
+    assert service_meta.version >= "0.2.5"
+    assert isinstance(service_meta.response_datetime, datetime)
+    assert service_meta.url == 'https://github.com/cancervariants/disease-normalization'  # noqa: E501
+
+    response = query_handler.normalize(test_query)
+    service_meta = response['service_meta_']
+    assert service_meta.name == "disease-normalizer"
+    assert service_meta.version >= "0.2.5"
+    assert isinstance(service_meta.response_datetime, datetime)
+    assert service_meta.url == 'https://github.com/cancervariants/disease-normalization'  # noqa: E501

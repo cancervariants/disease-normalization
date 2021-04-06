@@ -274,14 +274,14 @@ def test_other_id_match(mondo, neuroblastoma, richter_syndrome,
 def test_meta(mondo):
     """Test that meta field is correct."""
     response = mondo.search('neuroblastoma')
-    assert response['meta_'].data_license == 'CC BY 4.0'
-    assert response['meta_'].data_license_url == \
+    assert response['source_meta_'].data_license == 'CC BY 4.0'
+    assert response['source_meta_'].data_license_url == \
         'https://creativecommons.org/licenses/by/4.0/legalcode'
-    assert response['meta_'].version == '20210129'
-    assert response['meta_'].data_url == \
+    assert response['source_meta_'].version == '20210129'
+    assert response['source_meta_'].data_url == \
         'https://mondo.monarchinitiative.org/pages/download/'
-    assert response['meta_'].rdp_url == 'http://reusabledata.org/monarch.html'
-    assert response['meta_'].data_license_attributes == {
+    assert response['source_meta_'].rdp_url == 'http://reusabledata.org/monarch.html'  # noqa: E501
+    assert response['source_meta_'].data_license_attributes == {
         "non_commercial": False,
         "share_alike": False,
         "attribution": True

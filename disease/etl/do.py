@@ -3,7 +3,7 @@ import logging
 from .base import OWLBase
 from pathlib import Path
 from disease import PROJECT_ROOT, PREFIX_LOOKUP
-from disease.schemas import Meta, SourceName, NamespacePrefix
+from disease.schemas import SourceMeta, SourceName, NamespacePrefix
 from disease.database import Database
 from datetime import datetime
 import owlready2 as owl
@@ -74,7 +74,7 @@ class DO(OWLBase):
                 "attribution": False
             }
         }
-        assert Meta(**metadata_params)
+        assert SourceMeta(**metadata_params)
         metadata_params['src_name'] = SourceName.DO.value
         self.database.metadata.put_item(Item=metadata_params)
 

@@ -4,6 +4,7 @@ disease records.
 from typing import Any, Dict, Type, List, Optional, Union
 from enum import Enum, IntEnum
 from pydantic import BaseModel, StrictBool, validator
+from datetime import datetime
 
 
 class MatchType(IntEnum):
@@ -131,7 +132,7 @@ class DataLicenseAttributes(BaseModel):
     attribution: StrictBool
 
 
-class Meta(BaseModel):
+class SourceMeta(BaseModel):
     """Metadata for a given source to return in response object."""
 
     data_license: str
@@ -146,7 +147,7 @@ class Meta(BaseModel):
 
         @staticmethod
         def schema_extra(schema: Dict[str, Any],
-                         model: Type['Meta']) -> None:
+                         model: Type['SourceMeta']) -> None:
             """Configure OpenAPI schema"""
             if 'title' in schema.keys():
                 schema.pop('title', None)
@@ -173,7 +174,7 @@ class MatchesKeyed(BaseModel):
 
     match_type: MatchType
     records: List[Disease]
-    meta_: Meta
+    source_meta_: SourceMeta
 
     class Config:
         """Enables orm_mode"""
@@ -202,7 +203,7 @@ class MatchesKeyed(BaseModel):
                     "xrefs": ["umls:C0019562"],
                     "pediatric_disease": None,
                 }],
-                "meta_": {
+                "source_meta_": {
                     "data_license": "CC BY 4.0",
                     "data_license_url": "https://creativecommons.org/licenses/by/4.0/legalcode",  # noqa: E501
                     "version": "21.01d",
@@ -225,7 +226,7 @@ class MatchesListed(BaseModel):
     source: SourceName
     match_type: MatchType
     records: List[Disease]
-    meta_: Meta
+    source_meta_: SourceMeta
 
     class Config:
         """Enables orm_mode"""
@@ -255,7 +256,7 @@ class MatchesListed(BaseModel):
                     "xrefs": ["umls:C0019562"],
                     "pediatric_disease": None
                 }],
-                "meta_": {
+                "source_meta_": {
                     "data_license": "CC BY 4.0",
                     "data_license_url": "https://creativecommons.org/licenses/by/4.0/legalcode",  # noqa: E501
                     "version": "21.01d",
@@ -384,6 +385,33 @@ class ValueObjectDescriptor(BaseModel):
             }
 
 
+class ServiceMeta(BaseModel):
+    """Metadata regarding the therapy-normalization service."""
+
+    name = "disease-normalizer"
+    version: str
+    response_datetime: datetime
+    url: str
+
+    class Config:
+        """Enables orm_mode"""
+
+        @staticmethod
+        def schema_extra(schema: Dict[str, Any],
+                         model: Type['ServiceMeta']) -> None:
+            """Configure OpenAPI schema"""
+            if 'title' in schema.keys():
+                schema.pop('title', None)
+            for prop in schema.get('properties', {}).values():
+                prop.pop('title', None)
+            schema['example'] = {
+                'name': 'disease-normalizer',
+                'version': '0.1.0',
+                'response_datetime': '2021-04-05T16:44:15.367831',
+                'url': 'https://github.com/cancervariants/disease-normalization'  # noqa: E501
+            }
+
+
 class NormalizationService(BaseModel):
     """Response containing one or more merged records and source data."""
 
@@ -391,7 +419,8 @@ class NormalizationService(BaseModel):
     warnings: Optional[Dict]
     match_type: MatchType
     value_object_descriptor: Optional[ValueObjectDescriptor]
-    meta_: Optional[Dict[SourceName, Meta]]
+    source_meta_: Optional[Dict[SourceName, SourceMeta]]
+    service_meta_: ServiceMeta
 
     class Config:
         """Configure model."""
@@ -440,7 +469,7 @@ class NormalizationService(BaseModel):
                         }
                     ]
                 },
-                "meta_": {
+                "source_meta_": {
                     "NCIt": {
                         "data_license": "CC BY 4.0",
                         "data_license_url": "https://creativecommons.org/licenses/by/4.0/legalcode",  # noqa: E501
@@ -477,23 +506,30 @@ class NormalizationService(BaseModel):
                             "share_alike": False
                         }
                     }
+                },
+                "service_meta_": {
+                    'name': 'disease-normalizer',
+                    'version': '0.1.0',
+                    'response_datetime': '2021-04-05T16:44:15.367831',
+                    'url': 'https://github.com/cancervariants/disease-normalization'  # noqa: E501
                 }
             }
 
 
-class Service(BaseModel):
+class SearchService(BaseModel):
     """Core response schema containing matches for each source"""
 
     query: str
     warnings: Optional[Dict]
     source_matches: Union[Dict[SourceName, MatchesKeyed], List[MatchesListed]]
+    service_meta_: ServiceMeta
 
     class Config:
         """Enables orm_mode"""
 
         @staticmethod
         def schema_extra(schema: Dict[str, Any],
-                         model: Type['Service']) -> None:
+                         model: Type['SearchService']) -> None:
             """Configure OpenAPI schema"""
             if 'title' in schema.keys():
                 schema.pop('title', None)
@@ -519,7 +555,7 @@ class Service(BaseModel):
                         "xrefs": ["umls:C0019562"],
                         "pediatric_disease": None,
                     }],
-                    "meta_": {
+                    "source_meta_": {
                         "data_license": "CC BY 4.0",
                         "data_license_url": "https://creativecommons.org/licenses/by/4.0/legalcode",  # noqa: E501
                         "version": "21.01d",
@@ -531,5 +567,11 @@ class Service(BaseModel):
                             "share_alike": False
                         }
                     }
-                }]
+                }],
+                "service_meta_": {
+                    'name': 'disease-normalizer',
+                    'version': '0.1.0',
+                    'response_datetime': '2021-04-05T16:44:15.367831',
+                    'url': 'https://github.com/cancervariants/disease-normalization'  # noqa: E501
+                }
             }
