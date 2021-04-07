@@ -119,14 +119,14 @@ def test_label_match(oncotree, neuroblastoma, nsclc, ipn, compare_records):
 def test_meta(oncotree):
     """Test that meta field is correct."""
     response = oncotree.search('neuroblastoma')
-    assert response['meta_'].data_license == 'CC BY 4.0'
-    assert response['meta_'].data_license_url == \
+    assert response['source_meta_'].data_license == 'CC BY 4.0'
+    assert response['source_meta_'].data_license_url == \
         'https://creativecommons.org/licenses/by/4.0/legalcode'
-    assert response['meta_'].version == '2020_10_01'
-    assert response['meta_'].data_url == \
+    assert response['source_meta_'].version == '2020_10_01'
+    assert response['source_meta_'].data_url == \
         'http://oncotree.mskcc.org/#/home?tab=api'
-    assert response['meta_'].rdp_url is None
-    assert response['meta_'].data_license_attributes == {
+    assert response['source_meta_'].rdp_url is None
+    assert response['source_meta_'].data_license_attributes == {
         "non_commercial": False,
         "share_alike": False,
         "attribution": True

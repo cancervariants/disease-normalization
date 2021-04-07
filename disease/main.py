@@ -1,7 +1,7 @@
 """Main application for FastAPI"""
 from disease import __version__
 from disease.query import QueryHandler, InvalidParameterException
-from disease.schemas import Service, NormalizationService
+from disease.schemas import SearchService, NormalizationService
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.openapi.utils import get_openapi
 import html
@@ -62,7 +62,7 @@ normalize_description = ("Return merged strongest-match concept for query "
          description=search_descr,
          operation_id="getQueryResponse",
          response_description=response_descr,
-         response_model=Service)
+         response_model=SearchService)
 def search(q: str = Query(..., description=q_descr),
            keyed: Optional[bool] = Query(False, description=keyed_descr),
            incl: Optional[str] = Query('', description=incl_descr),

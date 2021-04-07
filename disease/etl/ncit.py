@@ -3,7 +3,7 @@ import logging
 from .base import OWLBase
 from disease import PROJECT_ROOT
 from disease.database import Database
-from disease.schemas import Meta, SourceName, NamespacePrefix
+from disease.schemas import SourceMeta, SourceName, NamespacePrefix
 from pathlib import Path
 import requests
 import zipfile
@@ -75,16 +75,16 @@ class NCIt(OWLBase):
 
     def _load_meta(self):
         """Load metadata"""
-        metadata = Meta(data_license="CC BY 4.0",
-                        data_license_url="https://creativecommons.org/licenses/by/4.0/legalcode",  # noqa F401
-                        version=self._data_file.stem.split('_')[1],
-                        data_url=self._SRC_DIR,
-                        rdp_url='http://reusabledata.org/ncit.html',
-                        data_license_attributes={
-                            'non_commercial': False,
-                            'share_alike': False,
-                            'attribution': True
-                        })
+        metadata = SourceMeta(data_license="CC BY 4.0",
+                              data_license_url="https://creativecommons.org/licenses/by/4.0/legalcode",  # noqa F401
+                              version=self._data_file.stem.split('_')[1],
+                              data_url=self._SRC_DIR,
+                              rdp_url='http://reusabledata.org/ncit.html',
+                              data_license_attributes={
+                                  'non_commercial': False,
+                                  'share_alike': False,
+                                  'attribution': True
+                              })
         params = dict(metadata)
         params['src_name'] = SourceName.NCIT.value
         self.database.metadata.put_item(Item=params)

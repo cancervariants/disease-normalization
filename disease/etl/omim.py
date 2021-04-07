@@ -2,7 +2,7 @@
 import logging
 from .base import Base
 from disease import PROJECT_ROOT, DownloadException
-from disease.schemas import Meta, SourceName, Disease, NamespacePrefix
+from disease.schemas import SourceMeta, SourceName, Disease, NamespacePrefix
 from disease.database import Database
 from pathlib import Path
 from typing import List
@@ -52,16 +52,16 @@ class OMIM(Base):
 
     def _load_meta(self):
         """Load source metadata."""
-        metadata = Meta(data_license="custom",
-                        data_license_url="https://omim.org/help/agreement",
-                        version=self._data_file.stem.split('_', 1)[1],
-                        data_url=self._SRC_URL,
-                        rdp_url='http://reusabledata.org/omim.html',
-                        data_license_attributes={
-                            'non_commercial': False,
-                            'share_alike': True,
-                            'attribution': True
-                        })
+        metadata = SourceMeta(data_license="custom",
+                              data_license_url="https://omim.org/help/agreement",  # noqa: E501
+                              version=self._data_file.stem.split('_', 1)[1],
+                              data_url=self._SRC_URL,
+                              rdp_url='http://reusabledata.org/omim.html',
+                              data_license_attributes={
+                                  'non_commercial': False,
+                                  'share_alike': True,
+                                  'attribution': True
+                              })
         params = dict(metadata)
         params['src_name'] = SourceName.OMIM.value
         self.database.metadata.put_item(Item=params)

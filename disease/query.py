@@ -2,11 +2,14 @@
 import re
 from typing import Dict, Set, Optional
 from uvicorn.config import logger
-from disease import NAMESPACE_LOOKUP, PREFIX_LOOKUP, SOURCES_LOWER_LOOKUP
+from disease import NAMESPACE_LOOKUP, PREFIX_LOOKUP, SOURCES_LOWER_LOOKUP, \
+    __version__
 from disease.database import Database
-from disease.schemas import Disease, Meta, MatchType, SourceName
+from disease.schemas import Disease, SourceMeta, MatchType, SourceName, \
+    ServiceMeta
 from botocore.exceptions import ClientError
 from urllib.parse import quote
+from datetime import datetime
 
 
 class InvalidParameterException(Exception):
@@ -47,7 +50,7 @@ class QueryHandler:
             )
         return warnings
 
-    def _fetch_meta(self, src_name: str) -> Meta:
+    def _fetch_meta(self, src_name: str) -> SourceMeta:
         """Fetch metadata for src_name.
         :param str src_name: name of source to get metadata for
         :return: Meta object containing source metadata
@@ -59,7 +62,7 @@ class QueryHandler:
                 db_response = self.db.metadata.get_item(
                     Key={'src_name': src_name}
                 )
-                response = Meta(**db_response['Item'])
+                response = SourceMeta(**db_response['Item'])
                 self.db.cached_sources[src_name] = response
                 return response
             except ClientError as e:
@@ -93,7 +96,7 @@ class QueryHandler:
             matches[src_name] = {
                 'match_type': MatchType[match_type.upper()],
                 'records': [disease],
-                'meta_': self._fetch_meta(src_name)
+                'source_meta_': self._fetch_meta(src_name)
             }
         elif matches[src_name]['match_type'] == MatchType[match_type.upper()]:
             matches[src_name]['records'].append(disease)
@@ -137,7 +140,7 @@ class QueryHandler:
                 resp['source_matches'][src_name] = {
                     'match_type': MatchType.NO_MATCH,
                     'records': [],
-                    'meta_': self._fetch_meta(src_name)
+                    'source_meta_': self._fetch_meta(src_name)
                 }
         return resp
 
@@ -303,6 +306,10 @@ class QueryHandler:
         else:
             response = self._response_list(query_str, query_sources)
 
+        response['service_meta_'] = ServiceMeta(
+            version=__version__,
+            response_datetime=datetime.now(),
+        )
         return response
 
     def _add_merged_meta(self, response: Dict) -> Dict:
@@ -319,7 +326,7 @@ class QueryHandler:
             src_name = PREFIX_LOOKUP[prefix.lower()]
             if src_name not in sources_meta:
                 sources_meta[src_name] = self._fetch_meta(src_name)
-        response['meta_'] = sources_meta
+        response['source_meta_'] = sources_meta
         return response
 
     def _add_vod(self, response: Dict, record: Dict, query: str,
@@ -410,11 +417,15 @@ class QueryHandler:
         response = {
             'query': query,
             'warnings': self._emit_warnings(query),
+            'service_meta_': ServiceMeta(
+                version=__version__,
+                response_datetime=datetime.now(),
+            )
         }
         if query == '':
             response['match_type'] = MatchType.NO_MATCH
             return response
-        query_str = query.lower()
+        query_str = query.lower().strip()
 
         # check merged concept ID match
         record = self.db.get_record_by_id(query_str, case_sensitive=False,
