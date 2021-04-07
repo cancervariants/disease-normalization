@@ -297,3 +297,17 @@ def test_service_meta(query_handler):
     assert service_meta.version >= "0.2.5"
     assert isinstance(service_meta.response_datetime, datetime)
     assert service_meta.url == 'https://github.com/cancervariants/disease-normalization'  # noqa: E501
+
+    response = query_handler.search('this-will-not-normalize')
+    service_meta = response['service_meta_']
+    assert service_meta.name == "disease-normalizer"
+    assert service_meta.version >= "0.2.5"
+    assert isinstance(service_meta.response_datetime, datetime)
+    assert service_meta.url == 'https://github.com/cancervariants/disease-normalization'  # noqa: E501
+
+    response = query_handler.normalize('this-will-not-normalize')
+    service_meta = response['service_meta_']
+    assert service_meta.name == "disease-normalizer"
+    assert service_meta.version >= "0.2.5"
+    assert isinstance(service_meta.response_datetime, datetime)
+    assert service_meta.url == 'https://github.com/cancervariants/disease-normalization'  # noqa: E501
