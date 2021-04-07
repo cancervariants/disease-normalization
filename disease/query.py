@@ -309,7 +309,6 @@ class QueryHandler:
         response['service_meta_'] = ServiceMeta(
             version=__version__,
             response_datetime=datetime.now(),
-            url="https://github.com/cancervariants/disease-normalization"  # noqa: E501
         )
         return response
 
@@ -421,7 +420,6 @@ class QueryHandler:
             'service_meta_': ServiceMeta(
                 version=__version__,
                 response_datetime=datetime.now(),
-                url='https://github.com/cancervariants/disease-normalization'
             )
         }
         if query == '':

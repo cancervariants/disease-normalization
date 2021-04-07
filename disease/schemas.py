@@ -388,10 +388,10 @@ class ValueObjectDescriptor(BaseModel):
 class ServiceMeta(BaseModel):
     """Metadata regarding the disease-normalization service."""
 
-    name = "disease-normalizer"
+    name = 'disease-normalizer'
     version: str
     response_datetime: datetime
-    url: str
+    url = 'https://github.com/cancervariants/disease-normalization'
 
     class Config:
         """Enables orm_mode"""
