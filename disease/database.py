@@ -213,8 +213,8 @@ class Database:
 
         :param query: string to match against
         :param str match_type: type of match to look for. Should be one
-            of "label" or "alias" (use `get_record_by_id` for concept ID
-            lookup)
+            of {"label", "alias", "other_id", "xref"} (use `get_record_by_id`
+            for concept ID lookup)
         :return: list of matching records. Empty if lookup fails.
         """
         pk = f'{query}##{match_type.lower()}'
@@ -251,7 +251,7 @@ class Database:
 
         :param str term: referent term
         :param str concept_id: concept ID to refer to
-        :param str ref_type: one of ('alias', 'label', 'other_id')
+        :param str ref_type: one of ('alias', 'label', 'other_id', 'xref')
         """
         label_and_type = f'{term.lower()}##{ref_type}'
         src_name = PREFIX_LOOKUP[concept_id.split(':')[0].lower()]

@@ -60,32 +60,25 @@ class Base(ABC):
         assert Disease(**disease)
         concept_id = disease['concept_id']
 
-        if 'aliases' in disease:
-            aliases = disease['aliases']
-            if aliases == [] or aliases is None:
-                del disease['aliases']
-            else:
-                aliases_lower = {a.lower() for a in aliases}
-                if len(aliases_lower) > 20:
-                    logger.debug(f"{concept_id} has > 20 aliases")
-                    del disease['aliases']
+        for field, name in (('aliases', 'alias'), ('other_identifiers',
+                            'other_id'), ('xrefs', 'xref')):
+            if field in disease:
+                items = disease[field]
+                if items == [] or items is None:
+                    del disease[field]
                 else:
-                    for al in aliases_lower:
-                        self.database.add_ref_record(al, concept_id, 'alias')
+                    if field == 'aliases':
+                        items = {items.lower() for i in items}
+                        if len(items) > 20:
+                            logger.debug(f"{concept_id} has > 20 aliases.")
+                            del disease[field]
+                            continue
+                    for i in items:
+                        self.database.add_ref_record(i, concept_id, name)
 
-        if 'other_identifiers' in disease:
-            other_ids = disease['other_identifiers']
-            if other_ids == [] or other_ids is None:
-                del disease['other_identifiers']
-            else:
-                for other_id in other_ids:
-                    self.database.add_ref_record(other_id, concept_id,
-                                                 'other_id')
-
-        for field in ('xrefs', 'pediatric_disease'):
-            if field in disease and (disease[field] is None or  # noqa: W504
-                                     disease[field] is []):
-                del disease[field]
+        if 'pediatric_disease' in disease \
+                and disease['pediatric_disease'] is None:
+            del disease[field]
 
         self.database.add_record(disease)
         self.database.add_ref_record(disease['label'], concept_id, 'label')

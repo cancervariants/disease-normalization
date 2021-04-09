@@ -52,7 +52,7 @@ class DO(OWLBase):
     def perform_etl(self) -> List[str]:
         """Public-facing method to initiate ETL procedures on given data.
 
-        :return: empty list (because NCIt IDs shouldn't be used to construct
+        :return: empty list (because DO IDs shouldn't be used to construct
             merged concept groups)
         """
         self._load_meta()
