@@ -283,7 +283,7 @@ def test_normalize_non_mondo(query_handler, skin_myo, neuroblastoma):
     assert response['match_type'] == MatchType.XREF
     assert len(response['source_meta_']) == 4
     neuroblastoma_alias = neuroblastoma.copy()
-    neuroblastoma_alias['id'] = 'normalize.disease:Cutaneous%20Myoepithelioma'
+    neuroblastoma_alias['id'] = 'normalize.disease:orphanet%3A635'
     compare_vod(response['value_object_descriptor'], neuroblastoma_alias)
     assert 'NCIt' in response['source_meta_']
     assert 'DO' in response['source_meta_']
