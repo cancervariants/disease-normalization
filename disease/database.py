@@ -268,15 +268,17 @@ class Database:
                          f"{concept_id} with match type {ref_type}: "
                          f"{e.response['Error']['Message']}")
 
-    def update_record(self, concept_id: str, field: str, new_value: Any):
+    def update_record(self, concept_id: str, field: str, new_value: Any,
+                      item_type: str = 'identity'):
         """Update the field of an individual record to a new value.
 
         :param str concept_id: record to update
         :param str field: name of field to update
         :param str new_value: new value
+        :param str item_type: record type, one of {'identity', 'merger'}
         """
         key = {
-            'label_and_type': f'{concept_id.lower()}##identity',
+            'label_and_type': f'{concept_id.lower()}##{item_type}',
             'concept_id': concept_id
         }
         update_expression = f"set {field}=:r"
