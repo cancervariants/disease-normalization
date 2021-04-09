@@ -373,7 +373,7 @@ class ValueObjectDescriptor(BaseModel):
                         "type": "Extension",
                         "name": "associated_with",
                         "value": [
-                            "icd.o:9591/3",
+                            "icdo:9591/3",
                             "umls:C0024305",
                             "omim:605027",
                             "orphanet:547",
