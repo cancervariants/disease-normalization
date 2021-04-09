@@ -68,7 +68,7 @@ class Base(ABC):
                     del disease[field]
                 else:
                     if field == 'aliases':
-                        items = {items.lower() for i in items}
+                        items = {i.lower() for i in items}
                         if len(items) > 20:
                             logger.debug(f"{concept_id} has > 20 aliases.")
                             del disease[field]
