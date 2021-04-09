@@ -400,7 +400,7 @@
     "xrefs": ["umls:C0349631", "gard:7578", "icd10.cm:C91.1"]
   },
   {
-    "label_and_type": "icd10.cm:c91.1",
+    "label_and_type": "icd10.cm:c91.1##xref",
     "item_type": "xref",
     "concept_id": "DOID:1703",
     "src_name": "DO"
