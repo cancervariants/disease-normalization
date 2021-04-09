@@ -51,13 +51,12 @@ def neuroblastoma():
         ],
         "xrefs": [
             "umls:C0027819",
-            "icd.o:9500/3",
+            "icdo:9500/3",
             "efo:0000621",
             "gard:7185",
             "gard:0007185",
             "icd:C74.9",
-            "icd.o:9500/3",
-            "icd.o:M9500/3",
+            "icdo:M9500/3",
             "mesh:D009447",
             "meddra:10029260",
             "nifstd:birnlex_12631",
@@ -164,7 +163,7 @@ def teratoma():
         "other_ids": ["mondo:0004099", "DOID:7079"],
         "label": "Adult Cystic Teratoma",
         "aliases": ["Adult cystic teratoma", "cystic teratoma of adults"],
-        "xrefs": ["icd.o:9080/0", "umls:C1368888"],
+        "xrefs": ["icdo:9080/0", "umls:C1368888"],
         "item_type": "merger",
     }
 

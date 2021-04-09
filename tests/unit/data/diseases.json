@@ -22,6 +22,12 @@
     "xrefs": ["umls:C0007131"]
   },
   {
+    "label_and_type": "umls:c0007131##xref",
+    "item_type": "xref",
+    "concept_id": "ncit:c2926",
+    "src_name": "NCIt"
+  },
+  {
     "label_and_type": "lung non-small cell carcinoma##label",
     "item_type": "label",
     "concept_id": "ncit:c2926",
@@ -97,7 +103,13 @@
       "Neuroblastoma, NOS",
       "neuroblastoma"
     ],
-    "xrefs": ["umls:C0027819", "icd.o:9500/3"]
+    "xrefs": ["umls:C0027819", "icdo:9500/3"]
+  },
+  {
+    "label_and_type": "icdo:9500/3##xref",
+    "item_type": "xref",
+    "concept_id": "ncit:c3270",
+    "src_name": "NCIt"
   },
   {
     "label_and_type": "neuroblastoma##label",
@@ -154,12 +166,24 @@
       "umls:C0027819",
       "gard:0007185",
       "meddra:10029260",
-      "icd.o:9500/3",
+      "icdo:9500/3",
       "umls:CN205405",
       "efo:0000621",
       "icd:C74.9",
       "mesh:D009447"
     ]
+  },
+  {
+    "label_and_type": "orphanet:635##xref",
+    "item_type": "xref",
+    "src_name": "Mondo",
+    "concept_id": "mondo:0005072"
+  },
+  {
+    "label_and_type": "icdo:9500/3##xref",
+    "item_type": "xref",
+    "src_name": "Mondo",
+    "concept_id": "mondo:0005072"
   },
   {
     "label_and_type": "doid:769##other_id",
@@ -207,6 +231,12 @@
     "xrefs": ["icd:C91.1", "umls:C0349631", "gard:0007578"]
   },
   {
+    "label_and_type": "gard:0007578##xref",
+    "item_type": "xref",
+    "concept_id": "mondo:0002083",
+    "src_name": "Mondo"
+  },
+  {
     "label_and_type": "richter syndrome##label",
     "item_type": "label",
     "concept_id": "mondo:0002083",
@@ -241,6 +271,12 @@
     "other_identifiers": ["DOID:5695", "ncit:C8091"],
     "xrefs": ["umls:C0279984"],
     "src_name": "Mondo"
+  },
+  {
+    "label_and_type": "umls:c0279984##xref",
+    "item_type": "other_id",
+    "src_name": "Mondo",
+    "concept_id": "mondo:0003587"
   },
   {
     "label_and_type": "ncit:c8091##other_id",
@@ -300,11 +336,17 @@
     "xrefs": [
       "efo:0000621",
       "gard:7185",
-      "icd.o:M9500/3",
+      "icdo:M9500/3",
       "mesh:D009447",
       "orphanet:635",
       "umls:C0027819"
     ]
+  },
+  {
+    "label_and_type": "umls:c0027819##xref",
+    "item_type": "xref",
+    "concept_id": "DOID:769",
+    "src_name": "DO"
   },
   {
     "label_and_type": "ncit:c3270##other_id",
@@ -329,6 +371,12 @@
     "src_name": "DO"
   },
   {
+    "label_and_type": "umls:c0279984##xref",
+    "concept_id": "DOID:5695",
+    "src_name": "DO",
+    "item_type": "xref"
+  },
+  {
     "label_and_type": "ncit:c8091##other_id",
     "concept_id": "DOID:5695",
     "src_name": "DO",
@@ -350,6 +398,12 @@
     "aliases": ["Richter syndrome"],
     "other_identifiers": ["ncit:C35424"],
     "xrefs": ["umls:C0349631", "gard:7578", "icd10.cm:C91.1"]
+  },
+  {
+    "label_and_type": "icd10.cm:c91.1",
+    "item_type": "xref",
+    "concept_id": "DOID:1703",
+    "src_name": "DO"
   },
   {
     "label_and_type": "richter's syndrome##label",
@@ -389,6 +443,12 @@
       "kegg.disease:05223",
       "HP:0030358"
     ]
+  },
+  {
+    "label_and_type": "icd:c34##xref",
+    "item_type": "xref",
+    "src_name": "Mondo",
+    "concept_id": "mondo:0005233"
   },
   {
     "label_and_type": "ncit:c2926##other_id",
@@ -530,7 +590,7 @@
     "label": "Adult Cystic Teratoma",
     "concept_id": "ncit:C9012",
     "aliases": ["Adult cystic teratoma"],
-    "xrefs": ["icd.o:9080/0"],
+    "xrefs": ["icdo:9080/0"],
     "src_name": "NCIt"
   },
   {
@@ -602,13 +662,12 @@
     ],
     "xrefs": [
       "umls:C0027819",
-      "icd.o:9500/3",
       "efo:0000621",
       "gard:0007185",
       "gard:7185",
       "icd:C74.9",
-      "icd.o:9500/3",
-      "icd.o:M9500/3",
+      "icdo:9500/3",
+      "icdo:M9500/3",
       "mesh:D009447",
       "meddra:10029260",
       "nifstd:birnlex_12631",
@@ -695,7 +754,7 @@
     "other_ids": ["mondo:0004099", "DOID:7079"],
     "label": "Adult Cystic Teratoma",
     "aliases": ["Adult cystic teratoma", "cystic teratoma of adults"],
-    "xrefs": ["icd.o:9080/0", "umls:C1368888"]
+    "xrefs": ["icdo:9080/0", "umls:C1368888"]
   },
   {
     "label_and_type": "mondo:0010648##identity",
@@ -741,6 +800,12 @@
     "xrefs": ["umls:C0027819"]
   },
   {
+    "label_and_type": "umls:c0027819##xref",
+    "concept_id": "oncotree:nbl",
+    "src_name": "OncoTree",
+    "item_type": "xref"
+  },
+  {
     "label_and_type": "neuroblastoma##label",
     "concept_id": "oncotree:nbl",
     "src_name": "OncoTree",
@@ -755,6 +820,12 @@
     "concept_id": "oncotree:NSCLC",
     "other_identifiers": ["ncit:C2926"],
     "xrefs": ["umls:C0007131"]
+  },
+  {
+    "label_and_type": "umls:c0007131##xref",
+    "item_type": "xref",
+    "src_name": "OncoTree",
+    "concept_id": "oncotree:NSCLC"
   },
   {
     "label_and_type": "non-small cell lung cancer##label",

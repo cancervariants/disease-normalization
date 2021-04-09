@@ -41,7 +41,7 @@ def neuroblastoma():
             "umls:C0027819",
             "gard:0007185",
             "meddra:10029260",
-            "icd.o:9500/3",
+            "icdo:9500/3",
             "umls:CN205405",
             "efo:0000621",
             "icd:C74.9",
@@ -266,6 +266,34 @@ def test_other_id_match(mondo, neuroblastoma, richter_syndrome,
 
     response = mondo.search("ncit:C2926")
     assert response['match_type'] == MatchType.OTHER_ID
+    assert len(response['records']) == 1
+    actual_disease = response['records'][0].dict()
+    compare_records(actual_disease, nsclc)
+
+
+def test_xref_match(mondo, neuroblastoma, richter_syndrome,
+                    pediatric_liposarcoma, nsclc, compare_records):
+    """Test that xref search resolves to correct record."""
+    response = mondo.search('icdo:9500/3')
+    assert response['match_type'] == MatchType.XREF
+    assert len(response['records']) == 1
+    actual_disease = response['records'][0].dict()
+    compare_records(actual_disease, neuroblastoma)
+
+    response = mondo.search('gard:0007578')
+    assert response['match_type'] == MatchType.XREF
+    assert len(response['records']) == 1
+    actual_disease = response['records'][0].dict()
+    compare_records(actual_disease, richter_syndrome)
+
+    response = mondo.search('UMLS:C0279984')
+    assert response['match_type'] == MatchType.XREF
+    assert len(response['records']) == 1
+    actual_disease = response['records'][0].dict()
+    compare_records(actual_disease, pediatric_liposarcoma)
+
+    response = mondo.search('icd:C34')
+    assert response['match_type'] == MatchType.XREF
     assert len(response['records']) == 1
     actual_disease = response['records'][0].dict()
     compare_records(actual_disease, nsclc)
