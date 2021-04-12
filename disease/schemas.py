@@ -348,7 +348,7 @@ class ValueObjectDescriptor(BaseModel):
                 "type": "DiseaseDescriptor",
                 "value": {
                     "type": "Disease",
-                    "disease_id": "ncit:C3211"
+                    "id": "ncit:C3211"
                 },
                 "label": "Non-Hodgkin Lymphoma",
                 "xrefs": [
@@ -442,7 +442,7 @@ class NormalizationService(BaseModel):
                     "type": "DiseaseDescriptor",
                     "value": {
                         "type": "Disease",
-                        "disease_id": "ncit:C4989"
+                        "id": "ncit:C4989"
                     },
                     "label": "Childhood Leukemia",
                     "xrefs": [
