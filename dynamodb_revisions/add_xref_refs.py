@@ -44,7 +44,7 @@ def update_identity_records():
             xrefs_l = {xref.lower() for xref in xrefs_updated}
             for xref in xrefs_l:
                 batch.put_item(Item={
-                    'label_and_type': f"{xref.lower()}##xref",
+                    'label_and_type': f"{xref}##xref",
                     'concept_id': record['concept_id'].lower(),
                     'src_name': record['src_name']
                 })
