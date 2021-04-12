@@ -182,7 +182,7 @@ class QueryHandler:
         :param Dict resp: in-progress response object to return to client
         :param Set[str] sources: remaining unmatched sources
         :param str match_type: Match type to check for. Should be one of
-            {'label', 'alias', 'other_id'}
+            {'label', 'alias', 'other_id', 'xref'}
         :return: Tuple with updated resp object and updated set of unmatched
                  sources
         """
@@ -218,7 +218,7 @@ class QueryHandler:
         if len(sources) == 0:
             return response
 
-        match_types = ['label', 'alias', 'other_id']
+        match_types = ['label', 'alias', 'other_id', 'xref']
         for match_type in match_types:
             (response, sources) = self._check_match_type(query, response,
                                                          sources, match_type)
@@ -453,7 +453,7 @@ class QueryHandler:
                 non_merged_match = (record, 'concept_id')
 
         # check other match types
-        for match_type in ['label', 'alias', 'other_id']:
+        for match_type in ['label', 'alias', 'other_id', 'xref']:
             # get matches list for match tier
             query_matches = self.db.get_records_by_type(query_str, match_type)
             query_matches = [self.db.get_record_by_id(m['concept_id'],

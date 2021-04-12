@@ -116,6 +116,21 @@ def test_label_match(oncotree, neuroblastoma, nsclc, ipn, compare_records):
     compare_records(actual_disease, ipn)
 
 
+def test_xref_match(oncotree, neuroblastoma, nsclc, compare_records):
+    """Test that xref search resolves to correct record."""
+    response = oncotree.search('umls:c0027819')
+    assert response['match_type'] == MatchType.XREF
+    assert len(response['records']) == 1
+    actual_disease = response['records'][0].dict()
+    compare_records(actual_disease, neuroblastoma)
+
+    response = oncotree.search('umls:C0007131')
+    assert response['match_type'] == MatchType.XREF
+    assert len(response['records']) == 1
+    actual_disease = response['records'][0].dict()
+    compare_records(actual_disease, nsclc)
+
+
 def test_meta(oncotree):
     """Test that meta field is correct."""
     response = oncotree.search('neuroblastoma')

@@ -14,6 +14,7 @@ class MatchType(IntEnum):
     LABEL = 80
     ALIAS = 60
     OTHER_ID = 60
+    XREF = 60
     FUZZY_MATCH = 20
     NO_MATCH = 0
 
@@ -56,9 +57,9 @@ class NamespacePrefix(Enum):
     HPO = "HP"
     ICD9 = "icd9"
     ICD9CM = "icd9.cm"
-    ICD10 = "icd"
+    ICD10 = "icd10"
     ICD10CM = "icd10.cm"
-    ICDO = "icd.o"
+    ICDO = "icdo"
     IDO = "ido"
     IMDRF = "imdrf"
     KEGG = "kegg.disease"
@@ -372,7 +373,7 @@ class ValueObjectDescriptor(BaseModel):
                         "type": "Extension",
                         "name": "associated_with",
                         "value": [
-                            "icd.o:9591/3",
+                            "icdo:9591/3",
                             "umls:C0024305",
                             "omim:605027",
                             "orphanet:547",

@@ -31,7 +31,7 @@ def neuroblastoma():
         "xrefs": [
             "efo:0000621",
             "gard:7185",
-            "icd.o:M9500/3",
+            "icdo:M9500/3",
             "mesh:D009447",
             "orphanet:635",
             "umls:C0027819",
@@ -67,12 +67,7 @@ def richter():
 def test_concept_id_match(do, neuroblastoma, pediatric_liposarcoma, richter,
                           compare_records):
     """Test that concept ID search resolves to correct record"""
-    import boto3
-    from boto3.dynamodb.conditions import Key
-    response = boto3.resource('dynamodb', endpoint_url="http://localhost:8000").Table('disease_concepts').query(KeyConditionExpression=Key('label_and_type').eq('doid:769##identity'))['Items'][0]  # noqa: E501
-    print(response)
     response = do.search('DOID:769')
-    print(response)
     assert response['match_type'] == MatchType.CONCEPT_ID
     assert len(response['records']) == 1
     actual_disease = response['records'][0].dict()
@@ -133,3 +128,25 @@ def test_other_id_match(do, neuroblastoma, pediatric_liposarcoma,
     assert len(response['records']) == 1
     actual_disease = response['records'][0].dict()
     compare_records(actual_disease, pediatric_liposarcoma)
+
+
+def test_xref_match(do, neuroblastoma, pediatric_liposarcoma, richter,
+                    compare_records):
+    """Test that xref search resolves to correct records."""
+    response = do.search('umls:c0027819')
+    assert response['match_type'] == MatchType.XREF
+    assert len(response['records']) == 1
+    actual_disease = response['records'][0].dict()
+    compare_records(actual_disease, neuroblastoma)
+
+    response = do.search('umls:C0279984')
+    assert response['match_type'] == MatchType.XREF
+    assert len(response['records']) == 1
+    actual_disease = response['records'][0].dict()
+    compare_records(actual_disease, pediatric_liposarcoma)
+
+    response = do.search('icd10.cm:c91.1')
+    assert response['match_type'] == MatchType.XREF
+    assert len(response['records']) == 1
+    actual_disease = response['records'][0].dict()
+    compare_records(actual_disease, richter)

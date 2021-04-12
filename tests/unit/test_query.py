@@ -59,13 +59,13 @@ def neuroblastoma():
                 "name": "associated_with",
                 "value": [
                     "umls:C0027819",
-                    "icd.o:9500/3",
+                    "icdo:9500/3",
                     "efo:0000621",
                     "gard:7185",
                     "gard:0007185",
-                    "icd:C74.9",
-                    "icd.o:9500/3",
-                    "icd.o:M9500/3",
+                    "icd10:C74.9",
+                    "icdo:9500/3",
+                    "icdo:M9500/3",
                     "mesh:D009447",
                     "meddra:10029260",
                     "nifstd:birnlex_12631",
@@ -261,7 +261,7 @@ def test_normalize_query(query_handler, neuroblastoma, mafd2):
     assert 'Mondo' in response['source_meta_']
 
 
-def test_normalize_non_mondo(query_handler, skin_myo):
+def test_normalize_non_mondo(query_handler, skin_myo, neuroblastoma):
     """Test that normalize endpoint returns records not in Mondo groups."""
     response = query_handler.normalize('Skin Myoepithelioma')
     assert response['match_type'] == MatchType.LABEL
@@ -278,6 +278,17 @@ def test_normalize_non_mondo(query_handler, skin_myo):
     skin_myo_alias['id'] = 'normalize.disease:Cutaneous%20Myoepithelioma'
     compare_vod(response['value_object_descriptor'], skin_myo_alias)
     assert 'NCIt' in response['source_meta_']
+
+    response = query_handler.normalize('orphanet:635')
+    assert response['match_type'] == MatchType.XREF
+    assert len(response['source_meta_']) == 4
+    neuroblastoma_alias = neuroblastoma.copy()
+    neuroblastoma_alias['id'] = 'normalize.disease:orphanet%3A635'
+    compare_vod(response['value_object_descriptor'], neuroblastoma_alias)
+    assert 'NCIt' in response['source_meta_']
+    assert 'DO' in response['source_meta_']
+    assert 'Mondo' in response['source_meta_']
+    assert 'OncoTree' in response['source_meta_']
 
 
 def test_service_meta(query_handler):
