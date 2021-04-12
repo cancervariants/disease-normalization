@@ -275,7 +275,7 @@ class DiseaseValue(BaseModel):
     """Class for Disease Value within VOD."""
 
     type: str = "Disease"
-    disease_id: str
+    id: str
 
     @validator('type')
     def check_type(cls, type_value):
@@ -293,7 +293,7 @@ class DiseaseValue(BaseModel):
             """Configure schema display."""
             schema['example'] = {
                 "type": "Disease",
-                "disease_id": "ncit:C3211"
+                "id": "ncit:C3211"
             }
 
 
