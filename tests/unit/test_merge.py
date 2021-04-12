@@ -55,7 +55,7 @@ def neuroblastoma():
             "efo:0000621",
             "gard:7185",
             "gard:0007185",
-            "icd:C74.9",
+            "icd10:C74.9",
             "icdo:M9500/3",
             "mesh:D009447",
             "meddra:10029260",
@@ -99,7 +99,7 @@ def lnscc():
             "mesh:D002289",
             "umls:C0007131",
             "efo:0003060",
-            "icd:C34",
+            "icd10:C34",
             "kegg.disease:05223",
             "HP:0030358"
         ],
@@ -125,7 +125,7 @@ def richter():
         ],
         "xrefs": [
             "umls:C0349631",
-            "icd:C91.1",
+            "icd10:C91.1",
             "gard:0007578",
             "gard:7578",
             "icd10.cm:C91.1"

@@ -44,7 +44,7 @@ def neuroblastoma():
             "icdo:9500/3",
             "umls:CN205405",
             "efo:0000621",
-            "icd:C74.9",
+            "icd10:C74.9",
             "mesh:D009447"
         ],
         "pediatric_disease": None,
@@ -64,7 +64,7 @@ def richter_syndrome():
         ],
         "other_identifiers": ["ncit:C35424", "DOID:1703"],
         "xrefs": [
-            "icd:C91.1",
+            "icd10:C91.1",
             "umls:C0349631",
             "gard:0007578",
         ],
@@ -127,7 +127,7 @@ def nsclc():
         "xrefs": [
             "mesh:D002289",
             "umls:C0007131",
-            "icd:C34",
+            "icd10:C34",
             "efo:0003060",
             "kegg.disease:05223",
             "HP:0030358"

@@ -169,7 +169,7 @@
       "icdo:9500/3",
       "umls:CN205405",
       "efo:0000621",
-      "icd:C74.9",
+      "icd10:C74.9",
       "mesh:D009447"
     ]
   },
@@ -228,7 +228,7 @@
       "Richter's transformation"
     ],
     "other_identifiers": ["ncit:C35424", "DOID:1703"],
-    "xrefs": ["icd:C91.1", "umls:C0349631", "gard:0007578"]
+    "xrefs": ["icd10:C91.1", "umls:C0349631", "gard:0007578"]
   },
   {
     "label_and_type": "gard:0007578##xref",
@@ -439,13 +439,13 @@
       "mesh:D002289",
       "umls:C0007131",
       "efo:0003060",
-      "icd:C34",
+      "icd10:C34",
       "kegg.disease:05223",
       "HP:0030358"
     ]
   },
   {
-    "label_and_type": "icd:c34##xref",
+    "label_and_type": "icd10:c34##xref",
     "item_type": "xref",
     "src_name": "Mondo",
     "concept_id": "mondo:0005233"
@@ -665,7 +665,7 @@
       "efo:0000621",
       "gard:0007185",
       "gard:7185",
-      "icd:C74.9",
+      "icd10:C74.9",
       "icdo:9500/3",
       "icdo:M9500/3",
       "mesh:D009447",
@@ -726,7 +726,7 @@
     ],
     "xrefs": [
       "umls:C0349631",
-      "icd:C91.1",
+      "icd10:C91.1",
       "gard:0007578",
       "gard:7578",
       "icd10.cm:C91.1"
