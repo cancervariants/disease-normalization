@@ -275,7 +275,7 @@ class DiseaseValue(BaseModel):
     """Class for Disease Value within VOD."""
 
     type: str = "Disease"
-    disease_id: str
+    id: str
 
     @validator('type')
     def check_type(cls, type_value):
@@ -293,7 +293,7 @@ class DiseaseValue(BaseModel):
             """Configure schema display."""
             schema['example'] = {
                 "type": "Disease",
-                "disease_id": "ncit:C3211"
+                "id": "ncit:C3211"
             }
 
 
@@ -348,7 +348,7 @@ class ValueObjectDescriptor(BaseModel):
                 "type": "DiseaseDescriptor",
                 "value": {
                     "type": "Disease",
-                    "disease_id": "ncit:C3211"
+                    "id": "ncit:C3211"
                 },
                 "label": "Non-Hodgkin Lymphoma",
                 "xrefs": [
@@ -442,7 +442,7 @@ class NormalizationService(BaseModel):
                     "type": "DiseaseDescriptor",
                     "value": {
                         "type": "Disease",
-                        "disease_id": "ncit:C4989"
+                        "id": "ncit:C4989"
                     },
                     "label": "Childhood Leukemia",
                     "xrefs": [

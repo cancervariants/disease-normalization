@@ -33,7 +33,7 @@ def neuroblastoma():
         "type": "DiseaseDescriptor",
         "value": {
             "type": "Disease",
-            "disease_id": "ncit:C3270"
+            "id": "ncit:C3270"
         },
         "label": "Neuroblastoma",
         "xrefs": [
@@ -86,7 +86,7 @@ def skin_myo():
         "type": "DiseaseDescriptor",
         "value": {
             "type": "Disease",
-            "disease_id": "ncit:C167370"
+            "id": "ncit:C167370"
         },
         "label": "Skin Myoepithelioma",
         "alternate_labels": ["Cutaneous Myoepithelioma"],
@@ -103,7 +103,7 @@ def mafd2():
         "type": "DiseaseDescriptor",
         "value": {
             "type": "Disease",
-            "disease_id": "mondo:0010648"
+            "id": "mondo:0010648"
         },
         "label": "major affective disorder 2",
         "alternate_labels": [
