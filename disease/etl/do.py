@@ -96,7 +96,7 @@ class DO(OWLBase):
 
     def _transform_data(self):
         """Transform source data and send to loading method."""
-        do = owl.get_ontology(self._SRC_URL).load()
+        do = owl.get_ontology(self._data_file.absolute().as_uri()).load()
         disease_uri = 'http://purl.obolibrary.org/obo/DOID_4'
         diseases = self._get_subclasses(disease_uri)
         for uri in diseases:

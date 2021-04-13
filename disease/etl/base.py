@@ -38,7 +38,7 @@ class Base(ABC):
     def _extract_data(self):
         """Get source file from data directory."""
         self._data_path.mkdir(exist_ok=True, parents=True)
-        src_name = type(self).__name__.lower()
+        src_name = f'{type(self).__name__.lower()}_'
         dir_files = [f for f in self._data_path.iterdir()
                      if f.name.startswith(src_name)]
         if len(dir_files) == 0:
