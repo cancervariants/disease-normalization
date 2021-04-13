@@ -1,6 +1,7 @@
 """Disease Ontology ETL module."""
 import logging
 from .base import OWLBase
+import requests
 from pathlib import Path
 from disease import PROJECT_ROOT, PREFIX_LOOKUP
 from disease.schemas import SourceMeta, SourceName, NamespacePrefix
@@ -55,10 +56,25 @@ class DO(OWLBase):
         :return: empty list (because DO IDs shouldn't be used to construct
             merged concept groups)
         """
+        self._extract_data()
         self._load_meta()
         self._transform_data()
         self.database.flush_batch()
         return []
+
+    def _download_data(self):
+        """Download DO source file for loading into normalizer."""
+        logger.info('Downloading DO data...')
+        try:
+            response = requests.get(self._SRC_URL, stream=True)
+        except requests.exceptions.RequestException as e:
+            logger.error(f'DO download failed: {e}')
+            raise e
+        handle = open(self._data_path / f'do_{self._version}.owl', "wb")
+        for chunk in response.iter_content(chunk_size=512):
+            if chunk:
+                handle.write(chunk)
+        logger.info('Finished downloading Human Disease Ontology')
 
     def _load_meta(self):
         """Load metadata"""
