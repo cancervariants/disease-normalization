@@ -214,9 +214,9 @@ def record_id_groups():
 def compare_merged_records(actual, fixture):
     """Verify correctness of merged DB record."""
     assert actual['concept_id'] == fixture['concept_id']
-    assert ('xrefs' in actual) == ('other_ids' in fixture)
+    assert ('xrefs' in actual) == ('xrefs' in fixture)
     if 'xrefs' in actual:
-        assert set(actual['xrefs']) == set(fixture['other_ids'])
+        assert set(actual['xrefs']) == set(fixture['xrefs'])
 
     assert actual['label_and_type'] == fixture['label_and_type']
 

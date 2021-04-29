@@ -243,29 +243,29 @@ def test_alias_match(mondo, neuroblastoma, richter_syndrome, compare_records):
     assert response['match_type'] == MatchType.NO_MATCH
 
 
-def test_other_id_match(mondo, neuroblastoma, richter_syndrome,
-                        pediatric_liposarcoma, nsclc, compare_records):
-    """Test that other_id search resolves to correct record."""
+def test_xref_match(mondo, neuroblastoma, richter_syndrome,
+                    pediatric_liposarcoma, nsclc, compare_records):
+    """Test that xref search resolves to correct record."""
     response = mondo.search('DOID:769')
-    assert response['match_type'] == MatchType.OTHER_ID
+    assert response['match_type'] == MatchType.XREF
     assert len(response['records']) == 1
     actual_disease = response['records'][0].dict()
     compare_records(actual_disease, neuroblastoma)
 
     response = mondo.search('ncit:c8091')
-    assert response['match_type'] == MatchType.OTHER_ID
+    assert response['match_type'] == MatchType.XREF
     assert len(response['records']) == 1
     actual_disease = response['records'][0].dict()
     compare_records(actual_disease, pediatric_liposarcoma)
 
     response = mondo.search('oncotree:NSCLC')
-    assert response['match_type'] == MatchType.OTHER_ID
+    assert response['match_type'] == MatchType.XREF
     assert len(response['records']) == 1
     actual_disease = response['records'][0].dict()
     compare_records(actual_disease, nsclc)
 
     response = mondo.search("ncit:C2926")
-    assert response['match_type'] == MatchType.OTHER_ID
+    assert response['match_type'] == MatchType.XREF
     assert len(response['records']) == 1
     actual_disease = response['records'][0].dict()
     compare_records(actual_disease, nsclc)
