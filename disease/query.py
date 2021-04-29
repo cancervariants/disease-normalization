@@ -80,11 +80,12 @@ class QueryHandler:
         :return: Tuple containing updated response object, and string
             containing name of the source of the match
         """
-        del item['label_and_type']
-        attr_types = ['aliases', 'other_identifiers', 'xrefs']
-        for attr_type in attr_types:
-            if attr_type not in item.keys():
-                item[attr_type] = []
+        # TODO REMOVE?
+        # del item['label_and_type']
+        # attr_types = ['aliases', 'xrefs', 'associated_with']
+        # for attr_type in attr_types:
+        #     if attr_type not in item.keys():
+        #         item[attr_type] = []
 
         disease = Disease(**item)
         src_name = item['src_name']
@@ -182,7 +183,7 @@ class QueryHandler:
         :param Dict resp: in-progress response object to return to client
         :param Set[str] sources: remaining unmatched sources
         :param str match_type: Match type to check for. Should be one of
-            {'label', 'alias', 'other_id', 'xref'}
+            {'label', 'alias', 'xref', 'associated_with'}
         :return: Tuple with updated resp object and updated set of unmatched
                  sources
         """
@@ -218,7 +219,7 @@ class QueryHandler:
         if len(sources) == 0:
             return response
 
-        match_types = ['label', 'alias', 'other_id', 'xref']
+        match_types = ['label', 'alias', 'xref', 'associated_with']
         for match_type in match_types:
             (response, sources) = self._check_match_type(query, response,
                                                          sources, match_type)
@@ -349,8 +350,8 @@ class QueryHandler:
             'label': record['label'],
             'extensions': [],
         }
-        if 'other_ids' in record:
-            vod['xrefs'] = record['other_ids']
+        if 'xrefs' in record:
+            vod['xrefs'] = record['xrefs']
         if 'aliases' in record:
             vod['alternate_labels'] = record['aliases']
         if 'pediatric_disease' in record and \
@@ -360,11 +361,11 @@ class QueryHandler:
                 'name': 'pediatric_disease',
                 'value': record['pediatric_disease']
             })
-        if 'xrefs' in record and record['xrefs']:
+        if 'associated_with' in record and record['associated_with']:
             vod['extensions'].append({
                 'type': 'Extension',
                 'name': 'associated_with',
-                'value': record['xrefs']
+                'value': record['associated_with']
             })
         if not vod['extensions']:
             del vod['extensions']
@@ -453,7 +454,7 @@ class QueryHandler:
                 non_merged_match = (record, 'concept_id')
 
         # check other match types
-        for match_type in ['label', 'alias', 'other_id', 'xref']:
+        for match_type in ['label', 'alias', 'xref', 'associated_with']:
             # get matches list for match tier
             query_matches = self.db.get_records_by_type(query_str, match_type)
             query_matches = [self.db.get_record_by_id(m['concept_id'],
