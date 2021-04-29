@@ -60,8 +60,8 @@ class Base(ABC):
         assert Disease(**disease)
         concept_id = disease['concept_id']
 
-        for field, name in (('aliases', 'alias'), ('other_identifiers',
-                            'other_id'), ('xrefs', 'xref')):
+        for field, name in (('aliases', 'alias'), ('xrefs', 'xref'),
+                            ('associated_with', 'associated_with')):
             if field in disease:
                 items = disease[field]
                 if items == [] or items is None:
