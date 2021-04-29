@@ -35,8 +35,8 @@ def neuroblastoma():
             "Neuroblastoma, NOS",
             "neuroblastoma"
         ],
-        "other_identifiers": [],
-        "xrefs": ["umls:C0027819", "icdo:9500/3"],
+        "xrefs": [],
+        "associated_with": ["umls:C0027819", "icdo:9500/3"],
         "src_name": "NCIt"
     }
 
@@ -60,8 +60,8 @@ def nsclc():
             "NSCLC - Non-Small Cell Lung Cancer",
             "Non-Small Cell Lung Carcinoma"
         ],
-        "other_identifiers": [],
-        "xrefs": ["umls:C0007131"]
+        "xrefs": [],
+        "associated_with": ["umls:C0007131"]
     }
 
 
@@ -161,16 +161,16 @@ def test_alias_match(ncit, neuroblastoma, nsclc, compare_records):
     assert response['match_type'] == MatchType.NO_MATCH
 
 
-def test_xref_match(ncit, neuroblastoma, nsclc, compare_records):
-    """Test that xref search resolves to correct record."""
+def test_associated_with_match(ncit, neuroblastoma, nsclc, compare_records):
+    """Test that associated_with search resolves to correct record."""
     response = ncit.search('icdo:9500/3')
-    assert response['match_type'] == MatchType.XREF
+    assert response['match_type'] == MatchType.ASSOCIATED_WITH
     assert len(response['records']) == 1
     actual_disease = response['records'][0].dict()
     compare_records(actual_disease, neuroblastoma)
 
     response = ncit.search('umls:C0007131')
-    assert response['match_type'] == MatchType.XREF
+    assert response['match_type'] == MatchType.ASSOCIATED_WITH
     assert len(response['records']) == 1
     actual_disease = response['records'][0].dict()
     compare_records(actual_disease, nsclc)

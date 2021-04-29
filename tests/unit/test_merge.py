@@ -35,7 +35,7 @@ def neuroblastoma():
         "label_and_type": "ncit:c3270##merger",
         "concept_id": "ncit:C3270",
         "item_type": "merger",
-        "other_ids": ["mondo:0005072", "oncotree:NBL", "DOID:769"],
+        "xrefs": ["mondo:0005072", "oncotree:NBL", "DOID:769"],
         "label": "Neuroblastoma",
         "aliases": [
             "neuroblastoma",
@@ -49,7 +49,7 @@ def neuroblastoma():
             "neural Crest tumor, malignant",
             "neuroblastoma, malignant"
         ],
-        "xrefs": [
+        "associated_with": [
             "umls:C0027819",
             "icdo:9500/3",
             "efo:0000621",
@@ -73,7 +73,7 @@ def lnscc():
     return {
         "label_and_type": "ncit:c2926##merger",
         "concept_id": "ncit:C2926",
-        "other_ids": ["mondo:0005233", "oncotree:NSCLC", "DOID:3908"],
+        "xrefs": ["mondo:0005233", "oncotree:NSCLC", "DOID:3908"],
         "label": "Lung Non-Small Cell Carcinoma",
         "aliases": [
             "Non Small Cell Lung Cancer NOS",
@@ -94,7 +94,7 @@ def lnscc():
             "non-small cell cancer of lung",
             "non-small cell cancer of the lung",
         ],
-        "xrefs": [
+        "associated_with": [
             "umls:C0007131",
             "mesh:D002289",
             "umls:C0007131",
@@ -113,7 +113,7 @@ def richter():
     return {
         "label_and_type": "ncit:c35424##merger",
         "concept_id": "ncit:C35424",
-        "other_ids": ["mondo:0002083", "DOID:1703"],
+        "xrefs": ["mondo:0002083", "DOID:1703"],
         "label": "Richter Syndrome",
         "aliases": [
             "Richter's Syndrome",
@@ -123,7 +123,7 @@ def richter():
             "Richter's syndrome",
             "Richter's transformation"
         ],
-        "xrefs": [
+        "associated_with": [
             "umls:C0349631",
             "icd10:C91.1",
             "gard:0007578",
@@ -140,7 +140,7 @@ def ped_liposarcoma():
     return {
         "label_and_type": "ncit:c8091##merger",
         "concept_id": "ncit:C8091",
-        "other_ids": ["mondo:0003587", "DOID:5695"],
+        "xrefs": ["mondo:0003587", "DOID:5695"],
         "label": "Childhood Liposarcoma",
         "aliases": [
             "Liposarcoma",
@@ -148,7 +148,7 @@ def ped_liposarcoma():
             "childhood liposarcoma",
             "liposarcoma"
         ],
-        "xrefs": ["umls:C0279984"],
+        "associated_with": ["umls:C0279984"],
         "pediatric_disease": True,
         "item_type": "merger"
     }
@@ -160,10 +160,10 @@ def teratoma():
     return {
         "label_and_type": "ncit:c9012##merger",
         "concept_id": "ncit:C9012",
-        "other_ids": ["mondo:0004099", "DOID:7079"],
+        "xrefs": ["mondo:0004099", "DOID:7079"],
         "label": "Adult Cystic Teratoma",
         "aliases": ["Adult cystic teratoma", "cystic teratoma of adults"],
-        "xrefs": ["icdo:9080/0", "umls:C1368888"],
+        "associated_with": ["icdo:9080/0", "umls:C1368888"],
         "item_type": "merger",
     }
 
@@ -181,7 +181,7 @@ def mafd2():
         "aliases": [
             "MAFD2"
         ],
-        "xrefs": [
+        "associated_with": [
             "mesh:C564108",
             "omim:309200"
         ]
@@ -214,9 +214,9 @@ def record_id_groups():
 def compare_merged_records(actual, fixture):
     """Verify correctness of merged DB record."""
     assert actual['concept_id'] == fixture['concept_id']
-    assert ('other_ids' in actual) == ('other_ids' in fixture)
-    if 'other_ids' in actual:
-        assert set(actual['other_ids']) == set(fixture['other_ids'])
+    assert ('xrefs' in actual) == ('other_ids' in fixture)
+    if 'xrefs' in actual:
+        assert set(actual['xrefs']) == set(fixture['other_ids'])
 
     assert actual['label_and_type'] == fixture['label_and_type']
 
@@ -228,9 +228,10 @@ def compare_merged_records(actual, fixture):
     if 'aliases' in actual or 'aliases' in fixture:
         assert set(actual['aliases']) == set(fixture['aliases'])
 
-    assert ('xrefs' in actual) == ('xrefs' in fixture)
-    if 'xrefs' in actual or 'xrefs' in fixture:
-        assert set(actual['xrefs']) == set(fixture['xrefs'])
+    assert ('associated_with' in actual) == ('associated_with' in fixture)
+    if 'associated_with' in actual or 'associated_with' in fixture:
+        assert set(actual['associated_with']) == \
+            set(fixture['associated_with'])
 
     assert ('pediatric_disease' in actual) == \
         ('pediatric_disease' in fixture)

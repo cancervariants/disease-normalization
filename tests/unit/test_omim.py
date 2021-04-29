@@ -34,8 +34,8 @@ def mafd2():
             "BIPOLAR AFFECTIVE DISORDER",
             "BPAD"
         ],
-        "other_identifiers": [],
         "xrefs": [],
+        "associated_with": [],
         "pediatric_disease": None,
     }
 
@@ -55,8 +55,8 @@ def acute_ll():
             "LEUKEMIA, T-CELL ACUTE LYMPHOBLASTIC, SUSCEPTIBILITY TO",
             "LEUKEMIA, ACUTE LYMPHOBLASTIC, B-HYPERDIPLOID, SUSCEPTIBILITY TO"
         ],
-        "other_identifiers": [],
         "xrefs": [],
+        "associated_with": [],
         "pediatric_disease": None,
     }
 
@@ -71,8 +71,8 @@ def lall():
             "LALL",
             "LYMPHOMATOUS ALL"
         ],
-        "other_identifiers": [],
         "xrefs": [],
+        "associated_with": [],
         "pediatric_disease": None,
     }
 

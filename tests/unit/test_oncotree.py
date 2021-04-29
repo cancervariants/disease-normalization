@@ -26,8 +26,8 @@ def neuroblastoma():
         "label": "Neuroblastoma",
         "concept_id": "oncotree:NBL",
         "aliases": [],
-        "other_identifiers": ["ncit:C3270"],
-        "xrefs": ["umls:C0027819"],
+        "xrefs": ["ncit:C3270"],
+        "associated_with": ["umls:C0027819"],
         "pediatric_disease": None
     }
 
@@ -39,8 +39,8 @@ def nsclc():
         "label": "Non-Small Cell Lung Cancer",
         "concept_id": "oncotree:NSCLC",
         "aliases": [],
-        "other_identifiers": ["ncit:C2926"],
-        "xrefs": ["umls:C0007131"],
+        "xrefs": ["ncit:C2926"],
+        "associated_with": ["umls:C0007131"],
         "pediatric_disease": None
     }
 
@@ -52,8 +52,8 @@ def ipn():
         "label": "Intracholecystic Papillary Neoplasm",
         "concept_id": "oncotree:ICPN",
         "aliases": [],
-        "other_identifiers": [],
         "xrefs": [],
+        "associated_with": [],
         "pediatric_disease": None
     }
 
@@ -116,16 +116,17 @@ def test_label_match(oncotree, neuroblastoma, nsclc, ipn, compare_records):
     compare_records(actual_disease, ipn)
 
 
-def test_xref_match(oncotree, neuroblastoma, nsclc, compare_records):
-    """Test that xref search resolves to correct record."""
+def test_associated_with_match(oncotree, neuroblastoma, nsclc,
+                               compare_records):
+    """Test that associated_with search resolves to correct record."""
     response = oncotree.search('umls:c0027819')
-    assert response['match_type'] == MatchType.XREF
+    assert response['match_type'] == MatchType.ASSOCIATED_WITH
     assert len(response['records']) == 1
     actual_disease = response['records'][0].dict()
     compare_records(actual_disease, neuroblastoma)
 
     response = oncotree.search('umls:C0007131')
-    assert response['match_type'] == MatchType.XREF
+    assert response['match_type'] == MatchType.ASSOCIATED_WITH
     assert len(response['records']) == 1
     actual_disease = response['records'][0].dict()
     compare_records(actual_disease, nsclc)

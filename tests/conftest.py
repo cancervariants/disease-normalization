@@ -20,12 +20,14 @@ def compare_records():
         assert ('aliases' in actual_record.keys()) == ('aliases' in fixture_record.keys())  # noqa: E501
         if 'aliases' in actual_record or 'aliases' in fixture_record:
             assert set(actual_record['aliases']) == set(fixture_record['aliases'])  # noqa: E501
-        assert ('other_identifiers' in actual_record.keys()) == ('other_identifiers' in fixture_record.keys())  # noqa: E501
-        if 'other_identifiers' in actual_record or 'other_identifiers' in fixture_record:  # noqa: E501
-            assert set(actual_record['other_identifiers']) == set(fixture_record['other_identifiers'])  # noqa: E501
         assert ('xrefs' in actual_record.keys()) == ('xrefs' in fixture_record.keys())  # noqa: E501
         if 'xrefs' in actual_record or 'xrefs' in fixture_record:
             assert set(actual_record['xrefs']) == set(fixture_record['xrefs'])
+        assert ('associated_with' in actual_record.keys()) == \
+            ('associated_with' in fixture_record.keys())  # noqa: E501
+        if 'associated_with' in actual_record or 'associated_with' in fixture_record:  # noqa: E501
+            assert set(actual_record['associated_with']) == \
+                set(fixture_record['associated_with'])
     return compare_records
 
 

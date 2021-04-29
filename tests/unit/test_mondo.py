@@ -30,12 +30,12 @@ def neuroblastoma():
             "neuroblastoma (Schwannian Stroma-poor)",
             "neuroblastoma, malignant"
         ],
-        "other_identifiers": [
+        "xrefs": [
             "ncit:C3270",
             "DOID:769",
             "oncotree:NBL",
         ],
-        "xrefs": [
+        "associated_with": [
             "orphanet:635",
             "nifstd:birnlex_12631",
             "umls:C0027819",
@@ -62,8 +62,8 @@ def richter_syndrome():
             "Richter transformation",
             "Richter's transformation"
         ],
-        "other_identifiers": ["ncit:C35424", "DOID:1703"],
-        "xrefs": [
+        "xrefs": ["ncit:C35424", "DOID:1703"],
+        "associated_with": [
             "icd10:C91.1",
             "umls:C0349631",
             "gard:0007578",
@@ -84,8 +84,8 @@ def pediatric_liposarcoma():
             "childhood liposarcoma",
             "liposarcoma"
         ],
-        "other_identifiers": ["DOID:5695", "ncit:C8091"],
-        "xrefs": [
+        "xrefs": ["DOID:5695", "ncit:C8091"],
+        "associated_with": [
             "umls:C0279984"
         ],
         "pediatric_disease": True,
@@ -102,8 +102,8 @@ def cystic_teratoma_adult():
         "label": "adult cystic teratoma",
         "aliases": ["cystic teratoma of adults"],
         "pediatric_disease": None,
-        "other_identifiers": ["ncit:C9012", "DOID:7079"],
-        "xrefs": ["umls:C1368888"],
+        "xrefs": ["ncit:C9012", "DOID:7079"],
+        "associated_with": ["umls:C1368888"],
     }
 
 
@@ -123,8 +123,8 @@ def nsclc():
             "non-small cell cancer of the lung",
             "NSCLC"
         ],
-        "other_identifiers": ["ncit:C2926", "oncotree:NSCLC", "DOID:3908"],
-        "xrefs": [
+        "xrefs": ["ncit:C2926", "oncotree:NSCLC", "DOID:3908"],
+        "associated_with": [
             "mesh:D002289",
             "umls:C0007131",
             "icd10:C34",
@@ -271,23 +271,23 @@ def test_other_id_match(mondo, neuroblastoma, richter_syndrome,
     compare_records(actual_disease, nsclc)
 
 
-def test_xref_match(mondo, neuroblastoma, richter_syndrome,
-                    pediatric_liposarcoma, compare_records):
-    """Test that xref search resolves to correct record."""
+def test_associated_with_match(mondo, neuroblastoma, richter_syndrome,
+                               pediatric_liposarcoma, compare_records):
+    """Test that associated_with search resolves to correct record."""
     response = mondo.search('icdo:9500/3')
-    assert response['match_type'] == MatchType.XREF
+    assert response['match_type'] == MatchType.ASSOCIATED_WITH
     assert len(response['records']) == 1
     actual_disease = response['records'][0].dict()
     compare_records(actual_disease, neuroblastoma)
 
     response = mondo.search('gard:0007578')
-    assert response['match_type'] == MatchType.XREF
+    assert response['match_type'] == MatchType.ASSOCIATED_WITH
     assert len(response['records']) == 1
     actual_disease = response['records'][0].dict()
     compare_records(actual_disease, richter_syndrome)
 
     response = mondo.search('UMLS:C0279984')
-    assert response['match_type'] == MatchType.XREF
+    assert response['match_type'] == MatchType.ASSOCIATED_WITH
     assert len(response['records']) == 1
     actual_disease = response['records'][0].dict()
     compare_records(actual_disease, pediatric_liposarcoma)
