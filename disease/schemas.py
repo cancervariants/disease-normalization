@@ -13,8 +13,8 @@ class MatchType(IntEnum):
     CONCEPT_ID = 100
     LABEL = 80
     ALIAS = 60
-    OTHER_ID = 60
     XREF = 60
+    ASSOCIATED_WITH = 60
     FUZZY_MATCH = 20
     NO_MATCH = 0
 
@@ -94,8 +94,8 @@ class Disease(BaseModel):
     label: str
     concept_id: str
     aliases: Optional[List[str]]
-    other_identifiers: Optional[List[str]]
     xrefs: Optional[List[str]]
+    associated_with: Optional[List[str]]
     pediatric_disease: Optional[bool]
 
     class Config:
@@ -119,8 +119,8 @@ class Disease(BaseModel):
                     "von Hippel-Lindau syndrome",
                     "VHL syndrome"
                 ],
-                "other_identifiers": [],
-                "xrefs": ["umls:C0019562"],
+                "xrefs": [],
+                "associated_with": ["umls:C0019562"],
                 "pediatric_disease": None,
             }
 
@@ -200,8 +200,8 @@ class MatchesKeyed(BaseModel):
                         "von Hippel-Lindau syndrome",
                         "VHL syndrome"
                     ],
-                    "other_identifiers": [],
-                    "xrefs": ["umls:C0019562"],
+                    "xrefs": [],
+                    "associated_with": ["umls:C0019562"],
                     "pediatric_disease": None,
                 }],
                 "source_meta_": {
@@ -253,8 +253,8 @@ class MatchesListed(BaseModel):
                         "von Hippel-Lindau syndrome",
                         "VHL syndrome"
                     ],
-                    "other_identifiers": [],
-                    "xrefs": ["umls:C0019562"],
+                    "xrefs": [],
+                    "associated_with": ["umls:C0019562"],
                     "pediatric_disease": None
                 }],
                 "source_meta_": {
@@ -552,8 +552,8 @@ class SearchService(BaseModel):
                             "von Hippel-Lindau syndrome",
                             "VHL syndrome"
                         ],
-                        "other_identifiers": [],
-                        "xrefs": ["umls:C0019562"],
+                        "xrefs": [],
+                        "associated_with": ["umls:C0019562"],
                         "pediatric_disease": None,
                     }],
                     "source_meta_": {

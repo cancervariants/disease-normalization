@@ -25,10 +25,10 @@ def neuroblastoma():
     return {
         "concept_id": "DOID:769",
         "label": "neuroblastoma",
-        "other_identifiers": [
+        "xrefs": [
             "ncit:C3270"
         ],
-        "xrefs": [
+        "associated_with": [
             "efo:0000621",
             "gard:7185",
             "icdo:M9500/3",
@@ -46,8 +46,8 @@ def pediatric_liposarcoma():
     return {
         "concept_id": "DOID:5695",
         "label": "pediatric liposarcoma",
-        "other_identifiers": ["ncit:C8091"],
-        "xrefs": ["umls:C0279984"],
+        "xrefs": ["ncit:C8091"],
+        "associated_with": ["umls:C0279984"],
         "aliases": []
     }
 
@@ -59,8 +59,8 @@ def richter():
         "concept_id": "DOID:1703",
         "label": "Richter's syndrome",
         "aliases": ["Richter syndrome"],
-        "other_identifiers": ["ncit:C35424"],
-        "xrefs": ["umls:C0349631", "gard:7578", "icd10.cm:C91.1"]
+        "xrefs": ["ncit:C35424"],
+        "associated_with": ["umls:C0349631", "gard:7578", "icd10.cm:C91.1"]
     }
 
 
@@ -114,39 +114,39 @@ def test_alias_match(do, richter, compare_records):
     compare_records(actual_disease, richter)
 
 
-def test_other_id_match(do, neuroblastoma, pediatric_liposarcoma,
-                        compare_records):
-    """Test that other_id search resolves to correct records."""
+def test_xref_match(do, neuroblastoma, pediatric_liposarcoma,
+                    compare_records):
+    """Test that xref search resolves to correct records."""
     response = do.search('ncit:C3270')
-    assert response['match_type'] == MatchType.OTHER_ID
+    assert response['match_type'] == MatchType.XREF
     assert len(response['records']) == 1
     actual_disease = response['records'][0].dict()
     compare_records(actual_disease, neuroblastoma)
 
     response = do.search('NCIT:C8091')
-    assert response['match_type'] == MatchType.OTHER_ID
+    assert response['match_type'] == MatchType.XREF
     assert len(response['records']) == 1
     actual_disease = response['records'][0].dict()
     compare_records(actual_disease, pediatric_liposarcoma)
 
 
-def test_xref_match(do, neuroblastoma, pediatric_liposarcoma, richter,
-                    compare_records):
-    """Test that xref search resolves to correct records."""
+def test_associated_with_match(do, neuroblastoma, pediatric_liposarcoma,
+                               richter, compare_records):
+    """Test that associated_with search resolves to correct records."""
     response = do.search('umls:c0027819')
-    assert response['match_type'] == MatchType.XREF
+    assert response['match_type'] == MatchType.ASSOCIATED_WITH
     assert len(response['records']) == 1
     actual_disease = response['records'][0].dict()
     compare_records(actual_disease, neuroblastoma)
 
     response = do.search('umls:C0279984')
-    assert response['match_type'] == MatchType.XREF
+    assert response['match_type'] == MatchType.ASSOCIATED_WITH
     assert len(response['records']) == 1
     actual_disease = response['records'][0].dict()
     compare_records(actual_disease, pediatric_liposarcoma)
 
     response = do.search('icd10.cm:c91.1')
-    assert response['match_type'] == MatchType.XREF
+    assert response['match_type'] == MatchType.ASSOCIATED_WITH
     assert len(response['records']) == 1
     actual_disease = response['records'][0].dict()
     compare_records(actual_disease, richter)

@@ -42,9 +42,9 @@ class Merge:
                 logger.error(f"generate_merged_concepts couldn't find "
                              f"{concept_id}")
                 continue
-            other_ids = record.get('other_identifiers', None)
-            if other_ids:
-                group = set(other_ids + [concept_id])
+            xrefs = record.get('xrefs', None)
+            if xrefs:
+                group = set(xrefs + [concept_id])
             else:
                 group = {concept_id}
             self._groups.append((concept_id, group))
@@ -104,13 +104,13 @@ class Merge:
         merged_properties = {
             'concept_id': records[0]['concept_id'],
             'aliases': set(),
-            'xrefs': set()
+            'associated_with': set()
         }
         if len(records) > 1:
-            merged_properties['other_ids'] = [r['concept_id'] for r
-                                              in records[1:]]
+            merged_properties['xrefs'] = [r['concept_id'] for r
+                                          in records[1:]]
 
-        set_fields = ['aliases', 'xrefs']
+        set_fields = ['aliases', 'associated_with']
         scalar_fields = ['label', 'pediatric_disease']
         for record in records:
             for field in set_fields:

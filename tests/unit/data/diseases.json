@@ -19,11 +19,11 @@
       "NSCLC - Non-Small Cell Lung Cancer",
       "Non-Small Cell Lung Carcinoma"
     ],
-    "xrefs": ["umls:C0007131"]
+    "associated_with": ["umls:C0007131"]
   },
   {
-    "label_and_type": "umls:c0007131##xref",
-    "item_type": "xref",
+    "label_and_type": "umls:c0007131##associated_with",
+    "item_type": "associated_with",
     "concept_id": "ncit:c2926",
     "src_name": "NCIt"
   },
@@ -103,11 +103,11 @@
       "Neuroblastoma, NOS",
       "neuroblastoma"
     ],
-    "xrefs": ["umls:C0027819", "icdo:9500/3"]
+    "associated_with": ["umls:C0027819", "icdo:9500/3"]
   },
   {
-    "label_and_type": "icdo:9500/3##xref",
-    "item_type": "xref",
+    "label_and_type": "icdo:9500/3##associated_with",
+    "item_type": "associated_with",
     "concept_id": "ncit:c3270",
     "src_name": "NCIt"
   },
@@ -159,8 +159,8 @@
       "neuroblastoma (Schwannian Stroma-poor)",
       "neuroblastoma, malignant"
     ],
-    "other_identifiers": ["DOID:769", "ncit:C3270", "oncotree:NBL"],
-    "xrefs": [
+    "xrefs": ["DOID:769", "ncit:C3270", "oncotree:NBL"],
+    "associated_with": [
       "orphanet:635",
       "nifstd:birnlex_12631",
       "umls:C0027819",
@@ -174,20 +174,20 @@
     ]
   },
   {
-    "label_and_type": "orphanet:635##xref",
-    "item_type": "xref",
+    "label_and_type": "orphanet:635##associated_with",
+    "item_type": "associated_with",
     "src_name": "Mondo",
     "concept_id": "mondo:0005072"
   },
   {
-    "label_and_type": "icdo:9500/3##xref",
-    "item_type": "xref",
+    "label_and_type": "icdo:9500/3##associated_with",
+    "item_type": "associated_with",
     "src_name": "Mondo",
     "concept_id": "mondo:0005072"
   },
   {
-    "label_and_type": "doid:769##other_id",
-    "item_type": "other_id",
+    "label_and_type": "doid:769##xref",
+    "item_type": "xref",
     "src_name": "Mondo",
     "concept_id": "mondo:0005072"
   },
@@ -227,12 +227,12 @@
       "Richter transformation",
       "Richter's transformation"
     ],
-    "other_identifiers": ["ncit:C35424", "DOID:1703"],
-    "xrefs": ["icd10:C91.1", "umls:C0349631", "gard:0007578"]
+    "xrefs": ["ncit:C35424", "DOID:1703"],
+    "associated_with": ["icd10:C91.1", "umls:C0349631", "gard:0007578"]
   },
   {
-    "label_and_type": "gard:0007578##xref",
-    "item_type": "xref",
+    "label_and_type": "gard:0007578##associated_with",
+    "item_type": "associated_with",
     "concept_id": "mondo:0002083",
     "src_name": "Mondo"
   },
@@ -268,19 +268,19 @@
     "label": "pediatric liposarcoma",
     "aliases": ["childhood liposarcoma", "liposarcoma"],
     "pediatric_disease": true,
-    "other_identifiers": ["DOID:5695", "ncit:C8091"],
-    "xrefs": ["umls:C0279984"],
+    "xrefs": ["DOID:5695", "ncit:C8091"],
+    "associated_with": ["umls:C0279984"],
     "src_name": "Mondo"
   },
   {
-    "label_and_type": "umls:c0279984##xref",
-    "item_type": "other_id",
+    "label_and_type": "umls:c0279984##associated_with",
+    "item_type": "xref",
     "src_name": "Mondo",
     "concept_id": "mondo:0003587"
   },
   {
-    "label_and_type": "ncit:c8091##other_id",
-    "item_type": "other_id",
+    "label_and_type": "ncit:c8091##xref",
+    "item_type": "xref",
     "src_name": "Mondo",
     "concept_id": "mondo:0003587"
   },
@@ -309,8 +309,8 @@
     "concept_id": "mondo:0004099",
     "label": "adult cystic teratoma",
     "aliases": ["cystic teratoma of adults"],
-    "other_identifiers": ["ncit:C9012", "DOID:7079"],
-    "xrefs": ["umls:C1368888"],
+    "xrefs": ["ncit:C9012", "DOID:7079"],
+    "associated_with": ["umls:C1368888"],
     "src_name": "Mondo"
   },
   {
@@ -332,8 +332,8 @@
     "src_name": "DO",
     "concept_id": "DOID:769",
     "label": "neuroblastoma",
-    "other_identifiers": ["ncit:C3270"],
-    "xrefs": [
+    "xrefs": ["ncit:C3270"],
+    "associated_with": [
       "efo:0000621",
       "gard:7185",
       "icdo:M9500/3",
@@ -343,14 +343,14 @@
     ]
   },
   {
-    "label_and_type": "umls:c0027819##xref",
-    "item_type": "xref",
+    "label_and_type": "umls:c0027819##associated_with",
+    "item_type": "associated_with",
     "concept_id": "DOID:769",
     "src_name": "DO"
   },
   {
-    "label_and_type": "ncit:c3270##other_id",
-    "item_type": "other_id",
+    "label_and_type": "ncit:c3270##xref",
+    "item_type": "xref",
     "concept_id": "DOID:769",
     "src_name": "DO"
   },
@@ -366,21 +366,21 @@
     "concept_id": "DOID:5695",
     "merge_ref": "ncit:C8091",
     "label": "pediatric liposarcoma",
-    "other_identifiers": ["ncit:C8091"],
-    "xrefs": ["umls:C0279984"],
+    "xrefs": ["ncit:C8091"],
+    "associated_with": ["umls:C0279984"],
     "src_name": "DO"
   },
   {
-    "label_and_type": "umls:c0279984##xref",
+    "label_and_type": "umls:c0279984##associated_with",
+    "concept_id": "DOID:5695",
+    "src_name": "DO",
+    "item_type": "associated_with"
+  },
+  {
+    "label_and_type": "ncit:c8091##xref",
     "concept_id": "DOID:5695",
     "src_name": "DO",
     "item_type": "xref"
-  },
-  {
-    "label_and_type": "ncit:c8091##other_id",
-    "concept_id": "DOID:5695",
-    "src_name": "DO",
-    "item_type": "other_id"
   },
   {
     "label_and_type": "pediatric liposarcoma##label",
@@ -396,12 +396,12 @@
     "concept_id": "DOID:1703",
     "label": "Richter's syndrome",
     "aliases": ["Richter syndrome"],
-    "other_identifiers": ["ncit:C35424"],
-    "xrefs": ["umls:C0349631", "gard:7578", "icd10.cm:C91.1"]
+    "xrefs": ["ncit:C35424"],
+    "associated_with": ["umls:C0349631", "gard:7578", "icd10.cm:C91.1"]
   },
   {
-    "label_and_type": "icd10.cm:c91.1##xref",
-    "item_type": "xref",
+    "label_and_type": "icd10.cm:c91.1##associated_with",
+    "item_type": "associated_with",
     "concept_id": "DOID:1703",
     "src_name": "DO"
   },
@@ -434,8 +434,8 @@
       "non-small cell cancer of the lung",
       "NSCLC"
     ],
-    "other_identifiers": ["ncit:C2926", "oncotree:NSCLC", "DOID:3908"],
-    "xrefs": [
+    "xrefs": ["ncit:C2926", "oncotree:NSCLC", "DOID:3908"],
+    "associated_with": [
       "mesh:D002289",
       "umls:C0007131",
       "efo:0003060",
@@ -445,20 +445,20 @@
     ]
   },
   {
-    "label_and_type": "icd10:c34##xref",
+    "label_and_type": "icd10:c34##associated_with",
+    "item_type": "associated_with",
+    "src_name": "Mondo",
+    "concept_id": "mondo:0005233"
+  },
+  {
+    "label_and_type": "ncit:c2926##xref",
     "item_type": "xref",
     "src_name": "Mondo",
     "concept_id": "mondo:0005233"
   },
   {
-    "label_and_type": "ncit:c2926##other_id",
-    "item_type": "other_id",
-    "src_name": "Mondo",
-    "concept_id": "mondo:0005233"
-  },
-  {
-    "label_and_type": "oncotree:nsclc##other_id",
-    "item_type": "other_id",
+    "label_and_type": "oncotree:nsclc##xref",
+    "item_type": "xref",
     "src_name": "Mondo",
     "concept_id": "mondo:0005233"
   },
@@ -523,7 +523,7 @@
       "Richter transformation",
       "Richter's Transformation"
     ],
-    "xrefs": ["umls:C0349631"]
+    "associated_with": ["umls:C0349631"]
   },
   {
     "label_and_type": "richter syndrome##label",
@@ -562,7 +562,7 @@
     "label": "Childhood Liposarcoma",
     "concept_id": "ncit:C8091",
     "aliases": ["Liposarcoma", "Pediatric Liposarcoma"],
-    "xrefs": ["umls:C0279984"],
+    "associated_with": ["umls:C0279984"],
     "src_name": "NCIt"
   },
   {
@@ -590,7 +590,7 @@
     "label": "Adult Cystic Teratoma",
     "concept_id": "ncit:C9012",
     "aliases": ["Adult cystic teratoma"],
-    "xrefs": ["icdo:9080/0"],
+    "associated_with": ["icdo:9080/0"],
     "src_name": "NCIt"
   },
   {
@@ -612,8 +612,8 @@
     "src_name": "DO",
     "label": "adult cystic teratoma",
     "concept_id": "DOID:7079",
-    "other_identifiers": ["ncit:C9012"],
-    "xrefs": ["umls:C1368888"]
+    "xrefs": ["ncit:C9012"],
+    "associated_with": ["umls:C1368888"]
   },
   {
     "label_and_type": "adult cystic teratoma##label",
@@ -628,8 +628,8 @@
     "item_type": "identity",
     "label": "lung non-small cell carcinoma",
     "concept_id": "DOID:3908",
-    "other_identifiers": ["ncit:C2926"],
-    "xrefs": [
+    "xrefs": ["ncit:C2926"],
+    "associated_with": [
       "umls:C0007131",
       "kegg.disease:05223",
       "efo:0003060",
@@ -645,7 +645,7 @@
   {
     "label_and_type": "ncit:c3270##merger",
     "concept_id": "ncit:C3270",
-    "other_ids": ["mondo:0005072", "oncotree:NBL", "DOID:769"],
+    "xrefs": ["mondo:0005072", "oncotree:NBL", "DOID:769"],
     "item_type": "merger",
     "label": "Neuroblastoma",
     "aliases": [
@@ -660,7 +660,7 @@
       "neural Crest tumor, malignant",
       "neuroblastoma, malignant"
     ],
-    "xrefs": [
+    "associated_with": [
       "umls:C0027819",
       "efo:0000621",
       "gard:0007185",
@@ -679,7 +679,7 @@
     "label_and_type": "ncit:c2926##merger",
     "concept_id": "ncit:C2926",
     "item_type": "merger",
-    "other_ids": ["mondo:0005233", "oncotree:NSCLC", "DOID:3908"],
+    "xrefs": ["mondo:0005233", "oncotree:NSCLC", "DOID:3908"],
     "label": "Lung Non-Small Cell Carcinoma",
     "aliases": [
       "Non Small Cell Lung Cancer NOS",
@@ -700,7 +700,7 @@
       "non-small cell cancer of lung",
       "non-small cell cancer of the lung"
     ],
-    "xrefs": [
+    "associated_with": [
       "umls:C0007131",
       "mesh:D002289",
       "umls:C0007131",
@@ -714,7 +714,7 @@
     "label_and_type": "ncit:c35424##merger",
     "item_type": "merger",
     "concept_id": "ncit:C35424",
-    "other_ids": ["mondo:0002083", "DOID:1703"],
+    "xrefs": ["mondo:0002083", "DOID:1703"],
     "label": "Richter Syndrome",
     "aliases": [
       "Richter's Syndrome",
@@ -724,7 +724,7 @@
       "Richter's syndrome",
       "Richter's transformation"
     ],
-    "xrefs": [
+    "associated_with": [
       "umls:C0349631",
       "icd10:C91.1",
       "gard:0007578",
@@ -736,7 +736,7 @@
     "label_and_type": "ncit:c8091##merger",
     "concept_id": "ncit:C8091",
     "item_type": "merger",
-    "other_ids": ["mondo:0003587", "DOID:5695"],
+    "xrefs": ["mondo:0003587", "DOID:5695"],
     "label": "Childhood Liposarcoma",
     "aliases": [
       "Liposarcoma",
@@ -744,17 +744,17 @@
       "childhood liposarcoma",
       "liposarcoma"
     ],
-    "xrefs": ["umls:C0279984"],
+    "associated_with": ["umls:C0279984"],
     "pediatric_disease": true
   },
   {
     "label_and_type": "ncit:c9012##merger",
     "item_type": "merger",
     "concept_id": "ncit:C9012",
-    "other_ids": ["mondo:0004099", "DOID:7079"],
+    "xrefs": ["mondo:0004099", "DOID:7079"],
     "label": "Adult Cystic Teratoma",
     "aliases": ["Adult cystic teratoma", "cystic teratoma of adults"],
-    "xrefs": ["icdo:9080/0", "umls:C1368888"]
+    "associated_with": ["icdo:9080/0", "umls:C1368888"]
   },
   {
     "label_and_type": "mondo:0010648##identity",
@@ -764,8 +764,8 @@
     "label": "major affective disorder 2",
     "concept_id": "mondo:0010648",
     "aliases": ["MAFD2"],
-    "other_identifiers": ["DOID:0080221"],
-    "xrefs": ["mesh:C564108", "omim:309200"]
+    "xrefs": ["DOID:0080221"],
+    "associated_with": ["mesh:C564108", "omim:309200"]
   },
   {
     "label_and_type": "major affective disorder 2##label",
@@ -785,8 +785,8 @@
     "concept_id": "mondo:0010648",
     "label": "major affective disorder 2",
     "aliases": ["MDI","MDX","MANIC-DEPRESSIVE ILLNESS","BPAD","MAFD2","BIPOLAR AFFECTIVE DISORDER","MANIC-DEPRESSIVE PSYCHOSIS, X-LINKED"],
-    "other_ids": ["omim:309200"],
-    "xrefs": ["mesh:C564108"]
+    "xrefs": ["omim:309200"],
+    "associated_with": ["mesh:C564108"]
   },
   {
     "label_and_type": "oncotree:nbl##identity",
@@ -796,14 +796,14 @@
     "label": "Neuroblastoma",
     "concept_id": "oncotree:NBL",
     "aliases": [],
-    "other_identifiers": ["ncit:C3270"],
-    "xrefs": ["umls:C0027819"]
+    "xrefs": ["ncit:C3270"],
+    "associated_with": ["umls:C0027819"]
   },
   {
-    "label_and_type": "umls:c0027819##xref",
+    "label_and_type": "umls:c0027819##associated_with",
     "concept_id": "oncotree:nbl",
     "src_name": "OncoTree",
-    "item_type": "xref"
+    "item_type": "associated_with"
   },
   {
     "label_and_type": "neuroblastoma##label",
@@ -818,12 +818,12 @@
     "merge_ref": "ncit:c2926",
     "label": "Non-Small Cell Lung Cancer",
     "concept_id": "oncotree:NSCLC",
-    "other_identifiers": ["ncit:C2926"],
-    "xrefs": ["umls:C0007131"]
+    "xrefs": ["ncit:C2926"],
+    "associated_with": ["umls:C0007131"]
   },
   {
-    "label_and_type": "umls:c0007131##xref",
-    "item_type": "xref",
+    "label_and_type": "umls:c0007131##associated_with",
+    "item_type": "associated_with",
     "src_name": "OncoTree",
     "concept_id": "oncotree:NSCLC"
   },
@@ -1030,8 +1030,8 @@
     "merge_ref": "mondo:0009539",
     "label": "lymphoblastic leukemia, acute, with lymphomatous features",
     "concept_id": "mondo:0009539",
-    "other_identifiers": ["omim:247640"],
-    "xrefs": ["mesh:C565429", "umls:C1855472"]
+    "xrefs": ["omim:247640"],
+    "associated_with": ["mesh:C565429", "umls:C1855472"]
   },
   {
     "label_and_type": "lymphoblastic leukemia, acute, with lymphomatous features##label",
@@ -1044,9 +1044,9 @@
     "item_type": "merger",
     "label": "lymphoblastic leukemia, acute, with lymphomatous features",
     "concept_id": "mondo:0009539",
-    "other_identifiers": ["omim:247640"],
+    "xrefs": ["omim:247640"],
     "aliases": ["LYMPHOMATOUS ALL", "LALL"],
-    "xrefs": ["umls:C1855472", "mesh:C565429"]
+    "associated_with": ["umls:C1855472", "mesh:C565429"]
   },
   {
     "label_and_type": "mondo:0013108##identity",
@@ -1055,8 +1055,8 @@
     "src_name": "Mondo",
     "concept_id": "mondo:0013108",
     "label": "leukemia, acute lymphocytic, susceptibility to, 1",
-    "other_identifiers": ["omim:613065"],
-    "xrefs": ["umls:C2751595"]
+    "xrefs": ["omim:613065"],
+    "associated_with": ["umls:C2751595"]
   },
   {
     "label_and_type": "leukemia, acute lymphocytic, susceptibility to, 1##label",

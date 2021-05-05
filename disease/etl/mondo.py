@@ -142,7 +142,7 @@ class Mondo(OWLBase):
                 'label': label,
                 'aliases': aliases,
                 'xrefs': [],
-                'other_identifiers': []
+                'associated_with': [],
             }
 
             for ref in disease.hasDbXref:
@@ -150,15 +150,15 @@ class Mondo(OWLBase):
                 normed_prefix = MONDO_PREFIX_LOOKUP.get(prefix, None)
                 if not normed_prefix:
                     continue
-                other_id = f'{normed_prefix}:{id_no}'
+                xref = f'{normed_prefix}:{id_no}'
 
                 if normed_prefix.lower() in PREFIX_LOOKUP:
-                    params['other_identifiers'].append(other_id)
+                    params['xrefs'].append(xref)
                 elif normed_prefix == NamespacePrefix.KEGG:
-                    other_id = f'{normed_prefix}:H{id_no}'
-                    params['xrefs'].append(other_id)
+                    xref = f'{normed_prefix}:H{id_no}'
+                    params['associated_with'].append(xref)
                 else:
-                    params['xrefs'].append(other_id)
+                    params['associated_with'].append(xref)
 
             if disease.iri in peds_uris:
                 params['pediatric_disease'] = True

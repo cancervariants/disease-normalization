@@ -113,24 +113,24 @@ class DO(OWLBase):
             else:
                 aliases = []
 
-            other_ids = []
             xrefs = []
-            db_xrefs = set(disease_class.hasDbXref)
-            for other_id in db_xrefs:
-                prefix, id_no = other_id.split(':', 1)
+            associated_with = []
+            db_associated_with = set(disease_class.hasDbXref)
+            for xref in db_associated_with:
+                prefix, id_no = xref.split(':', 1)
                 normed_prefix = DO_PREFIX_LOOKUP.get(prefix, None)
                 if normed_prefix:
-                    other_id_no = f'{normed_prefix}:{id_no}'
+                    xref_no = f'{normed_prefix}:{id_no}'
                     if normed_prefix.lower() in PREFIX_LOOKUP:
-                        other_ids.append(other_id_no)
+                        xrefs.append(xref_no)
                     else:
-                        xrefs.append(other_id_no)
+                        associated_with.append(xref_no)
 
             disease = {
                 "concept_id": concept_id,
                 "label": label,
                 "aliases": aliases,
-                "other_identifiers": other_ids,
-                "xrefs": xrefs
+                "xrefs": xrefs,
+                "associated_with": associated_with
             }
             self._load_disease(disease)
