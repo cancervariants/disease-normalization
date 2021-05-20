@@ -1,6 +1,6 @@
 """A base class for extraction, transformation, and loading of data."""
 from abc import ABC, abstractmethod
-from disease import SOURCES_FOR_MERGE
+from disease import SOURCES_FOR_MERGE, ITEM_TYPES
 from disease.database import Database
 from disease.schemas import Disease
 import owlready2 as owl
@@ -60,28 +60,36 @@ class Base(ABC):
         assert Disease(**disease)
         concept_id = disease['concept_id']
 
-        for field, name in (('aliases', 'alias'), ('xrefs', 'xref'),
-                            ('associated_with', 'associated_with')):
-            if field in disease:
-                items = disease[field]
-                if items == [] or items is None:
-                    del disease[field]
-                else:
-                    if field == 'aliases':
-                        items = {i.lower() for i in items}
-                        if len(items) > 20:
-                            logger.debug(f"{concept_id} has > 20 aliases.")
-                            del disease[field]
-                            continue
-                    for i in items:
-                        self.database.add_ref_record(i, concept_id, name)
+        for attr_type, item_type in ITEM_TYPES.items():
+            if attr_type in disease:
+                value = disease[attr_type]
+                if value is not None and value != []:
+                    if isinstance(value, str):
+                        items = [disease[attr_type].lower()]
+                    else:
+                        disease[attr_type] = list(set(value))
+                        items = {item.lower() for item in value}
+                        if attr_type == 'aliases':
+                            if len(items) > 20:
+                                logger.debug(f"{concept_id} has > 20 aliases.")
+                                del disease[attr_type]
+                                continue
 
+                    for item in items:
+                        self.database.add_ref_record(item, concept_id,
+                                                     item_type)
+                else:
+                    del disease[attr_type]
+
+        # TODO: Check with James
+        #  Originally it was del disease[field], deleting `associated with`
+        #  since this would be the last thing field is set to
+        #  I think this was a bug and should have been pediatric disease?
         if 'pediatric_disease' in disease \
                 and disease['pediatric_disease'] is None:
-            del disease[field]
+            del disease['pediatric_disease']
 
         self.database.add_record(disease)
-        self.database.add_ref_record(disease['label'], concept_id, 'label')
         if self._store_ids:
             self._processed_ids.append(concept_id)
 

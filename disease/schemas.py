@@ -93,9 +93,9 @@ class Disease(BaseModel):
 
     label: str
     concept_id: str
-    aliases: Optional[List[str]]
-    xrefs: Optional[List[str]]
-    associated_with: Optional[List[str]]
+    aliases: Optional[List[str]] = []
+    xrefs: Optional[List[str]] = []
+    associated_with: Optional[List[str]] = []
     pediatric_disease: Optional[bool]
 
     class Config:
@@ -131,6 +131,16 @@ class DataLicenseAttributes(BaseModel):
     non_commercial: StrictBool
     share_alike: StrictBool
     attribution: StrictBool
+
+
+class ItemTypes(str, Enum):
+    """Item types used in DynamoDB."""
+
+    # Must be in descending MatchType order.
+    LABEL = 'label'
+    ALIASES = 'alias'
+    XREFS = 'xref'
+    ASSOCIATED_WITH = 'associated_with'
 
 
 class SourceMeta(BaseModel):
