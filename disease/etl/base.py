@@ -65,7 +65,7 @@ class Base(ABC):
                 value = disease[attr_type]
                 if value is not None and value != []:
                     if isinstance(value, str):
-                        items = [disease[attr_type].lower()]
+                        items = [value.lower()]
                     else:
                         disease[attr_type] = list(set(value))
                         items = {item.lower() for item in value}
