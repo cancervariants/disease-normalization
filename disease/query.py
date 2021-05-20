@@ -2,8 +2,9 @@
 import re
 from typing import Dict, Set, Optional
 from uvicorn.config import logger
-from disease import NAMESPACE_LOOKUP, PREFIX_LOOKUP, SOURCES_LOWER_LOOKUP, \
-    __version__, ITEM_TYPES
+from .version import __version__
+from disease import NAMESPACE_LOOKUP, PREFIX_LOOKUP, SOURCES_LOWER_LOOKUP,\
+    ITEM_TYPES
 from disease.database import Database
 from disease.schemas import Disease, SourceMeta, MatchType, SourceName, \
     ServiceMeta

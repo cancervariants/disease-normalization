@@ -1,4 +1,5 @@
 """The VICC library for normalizing diseases."""
+from .version import __version__  # noqa: F401
 from pathlib import Path
 import logging
 
@@ -11,9 +12,6 @@ logging.basicConfig(
     format='[%(asctime)s] - %(name)s - %(levelname)s : %(message)s')
 logger = logging.getLogger('disease')
 logger.setLevel(logging.DEBUG)
-
-
-__version__ = "0.2.8"  # remember to update setup.cfg as well!
 
 
 class DownloadException(Exception):
