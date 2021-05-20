@@ -81,10 +81,6 @@ class Base(ABC):
                 else:
                     del disease[attr_type]
 
-        # TODO: Check with James
-        #  Originally it was del disease[field], deleting `associated with`
-        #  since this would be the last thing field is set to
-        #  I think this was a bug and should have been pediatric disease?
         if 'pediatric_disease' in disease \
                 and disease['pediatric_disease'] is None:
             del disease['pediatric_disease']
