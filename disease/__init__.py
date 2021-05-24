@@ -1,4 +1,5 @@
 """The VICC library for normalizing diseases."""
+from .version import __version__  # noqa: F401
 from pathlib import Path
 import logging
 
@@ -8,12 +9,9 @@ PROJECT_ROOT = Path(__file__).resolve().parents[0]
 
 logging.basicConfig(
     filename='disease.log',
-    format='[%(asctime)s] %(levelname)s : %(message)s')
+    format='[%(asctime)s] - %(name)s - %(levelname)s : %(message)s')
 logger = logging.getLogger('disease')
 logger.setLevel(logging.DEBUG)
-
-
-__version__ = "0.2.8"  # remember to update setup.cfg as well!
 
 
 class DownloadException(Exception):
@@ -24,7 +22,9 @@ class DownloadException(Exception):
         super().__init__(*args, **kwargs)
 
 
-from disease.schemas import SourceName, SourceIDAfterNamespace, NamespacePrefix  # noqa: E402 E501
+from disease.schemas import SourceName, SourceIDAfterNamespace, NamespacePrefix, ItemTypes  # noqa: E402 E501
+ITEM_TYPES = {k.lower(): v.value for k, v in ItemTypes.__members__.items()}
+
 # use to lookup source name from lower-case string
 # technically the same as PREFIX_LOOKUP, but source namespace prefixes
 # sometimes differ from their names

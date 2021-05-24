@@ -2,8 +2,9 @@
 import re
 from typing import Dict, Set, Optional
 from uvicorn.config import logger
-from disease import NAMESPACE_LOOKUP, PREFIX_LOOKUP, SOURCES_LOWER_LOOKUP, \
-    __version__
+from .version import __version__
+from disease import NAMESPACE_LOOKUP, PREFIX_LOOKUP, SOURCES_LOWER_LOOKUP,\
+    ITEM_TYPES
 from disease.database import Database
 from disease.schemas import Disease, SourceMeta, MatchType, SourceName, \
     ServiceMeta
@@ -81,11 +82,6 @@ class QueryHandler:
             containing name of the source of the match
         """
         del item['label_and_type']
-        attr_types = ['aliases', 'xrefs', 'associated_with']
-        for attr_type in attr_types:
-            if attr_type not in item.keys():
-                item[attr_type] = []
-
         disease = Disease(**item)
         src_name = item['src_name']
 
@@ -218,8 +214,7 @@ class QueryHandler:
         if len(sources) == 0:
             return response
 
-        match_types = ['label', 'alias', 'xref', 'associated_with']
-        for match_type in match_types:
+        for match_type in ITEM_TYPES.values():
             (response, sources) = self._check_match_type(query, response,
                                                          sources, match_type)
             if len(sources) == 0:

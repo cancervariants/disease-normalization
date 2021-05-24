@@ -9,11 +9,16 @@ from botocore.exceptions import ClientError
 from boto3.dynamodb.conditions import Key
 from timeit import default_timer as timer
 from os import environ
+import logging
+
+logger = logging.getLogger('disease')
+logger.setLevel(logging.DEBUG)
 
 
 class CLI:
     """Class for updating the normalizer database via Click"""
 
+    @staticmethod
     @click.command()
     @click.option(
         '--normalizer',
@@ -78,25 +83,33 @@ class CLI:
 
             CLI()._update_normalizers(normalizers, db, update_merged)
 
-    def _help_msg(self, message):
+    @staticmethod
+    def _help_msg(message):
         """Display help message."""
         ctx = click.get_current_context()
         click.echo(message)
         click.echo(ctx.get_help())
         ctx.exit()
 
-    def _update_normalizers(self, normalizers, db, update_merged):
+    @staticmethod
+    def _update_normalizers(normalizers, db, update_merged):
         """Update selected normalizer sources."""
         processed_ids = []
         for n in normalizers:
-            click.echo(f"\nDeleting {n}...")
+            msg = f"Deleting {n}..."
+            click.echo(f"\n{msg}")
+            logger.info(msg)
             start_delete = timer()
             CLI()._delete_data(n, db)
             end_delete = timer()
             delete_time = end_delete - start_delete
-            click.echo(f"Deleted {n} in "
-                       f"{delete_time:.5f} seconds.\n")
-            click.echo(f"Loading {n}...")
+            msg = f"Deleted {n} in {delete_time:.5f} seconds."
+            click.echo(f"{msg}\n")
+            logger.info(msg)
+
+            msg = f"Loading {n}..."
+            click.echo(msg)
+            logger.info(msg)
             start_load = timer()
             source = SOURCES_CLASS_LOOKUP[n](database=db)
             if isinstance(source, Mondo):
@@ -105,16 +118,21 @@ class CLI:
                 source.perform_etl()
             end_load = timer()
             load_time = end_load - start_load
-            click.echo(f"Loaded {n} in {load_time:.5f} seconds.")
-            click.echo(f"Total time for {n}: "
-                       f"{(delete_time + load_time):.5f} seconds.")
+            msg = f"Loaded {n} in {load_time:.5f} seconds."
+            click.echo(msg)
+            logger.info(msg)
+            msg = f"Total time for {n}: " \
+                  f"{(delete_time + load_time):.5f} seconds."
+            click.echo(msg)
+            logger.info(msg)
         if update_merged and processed_ids:
             click.echo("Generating merged concepts...")
             merge = Merge(database=db)
             merge.create_merged_concepts(processed_ids)
             click.echo("Merged concept generation complete.")
 
-    def _delete_data(self, source, database):
+    @staticmethod
+    def _delete_data(source, database):
         # Delete source's metadata
         try:
             metadata = database.metadata.query(
