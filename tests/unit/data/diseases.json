@@ -390,7 +390,7 @@
     "item_type": "xref"
   },
   {
-    "label_and_type": "pediatric liposarcoma##label",
+    "label_and_type": "childhood liposarcoma##label",
     "item_type": "label",
     "concept_id": "DOID:5695",
     "src_name": "DO"
@@ -749,7 +749,8 @@
       "Liposarcoma",
       "Pediatric Liposarcoma",
       "childhood liposarcoma",
-      "liposarcoma"
+      "liposarcoma",
+      "pediatric liposarcoma"
     ],
     "associated_with": ["umls:C0279984"],
     "pediatric_disease": true
