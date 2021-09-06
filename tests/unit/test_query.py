@@ -31,10 +31,7 @@ def neuroblastoma():
     return {
         "id": "normalize.disease:Neuroblastoma",
         "type": "DiseaseDescriptor",
-        "value": {
-            "type": "Disease",
-            "id": "ncit:C3270"
-        },
+        "disease_id": "ncit:C3270",
         "label": "Neuroblastoma",
         "xrefs": [
             "mondo:0005072",
@@ -84,10 +81,7 @@ def skin_myo():
     return {
         "id": "normalize.disease:Skin Myoepithelioma",
         "type": "DiseaseDescriptor",
-        "value": {
-            "type": "Disease",
-            "id": "ncit:C167370"
-        },
+        "disease_id": "ncit:C167370",
         "label": "Skin Myoepithelioma",
         "alternate_labels": ["Cutaneous Myoepithelioma"],
     }
@@ -101,10 +95,7 @@ def mafd2():
     return {
         "id": "normalize.disease:MAFD2",
         "type": "DiseaseDescriptor",
-        "value": {
-            "type": "Disease",
-            "id": "mondo:0010648"
-        },
+        "disease_id": "mondo:0010648",
         "label": "major affective disorder 2",
         "alternate_labels": [
             "MAFD2",
@@ -133,9 +124,10 @@ def mafd2():
 
 def compare_vod(actual, fixture):
     """Verify correctness of returned VOD object against test fixture."""
+    actual = actual['disease_descriptor']
     assert actual['id'] == fixture['id']
     assert actual['type'] == fixture['type']
-    assert actual['value'] == fixture['value']
+    assert actual['disease_id'] == fixture['disease_id']
     assert actual['label'] == fixture['label']
 
     assert ('xrefs' in actual.keys()) == ('xrefs' in fixture.keys())
@@ -246,7 +238,7 @@ def test_normalize_query(query_handler, neuroblastoma, mafd2):
     response = query_handler.normalize('Neuroblastoma')
     assert response['match_type'] == MatchType.LABEL
     assert response['warnings'] is None
-    compare_vod(response['value_object_descriptor'], neuroblastoma)
+    compare_vod(response, neuroblastoma)
     assert len(response['source_meta_']) == 4
     assert 'NCIt' in response['source_meta_']
     assert 'DO' in response['source_meta_']
@@ -256,7 +248,7 @@ def test_normalize_query(query_handler, neuroblastoma, mafd2):
     response = query_handler.normalize('MAFD2')
     assert response['match_type'] == MatchType.ALIAS
     assert response['warnings'] is None
-    compare_vod(response['value_object_descriptor'], mafd2)
+    compare_vod(response, mafd2)
     assert len(response['source_meta_']) == 2
     assert 'Mondo' in response['source_meta_']
 
@@ -268,7 +260,7 @@ def test_normalize_non_mondo(query_handler, skin_myo, neuroblastoma):
     assert len(response['source_meta_']) == 1
     skin_myo_alias = skin_myo.copy()
     skin_myo_alias['id'] = 'normalize.disease:Skin%20Myoepithelioma'
-    compare_vod(response['value_object_descriptor'], skin_myo_alias)
+    compare_vod(response, skin_myo_alias)
     assert 'NCIt' in response['source_meta_']
 
     response = query_handler.normalize('Cutaneous Myoepithelioma')
@@ -276,7 +268,7 @@ def test_normalize_non_mondo(query_handler, skin_myo, neuroblastoma):
     assert len(response['source_meta_']) == 1
     skin_myo_alias = skin_myo.copy()
     skin_myo_alias['id'] = 'normalize.disease:Cutaneous%20Myoepithelioma'
-    compare_vod(response['value_object_descriptor'], skin_myo_alias)
+    compare_vod(response, skin_myo_alias)
     assert 'NCIt' in response['source_meta_']
 
     response = query_handler.normalize('orphanet:635')
@@ -284,7 +276,7 @@ def test_normalize_non_mondo(query_handler, skin_myo, neuroblastoma):
     assert len(response['source_meta_']) == 4
     neuroblastoma_alias = neuroblastoma.copy()
     neuroblastoma_alias['id'] = 'normalize.disease:orphanet%3A635'
-    compare_vod(response['value_object_descriptor'], neuroblastoma_alias)
+    compare_vod(response, neuroblastoma_alias)
     assert 'NCIt' in response['source_meta_']
     assert 'DO' in response['source_meta_']
     assert 'Mondo' in response['source_meta_']
