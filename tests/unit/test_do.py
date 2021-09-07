@@ -1,6 +1,6 @@
 """Test retrieval of Disease Ontology source data."""
 import pytest
-from disease.schemas import MatchType
+from disease.schemas import MatchType, SourceName
 from disease.query import QueryHandler
 
 
@@ -15,7 +15,7 @@ def do():
         def search(self, query_str):
             response = self.query_handler.search_sources(query_str, keyed=True,
                                                          incl='do')
-            return response['source_matches']['DO']
+            return response['source_matches'][SourceName.DO]
     return QueryGetter()
 
 
@@ -70,19 +70,19 @@ def test_concept_id_match(do, neuroblastoma, pediatric_liposarcoma, richter,
     response = do.search('DOID:769')
     assert response['match_type'] == MatchType.CONCEPT_ID
     assert len(response['records']) == 1
-    actual_disease = response['records'][0].dict()
+    actual_disease = response['records'][0]
     compare_records(actual_disease, neuroblastoma)
 
     response = do.search('doid:5695')
     assert response['match_type'] == MatchType.CONCEPT_ID
     assert len(response['records']) == 1
-    actual_disease = response['records'][0].dict()
+    actual_disease = response['records'][0]
     compare_records(actual_disease, pediatric_liposarcoma)
 
     response = do.search('DOid:1703')
     assert response['match_type'] == MatchType.CONCEPT_ID
     assert len(response['records']) == 1
-    actual_disease = response['records'][0].dict()
+    actual_disease = response['records'][0]
     compare_records(actual_disease, richter)
 
     response = do.search('5695')
@@ -95,19 +95,19 @@ def test_label_match(do, neuroblastoma, pediatric_liposarcoma,
     response = do.search('pediatric liposarcoma')
     assert response['match_type'] == MatchType.ALIAS
     assert len(response['records']) == 1
-    actual_disease = response['records'][0].dict()
+    actual_disease = response['records'][0]
     compare_records(actual_disease, pediatric_liposarcoma)
 
     response = do.search('childhood liposarcoma')
     assert response['match_type'] == MatchType.LABEL
     assert len(response['records']) == 1
-    actual_disease = response['records'][0].dict()
+    actual_disease = response['records'][0]
     compare_records(actual_disease, pediatric_liposarcoma)
 
     response = do.search('NEUROBLASTOMA')
     assert response['match_type'] == MatchType.LABEL
     assert len(response['records']) == 1
-    actual_disease = response['records'][0].dict()
+    actual_disease = response['records'][0]
     compare_records(actual_disease, neuroblastoma)
 
 
@@ -116,7 +116,7 @@ def test_alias_match(do, richter, compare_records):
     response = do.search('Richter Syndrome')
     assert response['match_type'] == MatchType.ALIAS
     assert len(response['records']) == 1
-    actual_disease = response['records'][0].dict()
+    actual_disease = response['records'][0]
     compare_records(actual_disease, richter)
 
 
@@ -126,13 +126,13 @@ def test_xref_match(do, neuroblastoma, pediatric_liposarcoma,
     response = do.search('ncit:C3270')
     assert response['match_type'] == MatchType.XREF
     assert len(response['records']) == 1
-    actual_disease = response['records'][0].dict()
+    actual_disease = response['records'][0]
     compare_records(actual_disease, neuroblastoma)
 
     response = do.search('NCIT:C8091')
     assert response['match_type'] == MatchType.XREF
     assert len(response['records']) == 1
-    actual_disease = response['records'][0].dict()
+    actual_disease = response['records'][0]
     compare_records(actual_disease, pediatric_liposarcoma)
 
 
@@ -142,17 +142,17 @@ def test_associated_with_match(do, neuroblastoma, pediatric_liposarcoma,
     response = do.search('umls:c0027819')
     assert response['match_type'] == MatchType.ASSOCIATED_WITH
     assert len(response['records']) == 1
-    actual_disease = response['records'][0].dict()
+    actual_disease = response['records'][0]
     compare_records(actual_disease, neuroblastoma)
 
     response = do.search('umls:C0279984')
     assert response['match_type'] == MatchType.ASSOCIATED_WITH
     assert len(response['records']) == 1
-    actual_disease = response['records'][0].dict()
+    actual_disease = response['records'][0]
     compare_records(actual_disease, pediatric_liposarcoma)
 
     response = do.search('icd10.cm:c91.1')
     assert response['match_type'] == MatchType.ASSOCIATED_WITH
     assert len(response['records']) == 1
-    actual_disease = response['records'][0].dict()
+    actual_disease = response['records'][0]
     compare_records(actual_disease, richter)

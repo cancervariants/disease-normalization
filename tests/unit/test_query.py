@@ -1,6 +1,6 @@
 """Test the therapy querying method."""
 from disease.query import QueryHandler, InvalidParameterException
-from disease.schemas import MatchType
+from disease.schemas import MatchType, SourceName
 import pytest
 from datetime import datetime
 
@@ -175,11 +175,11 @@ def test_query(query_handler):
     matches = resp['source_matches']
     assert isinstance(matches, list)
     assert len(matches) == 5
-    ncit = list(filter(lambda m: m['source'] == 'NCIt',
+    ncit = list(filter(lambda m: m['source'] == SourceName.NCIT,
                        matches))[0]
     assert len(ncit['records']) == 1
     ncit_record = ncit['records'][0]
-    assert ncit_record.label == 'Neuroblastoma'
+    assert ncit_record['label'] == 'Neuroblastoma'
 
 
 def test_query_keyed(query_handler):
@@ -187,9 +187,9 @@ def test_query_keyed(query_handler):
     resp = query_handler.search('Neuroblastoma', keyed=True)
     matches = resp['source_matches']
     assert isinstance(matches, dict)
-    ncit = matches['NCIt']
+    ncit = matches[SourceName.NCIT]
     ncit_record = ncit['records'][0]
-    assert ncit_record.label == 'Neuroblastoma'
+    assert ncit_record['label'] == 'Neuroblastoma'
 
 
 def test_query_specify_query_handlers(query_handler):
@@ -200,11 +200,11 @@ def test_query_specify_query_handlers(query_handler):
                                 incl=sources, excl='')
     matches = resp['source_matches']
     assert len(matches) == 5
-    assert 'NCIt' in matches
-    assert 'Mondo' in matches
-    assert 'DO' in matches
-    assert 'OncoTree' in matches
-    assert 'OMIM' in matches
+    assert SourceName.NCIT in matches
+    assert SourceName.MONDO in matches
+    assert SourceName.DO in matches
+    assert SourceName.ONCOTREE in matches
+    assert SourceName.OMIM in matches
 
     # test full exclusion
     resp = query_handler.search('Neuroblastoma', keyed=True,
@@ -215,11 +215,11 @@ def test_query_specify_query_handlers(query_handler):
     # test case insensitive
     resp = query_handler.search('Neuroblastoma', keyed=True, excl='NCIt')
     matches = resp['source_matches']
-    assert 'NCIt' not in matches
+    assert SourceName.NCIT not in matches
     resp = query_handler.search('Neuroblastoma', keyed=True,
                                 incl='nCiT')
     matches = resp['source_matches']
-    assert 'NCIt' in matches
+    assert SourceName.NCIT in matches
 
     # test error on invalid source names
     with pytest.raises(InvalidParameterException):
@@ -289,28 +289,28 @@ def test_service_meta(query_handler):
 
     response = query_handler.search(test_query)
     service_meta = response['service_meta_']
-    assert service_meta.name == "disease-normalizer"
-    assert service_meta.version >= "0.2.5"
-    assert isinstance(service_meta.response_datetime, datetime)
-    assert service_meta.url == 'https://github.com/cancervariants/disease-normalization'  # noqa: E501
+    assert service_meta['name'] == "disease-normalizer"
+    assert service_meta['version'] >= "0.2.0"
+    assert isinstance(service_meta['response_datetime'], datetime)
+    assert service_meta['url'] == 'https://github.com/cancervariants/disease-normalization'  # noqa: E501
 
     response = query_handler.normalize(test_query)
     service_meta = response['service_meta_']
-    assert service_meta.name == "disease-normalizer"
-    assert service_meta.version >= "0.2.5"
-    assert isinstance(service_meta.response_datetime, datetime)
-    assert service_meta.url == 'https://github.com/cancervariants/disease-normalization'  # noqa: E501
+    assert service_meta['name'] == "disease-normalizer"
+    assert service_meta['version'] >= "0.2.0"
+    assert isinstance(service_meta['response_datetime'], datetime)
+    assert service_meta['url'] == 'https://github.com/cancervariants/disease-normalization'  # noqa: E501
 
     response = query_handler.search('this-will-not-normalize')
     service_meta = response['service_meta_']
-    assert service_meta.name == "disease-normalizer"
-    assert service_meta.version >= "0.2.5"
-    assert isinstance(service_meta.response_datetime, datetime)
-    assert service_meta.url == 'https://github.com/cancervariants/disease-normalization'  # noqa: E501
+    assert service_meta['name'] == "disease-normalizer"
+    assert service_meta['version'] >= "0.2.0"
+    assert isinstance(service_meta['response_datetime'], datetime)
+    assert service_meta['url'] == 'https://github.com/cancervariants/disease-normalization'  # noqa: E501
 
     response = query_handler.normalize('this-will-not-normalize')
     service_meta = response['service_meta_']
-    assert service_meta.name == "disease-normalizer"
-    assert service_meta.version >= "0.2.5"
-    assert isinstance(service_meta.response_datetime, datetime)
-    assert service_meta.url == 'https://github.com/cancervariants/disease-normalization'  # noqa: E501
+    assert service_meta['name'] == "disease-normalizer"
+    assert service_meta['version'] >= "0.2.0"
+    assert isinstance(service_meta['response_datetime'], datetime)
+    assert service_meta['url'] == 'https://github.com/cancervariants/disease-normalization'  # noqa: E501

@@ -1,6 +1,6 @@
 """Test MONDO ETL methods."""
 import pytest
-from disease.schemas import MatchType
+from disease.schemas import MatchType, SourceName
 from disease.query import QueryHandler
 
 
@@ -15,7 +15,7 @@ def mondo():
         def search(self, query_str):
             response = self.query_handler.search_sources(query_str, keyed=True,
                                                          incl='mondo')
-            return response['source_matches']['Mondo']
+            return response['source_matches'][SourceName.MONDO]
     return QueryGetter()
 
 
@@ -141,25 +141,25 @@ def test_concept_id_match(mondo, neuroblastoma, richter_syndrome,
     response = mondo.search('mondo:0005072')
     assert response['match_type'] == MatchType.CONCEPT_ID
     assert len(response['records']) == 1
-    actual_disease = response['records'][0].dict()
+    actual_disease = response['records'][0]
     compare_records(actual_disease, neuroblastoma)
 
     response = mondo.search('mondo:0002083')
     assert response['match_type'] == MatchType.CONCEPT_ID
     assert len(response['records']) == 1
-    actual_disease = response['records'][0].dict()
+    actual_disease = response['records'][0]
     compare_records(actual_disease, richter_syndrome)
 
     response = mondo.search('MONDO:0005072')
     assert response['match_type'] == MatchType.CONCEPT_ID
     assert len(response['records']) == 1
-    actual_disease = response['records'][0].dict()
+    actual_disease = response['records'][0]
     compare_records(actual_disease, neuroblastoma)
 
     response = mondo.search('mondo:0003587')
     assert response['match_type'] == MatchType.CONCEPT_ID
     assert len(response['records']) == 1
-    actual_disease = response['records'][0].dict()
+    actual_disease = response['records'][0]
     compare_records(actual_disease, pediatric_liposarcoma)
 
     response = mondo.search('0002083')
@@ -173,31 +173,31 @@ def test_label_match(mondo, neuroblastoma, richter_syndrome,
     response = mondo.search('Neuroblastoma')
     assert response['match_type'] == MatchType.LABEL
     assert len(response['records']) == 1
-    actual_disease = response['records'][0].dict()
+    actual_disease = response['records'][0]
     compare_records(actual_disease, neuroblastoma)
 
     response = mondo.search('NEUROBLASTOMA')
     assert response['match_type'] == MatchType.LABEL
     assert len(response['records']) == 1
-    actual_disease = response['records'][0].dict()
+    actual_disease = response['records'][0]
     compare_records(actual_disease, neuroblastoma)
 
     response = mondo.search('richter syndrome')
     assert response['match_type'] == MatchType.LABEL
     assert len(response['records']) == 1
-    actual_disease = response['records'][0].dict()
+    actual_disease = response['records'][0]
     compare_records(actual_disease, richter_syndrome)
 
     response = mondo.search('pediatric liposarcoma')
     assert response['match_type'] == MatchType.LABEL
     assert len(response['records']) == 1
-    actual_disease = response['records'][0].dict()
+    actual_disease = response['records'][0]
     compare_records(actual_disease, pediatric_liposarcoma)
 
     response = mondo.search('Adult Cystic Teratoma')
     assert response['match_type'] == MatchType.LABEL
     assert len(response['records']) == 1
-    actual_disease = response['records'][0].dict()
+    actual_disease = response['records'][0]
     compare_records(actual_disease, cystic_teratoma_adult)
 
 
@@ -206,37 +206,37 @@ def test_alias_match(mondo, neuroblastoma, richter_syndrome, compare_records):
     response = mondo.search('neuroblastoma, malignant')
     assert response['match_type'] == MatchType.ALIAS
     assert len(response['records']) == 1
-    actual_disease = response['records'][0].dict()
+    actual_disease = response['records'][0]
     compare_records(actual_disease, neuroblastoma)
 
     response = mondo.search('RICHTER TRANSFORMATION')
     assert response['match_type'] == MatchType.ALIAS
     assert len(response['records']) == 1
-    actual_disease = response['records'][0].dict()
+    actual_disease = response['records'][0]
     compare_records(actual_disease, richter_syndrome)
 
     response = mondo.search('Neuroblastoma, Malignant')
     assert response['match_type'] == MatchType.ALIAS
     assert len(response['records']) == 1
-    actual_disease = response['records'][0].dict()
+    actual_disease = response['records'][0]
     compare_records(actual_disease, neuroblastoma)
 
     response = mondo.search('neuroblastoma (Schwannian Stroma-poor)')
     assert response['match_type'] == MatchType.ALIAS
     assert len(response['records']) == 1
-    actual_disease = response['records'][0].dict()
+    actual_disease = response['records'][0]
     compare_records(actual_disease, neuroblastoma)
 
     response = mondo.search("Richter's transformation")
     assert response['match_type'] == MatchType.ALIAS
     assert len(response['records']) == 1
-    actual_disease = response['records'][0].dict()
+    actual_disease = response['records'][0]
     compare_records(actual_disease, richter_syndrome)
 
     response = mondo.search("Richter's syndrome")
     assert response['match_type'] == MatchType.ALIAS
     assert len(response['records']) == 1
-    actual_disease = response['records'][0].dict()
+    actual_disease = response['records'][0]
     compare_records(actual_disease, richter_syndrome)
 
     response = mondo.search("neuroblastoma Schwannian Stroma-poor")
@@ -249,25 +249,25 @@ def test_xref_match(mondo, neuroblastoma, richter_syndrome,
     response = mondo.search('DOID:769')
     assert response['match_type'] == MatchType.XREF
     assert len(response['records']) == 1
-    actual_disease = response['records'][0].dict()
+    actual_disease = response['records'][0]
     compare_records(actual_disease, neuroblastoma)
 
     response = mondo.search('ncit:c8091')
     assert response['match_type'] == MatchType.XREF
     assert len(response['records']) == 1
-    actual_disease = response['records'][0].dict()
+    actual_disease = response['records'][0]
     compare_records(actual_disease, pediatric_liposarcoma)
 
     response = mondo.search('oncotree:NSCLC')
     assert response['match_type'] == MatchType.XREF
     assert len(response['records']) == 1
-    actual_disease = response['records'][0].dict()
+    actual_disease = response['records'][0]
     compare_records(actual_disease, nsclc)
 
     response = mondo.search("ncit:C2926")
     assert response['match_type'] == MatchType.XREF
     assert len(response['records']) == 1
-    actual_disease = response['records'][0].dict()
+    actual_disease = response['records'][0]
     compare_records(actual_disease, nsclc)
 
 
@@ -277,33 +277,33 @@ def test_associated_with_match(mondo, neuroblastoma, richter_syndrome,
     response = mondo.search('icdo:9500/3')
     assert response['match_type'] == MatchType.ASSOCIATED_WITH
     assert len(response['records']) == 1
-    actual_disease = response['records'][0].dict()
+    actual_disease = response['records'][0]
     compare_records(actual_disease, neuroblastoma)
 
     response = mondo.search('gard:0007578')
     assert response['match_type'] == MatchType.ASSOCIATED_WITH
     assert len(response['records']) == 1
-    actual_disease = response['records'][0].dict()
+    actual_disease = response['records'][0]
     compare_records(actual_disease, richter_syndrome)
 
     response = mondo.search('UMLS:C0279984')
     assert response['match_type'] == MatchType.ASSOCIATED_WITH
     assert len(response['records']) == 1
-    actual_disease = response['records'][0].dict()
+    actual_disease = response['records'][0]
     compare_records(actual_disease, pediatric_liposarcoma)
 
 
 def test_meta(mondo):
     """Test that meta field is correct."""
     response = mondo.search('neuroblastoma')
-    assert response['source_meta_'].data_license == 'CC BY 4.0'
-    assert response['source_meta_'].data_license_url == \
+    assert response['source_meta_']['data_license'] == 'CC BY 4.0'
+    assert response['source_meta_']['data_license_url'] == \
         'https://creativecommons.org/licenses/by/4.0/legalcode'
-    assert response['source_meta_'].version == '20210129'
-    assert response['source_meta_'].data_url == \
+    assert response['source_meta_']['version'] == '20210129'
+    assert response['source_meta_']['data_url'] == \
         'https://mondo.monarchinitiative.org/pages/download/'
-    assert response['source_meta_'].rdp_url == 'http://reusabledata.org/monarch.html'  # noqa: E501
-    assert response['source_meta_'].data_license_attributes == {
+    assert response['source_meta_']['rdp_url'] == 'http://reusabledata.org/monarch.html'  # noqa: E501
+    assert response['source_meta_']['data_license_attributes'] == {
         "non_commercial": False,
         "share_alike": False,
         "attribution": True

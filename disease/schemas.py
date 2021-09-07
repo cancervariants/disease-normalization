@@ -316,7 +316,7 @@ class NormalizationService(BaseModel):
     query: str
     warnings: Optional[Dict]
     match_type: MatchType
-    value_object_descriptor: Optional[ValueObjectDescriptor]
+    disease_descriptor: Optional[ValueObjectDescriptor]
     source_meta_: Optional[Dict[SourceName, SourceMeta]]
     service_meta_: ServiceMeta
 
