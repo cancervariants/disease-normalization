@@ -7,7 +7,7 @@ from disease import NAMESPACE_LOOKUP, PREFIX_LOOKUP, SOURCES_LOWER_LOOKUP,\
     ITEM_TYPES
 from disease.database import Database
 from disease.schemas import Disease, SourceMeta, MatchType, SourceName, \
-    ServiceMeta
+    ServiceMeta, NormalizationService, SearchService
 from botocore.exceptions import ClientError
 from urllib.parse import quote
 from datetime import datetime
@@ -304,8 +304,8 @@ class QueryHandler:
         response['service_meta_'] = ServiceMeta(
             version=__version__,
             response_datetime=datetime.now(),
-        )
-        return response
+        ).dict()
+        return SearchService(**response).dict()
 
     def _add_merged_meta(self, response: Dict) -> Dict:
         """Add source metadata to response object.
@@ -412,7 +412,7 @@ class QueryHandler:
             'service_meta_': ServiceMeta(
                 version=__version__,
                 response_datetime=datetime.now(),
-            )
+            ).dict()
         }
         if query == '':
             response['match_type'] = MatchType.NO_MATCH
@@ -481,4 +481,4 @@ class QueryHandler:
 
         if not query_matches:
             response['match_type'] = MatchType.NO_MATCH
-        return response
+        return NormalizationService(**response).dict()
