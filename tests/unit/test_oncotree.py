@@ -1,6 +1,6 @@
 """Test Oncotree ETL methods."""
 import pytest
-from disease.schemas import MatchType
+from disease.schemas import MatchType, SourceName
 from disease.query import QueryHandler
 
 
@@ -15,7 +15,7 @@ def oncotree():
         def search(self, query_str):
             response = self.query_handler.search_sources(query_str, keyed=True,
                                                          incl='oncotree')
-            return response['source_matches']['OncoTree']
+            return response['source_matches'][SourceName.ONCOTREE]
     return QueryGetter()
 
 
@@ -64,25 +64,25 @@ def test_concept_id_match(oncotree, neuroblastoma, nsclc, ipn,
     response = oncotree.search('oncotree:NBL')
     assert response['match_type'] == MatchType.CONCEPT_ID
     assert len(response['records']) == 1
-    actual_disease = response['records'][0].dict()
+    actual_disease = response['records'][0]
     compare_records(actual_disease, neuroblastoma)
 
     response = oncotree.search('oncotree:NSCLC')
     assert response['match_type'] == MatchType.CONCEPT_ID
     assert len(response['records']) == 1
-    actual_disease = response['records'][0].dict()
+    actual_disease = response['records'][0]
     compare_records(actual_disease, nsclc)
 
     response = oncotree.search('oncotree:icpn')
     assert response['match_type'] == MatchType.CONCEPT_ID
     assert len(response['records']) == 1
-    actual_disease = response['records'][0].dict()
+    actual_disease = response['records'][0]
     compare_records(actual_disease, ipn)
 
     response = oncotree.search('oncotree:ICPN')
     assert response['match_type'] == MatchType.CONCEPT_ID
     assert len(response['records']) == 1
-    actual_disease = response['records'][0].dict()
+    actual_disease = response['records'][0]
     compare_records(actual_disease, ipn)
 
     response = oncotree.search('ipn')
@@ -94,25 +94,25 @@ def test_label_match(oncotree, neuroblastoma, nsclc, ipn, compare_records):
     response = oncotree.search('Neuroblastoma')
     assert response['match_type'] == MatchType.LABEL
     assert len(response['records']) == 1
-    actual_disease = response['records'][0].dict()
+    actual_disease = response['records'][0]
     compare_records(actual_disease, neuroblastoma)
 
     response = oncotree.search('NEUROBLASTOMA')
     assert response['match_type'] == MatchType.LABEL
     assert len(response['records']) == 1
-    actual_disease = response['records'][0].dict()
+    actual_disease = response['records'][0]
     compare_records(actual_disease, neuroblastoma)
 
     response = oncotree.search('non-small cell lung cancer')
     assert response['match_type'] == MatchType.LABEL
     assert len(response['records']) == 1
-    actual_disease = response['records'][0].dict()
+    actual_disease = response['records'][0]
     compare_records(actual_disease, nsclc)
 
     response = oncotree.search('intracholecystic papillary neoplasm')
     assert response['match_type'] == MatchType.LABEL
     assert len(response['records']) == 1
-    actual_disease = response['records'][0].dict()
+    actual_disease = response['records'][0]
     compare_records(actual_disease, ipn)
 
 
@@ -122,27 +122,27 @@ def test_associated_with_match(oncotree, neuroblastoma, nsclc,
     response = oncotree.search('umls:c0027819')
     assert response['match_type'] == MatchType.ASSOCIATED_WITH
     assert len(response['records']) == 1
-    actual_disease = response['records'][0].dict()
+    actual_disease = response['records'][0]
     compare_records(actual_disease, neuroblastoma)
 
     response = oncotree.search('umls:C0007131')
     assert response['match_type'] == MatchType.ASSOCIATED_WITH
     assert len(response['records']) == 1
-    actual_disease = response['records'][0].dict()
+    actual_disease = response['records'][0]
     compare_records(actual_disease, nsclc)
 
 
 def test_meta(oncotree):
     """Test that meta field is correct."""
     response = oncotree.search('neuroblastoma')
-    assert response['source_meta_'].data_license == 'CC BY 4.0'
-    assert response['source_meta_'].data_license_url == \
+    assert response['source_meta_']['data_license'] == 'CC BY 4.0'
+    assert response['source_meta_']['data_license_url'] == \
         'https://creativecommons.org/licenses/by/4.0/legalcode'
-    assert response['source_meta_'].version == '2020_10_01'
-    assert response['source_meta_'].data_url == \
+    assert response['source_meta_']['version'] == '2020_10_01'
+    assert response['source_meta_']['data_url'] == \
         'http://oncotree.mskcc.org/#/home?tab=api'
-    assert response['source_meta_'].rdp_url is None
-    assert response['source_meta_'].data_license_attributes == {
+    assert response['source_meta_']['rdp_url'] is None
+    assert response['source_meta_']['data_license_attributes'] == {
         "non_commercial": False,
         "share_alike": False,
         "attribution": True
