@@ -365,10 +365,17 @@
     "item_type": "identity",
     "concept_id": "DOID:5695",
     "merge_ref": "ncit:C8091",
-    "label": "pediatric liposarcoma",
+    "label": "childhood liposarcoma",
+    "aliases": ["pediatric liposarcoma"],
     "xrefs": ["ncit:C8091"],
     "associated_with": ["umls:C0279984"],
     "src_name": "DO"
+  },
+  {
+    "label_and_type": "pediatric liposarcoma##alias",
+    "concept_id": "DOID:5695",
+    "src_name": "DO",
+    "item_type": "alias"
   },
   {
     "label_and_type": "umls:c0279984##associated_with",
@@ -383,7 +390,7 @@
     "item_type": "xref"
   },
   {
-    "label_and_type": "pediatric liposarcoma##label",
+    "label_and_type": "childhood liposarcoma##label",
     "item_type": "label",
     "concept_id": "DOID:5695",
     "src_name": "DO"
@@ -742,7 +749,8 @@
       "Liposarcoma",
       "Pediatric Liposarcoma",
       "childhood liposarcoma",
-      "liposarcoma"
+      "liposarcoma",
+      "pediatric liposarcoma"
     ],
     "associated_with": ["umls:C0279984"],
     "pediatric_disease": true

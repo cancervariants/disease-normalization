@@ -3,8 +3,9 @@ disease records.
 """
 from typing import Any, Dict, Type, List, Optional, Union
 from enum import Enum, IntEnum
-from pydantic import BaseModel, StrictBool, validator
+from pydantic import BaseModel, StrictBool
 from datetime import datetime
+from ga4gh.vrsatile.pydantic.vrsatile_model import ValueObjectDescriptor
 
 
 class MatchType(IntEnum):
@@ -282,120 +283,6 @@ class MatchesListed(BaseModel):
             }
 
 
-class DiseaseValue(BaseModel):
-    """Class for Disease Value within VOD."""
-
-    type: str = "Disease"
-    id: str
-
-    @validator('type')
-    def check_type(cls, type_value):
-        """Check that `type` field has value 'Disease'"""
-        if type_value != "Disease":
-            raise ValueError("DiseaseValue.type must be 'Disease'")
-        return type_value
-
-    class Config:
-        """Configure model."""
-
-        @staticmethod
-        def schema_extra(schema: Dict[str, Any],
-                         model: Type['Extension']) -> None:
-            """Configure schema display."""
-            schema['example'] = {
-                "type": "Disease",
-                "id": "ncit:C3211"
-            }
-
-
-class Extension(BaseModel):
-    """Value Object Descriptor Extension class."""
-
-    type: str
-    name: str
-    value: Union[bool, List[str]]
-
-    class Config:
-        """Configure model."""
-
-        @staticmethod
-        def schema_extra(schema: Dict[str, Any],
-                         model: Type['Extension']) -> None:
-            """Configure schema display."""
-            schema['example'] = {
-                "type": "Extension",
-                "name": "associated_with",
-                "value": [
-                    "icd:C95.90",
-                    "mesh:D007938",
-                    "icd9:207.80",
-                    "icd9.cm:208",
-                    "umls:C0023418",
-                    "icd10.cm:C95.90"
-                ]
-            }
-
-
-class ValueObjectDescriptor(BaseModel):
-    """VOD class."""
-
-    id: str
-    type: str
-    value: DiseaseValue
-    label: str
-    xrefs: Optional[List[str]]
-    alternate_labels: Optional[List[str]]
-    extensions: Optional[List[Extension]]
-
-    class Config:
-        """Configure model."""
-
-        @staticmethod
-        def schema_extra(schema: Dict[str, Any],
-                         model: Type['Extension']) -> None:
-            """Configure schema display."""
-            schema['example'] = {
-                "id": "normalize:non-hodgkin's lymphoma",
-                "type": "DiseaseDescriptor",
-                "value": {
-                    "type": "Disease",
-                    "id": "ncit:C3211"
-                },
-                "label": "Non-Hodgkin Lymphoma",
-                "xrefs": [
-                    "mondo:0018908",
-                    "oncotree:NHL",
-                    "DOID:0060060"
-                ],
-                "alternate_labels": [
-                    "NHL",
-                    "non-Hodgkin's lymphoma",
-                    "non-Hodgkin's lymphoma (NHL)",
-                    "NHL, NOS",
-                    "non-Hodgkins lymphoma",
-                    "Non-Hodgkin's Lymphoma (NHL)",
-                    "non-Hodgkin lymphoma",
-                    "Non-Hodgkin's Lymphoma",
-                    "Non-Hodgkin lymphoma, NOS"
-                ],
-                "extensions": [
-                    {
-                        "type": "Extension",
-                        "name": "associated_with",
-                        "value": [
-                            "icdo:9591/3",
-                            "umls:C0024305",
-                            "omim:605027",
-                            "orphanet:547",
-                            "efo:0005952",
-                            "meddra:10029547",
-                            "mesh:D008228"
-                        ]
-                    }
-                ]
-            }
-
-
 class ServiceMeta(BaseModel):
     """Metadata regarding the disease-normalization service."""
 
@@ -448,13 +335,10 @@ class NormalizationService(BaseModel):
                 "query": "childhood leukemia",
                 "warnings": None,
                 "match_type": 80,
-                "value_object_descriptor": {
+                "disease_descriptor": {
                     "id": "normalize:childhood%20leukemia",
                     "type": "DiseaseDescriptor",
-                    "value": {
-                        "type": "Disease",
-                        "id": "ncit:C4989"
-                    },
+                    "disease_id": "ncit:C4989",
                     "label": "Childhood Leukemia",
                     "xrefs": [
                         "mondo:0004355",

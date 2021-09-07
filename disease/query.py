@@ -314,8 +314,8 @@ class QueryHandler:
         :return: completed response object.
         """
         sources_meta = {}
-        vod = response['value_object_descriptor']
-        ids = [vod['value']['id']] + vod.get('xrefs', [])
+        vod = response['disease_descriptor']
+        ids = [vod['disease_id']] + vod.get('xrefs', [])
         for concept_id in ids:
             prefix = concept_id.split(':')[0]
             src_name = PREFIX_LOOKUP[prefix.lower()]
@@ -337,10 +337,7 @@ class QueryHandler:
         vod = {
             'id': f'normalize.disease:{quote(query)}',
             'type': 'DiseaseDescriptor',
-            'value': {
-                'type': 'Disease',
-                'id': record['concept_id']
-            },
+            'disease_id': record['concept_id'],
             'label': record['label'],
             'extensions': [],
         }
@@ -364,7 +361,7 @@ class QueryHandler:
         if not vod['extensions']:
             del vod['extensions']
         response['match_type'] = match_type
-        response['value_object_descriptor'] = vod
+        response['disease_descriptor'] = vod
         response = self._add_merged_meta(response)
         return response
 

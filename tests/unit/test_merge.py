@@ -146,7 +146,8 @@ def ped_liposarcoma():
             "Liposarcoma",
             "Pediatric Liposarcoma",
             "childhood liposarcoma",
-            "liposarcoma"
+            "liposarcoma",
+            "pediatric liposarcoma"
         ],
         "associated_with": ["umls:C0279984"],
         "pediatric_disease": True,

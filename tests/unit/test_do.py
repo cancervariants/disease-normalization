@@ -45,10 +45,10 @@ def pediatric_liposarcoma():
     """Create test fixture for pediatric liposarcoma."""
     return {
         "concept_id": "DOID:5695",
-        "label": "pediatric liposarcoma",
+        "label": "childhood liposarcoma",
         "xrefs": ["ncit:C8091"],
         "associated_with": ["umls:C0279984"],
-        "aliases": []
+        "aliases": ["pediatric liposarcoma"]
     }
 
 
@@ -93,6 +93,12 @@ def test_label_match(do, neuroblastoma, pediatric_liposarcoma,
                      compare_records):
     """Test that label searches resolve to correct records."""
     response = do.search('pediatric liposarcoma')
+    assert response['match_type'] == MatchType.ALIAS
+    assert len(response['records']) == 1
+    actual_disease = response['records'][0].dict()
+    compare_records(actual_disease, pediatric_liposarcoma)
+
+    response = do.search('childhood liposarcoma')
     assert response['match_type'] == MatchType.LABEL
     assert len(response['records']) == 1
     actual_disease = response['records'][0].dict()
