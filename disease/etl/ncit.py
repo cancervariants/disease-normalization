@@ -1,7 +1,6 @@
 """Module to load disease data from NCIt."""
-import logging
 from .base import OWLBase
-from disease import PROJECT_ROOT
+from disease import PROJECT_ROOT, logger
 from disease.database import Database
 from disease.schemas import SourceMeta, SourceName, NamespacePrefix
 from pathlib import Path
@@ -12,9 +11,6 @@ from typing import Set, List
 import owlready2 as owl
 import re
 
-
-logger = logging.getLogger('disease')
-logger.setLevel(logging.DEBUG)
 
 icdo_re = re.compile("[0-9]+/[0-9]+")
 

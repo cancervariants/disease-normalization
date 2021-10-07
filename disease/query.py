@@ -1,10 +1,9 @@
 """This module provides methods for handling queries."""
 import re
 from typing import Dict, Set, Optional
-from uvicorn.config import logger
 from .version import __version__
 from disease import NAMESPACE_LOOKUP, PREFIX_LOOKUP, SOURCES_LOWER_LOOKUP,\
-    ITEM_TYPES
+    ITEM_TYPES, logger
 from disease.database import Database
 from disease.schemas import Disease, SourceMeta, MatchType, SourceName, \
     ServiceMeta, NormalizationService, SearchService

@@ -1,6 +1,6 @@
 """This module provides a CLI util to make updates to normalizer database."""
 import click
-from disease import SOURCES_CLASS_LOOKUP, SOURCES_LOWER_LOOKUP
+from disease import SOURCES_CLASS_LOOKUP, SOURCES_LOWER_LOOKUP, logger
 from disease.schemas import SourceName
 from disease.database import Database
 from disease.etl.mondo import Mondo
@@ -9,10 +9,6 @@ from botocore.exceptions import ClientError
 from boto3.dynamodb.conditions import Key
 from timeit import default_timer as timer
 from os import environ
-import logging
-
-logger = logging.getLogger('disease')
-logger.setLevel(logging.DEBUG)
 
 
 class CLI:

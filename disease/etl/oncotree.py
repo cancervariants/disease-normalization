@@ -1,16 +1,12 @@
 """Module to load disease data from OncoTree."""
-import logging
 from .base import Base
-from disease import PROJECT_ROOT
+from disease import PROJECT_ROOT, logger
 from disease.schemas import SourceMeta, SourceName, NamespacePrefix, Disease
 from disease.database import Database
 from pathlib import Path
 from typing import List
 import requests
 import json
-
-logger = logging.getLogger('disease')
-logger.setLevel(logging.DEBUG)
 
 
 class OncoTree(Base):

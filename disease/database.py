@@ -1,5 +1,5 @@
 """This module creates the database."""
-from disease import PREFIX_LOOKUP
+from disease import PREFIX_LOOKUP, logger
 import boto3
 from boto3.dynamodb.conditions import Key
 from botocore.exceptions import ClientError
@@ -7,10 +7,6 @@ import click
 import sys
 from os import environ
 from typing import Optional, Dict, List, Any
-import logging
-
-logger = logging.getLogger('disease')
-logger.setLevel(logging.DEBUG)
 
 
 class Database:

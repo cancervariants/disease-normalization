@@ -2,16 +2,35 @@
 from .version import __version__  # noqa: F401
 from pathlib import Path
 import logging
+from os import environ
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[0]
 
+# establish environment-dependent params
+if "DISEASE_NORM_EB_PROD" in environ:
+    environ["DISEASE_NORM_EB_PROD"] = "true"
+    LOG_FN = "/tmp/disease.log"
+else:
+    LOG_FN = "disease.log"
 
+# set up logging
 logging.basicConfig(
-    filename='disease.log',
-    format='[%(asctime)s] - %(name)s - %(levelname)s : %(message)s')
-logger = logging.getLogger('disease')
+    filename=LOG_FN,
+    format="[%(asctime)s] - %(name)s - %(levelname)s : %(message)s"
+)
+logger = logging.getLogger("disease")
 logger.setLevel(logging.DEBUG)
+logger.handlers = []
+
+if "DISEASE_NORM_EB_PROD" in environ:
+    ch = logging.StreamHandler()
+    ch.setLevel(logging.DEBUG)
+    logger.addHandler(ch)
+
+    logging.getLogger("boto3").setLevel(logging.INFO)
+    logging.getLogger("botocore").setLevel(logging.INFO)
+    logging.getLogger("nose").setLevel(logging.INFO)
 
 
 class DownloadException(Exception):
