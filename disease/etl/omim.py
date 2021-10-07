@@ -1,14 +1,10 @@
 """Module to load disease data from OMIM."""
-import logging
 from .base import Base
-from disease import PROJECT_ROOT, DownloadException
+from disease import PROJECT_ROOT, DownloadException, logger
 from disease.schemas import SourceMeta, SourceName, Disease, NamespacePrefix
 from disease.database import Database
 from pathlib import Path
 from typing import List
-
-logger = logging.getLogger('disease')
-logger.setLevel(logging.DEBUG)
 
 
 class OMIM(Base):

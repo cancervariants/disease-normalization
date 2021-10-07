@@ -1,18 +1,14 @@
 """Disease Ontology ETL module."""
-import logging
 from .base import OWLBase
 import requests
 from pathlib import Path
-from disease import PROJECT_ROOT, PREFIX_LOOKUP
+from disease import PROJECT_ROOT, PREFIX_LOOKUP, logger
 from disease.schemas import SourceMeta, SourceName, NamespacePrefix
 from disease.database import Database
 from datetime import datetime
 import owlready2 as owl
 from typing import List
 
-
-logger = logging.getLogger('disease')
-logger.setLevel(logging.DEBUG)
 
 DO_PREFIX_LOOKUP = {
     "EFO": NamespacePrefix.EFO.value,

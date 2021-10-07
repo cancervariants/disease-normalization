@@ -1,15 +1,11 @@
 """A base class for extraction, transformation, and loading of data."""
 from abc import ABC, abstractmethod
-from disease import SOURCES_FOR_MERGE, ITEM_TYPES
+from disease import SOURCES_FOR_MERGE, ITEM_TYPES, logger
 from disease.database import Database
 from disease.schemas import Disease
 import owlready2 as owl
 from typing import Set, Dict, List
 from pathlib import Path
-import logging
-
-logger = logging.getLogger('disease')
-logger.setLevel(logging.DEBUG)
 
 
 class Base(ABC):
