@@ -5,7 +5,7 @@ elasticbeanstalk = boto3.client('elasticbeanstalk')
 servicecatalog = boto3.client('servicecatalog')
 terminate_time = 12
 eb_app_name = "DiseaseNormalization"
-eb_env_name = "DiseaseNormalization-staging-dev"
+eb_env_name = "DiseaseNormalization-dev-env"
 sc_product_id = "prod-mmw6ymv2ntzl2"
 print(f'Launching new Service Catalog Product for dev environment: '
       f'{eb_app_name}')
