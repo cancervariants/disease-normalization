@@ -1,12 +1,9 @@
 """Create concept groups and merged records."""
+from disease import logger
 from disease.database import Database
 from disease.schemas import SourcePriority
 from typing import Set, Dict, List
-import logging
 from timeit import default_timer as timer
-
-logger = logging.getLogger('disease')
-logger.setLevel(logging.DEBUG)
 
 
 class Merge:

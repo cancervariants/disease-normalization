@@ -1,17 +1,12 @@
 """Module to load disease data from Mondo Disease Ontology."""
 from .base import OWLBase
-import logging
-from disease import PROJECT_ROOT, PREFIX_LOOKUP
+from disease import PROJECT_ROOT, PREFIX_LOOKUP, logger
 from disease.database import Database
 from disease.schemas import SourceMeta, SourceName, NamespacePrefix
 from pathlib import Path
 import requests
 import owlready2 as owl
 from typing import List
-
-
-logger = logging.getLogger('disease')
-logger.setLevel(logging.DEBUG)
 
 
 MONDO_PREFIX_LOOKUP = {
