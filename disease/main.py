@@ -9,7 +9,11 @@ from typing import Optional
 
 
 query_handler = QueryHandler()
-app = FastAPI(docs_url='/disease', openapi_url='/disease/openapi.json')
+app = FastAPI(
+    docs_url="/disease",
+    openapi_url="/disease/openapi.json",
+    swagger_ui_parameters={"tryItOutEnabled": True}
+)
 
 
 def custom_openapi():
