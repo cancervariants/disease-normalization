@@ -17,7 +17,7 @@ matplotlib = "*"
 
 [packages]
 pydantic = "*"
-fastapi = "*"
+fastapi = ">=0.72.0"
 uvicorn = "*"
 uvloop = "*"
 websockets = "*"
