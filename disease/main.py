@@ -71,8 +71,8 @@ def search(q: str = Query(..., description=q_descr),
     provided by user.
     """
     try:
-        response = query_handler.search_sources(html.unescape(q), keyed=keyed,
-                                                incl=incl, excl=excl)
+        response = query_handler.search(html.unescape(q), keyed=keyed,
+                                        incl=incl, excl=excl)
     except InvalidParameterException as e:
         raise HTTPException(status_code=422, detail=str(e))
     return response
@@ -95,7 +95,7 @@ def normalize(q: str = Query(..., description=merged_q_descr)):
     :param q: therapy search term
     """
     try:
-        response = query_handler.search_groups(q)
+        response = query_handler.normalize(q)
     except InvalidParameterException as e:
         raise HTTPException(status_code=422, detail=str(e))
     return response
