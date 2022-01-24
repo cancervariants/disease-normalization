@@ -1,9 +1,11 @@
 """Pytest test config tools."""
-from disease.database import Database
 from typing import Dict, Any, Optional, List
 import json
 import pytest
 from pathlib import Path
+
+from disease.database import Database
+from disease.schemas import Disease
 
 TEST_ROOT = Path(__file__).resolve().parents[1]
 
@@ -11,23 +13,24 @@ TEST_ROOT = Path(__file__).resolve().parents[1]
 @pytest.fixture(scope='module')
 def compare_records():
     """Provide compare_records method to test classes"""
-    def compare_records(actual_record: Dict, fixture_record: Dict):
+    def compare_records(actual_record: Disease, fixture_record: Disease):
         """Check that identity records are identical."""
-        assert actual_record['concept_id'] == fixture_record['concept_id']
-        assert ('label' in actual_record.keys()) == ('label' in fixture_record.keys())  # noqa: E501
-        if 'label' in actual_record or 'label' in fixture_record:
-            assert actual_record['label'] == fixture_record['label']
-        assert ('aliases' in actual_record.keys()) == ('aliases' in fixture_record.keys())  # noqa: E501
-        if 'aliases' in actual_record or 'aliases' in fixture_record:
-            assert set(actual_record['aliases']) == set(fixture_record['aliases'])  # noqa: E501
-        assert ('xrefs' in actual_record.keys()) == ('xrefs' in fixture_record.keys())  # noqa: E501
-        if 'xrefs' in actual_record or 'xrefs' in fixture_record:
-            assert set(actual_record['xrefs']) == set(fixture_record['xrefs'])
-        assert ('associated_with' in actual_record.keys()) == \
-            ('associated_with' in fixture_record.keys())  # noqa: E501
-        if 'associated_with' in actual_record or 'associated_with' in fixture_record:  # noqa: E501
-            assert set(actual_record['associated_with']) == \
-                set(fixture_record['associated_with'])
+        assert actual_record.concept_id == fixture_record.concept_id
+        assert (actual_record.label is None) == (fixture_record.label is None)
+        if actual_record.label or fixture_record.label:
+            assert actual_record.label == fixture_record.label
+        assert (actual_record.aliases is None) == \
+            (fixture_record.aliases is None)
+        if actual_record.aliases and fixture_record.aliases:
+            assert set(actual_record.aliases) == set(fixture_record.aliases)
+        assert (actual_record.xrefs is None) == (fixture_record.xrefs is None)
+        if actual_record.xrefs and fixture_record.xrefs:
+            assert set(actual_record.xrefs) == set(fixture_record.xrefs)
+        assert (actual_record.associated_with is None) == \
+            (fixture_record.associated_with is None)
+        if actual_record.associated_with and fixture_record.associated_with:
+            assert set(actual_record.associated_with) == \
+                set(fixture_record.associated_with)
     return compare_records
 
 
