@@ -9,6 +9,16 @@ from os import environ
 from typing import Optional, Dict, List, Any
 
 
+def confirm_aws_db_use(env_name: str) -> None:
+    """Check to ensure that AWS instance should actually be used."""
+    if click.confirm(f"Are you sure you want to use the AWS {env_name} database?",
+                     default=False):
+        click.echo(f"***DISEASE {env_name.upper()} DATABASE IN USE***")
+    else:
+        click.echo("Exiting.")
+        sys.exit()
+
+
 class Database:
     """The database class."""
 
@@ -18,20 +28,30 @@ class Database:
         :param str db_url: database endpoint URL to connect to
         :param str region_name: AWS region name to use
         """
-        if 'DISEASE_NORM_PROD' in environ or \
-                'DISEASE_NORM_EB_PROD' in environ:
+        disease_concepts_table = "disease_concepts"  # default
+        disease_metadata_table = "disease_metadata"  # default
+
+        if 'DISEASE_NORM_PROD' in environ or 'DISEASE_NORM_EB_PROD' in environ:
             boto_params = {
                 'region_name': region_name
             }
             if 'DISEASE_NORM_EB_PROD' not in environ:
                 # EB Instance should not have to confirm.
                 # This is used only for using production via CLI
-                if click.confirm("Are you sure you want to use the "
-                                 "production database?", default=False):
-                    click.echo("***DISEASE PRODUCTION DATABASE IN USE***")
-                else:
-                    click.echo("Exiting.")
-                    sys.exit()
+                confirm_aws_db_use("PROD")
+        elif "DISEASE_NORM_NONPROD" in environ:
+            # This is a nonprod table. Only to be used for creating backups which
+            # prod will restore. Will need to manually delete / create this table
+            # on an as needed basis.
+            disease_concepts_table = "disease_concepts_nonprod"
+            disease_metadata_table = "disease_metadata_nonprod"
+
+            boto_params = {
+                "region_name": region_name
+            }
+
+            # This is used only for updating nonprod via CLI
+            confirm_aws_db_use("NONPROD")
         else:
             if db_url:
                 endpoint_url = db_url
@@ -48,15 +68,16 @@ class Database:
         self.dynamodb = boto3.resource('dynamodb', **boto_params)
         self.dynamodb_client = boto3.client('dynamodb', **boto_params)
 
-        # Table creation for local database
-        if 'DISEASE_NORM_PROD' not in environ and \
-                'DISEASE_NORM_EB_PROD' not in environ:
+        # Only create tables for local instance
+        envs_do_not_create_tables = {"DISEASE_NORM_PROD", "DISEASE_NORM_EB_PROD",
+                                     "DISEASE_NORM_NONPROD"}
+        if not set(envs_do_not_create_tables) & set(environ):
             existing_tables = self.dynamodb_client.list_tables()['TableNames']
             self.create_diseases_table(existing_tables)
             self.create_meta_data_table(existing_tables)
 
-        self.diseases = self.dynamodb.Table('disease_concepts')
-        self.metadata = self.dynamodb.Table('disease_metadata')
+        self.diseases = self.dynamodb.Table(disease_concepts_table)
+        self.metadata = self.dynamodb.Table(disease_metadata_table)
         self.batch = self.diseases.batch_writer()
         self.cached_sources = {}
 
