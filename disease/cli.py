@@ -2,7 +2,7 @@
 import click
 from disease import SOURCES_CLASS_LOOKUP, SOURCES_LOWER_LOOKUP, logger
 from disease.schemas import SourceName
-from disease.database import Database
+from disease.database import Database, confirm_aws_db_use
 from disease.etl.mondo import Mondo
 from disease.etl.merge import Merge
 from botocore.exceptions import ClientError
@@ -43,6 +43,11 @@ class CLI:
     def update_normalizer_db(normalizer, prod, db_url, update_all,
                              update_merged):
         """Update selected source(s) in the Disease Normalizer database."""
+        # Sometimes DISEASE_NORM_EB_PROD is accidentally set. We should verify that
+        # it should actually be used in CLI
+        if "DISEASE_NORM_EB_PROD" in environ:
+            confirm_aws_db_use("PROD")
+
         if prod:
             environ['DISEASE_NORM_PROD'] = "TRUE"
             db: Database = Database()
