@@ -47,5 +47,5 @@ try:
         eb_provisioned_product_status = \
             product_status['ProvisionedProductDetail']['Status']
         print(eb_provisioned_product_status)
-except:  # noqa: E722
-    print("The EB environment is already running...")
+except Exception as e:
+    print(str(e))
