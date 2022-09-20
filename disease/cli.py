@@ -1,8 +1,8 @@
 """This module provides a CLI util to make updates to normalizer database."""
 import click
-from disease import SOURCES_CLASS_LOOKUP, SOURCES_LOWER_LOOKUP
+from disease import SOURCES_CLASS_LOOKUP, SOURCES_LOWER_LOOKUP, logger
 from disease.schemas import SourceName
-from disease.database import Database
+from disease.database import Database, confirm_aws_db_use
 from disease.etl.mondo import Mondo
 from disease.etl.merge import Merge
 from botocore.exceptions import ClientError
@@ -14,6 +14,7 @@ from os import environ
 class CLI:
     """Class for updating the normalizer database via Click"""
 
+    @staticmethod
     @click.command()
     @click.option(
         '--normalizer',
@@ -42,6 +43,11 @@ class CLI:
     def update_normalizer_db(normalizer, prod, db_url, update_all,
                              update_merged):
         """Update selected source(s) in the Disease Normalizer database."""
+        # Sometimes DISEASE_NORM_EB_PROD is accidentally set. We should verify that
+        # it should actually be used in CLI
+        if "DISEASE_NORM_EB_PROD" in environ:
+            confirm_aws_db_use("PROD")
+
         if prod:
             environ['DISEASE_NORM_PROD'] = "TRUE"
             db: Database = Database()
@@ -78,25 +84,33 @@ class CLI:
 
             CLI()._update_normalizers(normalizers, db, update_merged)
 
-    def _help_msg(self, message):
+    @staticmethod
+    def _help_msg(message):
         """Display help message."""
         ctx = click.get_current_context()
         click.echo(message)
         click.echo(ctx.get_help())
         ctx.exit()
 
-    def _update_normalizers(self, normalizers, db, update_merged):
+    @staticmethod
+    def _update_normalizers(normalizers, db, update_merged):
         """Update selected normalizer sources."""
         processed_ids = []
         for n in normalizers:
-            click.echo(f"\nDeleting {n}...")
+            msg = f"Deleting {n}..."
+            click.echo(f"\n{msg}")
+            logger.info(msg)
             start_delete = timer()
             CLI()._delete_data(n, db)
             end_delete = timer()
             delete_time = end_delete - start_delete
-            click.echo(f"Deleted {n} in "
-                       f"{delete_time:.5f} seconds.\n")
-            click.echo(f"Loading {n}...")
+            msg = f"Deleted {n} in {delete_time:.5f} seconds."
+            click.echo(f"{msg}\n")
+            logger.info(msg)
+
+            msg = f"Loading {n}..."
+            click.echo(msg)
+            logger.info(msg)
             start_load = timer()
             source = SOURCES_CLASS_LOOKUP[n](database=db)
             if isinstance(source, Mondo):
@@ -105,16 +119,21 @@ class CLI:
                 source.perform_etl()
             end_load = timer()
             load_time = end_load - start_load
-            click.echo(f"Loaded {n} in {load_time:.5f} seconds.")
-            click.echo(f"Total time for {n}: "
-                       f"{(delete_time + load_time):.5f} seconds.")
+            msg = f"Loaded {n} in {load_time:.5f} seconds."
+            click.echo(msg)
+            logger.info(msg)
+            msg = f"Total time for {n}: " \
+                  f"{(delete_time + load_time):.5f} seconds."
+            click.echo(msg)
+            logger.info(msg)
         if update_merged and processed_ids:
             click.echo("Generating merged concepts...")
             merge = Merge(database=db)
             merge.create_merged_concepts(processed_ids)
             click.echo("Merged concept generation complete.")
 
-    def _delete_data(self, source, database):
+    @staticmethod
+    def _delete_data(source, database):
         # Delete source's metadata
         try:
             metadata = database.metadata.query(

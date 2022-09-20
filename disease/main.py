@@ -9,7 +9,11 @@ from typing import Optional
 
 
 query_handler = QueryHandler()
-app = FastAPI(docs_url='/disease', openapi_url='/disease/openapi.json')
+app = FastAPI(
+    docs_url="/disease",
+    openapi_url="/disease/openapi.json",
+    swagger_ui_parameters={"tryItOutEnabled": True}
+)
 
 
 def custom_openapi():
@@ -29,7 +33,8 @@ def custom_openapi():
 #    }
     openapi_schema['info']['contact'] = {
         "name": "Alex H. Wagner",
-        "email": "Alex.Wagner@nationwidechildrens.org"
+        "email": "Alex.Wagner@nationwidechildrens.org",
+        "url": "https://www.nationwidechildrens.org/specialties/institute-for-genomic-medicine/research-labs/wagner-lab"  # noqa: E501
     }
     app.openapi_schema = openapi_schema
     return app.openapi_schema
@@ -71,8 +76,8 @@ def search(q: str = Query(..., description=q_descr),
     provided by user.
     """
     try:
-        response = query_handler.search_sources(html.unescape(q), keyed=keyed,
-                                                incl=incl, excl=excl)
+        response = query_handler.search(html.unescape(q), keyed=keyed,
+                                        incl=incl, excl=excl)
     except InvalidParameterException as e:
         raise HTTPException(status_code=422, detail=str(e))
     return response
@@ -95,7 +100,7 @@ def normalize(q: str = Query(..., description=merged_q_descr)):
     :param q: therapy search term
     """
     try:
-        response = query_handler.search_groups(q)
+        response = query_handler.normalize(q)
     except InvalidParameterException as e:
         raise HTTPException(status_code=422, detail=str(e))
     return response

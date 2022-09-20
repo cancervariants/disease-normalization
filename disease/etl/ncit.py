@@ -1,7 +1,6 @@
 """Module to load disease data from NCIt."""
-import logging
 from .base import OWLBase
-from disease import PROJECT_ROOT
+from disease import PROJECT_ROOT, logger
 from disease.database import Database
 from disease.schemas import SourceMeta, SourceName, NamespacePrefix
 from pathlib import Path
@@ -12,9 +11,6 @@ from typing import Set, List
 import owlready2 as owl
 import re
 
-
-logger = logging.getLogger('disease')
-logger.setLevel(logging.DEBUG)
 
 icdo_re = re.compile("[0-9]+/[0-9]+")
 
@@ -118,26 +114,26 @@ class NCIt(OWLBase):
                 continue
             aliases = [a for a in disease_class.P90 if a != label]
 
-            xrefs = []
+            associated_with = []
             if disease_class.P207:
-                xrefs.append(f"{NamespacePrefix.UMLS.value}:"
-                             f"{disease_class.P207.first()}")
+                associated_with.append(f"{NamespacePrefix.UMLS.value}:"
+                                       f"{disease_class.P207.first()}")
             maps_to = disease_class.P375
             if maps_to:
                 icdo_list = list(filter(lambda s: icdo_re.match(s), maps_to))
                 if len(icdo_list) == 1:
-                    xrefs.append(f"{NamespacePrefix.ICDO.value}:"
-                                 f"{icdo_list[0]}")
+                    associated_with.append(f"{NamespacePrefix.ICDO.value}:"
+                                           f"{icdo_list[0]}")
             imdrf = disease_class.hasDbXref
             if imdrf:
-                xrefs.append(f"{NamespacePrefix.IMDRF.value}:"
-                             f"{imdrf[0].split(':')[1]}")
+                associated_with.append(f"{NamespacePrefix.IMDRF.value}:"
+                                       f"{imdrf[0].split(':')[1]}")
 
             disease = {
                 'concept_id': concept_id,
                 'src_name': SourceName.NCIT.value,
                 'label': label,
                 'aliases': aliases,
-                'xrefs': xrefs
+                'associated_with': associated_with
             }
             self._load_disease(disease)

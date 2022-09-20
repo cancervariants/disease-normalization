@@ -1,12 +1,12 @@
 """This module provides methods for handling queries."""
 import re
-from typing import Dict, Set, Optional
-from uvicorn.config import logger
-from disease import NAMESPACE_LOOKUP, PREFIX_LOOKUP, SOURCES_LOWER_LOOKUP, \
-    __version__
+from typing import Dict, Set, Optional, Tuple
+from .version import __version__
+from disease import NAMESPACE_LOOKUP, PREFIX_LOOKUP, SOURCES_LOWER_LOOKUP,\
+    ITEM_TYPES, logger
 from disease.database import Database
 from disease.schemas import Disease, SourceMeta, MatchType, SourceName, \
-    ServiceMeta
+    ServiceMeta, NormalizationService, SearchService
 from botocore.exceptions import ClientError
 from urllib.parse import quote
 from datetime import datetime
@@ -71,7 +71,7 @@ class QueryHandler:
     def _add_record(self,
                     response: Dict[str, Dict],
                     item: Dict,
-                    match_type: str) -> (Dict, str):
+                    match_type: str) -> Tuple[Dict, str]:
         """Add individual record to response object
         :param Dict[str, Dict] response: in-progress response object to return
             to client
@@ -81,11 +81,6 @@ class QueryHandler:
             containing name of the source of the match
         """
         del item['label_and_type']
-        attr_types = ['aliases', 'other_identifiers', 'xrefs']
-        for attr_type in attr_types:
-            if attr_type not in item.keys():
-                item[attr_type] = []
-
         disease = Disease(**item)
         src_name = item['src_name']
 
@@ -106,7 +101,7 @@ class QueryHandler:
     def _fetch_records(self,
                        response: Dict[str, Dict],
                        concept_ids: Set[str],
-                       match_type: str) -> (Dict, Set):
+                       match_type: str) -> Tuple[Dict, Set]:
         """Return matched Disease records as a structured response for a given
         collection of concept IDs.
         :param Dict[str, Dict] response: in-progress response object to return
@@ -176,13 +171,13 @@ class QueryHandler:
                           query: str,
                           resp: Dict,
                           sources: Set[str],
-                          match_type: str) -> (Dict, Set):
+                          match_type: str) -> Tuple[Dict, Set]:
         """Check query for selected match type.
         :param str query: search string
         :param Dict resp: in-progress response object to return to client
         :param Set[str] sources: remaining unmatched sources
         :param str match_type: Match type to check for. Should be one of
-            {'label', 'alias', 'other_id'}
+            {'label', 'alias', 'xref', 'associated_with'}
         :return: Tuple with updated resp object and updated set of unmatched
                  sources
         """
@@ -218,8 +213,7 @@ class QueryHandler:
         if len(sources) == 0:
             return response
 
-        match_types = ['label', 'alias', 'other_id']
-        for match_type in match_types:
+        for match_type in ITEM_TYPES.values():
             (response, sources) = self._check_match_type(query, response,
                                                          sources, match_type)
             if len(sources) == 0:
@@ -249,7 +243,8 @@ class QueryHandler:
 
         return response_dict
 
-    def search_sources(self, query_str, keyed=False, incl='', excl='') -> Dict:
+    def search(self, query_str, keyed=False, incl="",
+               excl="") -> SearchService:
         """Fetch normalized disease objects.
         :param str query_str: query, a string, to search for
         :param bool keyed: if true, return response as dict keying source names
@@ -309,8 +304,8 @@ class QueryHandler:
         response['service_meta_'] = ServiceMeta(
             version=__version__,
             response_datetime=datetime.now(),
-        )
-        return response
+        ).dict()
+        return SearchService(**response)
 
     def _add_merged_meta(self, response: Dict) -> Dict:
         """Add source metadata to response object.
@@ -319,8 +314,8 @@ class QueryHandler:
         :return: completed response object.
         """
         sources_meta = {}
-        vod = response['value_object_descriptor']
-        ids = [vod['value']['disease_id']] + vod.get('xrefs', [])
+        vod = response['disease_descriptor']
+        ids = [vod['disease_id']] + vod.get('xrefs', [])
         for concept_id in ids:
             prefix = concept_id.split(':')[0]
             src_name = PREFIX_LOOKUP[prefix.lower()]
@@ -330,27 +325,24 @@ class QueryHandler:
         return response
 
     def _add_vod(self, response: Dict, record: Dict, query: str,
-                 match_type: MatchType) -> Dict:
+                 match_type: MatchType) -> NormalizationService:
         """Format received DB record as VOD and update response object.
 
         :param Dict response: in-progress response object
         :param Dict record: record as stored in DB
         :param str query: query string from user request
         :param MatchType match_type: type of match achieved
-        :return: completed response object ready to return to user
+        :return: completed normalized response object ready to return to user
         """
         vod = {
             'id': f'normalize.disease:{quote(query)}',
             'type': 'DiseaseDescriptor',
-            'value': {
-                'type': 'Disease',
-                'disease_id': record['concept_id']
-            },
+            'disease_id': record['concept_id'],
             'label': record['label'],
             'extensions': [],
         }
-        if 'other_ids' in record:
-            vod['xrefs'] = record['other_ids']
+        if 'xrefs' in record:
+            vod['xrefs'] = record['xrefs']
         if 'aliases' in record:
             vod['alternate_labels'] = record['aliases']
         if 'pediatric_disease' in record and \
@@ -360,18 +352,18 @@ class QueryHandler:
                 'name': 'pediatric_disease',
                 'value': record['pediatric_disease']
             })
-        if 'xrefs' in record and record['xrefs']:
+        if 'associated_with' in record and record['associated_with']:
             vod['extensions'].append({
                 'type': 'Extension',
                 'name': 'associated_with',
-                'value': record['xrefs']
+                'value': record['associated_with']
             })
         if not vod['extensions']:
             del vod['extensions']
         response['match_type'] = match_type
-        response['value_object_descriptor'] = vod
+        response['disease_descriptor'] = vod
         response = self._add_merged_meta(response)
-        return response
+        return NormalizationService(**response)
 
     def _record_order(self, record: Dict) -> (int, str):
         """Construct priority order for matching. Only called by sort().
@@ -396,22 +388,24 @@ class QueryHandler:
             source_rank = 4
         return source_rank, record['concept_id']
 
-    def _handle_failed_merge_ref(self, record, response, query) -> Dict:
+    def _handle_failed_merge_ref(self, record, response,
+                                 query) -> NormalizationService:
         """Log + fill out response for a failed merge reference lookup.
 
         :param Dict record: record containing failed merge_ref
         :param Dict response: in-progress response object
         :param str query: original query value
-        :return: response with no match
+        :return: Normalized response with no match
         """
         logger.error(f"Merge ref lookup failed for ref {record['merge_ref']} "
                      f"in record {record['concept_id']} from query {query}")
         response['match_type'] = MatchType.NO_MATCH
-        return response
+        return NormalizationService(**response)
 
-    def search_groups(self, query: str) -> Dict:
+    def normalize(self, query: str) -> NormalizationService:
         """Return normalized concept for given search term.
         :param str query: string to search against
+        :return: NormalizationService object with complete response
         """
         # prepare basic response
         response = {
@@ -424,15 +418,14 @@ class QueryHandler:
         }
         if query == '':
             response['match_type'] = MatchType.NO_MATCH
-            return response
+            return NormalizationService(**response)
         query_str = query.lower().strip()
 
         # check merged concept ID match
         record = self.db.get_record_by_id(query_str, case_sensitive=False,
                                           merge=True)
         if record:
-            return self._add_vod(response, record, query,
-                                 MatchType.CONCEPT_ID)
+            return self._add_vod(response, record, query, MatchType.CONCEPT_ID)
 
         non_merged_match = None
 
@@ -453,7 +446,7 @@ class QueryHandler:
                 non_merged_match = (record, 'concept_id')
 
         # check other match types
-        for match_type in ['label', 'alias', 'other_id']:
+        for match_type in ['label', 'alias', 'xref', 'associated_with']:
             # get matches list for match tier
             query_matches = self.db.get_records_by_type(query_str, match_type)
             query_matches = [self.db.get_record_by_id(m['concept_id'],
@@ -483,10 +476,9 @@ class QueryHandler:
         # if no successful match, try available non-merged match
         if non_merged_match:
             match_type = MatchType[non_merged_match[1].upper()]
-            response = self._add_vod(response, non_merged_match[0], query,
-                                     match_type)
-            return response
+            return self._add_vod(response, non_merged_match[0], query,
+                                 match_type)
 
         if not query_matches:
             response['match_type'] = MatchType.NO_MATCH
-        return response
+        return NormalizationService(**response)

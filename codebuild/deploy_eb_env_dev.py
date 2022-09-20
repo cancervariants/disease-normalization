@@ -5,9 +5,9 @@ elasticbeanstalk = boto3.client('elasticbeanstalk')
 servicecatalog = boto3.client('servicecatalog')
 terminate_time = 12
 eb_app_name = "DiseaseNormalization"
-eb_env_name = "DiseaseNormalization-staging-env"
+eb_env_name = "DiseaseNormalization-dev-env"
 sc_product_id = "prod-m4b65t5jgmcm4"
-print(f'Launching new Service Catalog Product for staging environment: '
+print(f'Launching new Service Catalog Product for dev environment: '
       f'{eb_app_name}')
 sc_product_artifacts = \
     servicecatalog.list_provisioning_artifacts(ProductId=sc_product_id)
@@ -26,7 +26,7 @@ try:
             },
             {
                 'Key': 'EnvType',
-                'Value': 'staging'
+                'Value': 'dev'
             },
             {
                 'Key': 'TerminateTime',

@@ -1,6 +1,6 @@
 """Test retrieval of Disease Ontology source data."""
 import pytest
-from disease.schemas import MatchType
+from disease.schemas import MatchType, SourceName, Disease
 from disease.query import QueryHandler
 
 
@@ -13,123 +13,146 @@ def do():
             self.query_handler = QueryHandler()
 
         def search(self, query_str):
-            response = self.query_handler.search_sources(query_str, keyed=True,
-                                                         incl='do')
-            return response['source_matches']['DO']
+            response = self.query_handler.search(query_str, keyed=True,
+                                                 incl="do")
+            return response.source_matches[SourceName.DO]
     return QueryGetter()
 
 
 @pytest.fixture(scope='module')
 def neuroblastoma():
     """Build neuroblastoma fixture."""
-    return {
+    return Disease(**{
         "concept_id": "DOID:769",
         "label": "neuroblastoma",
-        "other_identifiers": [
+        "xrefs": [
             "ncit:C3270"
         ],
-        "xrefs": [
+        "associated_with": [
             "efo:0000621",
             "gard:7185",
-            "icd.o:M9500/3",
+            "icdo:M9500/3",
             "mesh:D009447",
             "orphanet:635",
             "umls:C0027819",
         ],
         "aliases": []
-    }
+    })
 
 
 @pytest.fixture(scope='module')
 def pediatric_liposarcoma():
     """Create test fixture for pediatric liposarcoma."""
-    return {
+    return Disease(**{
         "concept_id": "DOID:5695",
-        "label": "pediatric liposarcoma",
-        "other_identifiers": ["ncit:C8091"],
-        "xrefs": ["umls:C0279984"],
-        "aliases": []
-    }
+        "label": "childhood liposarcoma",
+        "xrefs": ["ncit:C8091"],
+        "associated_with": ["umls:C0279984"],
+        "aliases": ["pediatric liposarcoma"]
+    })
 
 
 @pytest.fixture(scope='module')
 def richter():
     """Create test fixture for Richter's Syndrome."""
-    return {
+    return Disease(**{
         "concept_id": "DOID:1703",
         "label": "Richter's syndrome",
         "aliases": ["Richter syndrome"],
-        "other_identifiers": ["ncit:C35424"],
-        "xrefs": ["umls:C0349631", "gard:7578", "icd10.cm:C91.1"]
-    }
+        "xrefs": ["ncit:C35424"],
+        "associated_with": ["umls:C0349631", "gard:7578", "icd10.cm:C91.1"]
+    })
 
 
 def test_concept_id_match(do, neuroblastoma, pediatric_liposarcoma, richter,
                           compare_records):
     """Test that concept ID search resolves to correct record"""
-    import boto3
-    from boto3.dynamodb.conditions import Key
-    response = boto3.resource('dynamodb', endpoint_url="http://localhost:8000").Table('disease_concepts').query(KeyConditionExpression=Key('label_and_type').eq('doid:769##identity'))['Items'][0]  # noqa: E501
-    print(response)
     response = do.search('DOID:769')
-    print(response)
-    assert response['match_type'] == MatchType.CONCEPT_ID
-    assert len(response['records']) == 1
-    actual_disease = response['records'][0].dict()
+    assert response.match_type == MatchType.CONCEPT_ID
+    assert len(response.records) == 1
+    actual_disease = response.records[0]
     compare_records(actual_disease, neuroblastoma)
 
     response = do.search('doid:5695')
-    assert response['match_type'] == MatchType.CONCEPT_ID
-    assert len(response['records']) == 1
-    actual_disease = response['records'][0].dict()
+    assert response.match_type == MatchType.CONCEPT_ID
+    assert len(response.records) == 1
+    actual_disease = response.records[0]
     compare_records(actual_disease, pediatric_liposarcoma)
 
     response = do.search('DOid:1703')
-    assert response['match_type'] == MatchType.CONCEPT_ID
-    assert len(response['records']) == 1
-    actual_disease = response['records'][0].dict()
+    assert response.match_type == MatchType.CONCEPT_ID
+    assert len(response.records) == 1
+    actual_disease = response.records[0]
     compare_records(actual_disease, richter)
 
     response = do.search('5695')
-    assert response['match_type'] == MatchType.NO_MATCH
+    assert response.match_type == MatchType.NO_MATCH
 
 
 def test_label_match(do, neuroblastoma, pediatric_liposarcoma,
                      compare_records):
     """Test that label searches resolve to correct records."""
     response = do.search('pediatric liposarcoma')
-    assert response['match_type'] == MatchType.LABEL
-    assert len(response['records']) == 1
-    actual_disease = response['records'][0].dict()
+    assert response.match_type == MatchType.ALIAS
+    assert len(response.records) == 1
+    actual_disease = response.records[0]
+    compare_records(actual_disease, pediatric_liposarcoma)
+
+    response = do.search('childhood liposarcoma')
+    assert response.match_type == MatchType.LABEL
+    assert len(response.records) == 1
+    actual_disease = response.records[0]
     compare_records(actual_disease, pediatric_liposarcoma)
 
     response = do.search('NEUROBLASTOMA')
-    assert response['match_type'] == MatchType.LABEL
-    assert len(response['records']) == 1
-    actual_disease = response['records'][0].dict()
+    assert response.match_type == MatchType.LABEL
+    assert len(response.records) == 1
+    actual_disease = response.records[0]
     compare_records(actual_disease, neuroblastoma)
 
 
 def test_alias_match(do, richter, compare_records):
     """Test that alias searches resolve to correct records."""
     response = do.search('Richter Syndrome')
-    assert response['match_type'] == MatchType.ALIAS
-    assert len(response['records']) == 1
-    actual_disease = response['records'][0].dict()
+    assert response.match_type == MatchType.ALIAS
+    assert len(response.records) == 1
+    actual_disease = response.records[0]
     compare_records(actual_disease, richter)
 
 
-def test_other_id_match(do, neuroblastoma, pediatric_liposarcoma,
-                        compare_records):
-    """Test that other_id search resolves to correct records."""
+def test_xref_match(do, neuroblastoma, pediatric_liposarcoma,
+                    compare_records):
+    """Test that xref search resolves to correct records."""
     response = do.search('ncit:C3270')
-    assert response['match_type'] == MatchType.OTHER_ID
-    assert len(response['records']) == 1
-    actual_disease = response['records'][0].dict()
+    assert response.match_type == MatchType.XREF
+    assert len(response.records) == 1
+    actual_disease = response.records[0]
     compare_records(actual_disease, neuroblastoma)
 
     response = do.search('NCIT:C8091')
-    assert response['match_type'] == MatchType.OTHER_ID
-    assert len(response['records']) == 1
-    actual_disease = response['records'][0].dict()
+    assert response.match_type == MatchType.XREF
+    assert len(response.records) == 1
+    actual_disease = response.records[0]
     compare_records(actual_disease, pediatric_liposarcoma)
+
+
+def test_associated_with_match(do, neuroblastoma, pediatric_liposarcoma,
+                               richter, compare_records):
+    """Test that associated_with search resolves to correct records."""
+    response = do.search('umls:c0027819')
+    assert response.match_type == MatchType.ASSOCIATED_WITH
+    assert len(response.records) == 1
+    actual_disease = response.records[0]
+    compare_records(actual_disease, neuroblastoma)
+
+    response = do.search('umls:C0279984')
+    assert response.match_type == MatchType.ASSOCIATED_WITH
+    assert len(response.records) == 1
+    actual_disease = response.records[0]
+    compare_records(actual_disease, pediatric_liposarcoma)
+
+    response = do.search('icd10.cm:c91.1')
+    assert response.match_type == MatchType.ASSOCIATED_WITH
+    assert len(response.records) == 1
+    actual_disease = response.records[0]
+    compare_records(actual_disease, richter)

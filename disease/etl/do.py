@@ -1,17 +1,14 @@
 """Disease Ontology ETL module."""
-import logging
 from .base import OWLBase
+import requests
 from pathlib import Path
-from disease import PROJECT_ROOT, PREFIX_LOOKUP
+from disease import PROJECT_ROOT, PREFIX_LOOKUP, logger
 from disease.schemas import SourceMeta, SourceName, NamespacePrefix
 from disease.database import Database
 from datetime import datetime
 import owlready2 as owl
 from typing import List
 
-
-logger = logging.getLogger('disease')
-logger.setLevel(logging.DEBUG)
 
 DO_PREFIX_LOOKUP = {
     "EFO": NamespacePrefix.EFO.value,
@@ -52,13 +49,28 @@ class DO(OWLBase):
     def perform_etl(self) -> List[str]:
         """Public-facing method to initiate ETL procedures on given data.
 
-        :return: empty list (because NCIt IDs shouldn't be used to construct
+        :return: empty list (because DO IDs shouldn't be used to construct
             merged concept groups)
         """
+        self._extract_data()
         self._load_meta()
         self._transform_data()
         self.database.flush_batch()
         return []
+
+    def _download_data(self):
+        """Download DO source file for loading into normalizer."""
+        logger.info('Downloading DO data...')
+        try:
+            response = requests.get(self._SRC_URL, stream=True)
+        except requests.exceptions.RequestException as e:
+            logger.error(f'DO download failed: {e}')
+            raise e
+        handle = open(self._data_path / f'do_{self._version}.owl', "wb")
+        for chunk in response.iter_content(chunk_size=512):
+            if chunk:
+                handle.write(chunk)
+        logger.info('Finished downloading Human Disease Ontology')
 
     def _load_meta(self):
         """Load metadata"""
@@ -80,7 +92,7 @@ class DO(OWLBase):
 
     def _transform_data(self):
         """Transform source data and send to loading method."""
-        do = owl.get_ontology(self._SRC_URL).load()
+        do = owl.get_ontology(self._data_file.absolute().as_uri()).load()
         disease_uri = 'http://purl.obolibrary.org/obo/DOID_4'
         diseases = self._get_subclasses(disease_uri)
         for uri in diseases:
@@ -97,24 +109,24 @@ class DO(OWLBase):
             else:
                 aliases = []
 
-            other_ids = []
             xrefs = []
-            db_xrefs = set(disease_class.hasDbXref)
-            for other_id in db_xrefs:
-                prefix, id_no = other_id.split(':', 1)
+            associated_with = []
+            db_associated_with = set(disease_class.hasDbXref)
+            for xref in db_associated_with:
+                prefix, id_no = xref.split(':', 1)
                 normed_prefix = DO_PREFIX_LOOKUP.get(prefix, None)
                 if normed_prefix:
-                    other_id_no = f'{normed_prefix}:{id_no}'
+                    xref_no = f'{normed_prefix}:{id_no}'
                     if normed_prefix.lower() in PREFIX_LOOKUP:
-                        other_ids.append(other_id_no)
+                        xrefs.append(xref_no)
                     else:
-                        xrefs.append(other_id_no)
+                        associated_with.append(xref_no)
 
             disease = {
                 "concept_id": concept_id,
                 "label": label,
                 "aliases": aliases,
-                "other_identifiers": other_ids,
-                "xrefs": xrefs
+                "xrefs": xrefs,
+                "associated_with": associated_with
             }
             self._load_disease(disease)

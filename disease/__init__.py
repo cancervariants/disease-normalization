@@ -1,19 +1,36 @@
 """The VICC library for normalizing diseases."""
+from .version import __version__  # noqa: F401
 from pathlib import Path
 import logging
+from os import environ
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[0]
 
+# establish environment-dependent params
+if "DISEASE_NORM_EB_PROD" in environ:
+    environ["DISEASE_NORM_EB_PROD"] = "true"
+    LOG_FN = "/tmp/disease.log"
+else:
+    LOG_FN = "disease.log"
 
+# set up logging
 logging.basicConfig(
-    filename='disease.log',
-    format='[%(asctime)s] %(levelname)s : %(message)s')
-logger = logging.getLogger('disease')
+    filename=LOG_FN,
+    format="[%(asctime)s] - %(name)s - %(levelname)s : %(message)s"
+)
+logger = logging.getLogger("disease")
 logger.setLevel(logging.DEBUG)
+logger.handlers = []
 
+if "DISEASE_NORM_EB_PROD" in environ:
+    ch = logging.StreamHandler()
+    ch.setLevel(logging.DEBUG)
+    logger.addHandler(ch)
 
-__version__ = "0.2.5"  # remember to update setup.cfg as well!
+    logging.getLogger("boto3").setLevel(logging.INFO)
+    logging.getLogger("botocore").setLevel(logging.INFO)
+    logging.getLogger("nose").setLevel(logging.INFO)
 
 
 class DownloadException(Exception):
@@ -24,7 +41,9 @@ class DownloadException(Exception):
         super().__init__(*args, **kwargs)
 
 
-from disease.schemas import SourceName, SourceIDAfterNamespace, NamespacePrefix  # noqa: E402 E501
+from disease.schemas import SourceName, SourceIDAfterNamespace, NamespacePrefix, ItemTypes  # noqa: E402 E501
+ITEM_TYPES = {k.lower(): v.value for k, v in ItemTypes.__members__.items()}
+
 # use to lookup source name from lower-case string
 # technically the same as PREFIX_LOOKUP, but source namespace prefixes
 # sometimes differ from their names

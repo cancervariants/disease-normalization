@@ -3,8 +3,9 @@ disease records.
 """
 from typing import Any, Dict, Type, List, Optional, Union
 from enum import Enum, IntEnum
-from pydantic import BaseModel, StrictBool, validator
+from pydantic import BaseModel, StrictBool
 from datetime import datetime
+from ga4gh.vrsatile.pydantic.vrsatile_models import DiseaseDescriptor
 
 
 class MatchType(IntEnum):
@@ -13,7 +14,8 @@ class MatchType(IntEnum):
     CONCEPT_ID = 100
     LABEL = 80
     ALIAS = 60
-    OTHER_ID = 60
+    XREF = 60
+    ASSOCIATED_WITH = 60
     FUZZY_MATCH = 20
     NO_MATCH = 0
 
@@ -56,9 +58,9 @@ class NamespacePrefix(Enum):
     HPO = "HP"
     ICD9 = "icd9"
     ICD9CM = "icd9.cm"
-    ICD10 = "icd"
+    ICD10 = "icd10"
     ICD10CM = "icd10.cm"
-    ICDO = "icd.o"
+    ICDO = "icdo"
     IDO = "ido"
     IMDRF = "imdrf"
     KEGG = "kegg.disease"
@@ -92,9 +94,9 @@ class Disease(BaseModel):
 
     label: str
     concept_id: str
-    aliases: Optional[List[str]]
-    other_identifiers: Optional[List[str]]
-    xrefs: Optional[List[str]]
+    aliases: Optional[List[str]] = []
+    xrefs: Optional[List[str]] = []
+    associated_with: Optional[List[str]] = []
     pediatric_disease: Optional[bool]
 
     class Config:
@@ -118,8 +120,8 @@ class Disease(BaseModel):
                     "von Hippel-Lindau syndrome",
                     "VHL syndrome"
                 ],
-                "other_identifiers": [],
-                "xrefs": ["umls:C0019562"],
+                "xrefs": [],
+                "associated_with": ["umls:C0019562"],
                 "pediatric_disease": None,
             }
 
@@ -130,6 +132,16 @@ class DataLicenseAttributes(BaseModel):
     non_commercial: StrictBool
     share_alike: StrictBool
     attribution: StrictBool
+
+
+class ItemTypes(str, Enum):
+    """Item types used in DynamoDB."""
+
+    # Must be in descending MatchType order.
+    LABEL = 'label'
+    ALIASES = 'alias'
+    XREFS = 'xref'
+    ASSOCIATED_WITH = 'associated_with'
 
 
 class SourceMeta(BaseModel):
@@ -199,8 +211,8 @@ class MatchesKeyed(BaseModel):
                         "von Hippel-Lindau syndrome",
                         "VHL syndrome"
                     ],
-                    "other_identifiers": [],
-                    "xrefs": ["umls:C0019562"],
+                    "xrefs": [],
+                    "associated_with": ["umls:C0019562"],
                     "pediatric_disease": None,
                 }],
                 "source_meta_": {
@@ -252,8 +264,8 @@ class MatchesListed(BaseModel):
                         "von Hippel-Lindau syndrome",
                         "VHL syndrome"
                     ],
-                    "other_identifiers": [],
-                    "xrefs": ["umls:C0019562"],
+                    "xrefs": [],
+                    "associated_with": ["umls:C0019562"],
                     "pediatric_disease": None
                 }],
                 "source_meta_": {
@@ -268,120 +280,6 @@ class MatchesListed(BaseModel):
                         "share_alike": False
                     }
                 }
-            }
-
-
-class DiseaseValue(BaseModel):
-    """Class for Disease Value within VOD."""
-
-    type: str = "Disease"
-    disease_id: str
-
-    @validator('type')
-    def check_type(cls, type_value):
-        """Check that `type` field has value 'Disease'"""
-        if type_value != "Disease":
-            raise ValueError("DiseaseValue.type must be 'Disease'")
-        return type_value
-
-    class Config:
-        """Configure model."""
-
-        @staticmethod
-        def schema_extra(schema: Dict[str, Any],
-                         model: Type['Extension']) -> None:
-            """Configure schema display."""
-            schema['example'] = {
-                "type": "Disease",
-                "disease_id": "ncit:C3211"
-            }
-
-
-class Extension(BaseModel):
-    """Value Object Descriptor Extension class."""
-
-    type: str
-    name: str
-    value: Union[bool, List[str]]
-
-    class Config:
-        """Configure model."""
-
-        @staticmethod
-        def schema_extra(schema: Dict[str, Any],
-                         model: Type['Extension']) -> None:
-            """Configure schema display."""
-            schema['example'] = {
-                "type": "Extension",
-                "name": "associated_with",
-                "value": [
-                    "icd:C95.90",
-                    "mesh:D007938",
-                    "icd9:207.80",
-                    "icd9.cm:208",
-                    "umls:C0023418",
-                    "icd10.cm:C95.90"
-                ]
-            }
-
-
-class ValueObjectDescriptor(BaseModel):
-    """VOD class."""
-
-    id: str
-    type: str
-    value: DiseaseValue
-    label: str
-    xrefs: Optional[List[str]]
-    alternate_labels: Optional[List[str]]
-    extensions: Optional[List[Extension]]
-
-    class Config:
-        """Configure model."""
-
-        @staticmethod
-        def schema_extra(schema: Dict[str, Any],
-                         model: Type['Extension']) -> None:
-            """Configure schema display."""
-            schema['example'] = {
-                "id": "normalize:non-hodgkin's lymphoma",
-                "type": "DiseaseDescriptor",
-                "value": {
-                    "type": "Disease",
-                    "disease_id": "ncit:C3211"
-                },
-                "label": "Non-Hodgkin Lymphoma",
-                "xrefs": [
-                    "mondo:0018908",
-                    "oncotree:NHL",
-                    "DOID:0060060"
-                ],
-                "alternate_labels": [
-                    "NHL",
-                    "non-Hodgkin's lymphoma",
-                    "non-Hodgkin's lymphoma (NHL)",
-                    "NHL, NOS",
-                    "non-Hodgkins lymphoma",
-                    "Non-Hodgkin's Lymphoma (NHL)",
-                    "non-Hodgkin lymphoma",
-                    "Non-Hodgkin's Lymphoma",
-                    "Non-Hodgkin lymphoma, NOS"
-                ],
-                "extensions": [
-                    {
-                        "type": "Extension",
-                        "name": "associated_with",
-                        "value": [
-                            "icd.o:9591/3",
-                            "umls:C0024305",
-                            "omim:605027",
-                            "orphanet:547",
-                            "efo:0005952",
-                            "meddra:10029547",
-                            "mesh:D008228"
-                        ]
-                    }
-                ]
             }
 
 
@@ -418,7 +316,7 @@ class NormalizationService(BaseModel):
     query: str
     warnings: Optional[Dict]
     match_type: MatchType
-    value_object_descriptor: Optional[ValueObjectDescriptor]
+    disease_descriptor: Optional[DiseaseDescriptor]
     source_meta_: Optional[Dict[SourceName, SourceMeta]]
     service_meta_: ServiceMeta
 
@@ -437,13 +335,10 @@ class NormalizationService(BaseModel):
                 "query": "childhood leukemia",
                 "warnings": None,
                 "match_type": 80,
-                "value_object_descriptor": {
+                "disease_descriptor": {
                     "id": "normalize:childhood%20leukemia",
                     "type": "DiseaseDescriptor",
-                    "value": {
-                        "type": "Disease",
-                        "disease_id": "ncit:C4989"
-                    },
+                    "disease_id": "ncit:C4989",
                     "label": "Childhood Leukemia",
                     "xrefs": [
                         "mondo:0004355",
@@ -551,8 +446,8 @@ class SearchService(BaseModel):
                             "von Hippel-Lindau syndrome",
                             "VHL syndrome"
                         ],
-                        "other_identifiers": [],
-                        "xrefs": ["umls:C0019562"],
+                        "xrefs": [],
+                        "associated_with": ["umls:C0019562"],
                         "pediatric_disease": None,
                     }],
                     "source_meta_": {

@@ -1,15 +1,11 @@
 """A base class for extraction, transformation, and loading of data."""
 from abc import ABC, abstractmethod
-from disease import SOURCES_FOR_MERGE
+from disease import SOURCES_FOR_MERGE, ITEM_TYPES, logger
 from disease.database import Database
 from disease.schemas import Disease
 import owlready2 as owl
 from typing import Set, Dict, List
 from pathlib import Path
-import logging
-
-logger = logging.getLogger('disease')
-logger.setLevel(logging.DEBUG)
 
 
 class Base(ABC):
@@ -38,7 +34,7 @@ class Base(ABC):
     def _extract_data(self):
         """Get source file from data directory."""
         self._data_path.mkdir(exist_ok=True, parents=True)
-        src_name = type(self).__name__.lower()
+        src_name = f'{type(self).__name__.lower()}_'
         dir_files = [f for f in self._data_path.iterdir()
                      if f.name.startswith(src_name)]
         if len(dir_files) == 0:
@@ -60,35 +56,32 @@ class Base(ABC):
         assert Disease(**disease)
         concept_id = disease['concept_id']
 
-        if 'aliases' in disease:
-            aliases = disease['aliases']
-            if aliases == [] or aliases is None:
-                del disease['aliases']
-            else:
-                aliases_lower = {a.lower() for a in aliases}
-                if len(aliases_lower) > 20:
-                    logger.debug(f"{concept_id} has > 20 aliases")
-                    del disease['aliases']
+        for attr_type, item_type in ITEM_TYPES.items():
+            if attr_type in disease:
+                value = disease[attr_type]
+                if value is not None and value != []:
+                    if isinstance(value, str):
+                        items = [value.lower()]
+                    else:
+                        disease[attr_type] = list(set(value))
+                        items = {item.lower() for item in value}
+                        if attr_type == 'aliases':
+                            if len(items) > 20:
+                                logger.debug(f"{concept_id} has > 20 aliases.")
+                                del disease[attr_type]
+                                continue
+
+                    for item in items:
+                        self.database.add_ref_record(item, concept_id,
+                                                     item_type)
                 else:
-                    for al in aliases_lower:
-                        self.database.add_ref_record(al, concept_id, 'alias')
+                    del disease[attr_type]
 
-        if 'other_identifiers' in disease:
-            other_ids = disease['other_identifiers']
-            if other_ids == [] or other_ids is None:
-                del disease['other_identifiers']
-            else:
-                for other_id in other_ids:
-                    self.database.add_ref_record(other_id, concept_id,
-                                                 'other_id')
-
-        for field in ('xrefs', 'pediatric_disease'):
-            if field in disease and (disease[field] is None or  # noqa: W504
-                                     disease[field] is []):
-                del disease[field]
+        if 'pediatric_disease' in disease \
+                and disease['pediatric_disease'] is None:
+            del disease['pediatric_disease']
 
         self.database.add_record(disease)
-        self.database.add_ref_record(disease['label'], concept_id, 'label')
         if self._store_ids:
             self._processed_ids.append(concept_id)
 
