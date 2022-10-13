@@ -1,37 +1,61 @@
 name: github-actions
 on: [push, pull_request]
 jobs:
-    test:
-        runs-on: ubuntu-latest
-        env:
-            AWS_ACCESS_KEY_ID: ${{ secrets.DUMMY_AWS_ACCESS_KEY_ID }}
-            AWS_SECRET_ACCESS_KEY: ${{ secrets.DUMMY_AWS_SECRET_ACCESS_KEY }}
-            AWS_DEFAULT_REGION: us-east-2
-            AWS_DEFAULT_OUTPUT: text
-            DISEASE_NORM_DB_URL: http://localhost:8000
-            TEST: DISEASE_TEST
-        steps:
-            - uses: actions/checkout@v2
+  test:
+    runs-on: ubuntu-latest
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.DUMMY_AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.DUMMY_AWS_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: us-east-2
+      AWS_DEFAULT_OUTPUT: text
+      DISEASE_NORM_DB_URL: http://localhost:8000
+      TEST: DISEASE_TEST
+    strategy:
+      matrix:
+        python-version: ['3.8', '3.9', '3.10']
+    steps:
+    - uses: actions/checkout@v3
 
-            - name: Setup Python
-              uses: actions/setup-python@v1
-              with:
-                  python-version: 3.8
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+          python-version: ${{ matrix.python-version }}
 
-            - name: Install dependencies
-              run: |
-                  python3 -m pip install pipenv
-                  pipenv install --dev
+    - name: Install dependencies
+      run: |
+          python3 -m pip install pipenv
+          pipenv install --dev
 
-            - name: Build local DynamoDB
-              run: |
-                  chmod +x ./tests/unit/dynamodb_build.bash
-                  ./tests/unit/dynamodb_build.bash
+    - name: Build local DynamoDB
+      run: |
+          chmod +x ./tests/unit/dynamodb_build.bash
+          ./tests/unit/dynamodb_build.bash
 
-            - name: Load and Test DynamoDB
-              run: |
-                  pipenv run pytest tests/unit/test_database.py
+    - name: Load and Test DynamoDB
+      run: |
+          pipenv run pytest tests/unit/test_database.py
 
-            - run: pipenv run flake8
-            - run: pipenv run pytest tests/
+    - run: pipenv run pytest tests/
+  lint:
+    runs-on: ubuntu-latest
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.DUMMY_AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.DUMMY_AWS_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: us-east-2
+      AWS_DEFAULT_OUTPUT: text
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        python-version: '3.10'
 
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+          python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+          python3 -m pip install pipenv
+          pipenv install --dev
+    - name: check style
+      run: pipenv run flake8
