@@ -103,7 +103,7 @@
       "Neuroblastoma, NOS",
       "neuroblastoma"
     ],
-    "associated_with": ["umls:C0027819", "icdo:9500/3"]
+    "associated_with": ["umls:C2751421", "icdo:9500/3"]
   },
   {
     "label_and_type": "icdo:9500/3##associated_with",
@@ -169,7 +169,6 @@
       "icdo:9500/3",
       "umls:CN205405",
       "efo:0000621",
-      "icd10:C74.9",
       "mesh:D009447"
     ]
   },
@@ -336,7 +335,7 @@
     "associated_with": [
       "efo:0000621",
       "gard:7185",
-      "icdo:M9500/3",
+      "icdo:9500/3",
       "mesh:D009447",
       "orphanet:635",
       "umls:C0027819"
@@ -672,13 +671,12 @@
       "efo:0000621",
       "gard:0007185",
       "gard:7185",
-      "icd10:C74.9",
       "icdo:9500/3",
-      "icdo:M9500/3",
       "mesh:D009447",
       "meddra:10029260",
       "nifstd:birnlex_12631",
       "orphanet:635",
+      "umls:C2751421",
       "umls:CN205405"
     ]
   },

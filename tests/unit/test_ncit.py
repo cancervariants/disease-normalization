@@ -185,8 +185,8 @@ def test_meta(ncit):
         'https://creativecommons.org/licenses/by/4.0/legalcode'
     assert response.source_meta_.version == '22.09d'
     assert response.source_meta_.data_url == \
-        "https://evs.nci.nih.gov/ftp1/NCI_Thesaurus/"  # noqa: E501
-    assert response.source_meta_.rdp_url == 'http://reusabledata.org/ncit.html'  # noqa: E501
+        "https://evs.nci.nih.gov/ftp1/NCI_Thesaurus/"
+    assert response.source_meta_.rdp_url == 'http://reusabledata.org/ncit.html'
     assert response.source_meta_.data_license_attributes == {
         "non_commercial": False,
         "share_alike": False,
