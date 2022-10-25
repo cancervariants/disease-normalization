@@ -5,7 +5,7 @@ import logging
 from os import environ
 
 
-PROJECT_ROOT = Path(__file__).resolve().parents[0]
+APP_ROOT = Path(__file__).resolve().parents[0]
 
 # establish environment-dependent params
 if "DISEASE_NORM_EB_PROD" in environ:

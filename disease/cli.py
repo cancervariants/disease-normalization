@@ -1,14 +1,17 @@
 """This module provides a CLI util to make updates to normalizer database."""
+from timeit import default_timer as timer
+from os import environ
+from typing import Optional, List
+
 import click
-from disease import SOURCES_CLASS_LOOKUP, SOURCES_LOWER_LOOKUP, logger
+from botocore.exceptions import ClientError
+from boto3.dynamodb.conditions import Key
+
+from disease import SOURCES_CLASS_LOOKUP, logger
 from disease.schemas import SourceName
 from disease.database import Database, confirm_aws_db_use
 from disease.etl.mondo import Mondo
 from disease.etl.merge import Merge
-from botocore.exceptions import ClientError
-from boto3.dynamodb.conditions import Key
-from timeit import default_timer as timer
-from os import environ
 
 
 class CLI:
@@ -37,103 +40,151 @@ class CLI:
     @click.option(
         '--update_merged',
         is_flag=True,
-        help='Update concepts for normalize endpoint. Must select either '
-             '--update_all or include Mondo as a normalizer source argument.'
+        help='Update concepts for /normalize endpoint.'
+    )
+    @click.option(
+        '--from_local',
+        is_flag=True,
+        default=False,
+        help="Use most recent local source data instead of fetching latest versions."
     )
     def update_normalizer_db(normalizer, prod, db_url, update_all,
-                             update_merged):
+                             update_merged, from_local):
         """Update selected source(s) in the Disease Normalizer database."""
         # Sometimes DISEASE_NORM_EB_PROD is accidentally set. We should verify that
         # it should actually be used in CLI
         if "DISEASE_NORM_EB_PROD" in environ:
             confirm_aws_db_use("PROD")
 
+        endpoint_url = None
         if prod:
-            environ['DISEASE_NORM_PROD'] = "TRUE"
-            db: Database = Database()
+            environ["DISEASE_NORM_PROD"] = "TRUE"
+            db = Database()
         else:
             if db_url:
                 endpoint_url = db_url
-            elif 'DISEASE_NORM_DB_URL' in environ.keys():
-                endpoint_url = environ['DISEASE_NORM_DB_URL']
+            elif "DISEASE_NORM_DB_URL" in environ:
+                endpoint_url = environ["DISEASE_NORM_DB_URL"]
             else:
-                endpoint_url = 'http://localhost:8000'
-            db: Database = Database(db_url=endpoint_url)
+                endpoint_url = "http://localhost:8000"
+            db = Database(db_url=endpoint_url)
 
         if update_all:
-            normalizers = list(src for src in SOURCES_CLASS_LOOKUP)
-            CLI()._update_normalizers(normalizers, db, update_merged)
+            sources_to_update = list(src for src in SOURCES_CLASS_LOOKUP)
+            CLI()._update_sources(sources_to_update, db, update_merged, from_local)
         elif not normalizer:
-            CLI()._help_msg("Must provide 1 or more source names, or use `--update_all` parameter")  # noqa: E501
+            if update_merged:
+                CLI()._update_merged(db, [])
+            else:
+                CLI()._help_msg()
         else:
-            normalizers = normalizer.lower().split()
+            sources_to_update = str(normalizer).lower().split()
+            if len(sources_to_update) == 0:
+                CLI()._help_msg()
 
-            if len(normalizers) == 0:
-                CLI()._help_msg("Must provide 1 or more source names, or use `--update_all` parameter")  # noqa: E501
+            invalid_sources = set(sources_to_update) - {src for src
+                                                        in SOURCES_CLASS_LOOKUP}
+            if len(invalid_sources) != 0:
+                raise Exception(f"Not valid sources: {invalid_sources}")
 
-            non_sources = set(normalizers) - {src for src
-                                              in SOURCES_LOWER_LOOKUP}
-
-            if len(non_sources) != 0:
-                raise Exception(f"Not valid source(s): {non_sources}. \n"
-                                f"Legal sources are "
-                                f"{list(SOURCES_LOWER_LOOKUP.values())}.")
-
-            if update_merged and 'mondo' not in normalizers:
-                CLI()._help_msg("Must include Mondo in sources to update for `--update_merged`")  # noqa: E501
-
-            CLI()._update_normalizers(normalizers, db, update_merged)
+            CLI()._update_sources(sources_to_update, db, update_merged, from_local)
 
     @staticmethod
-    def _help_msg(message):
+    def _help_msg(message: Optional[str] = None):
         """Display help message."""
         ctx = click.get_current_context()
-        click.echo(message)
+        if message:
+            click.echo(message)
         click.echo(ctx.get_help())
         ctx.exit()
 
     @staticmethod
-    def _update_normalizers(normalizers, db, update_merged):
+    def _update_sources(sources: List[str], db: Database, update_merged: bool,
+                        from_local: bool = False):
         """Update selected normalizer sources."""
-        processed_ids = []
-        for n in normalizers:
-            msg = f"Deleting {n}..."
+        added_ids = []
+        for source in sources:
+            msg = f"Deleting {source}..."
             click.echo(f"\n{msg}")
             logger.info(msg)
             start_delete = timer()
-            CLI()._delete_data(n, db)
+            CLI()._delete_data(source, db)
             end_delete = timer()
             delete_time = end_delete - start_delete
-            msg = f"Deleted {n} in {delete_time:.5f} seconds."
+            msg = f"Deleted {source} in {delete_time:.5f} seconds."
             click.echo(f"{msg}\n")
             logger.info(msg)
 
-            msg = f"Loading {n}..."
+            msg = f"Loading {source}..."
             click.echo(msg)
             logger.info(msg)
             start_load = timer()
-            source = SOURCES_CLASS_LOOKUP[n](database=db)
+            source = SOURCES_CLASS_LOOKUP[source](database=db)
             if isinstance(source, Mondo):
-                processed_ids = source.perform_etl()
+                added_ids = source.perform_etl(from_local)
             else:
                 source.perform_etl()
             end_load = timer()
             load_time = end_load - start_load
-            msg = f"Loaded {n} in {load_time:.5f} seconds."
+            msg = f"Loaded {source} in {load_time:.5f} seconds."
             click.echo(msg)
             logger.info(msg)
-            msg = f"Total time for {n}: " \
+            msg = f"Total time for {source}: " \
                   f"{(delete_time + load_time):.5f} seconds."
             click.echo(msg)
             logger.info(msg)
-        if update_merged and processed_ids:
-            click.echo("Generating merged concepts...")
-            merge = Merge(database=db)
-            merge.create_merged_concepts(processed_ids)
-            click.echo("Merged concept generation complete.")
+        if update_merged:
+            CLI()._update_merged(db, added_ids)
+
+    def _update_merged(self, db: Database, added_ids: List[str]) -> None:
+        """Update merged concepts and references.
+        :param db: Database client
+        :param added_ids: list of concept IDs to use for normalized groups.
+            Should consist solely of MONDO IDs. If empty, will be fetched.
+        """
+        start_merge = timer()
+        if not added_ids:
+            CLI()._delete_merged_data(db)
+            added_ids = db.get_ids_for_merge()
+        merge = Merge(database=db)
+        click.echo("Constructing normalized records...")
+        merge.create_merged_concepts(added_ids)
+        end_merge = timer()
+        click.echo(f"Merged concept generation completed in"
+                   f" {(end_merge - start_merge):.5f} seconds.")
 
     @staticmethod
-    def _delete_data(source, database):
+    def _delete_merged_data(database: Database):
+        """Delete data pertaining to merged records.
+        :param database: DynamoDB client
+        """
+        click.echo("\nDeleting normalized records...")
+        start_delete = timer()
+        try:
+            while True:
+                with database.diseases.batch_writer(
+                        overwrite_by_pkeys=["label_and_type", "concept_id"]) \
+                        as batch:
+                    response = database.diseases.query(
+                        IndexName="type_index",
+                        KeyConditionExpression=Key("item_type").eq("merger"),
+                    )
+                    records = response["Items"]
+                    if not records:
+                        break
+                    for record in records:
+                        batch.delete_item(Key={
+                            "label_and_type": record["label_and_type"],
+                            "concept_id": record["concept_id"]
+                        })
+        except ClientError as e:
+            click.echo(e.response["Error"]["Message"])
+        end_delete = timer()
+        delete_time = end_delete - start_delete
+        click.echo(f"Deleted normalized records in {delete_time:.5f} seconds.")
+
+    @staticmethod
+    def _delete_data(source: str, database: Database):
         # Delete source's metadata
         try:
             metadata = database.metadata.query(

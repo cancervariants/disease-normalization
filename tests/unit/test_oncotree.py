@@ -139,7 +139,7 @@ def test_meta(oncotree):
     assert response.source_meta_.data_license == 'CC BY 4.0'
     assert response.source_meta_.data_license_url == \
         'https://creativecommons.org/licenses/by/4.0/legalcode'
-    assert response.source_meta_.version == '2020_10_01'
+    assert response.source_meta_.version == "2021-11-02"
     assert response.source_meta_.data_url == \
         'http://oncotree.mskcc.org/#/home?tab=api'
     assert response.source_meta_.rdp_url is None
