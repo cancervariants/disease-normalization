@@ -124,7 +124,6 @@ def richter():
         ],
         "associated_with": [
             "umls:C0349631",
-            "icd10:C91.1",
             "gard:0007578",
             "gard:7578",
             "icd10.cm:C91.1"
@@ -145,7 +144,6 @@ def ped_liposarcoma():
             "Liposarcoma",
             "Pediatric Liposarcoma",
             "childhood liposarcoma",
-            "liposarcoma",
             "pediatric liposarcoma"
         ],
         "associated_with": ["umls:C0279984"],
