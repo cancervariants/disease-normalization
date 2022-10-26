@@ -8,7 +8,11 @@ class OMIM(Base):
     """Gather and load data from OMIM."""
 
     def _extract_data(self, use_existing: bool = False):
-        """TODO"""
+        """Override parent extract method to enforce OMIM-specific data file
+        requirements.
+        :param use_existing: technically non-functional, but included to match
+        sibling method signatures. If True, will print warning but otherwise proceed.
+        """
         if not use_existing:
             logger.warning(
                 "Overruling provided `use_existing` parameter. OMIM data is not "
@@ -29,7 +33,7 @@ class OMIM(Base):
     def _load_meta(self):
         """Load source metadata."""
         metadata = SourceMeta(data_license="custom",
-                              data_license_url="https://omim.org/help/agreement",  # noqa: E501
+                              data_license_url="https://omim.org/help/agreement",
                               version=self._data_file.stem.split('_', 1)[1],
                               data_url="https://www.omim.org/downloads",
                               rdp_url='http://reusabledata.org/omim.html',
