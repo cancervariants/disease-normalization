@@ -227,7 +227,7 @@
       "Richter's transformation"
     ],
     "xrefs": ["ncit:C35424", "DOID:1703"],
-    "associated_with": ["icd10:C91.1", "umls:C0349631", "gard:0007578"]
+    "associated_with": ["umls:C0349631", "gard:0007578"]
   },
   {
     "label_and_type": "gard:0007578##associated_with",
