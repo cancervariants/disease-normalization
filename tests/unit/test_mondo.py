@@ -45,7 +45,6 @@ def neuroblastoma():
             "icdo:9500/3",
             "umls:CN205405",
             "efo:0000621",
-            "icd10:C74.9",
             "mesh:D009447"
         ],
         "pediatric_disease": None,
@@ -65,7 +64,6 @@ def richter_syndrome():
         ],
         "xrefs": ["ncit:C35424", "DOID:1703"],
         "associated_with": [
-            "icd10:C91.1",
             "umls:C0349631",
             "gard:0007578",
         ],
@@ -83,7 +81,6 @@ def pediatric_liposarcoma():
         "label": "pediatric liposarcoma",
         "aliases": [
             "childhood liposarcoma",
-            "liposarcoma"
         ],
         "xrefs": ["DOID:5695", "ncit:C8091"],
         "associated_with": [
@@ -113,10 +110,10 @@ def nsclc():
     """Construct a test fixture for non small cell lung cancer."""
     return Disease(**{
         "concept_id": "mondo:0005233",
-        "label": "non-small cell lung carcinoma (disease)",
+        "label": "non-small cell lung carcinoma",
         "aliases": [
             "NSCLC - non-small cell lung cancer",
-            "non-small cell lung carcinoma",
+            "non-small cell lung carcinoma (disease)",
             "non-small cell carcinoma of lung",
             "non-small cell carcinoma of the lung",
             "non-small cell cancer of lung",
@@ -128,10 +125,10 @@ def nsclc():
         "associated_with": [
             "mesh:D002289",
             "umls:C0007131",
-            "icd10:C34",
             "efo:0003060",
             "kegg.disease:05223",
-            "HP:0030358"
+            "HP:0030358",
+            "orphanet:488201"
         ]
     })
 
@@ -300,7 +297,7 @@ def test_meta(mondo):
     assert response.source_meta_.data_license == 'CC BY 4.0'
     assert response.source_meta_.data_license_url == \
         'https://creativecommons.org/licenses/by/4.0/legalcode'
-    assert response.source_meta_.version == '20210129'
+    assert response.source_meta_.version == "2022-10-11"
     assert response.source_meta_.data_url == \
         'https://mondo.monarchinitiative.org/pages/download/'
     assert response.source_meta_.rdp_url == 'http://reusabledata.org/monarch.html'  # noqa: E501

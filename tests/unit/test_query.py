@@ -60,14 +60,13 @@ def neuroblastoma():
                     "efo:0000621",
                     "gard:7185",
                     "gard:0007185",
-                    "icd10:C74.9",
                     "icdo:9500/3",
-                    "icdo:M9500/3",
                     "mesh:D009447",
                     "meddra:10029260",
                     "nifstd:birnlex_12631",
                     "orphanet:635",
-                    "umls:CN205405"
+                    "umls:CN205405",
+                    "umls:C2751421"
                 ]
             }
         ]
@@ -104,7 +103,8 @@ def mafd2():
             "BPAD",
             "MAFD2",
             "BIPOLAR AFFECTIVE DISORDER",
-            "MANIC-DEPRESSIVE PSYCHOSIS, X-LINKED"
+            "MANIC-DEPRESSIVE PSYCHOSIS, X-LINKED",
+            "major affective disorder 2, X-linked dominant"
         ],
         "xrefs": [
             "omim:309200"

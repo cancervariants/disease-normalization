@@ -51,12 +51,11 @@ def neuroblastoma():
         ],
         "associated_with": [
             "umls:C0027819",
+            "umls:C2751421",
             "icdo:9500/3",
             "efo:0000621",
             "gard:7185",
             "gard:0007185",
-            "icd10:C74.9",
-            "icdo:M9500/3",
             "mesh:D009447",
             "meddra:10029260",
             "nifstd:birnlex_12631",
@@ -76,32 +75,33 @@ def lnscc():
         "xrefs": ["mondo:0005233", "oncotree:NSCLC", "DOID:3908"],
         "label": "Lung Non-Small Cell Carcinoma",
         "aliases": [
-            "Non Small Cell Lung Cancer NOS",
-            "Non-Small Cell Lung Cancer",
-            "Non-Small Cell Cancer of the Lung",
-            "NSCLC",
-            "non-small cell lung cancer",
-            "Non-Small Cell Carcinoma of the Lung",
-            "Non-Small Cell Cancer of Lung",
-            "Non-small cell lung cancer, NOS",
-            "Non-Small Cell Carcinoma of Lung",
             "NSCLC - Non-Small Cell Lung Cancer",
-            "Non-Small Cell Lung Carcinoma",
             "NSCLC - non-small cell lung cancer",
-            "non-small cell lung carcinoma",
-            "non-small cell carcinoma of lung",
-            "non-small cell carcinoma of the lung",
+            "NSCLC",
+            "Non Small Cell Lung Cancer NOS",
+            "Non-Small Cell Cancer of Lung",
+            "Non-Small Cell Cancer of the Lung",
+            "Non-Small Cell Carcinoma of Lung",
+            "Non-Small Cell Carcinoma of the Lung",
+            "Non-Small Cell Lung Cancer",
+            "Non-Small Cell Lung Carcinoma",
+            "Non-small cell lung cancer",
+            "Non-small cell lung cancer, NOS",
             "non-small cell cancer of lung",
             "non-small cell cancer of the lung",
+            "non-small cell carcinoma of lung",
+            "non-small cell carcinoma of the lung",
+            "non-small cell lung cancer",
+            "non-small cell lung carcinoma (disease)",
+            "non-small cell lung carcinoma",
         ],
         "associated_with": [
             "umls:C0007131",
             "mesh:D002289",
-            "umls:C0007131",
             "efo:0003060",
-            "icd10:C34",
             "kegg.disease:05223",
-            "HP:0030358"
+            "HP:0030358",
+            "orphanet:488201"
         ],
         "item_type": "merger"
     }
@@ -125,7 +125,6 @@ def richter():
         ],
         "associated_with": [
             "umls:C0349631",
-            "icd10:C91.1",
             "gard:0007578",
             "gard:7578",
             "icd10.cm:C91.1"
@@ -146,7 +145,6 @@ def ped_liposarcoma():
             "Liposarcoma",
             "Pediatric Liposarcoma",
             "childhood liposarcoma",
-            "liposarcoma",
             "pediatric liposarcoma"
         ],
         "associated_with": ["umls:C0279984"],
@@ -180,11 +178,17 @@ def mafd2():
         "concept_id": "mondo:0010648",
         "label": "major affective disorder 2",
         "aliases": [
-            "MAFD2"
+          "MANIC-DEPRESSIVE ILLNESS",
+          "MDX",
+          "MDI",
+          "MANIC-DEPRESSIVE PSYCHOSIS, X-LINKED",
+          "BPAD",
+          "BIPOLAR AFFECTIVE DISORDER",
+          "MAFD2",
+          "major affective disorder 2, X-linked dominant"
         ],
         "associated_with": [
-            "mesh:C564108",
-            "omim:309200"
+            "mesh:C564108"
         ]
     }
 

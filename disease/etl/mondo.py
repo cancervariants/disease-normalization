@@ -1,12 +1,9 @@
 """Module to load disease data from Mondo Disease Ontology."""
-from .base import OWLBase
-from disease import PROJECT_ROOT, PREFIX_LOOKUP, logger
-from disease.database import Database
-from disease.schemas import SourceMeta, SourceName, NamespacePrefix
-from pathlib import Path
-import requests
 import owlready2 as owl
-from typing import List
+
+from .base import OWLBase
+from disease import PREFIX_LOOKUP, logger
+from disease.schemas import SourceMeta, SourceName, NamespacePrefix
 
 
 MONDO_PREFIX_LOOKUP = {
@@ -49,47 +46,12 @@ MONDO_PREFIX_LOOKUP = {
 class Mondo(OWLBase):
     """Gather and load data from Mondo."""
 
-    def __init__(self,
-                 database: Database,
-                 src_dload_page: str = "https://mondo.monarchinitiative.org/pages/download/",  # noqa: E501
-                 src_url: str = "http://purl.obolibrary.org/obo/mondo.owl",
-                 version: str = "20210129",
-                 data_path: Path = PROJECT_ROOT / 'data' / 'mondo'):
-        """Override base class init method.
-
-        :param therapy.database.Database database: app database instance
-        :param str src_dload_page: user-facing download page
-        :param str src_url: direct URL to OWL file download
-        :param pathlib.Path data_path: path to local Mondo data directory
-        """
-        self._SRC_DLOAD_PAGE = src_dload_page
-        self._SRC_URL = src_url
-        self._version = version
-        super().__init__(database=database, data_path=data_path)
-
-    def perform_etl(self) -> List[str]:
-        """Public-facing method to initiate ETL procedures on given data.
-
-        :return: List of concept IDs that were added.
-        """
-        self._extract_data()
-        self._load_meta()
-        self._transform_data()
-        self.database.flush_batch()
-        return self._processed_ids
-
     def _download_data(self):
         """Download Mondo thesaurus source file for loading into normalizer."""
         logger.info('Downloading Mondo data...')
-        try:
-            response = requests.get(self._SRC_URL, stream=True)
-        except requests.exceptions.RequestException as e:
-            logger.error(f'Mondo download failed: {e}')
-            raise e
-        handle = open(self._data_path / f'mondo_{self._version}.owl', "wb")
-        for chunk in response.iter_content(chunk_size=512):
-            if chunk:
-                handle.write(chunk)
+        url = "http://purl.obolibrary.org/obo/mondo.owl"
+        output_file = self._src_dir / f"mondo_{self._version}.owl"
+        self._http_download(url, output_file)
         logger.info('Finished downloading Mondo Disease Ontology')
 
     def _load_meta(self):
@@ -97,7 +59,7 @@ class Mondo(OWLBase):
         metadata = SourceMeta(data_license="CC BY 4.0",
                               data_license_url="https://creativecommons.org/licenses/by/4.0/legalcode",  # noqa: E501
                               version=self._version,
-                              data_url=self._SRC_DLOAD_PAGE,
+                              data_url="https://mondo.monarchinitiative.org/pages/download/",  # noqa: E501
                               rdp_url='http://reusabledata.org/monarch.html',
                               data_license_attributes={
                                   'non_commercial': False,

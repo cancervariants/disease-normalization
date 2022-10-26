@@ -1,46 +1,30 @@
 """Module to load disease data from OMIM."""
 from .base import Base
-from disease import PROJECT_ROOT, DownloadException, logger
+from disease import DownloadException, logger
 from disease.schemas import SourceMeta, SourceName, Disease, NamespacePrefix
-from disease.database import Database
-from pathlib import Path
-from typing import List
 
 
 class OMIM(Base):
     """Gather and load data from OMIM."""
 
-    def __init__(self,
-                 database: Database,
-                 src_url: str = "https://www.omim.org/downloads",
-                 data_path: Path = PROJECT_ROOT / 'data' / 'omim'):
-        """Override base class init method.
-
-        :param therapy.database.Database database: app database instance
-        :param pathlib.Path data_path: path to local OMIM data directory
+    def _extract_data(self, use_existing: bool = False):
+        """Override parent extract method to enforce OMIM-specific data file
+        requirements.
+        :param use_existing: technically non-functional, but included to match
+        sibling method signatures. If True, will print warning but otherwise proceed.
         """
-        self._SRC_URL = src_url
-        super().__init__(database=database, data_path=data_path)
-
-    def perform_etl(self) -> List[str]:
-        """Public-facing method to initiate ETL procedures on given data.
-
-        :return: empty list (because OMIM IDs shouldn't be used to construct
-            merged concept groups)
-        """
+        if not use_existing:
+            logger.warning(
+                "Overruling provided `use_existing` parameter. OMIM data is not "
+                "publicly available - see README for details - and must be manually "
+                f"placed in {self._src_dir.absolute().as_uri()}"
+            )
         try:
-            self._extract_data()
-        except DownloadException:
-            logger.error("OMIM data extraction failed: input file must be "
-                         "manually placed in data directory.")
-            raise DownloadException(f"Could not access OMIM data - see README "
-                                    f"for details. Input data must be "
-                                    f"manually placed in "
-                                    f"{self._data_path.absolute().as_uri()}")
-        self._load_meta()
-        self._transform_data()
-        self.database.flush_batch()
-        return []
+            super()._extract_data(True)
+        except FileNotFoundError:
+            raise FileNotFoundError("Could not locate OMIM data. Per README, OMIM "
+                                    "source files must be manually placed in "
+                                    f"{self._src_dir.absolute().as_uri()}")
 
     def _download_data(self):
         """Download OMIM source data for loading into normalizer."""
@@ -49,9 +33,9 @@ class OMIM(Base):
     def _load_meta(self):
         """Load source metadata."""
         metadata = SourceMeta(data_license="custom",
-                              data_license_url="https://omim.org/help/agreement",  # noqa: E501
+                              data_license_url="https://omim.org/help/agreement",
                               version=self._data_file.stem.split('_', 1)[1],
-                              data_url=self._SRC_URL,
+                              data_url="https://www.omim.org/downloads",
                               rdp_url='http://reusabledata.org/omim.html',
                               data_license_attributes={
                                   'non_commercial': False,
