@@ -265,7 +265,7 @@
     "merge_ref": "ncit:C8091",
     "concept_id": "mondo:0003587",
     "label": "pediatric liposarcoma",
-    "aliases": ["childhood liposarcoma", "liposarcoma"],
+    "aliases": ["childhood liposarcoma"],
     "pediatric_disease": true,
     "xrefs": ["DOID:5695", "ncit:C8091"],
     "associated_with": ["umls:C0279984"],
@@ -731,7 +731,6 @@
     ],
     "associated_with": [
       "umls:C0349631",
-      "icd10:C91.1",
       "gard:0007578",
       "gard:7578",
       "icd10.cm:C91.1"
