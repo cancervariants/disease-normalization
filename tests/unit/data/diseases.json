@@ -7,17 +7,17 @@
     "concept_id": "ncit:C2926",
     "label": "Lung Non-Small Cell Carcinoma",
     "aliases": [
+      "Non-Small Cell Carcinoma of Lung",
       "Non Small Cell Lung Cancer NOS",
-      "Non-Small Cell Lung Cancer",
-      "Non-Small Cell Cancer of the Lung",
       "NSCLC",
       "non-small cell lung cancer",
       "Non-Small Cell Carcinoma of the Lung",
-      "Non-Small Cell Cancer of Lung",
+      "Non-Small Cell Cancer of the Lung",
+      "Non-Small Cell Lung Carcinoma",
       "Non-small cell lung cancer, NOS",
-      "Non-Small Cell Carcinoma of Lung",
+      "Non-Small Cell Lung Cancer",
       "NSCLC - Non-Small Cell Lung Cancer",
-      "Non-Small Cell Lung Carcinoma"
+      "Non-Small Cell Cancer of Lung"
     ],
     "associated_with": ["umls:C0007131"]
   },
@@ -429,16 +429,16 @@
     "src_name": "Mondo",
     "merge_ref": "ncit:c2926",
     "concept_id": "mondo:0005233",
-    "label": "non-small cell lung carcinoma (disease)",
+    "label": "non-small cell lung carcinoma",
     "aliases": [
-      "NSCLC - non-small cell lung cancer",
-      "non-small cell lung carcinoma",
-      "non-small cell carcinoma of lung",
-      "non-small cell carcinoma of the lung",
-      "non-small cell cancer of lung",
-      "non-small cell lung cancer",
-      "non-small cell cancer of the lung",
-      "NSCLC"
+       "non-small cell cancer of lung",
+       "non-small cell carcinoma of the lung",
+       "NSCLC",
+       "non-small cell lung cancer",
+       "non-small cell lung carcinoma (disease)",
+       "NSCLC - non-small cell lung cancer",
+       "non-small cell carcinoma of lung",
+       "non-small cell cancer of the lung"
     ],
     "xrefs": ["ncit:C2926", "oncotree:NSCLC", "DOID:3908"],
     "associated_with": [
@@ -640,6 +640,11 @@
       "kegg.disease:05223",
       "efo:0003060",
       "mesh:D002289"
+    ],
+    "aliases": [
+      "non-small cell lung carcinoma",
+      "Non-small cell lung cancer",
+      "NSCLC"
     ]
   },
   {
