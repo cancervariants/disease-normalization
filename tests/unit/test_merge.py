@@ -51,12 +51,11 @@ def neuroblastoma():
         ],
         "associated_with": [
             "umls:C0027819",
+            "umls:C2751421",
             "icdo:9500/3",
             "efo:0000621",
             "gard:7185",
             "gard:0007185",
-            "icd10:C74.9",
-            "icdo:M9500/3",
             "mesh:D009447",
             "meddra:10029260",
             "nifstd:birnlex_12631",
