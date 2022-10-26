@@ -98,11 +98,10 @@ def lnscc():
         "associated_with": [
             "umls:C0007131",
             "mesh:D002289",
-            "umls:C0007131",
             "efo:0003060",
-            "icd10:C34",
             "kegg.disease:05223",
-            "HP:0030358"
+            "HP:0030358",
+            "orphanet:488201"
         ],
         "item_type": "merger"
     }
@@ -179,11 +178,17 @@ def mafd2():
         "concept_id": "mondo:0010648",
         "label": "major affective disorder 2",
         "aliases": [
-            "MAFD2"
+          "MANIC-DEPRESSIVE ILLNESS",
+          "MDX",
+          "MDI",
+          "MANIC-DEPRESSIVE PSYCHOSIS, X-LINKED",
+          "BPAD",
+          "BIPOLAR AFFECTIVE DISORDER",
+          "MAFD2",
+          "major affective disorder 2, X-linked dominant"
         ],
         "associated_with": [
-            "mesh:C564108",
-            "omim:309200"
+            "mesh:C564108"
         ]
     }
 

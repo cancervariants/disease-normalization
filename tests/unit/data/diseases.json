@@ -445,7 +445,7 @@
       "mesh:D002289",
       "umls:C0007131",
       "efo:0003060",
-      "icd10:C34",
+      "orphanet:488201",
       "kegg.disease:05223",
       "HP:0030358"
     ]
@@ -715,7 +715,7 @@
       "mesh:D002289",
       "umls:C0007131",
       "efo:0003060",
-      "icd10:C34",
+      "orphanet:488201",
       "kegg.disease:05223",
       "HP:0030358"
     ]
@@ -773,9 +773,9 @@
     "merge_ref": "mondo:0010648",
     "label": "major affective disorder 2",
     "concept_id": "mondo:0010648",
-    "aliases": ["MAFD2"],
-    "xrefs": ["DOID:0080221"],
-    "associated_with": ["mesh:C564108", "omim:309200"]
+    "aliases": ["MAFD2", "major affective disorder 2, X-linked dominant"],
+    "xrefs": ["DOID:0080221", "omim:309200"],
+    "associated_with": ["mesh:C564108"]
   },
   {
     "label_and_type": "major affective disorder 2##label",
@@ -794,7 +794,7 @@
     "item_type": "merger",
     "concept_id": "mondo:0010648",
     "label": "major affective disorder 2",
-    "aliases": ["MDI","MDX","MANIC-DEPRESSIVE ILLNESS","BPAD","MAFD2","BIPOLAR AFFECTIVE DISORDER","MANIC-DEPRESSIVE PSYCHOSIS, X-LINKED"],
+    "aliases": ["MDI","MDX","MANIC-DEPRESSIVE ILLNESS","BPAD","MAFD2","BIPOLAR AFFECTIVE DISORDER","MANIC-DEPRESSIVE PSYCHOSIS, X-LINKED","major affective disorder 2, X-linked dominant"],
     "xrefs": ["omim:309200"],
     "associated_with": ["mesh:C564108"]
   },
