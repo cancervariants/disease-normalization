@@ -1,36 +1,20 @@
 """The VICC library for normalizing diseases."""
-from .version import __version__  # noqa: F401
 from pathlib import Path
 import logging
-from os import environ
+
+from .version import __version__  # noqa: F401
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[0]
 
-# establish environment-dependent params
-if "DISEASE_NORM_EB_PROD" in environ:
-    environ["DISEASE_NORM_EB_PROD"] = "true"
-    LOG_FN = "/tmp/disease.log"
-else:
-    LOG_FN = "disease.log"
-
 # set up logging
 logging.basicConfig(
-    filename=LOG_FN,
+    filename="disease.log",
     format="[%(asctime)s] - %(name)s - %(levelname)s : %(message)s"
 )
 logger = logging.getLogger("disease")
 logger.setLevel(logging.DEBUG)
 logger.handlers = []
-
-if "DISEASE_NORM_EB_PROD" in environ:
-    ch = logging.StreamHandler()
-    ch.setLevel(logging.DEBUG)
-    logger.addHandler(ch)
-
-    logging.getLogger("boto3").setLevel(logging.INFO)
-    logging.getLogger("botocore").setLevel(logging.INFO)
-    logging.getLogger("nose").setLevel(logging.INFO)
 
 
 class DownloadException(Exception):
@@ -65,13 +49,3 @@ NAMESPACE_LOOKUP = {v.value.lower(): NamespacePrefix[k].value
 
 # Use for checking whether to pull IDs for merge group generation
 SOURCES_FOR_MERGE = {SourceName.MONDO.value}
-
-from disease.etl import NCIt  # noqa: E402 F401
-from disease.etl import Mondo  # noqa: E402 F401
-from disease.etl import DO  # noqa: E402 F401
-from disease.etl import OncoTree  # noqa: E402 F401
-from disease.etl import OMIM  # noqa: E402 F401
-# Use to lookup class object from source name. Should be one key-value pair
-# for every functioning ETL class.
-SOURCES_CLASS_LOOKUP = {s.value.lower(): eval(s.value)
-                        for s in SourceName.__members__.values()}
