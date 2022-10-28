@@ -1,14 +1,27 @@
 """This module provides a CLI util to make updates to normalizer database."""
-import click
-from disease import SOURCES_CLASS_LOOKUP, SOURCES_LOWER_LOOKUP, logger
-from disease.schemas import SourceName
-from disease.database import Database, confirm_aws_db_use
-from disease.etl.mondo import Mondo
-from disease.etl.merge import Merge
-from botocore.exceptions import ClientError
-from boto3.dynamodb.conditions import Key
 from timeit import default_timer as timer
 from os import environ
+
+import click
+from botocore.exceptions import ClientError
+from boto3.dynamodb.conditions import Key
+
+from disease import SOURCES_LOWER_LOOKUP, logger
+from disease.schemas import SourceName
+from disease.database import Database, confirm_aws_db_use, SKIP_AWS_DB_ENV_NAME, \
+    VALID_AWS_ENV_NAMES, AWS_ENV_VAR_NAME
+from disease.etl.merge import Merge
+from disease.etl.mondo import Mondo
+from disease.etl import NCIt  # noqa: F401
+from disease.etl import DO  # noqa: F401
+from disease.etl import OncoTree  # noqa: F401
+from disease.etl import OMIM  # noqa: F401
+
+
+# Use to lookup class object from source name. Should be one key-value pair
+# for every functioning ETL class.
+SOURCES_CLASS_LOOKUP = {s.value.lower(): eval(s.value)
+                        for s in SourceName.__members__.values()}
 
 
 class CLI:
@@ -21,9 +34,9 @@ class CLI:
         help="The source(s) you wish to update separated by spaces."
     )
     @click.option(
-        '--prod',
-        is_flag=True,
-        help="Working in production environment."
+        '--aws_instance',
+        help=" Must be `Dev`, `Staging`, or `Prod`. This determines the AWS instance to"
+             " use. `Dev` uses nonprod. `Staging` and `Prod` uses prod."
     )
     @click.option(
         '--db_url',
@@ -40,16 +53,18 @@ class CLI:
         help='Update concepts for normalize endpoint. Must select either '
              '--update_all or include Mondo as a normalizer source argument.'
     )
-    def update_normalizer_db(normalizer, prod, db_url, update_all,
+    def update_normalizer_db(normalizer, aws_instance, db_url, update_all,
                              update_merged):
         """Update selected source(s) in the Disease Normalizer database."""
-        # Sometimes DISEASE_NORM_EB_PROD is accidentally set. We should verify that
-        # it should actually be used in CLI
-        if "DISEASE_NORM_EB_PROD" in environ:
-            confirm_aws_db_use("PROD")
-
-        if prod:
-            environ['DISEASE_NORM_PROD'] = "TRUE"
+        # If SKIP_AWS_CONFIRMATION is accidentally set, we should verify that the
+        # aws instance should actually be used
+        invalid_aws_msg = f"{AWS_ENV_VAR_NAME} must be set to one of {VALID_AWS_ENV_NAMES}"  # noqa: E501
+        aws_env_name = environ.get(AWS_ENV_VAR_NAME) or aws_instance
+        if aws_env_name:
+            assert aws_env_name in VALID_AWS_ENV_NAMES, invalid_aws_msg
+            environ[AWS_ENV_VAR_NAME] = aws_env_name
+            confirm_aws_db_use(aws_env_name.upper())
+            environ[SKIP_AWS_DB_ENV_NAME] = "true"  # this is already checked above
             db: Database = Database()
         else:
             if db_url:

@@ -9,3 +9,4 @@ exclude =
   outputs
   docs/*
   disease/version.py
+  build
