@@ -5,7 +5,7 @@ from typing import Any, Dict, Type, List, Optional, Union
 from enum import Enum, IntEnum
 from pydantic import BaseModel, StrictBool
 from datetime import datetime
-from ga4gh.vrsatile.pydantic.vrsatile_models import ValueObjectDescriptor
+from ga4gh.vrsatile.pydantic.vrsatile_models import DiseaseDescriptor
 
 
 class MatchType(IntEnum):
@@ -316,7 +316,7 @@ class NormalizationService(BaseModel):
     query: str
     warnings: Optional[Dict]
     match_type: MatchType
-    disease_descriptor: Optional[ValueObjectDescriptor]
+    disease_descriptor: Optional[DiseaseDescriptor]
     source_meta_: Optional[Dict[SourceName, SourceMeta]]
     service_meta_: ServiceMeta
 

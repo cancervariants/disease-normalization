@@ -5,6 +5,8 @@ name = "pypi"
 
 [dev-packages]
 disease-normalizer = {editable = true, path = "."}
+bioversions = "*"
+requests = "*"
 click = "*"
 owlready2 = "*"
 rdflib = "*"
@@ -23,7 +25,4 @@ pydantic = "*"
 fastapi = ">=0.72.0"
 uvicorn = "*"
 boto3 = "*"
-requests = "*"
-typing-extensions = "*"
-bioversions = "*"
-"ga4gh.vrsatile.pydantic" = "==0.0.11"
+"ga4gh.vrsatile.pydantic" = ">=0.1.dev3"
