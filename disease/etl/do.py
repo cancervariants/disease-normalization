@@ -63,7 +63,9 @@ class DO(OWLBase):
         """Transform source data and send to loading method."""
         do = owl.get_ontology(self._data_file.absolute().as_uri()).load()
         disease_uri = 'http://purl.obolibrary.org/obo/DOID_4'
-        diseases = self._get_subclasses(disease_uri)
+        diseases = self._get_subclasses(
+            disease_uri, owl.default_world.as_rdflib_graph()
+        )
         for uri in diseases:
             disease_class = do.search(iri=uri)[0]
             if disease_class.deprecated:

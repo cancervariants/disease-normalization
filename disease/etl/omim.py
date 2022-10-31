@@ -29,7 +29,7 @@ class OMIM(Base):
     def _load_meta(self):
         """Load source metadata."""
         metadata = SourceMeta(data_license="custom",
-                              data_license_url="https://omim.org/help/agreement",  # noqa: E501
+                              data_license_url="https://omim.org/help/agreement",
                               version=self._data_file.stem.split('_', 1)[1],
                               data_url="https://www.omim.org/downloads",
                               rdp_url='http://reusabledata.org/omim.html',

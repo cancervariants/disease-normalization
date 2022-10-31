@@ -162,11 +162,8 @@
     "xrefs": ["DOID:769", "ncit:C3270", "oncotree:NBL"],
     "associated_with": [
       "orphanet:635",
-      "nifstd:birnlex_12631",
       "umls:C0027819",
       "gard:0007185",
-      "meddra:10029260",
-      "icdo:9500/3",
       "umls:CN205405",
       "efo:0000621",
       "mesh:D009447"
@@ -174,12 +171,6 @@
   },
   {
     "label_and_type": "orphanet:635##associated_with",
-    "item_type": "associated_with",
-    "src_name": "Mondo",
-    "concept_id": "mondo:0005072"
-  },
-  {
-    "label_and_type": "icdo:9500/3##associated_with",
     "item_type": "associated_with",
     "src_name": "Mondo",
     "concept_id": "mondo:0005072"
@@ -445,9 +436,7 @@
       "mesh:D002289",
       "umls:C0007131",
       "efo:0003060",
-      "orphanet:488201",
-      "kegg.disease:05223",
-      "HP:0030358"
+      "orphanet:488201"
     ]
   },
   {
@@ -678,8 +667,6 @@
       "gard:7185",
       "icdo:9500/3",
       "mesh:D009447",
-      "meddra:10029260",
-      "nifstd:birnlex_12631",
       "orphanet:635",
       "umls:C2751421",
       "umls:CN205405"
@@ -713,11 +700,9 @@
     "associated_with": [
       "umls:C0007131",
       "mesh:D002289",
-      "umls:C0007131",
       "efo:0003060",
       "orphanet:488201",
-      "kegg.disease:05223",
-      "HP:0030358"
+      "kegg.disease:05223"
     ]
   },
   {
@@ -774,7 +759,7 @@
     "label": "major affective disorder 2",
     "concept_id": "mondo:0010648",
     "aliases": ["MAFD2", "major affective disorder 2, X-linked dominant"],
-    "xrefs": ["DOID:0080221", "omim:309200"],
+    "xrefs": ["omim:309200"],
     "associated_with": ["mesh:C564108"]
   },
   {
