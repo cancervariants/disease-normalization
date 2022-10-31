@@ -8,7 +8,11 @@ class OMIM(Base):
     """Gather and load data from OMIM."""
 
     def _extract_data(self, use_existing: bool = False):
-        """TODO"""
+        """Override parent extract method to enforce OMIM-specific data file
+        requirements.
+        :param use_existing: technically non-functional, but included to match
+        sibling method signatures. If True, will print warning but otherwise proceed.
+        """
         if not use_existing:
             logger.warning(
                 "Overruling provided `use_existing` parameter. OMIM data is not "
