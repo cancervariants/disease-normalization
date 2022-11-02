@@ -5,7 +5,7 @@ import logging
 from .version import __version__  # noqa: F401
 
 
-PROJECT_ROOT = Path(__file__).resolve().parents[0]
+APP_ROOT = Path(__file__).resolve().parents[0]
 
 # set up logging
 logging.basicConfig(

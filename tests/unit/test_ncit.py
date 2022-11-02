@@ -37,7 +37,7 @@ def neuroblastoma():
             "neuroblastoma"
         ],
         "xrefs": [],
-        "associated_with": ["umls:C0027819", "icdo:9500/3"],
+        "associated_with": ["umls:C2751421", "icdo:9500/3"],
         "src_name": "NCIt"
     })
 
@@ -183,10 +183,10 @@ def test_meta(ncit):
     assert response.source_meta_.data_license == 'CC BY 4.0'
     assert response.source_meta_.data_license_url == \
         'https://creativecommons.org/licenses/by/4.0/legalcode'
-    assert response.source_meta_.version == '21.01d'
+    assert response.source_meta_.version == '22.09d'
     assert response.source_meta_.data_url == \
-        "https://evs.nci.nih.gov/ftp1/NCI_Thesaurus/archive/21.01d_Release/"  # noqa: E501
-    assert response.source_meta_.rdp_url == 'http://reusabledata.org/ncit.html'  # noqa: E501
+        "https://evs.nci.nih.gov/ftp1/NCI_Thesaurus/"
+    assert response.source_meta_.rdp_url == 'http://reusabledata.org/ncit.html'
     assert response.source_meta_.data_license_attributes == {
         "non_commercial": False,
         "share_alike": False,

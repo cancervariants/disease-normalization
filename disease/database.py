@@ -259,6 +259,32 @@ class Database:
                          f"{e.response['Error']['Message']}")
             return []
 
+    def get_ids_for_merge(self) -> List[str]:
+        """Retrieve concept IDs for use in generating normalized records.
+        :return: List of concept IDs as strings.
+        """
+        last_evaluated_key = None
+        concept_ids = []
+        params = {
+            "ProjectionExpression": "concept_id,item_type,src_name",
+        }
+        while True:
+            if last_evaluated_key:
+                response = self.diseases.scan(
+                    ExclusiveStartKey=last_evaluated_key, **params
+                )
+            else:
+                response = self.diseases.scan(**params)
+            records = response["Items"]
+            for record in records:
+                if record["item_type"] == "identity" and record["src_name"] == "Mondo":
+                    concept_id = record["concept_id"]
+                    concept_ids.append(concept_id)
+            last_evaluated_key = response.get("LastEvaluatedKey")
+            if not last_evaluated_key:
+                break
+        return concept_ids
+
     def add_record(self, record: Dict, record_type: str = "identity"):
         """Add new record to database.
 
