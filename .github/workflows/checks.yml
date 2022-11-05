@@ -1,4 +1,4 @@
-name: github-actions
+name: checks
 on: [push, pull_request]
 jobs:
   test:
@@ -22,9 +22,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
     - name: Install dependencies
-      run: |
-          python3 -m pip install pipenv
-          pipenv install --dev
+      run: python3 -m pip install .
 
     - name: Build local DynamoDB
       run: |
@@ -32,10 +30,10 @@ jobs:
           ./tests/unit/dynamodb_build.bash
 
     - name: Load and Test DynamoDB
-      run: |
-          pipenv run pytest tests/unit/test_database.py
+      run: pytest tests/unit/test_database.py
 
-    - run: pipenv run pytest tests/
+    - name: Run other tests
+      run: pytest tests/
   lint:
     runs-on: ubuntu-latest
     env:
