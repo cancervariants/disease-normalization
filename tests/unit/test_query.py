@@ -1,5 +1,5 @@
 """Test the therapy querying method."""
-from ga4gh.vrsatile.pydantic.vrsatile_models import ValueObjectDescriptor
+from ga4gh.vrsatile.pydantic.vrsatile_models import DiseaseDescriptor
 from disease.query import QueryHandler, InvalidParameterException
 from disease.schemas import MatchType, SourceName
 import pytest
@@ -28,7 +28,7 @@ def query_handler():
 @pytest.fixture(scope='module')
 def neuroblastoma():
     """Create neuroblastoma fixture."""
-    return ValueObjectDescriptor(**{
+    return DiseaseDescriptor(**{
         "id": "normalize.disease:Neuroblastoma",
         "type": "DiseaseDescriptor",
         "disease": "ncit:C3270",
@@ -74,7 +74,7 @@ def neuroblastoma():
 @pytest.fixture(scope='module')
 def skin_myo():
     """Create a test fixture for skin myopithelioma"""
-    return ValueObjectDescriptor(**{
+    return DiseaseDescriptor(**{
         "id": "normalize.disease:Skin Myoepithelioma",
         "type": "DiseaseDescriptor",
         "disease": "ncit:C167370",
@@ -88,7 +88,7 @@ def mafd2():
     """Create a test fixture for major affective disorder 2. Query should not
     include a "pediatric_disease" Extension object.
     """
-    return ValueObjectDescriptor(**{
+    return DiseaseDescriptor(**{
         "id": "normalize.disease:MAFD2",
         "type": "DiseaseDescriptor",
         "disease": "mondo:0010648",
