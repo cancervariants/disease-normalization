@@ -1,7 +1,8 @@
 """Module to load disease data from OMIM."""
-from .base import Base
 from disease import DownloadException, logger
-from disease.schemas import SourceMeta, SourceName, Disease, NamespacePrefix
+from disease.schemas import Disease, NamespacePrefix, SourceMeta, SourceName
+
+from .base import Base
 
 
 class OMIM(Base):
@@ -22,9 +23,11 @@ class OMIM(Base):
         try:
             super()._extract_data(True)
         except FileNotFoundError:
-            raise FileNotFoundError("Could not locate OMIM data. Per README, OMIM "
-                                    "source files must be manually placed in "
-                                    f"{self._src_dir.absolute().as_uri()}")
+            raise FileNotFoundError(
+                "Could not locate OMIM data. Per README, OMIM "
+                "source files must be manually placed in "
+                f"{self._src_dir.absolute().as_uri()}"
+            )
 
     def _download_data(self):
         """Download OMIM source data for loading into normalizer."""
@@ -32,48 +35,52 @@ class OMIM(Base):
 
     def _load_meta(self):
         """Load source metadata."""
-        metadata = SourceMeta(data_license="custom",
-                              data_license_url="https://omim.org/help/agreement",
-                              version=self._data_file.stem.split('_', 1)[1],
-                              data_url="https://www.omim.org/downloads",
-                              rdp_url='http://reusabledata.org/omim.html',
-                              data_license_attributes={
-                                  'non_commercial': False,
-                                  'share_alike': True,
-                                  'attribution': True
-                              })
+        metadata = SourceMeta(
+            data_license="custom",
+            data_license_url="https://omim.org/help/agreement",
+            version=self._data_file.stem.split("_", 1)[1],
+            data_url="https://www.omim.org/downloads",
+            rdp_url="http://reusabledata.org/omim.html",
+            data_license_attributes={
+                "non_commercial": False,
+                "share_alike": True,
+                "attribution": True,
+            },
+        )
         params = dict(metadata)
-        params['src_name'] = SourceName.OMIM.value
+        params["src_name"] = SourceName.OMIM.value
         self.database.metadata.put_item(Item=params)
 
     def _transform_data(self):
         """Modulate data and prepare for loading."""
-        with open(self._data_file, 'r') as f:
+        with open(self._data_file, "r") as f:
             rows = f.readlines()
-        rows = [r.rstrip() for r in rows if not r.startswith('#')]
-        rows = [[g for g in r.split('\t')] for r in rows]
-        rows = [r for r in rows if r[0] not in ('Asterisk', 'Caret', 'Plus')]
+        rows = [r.rstrip() for r in rows if not r.startswith("#")]
+        rows = [[g for g in r.split("\t")] for r in rows]
+        rows = [r for r in rows if r[0] not in ("Asterisk", "Caret", "Plus")]
         for row in rows:
             disease = {
-                'concept_id': f'{NamespacePrefix.OMIM.value}:{row[1]}',
+                "concept_id": f"{NamespacePrefix.OMIM.value}:{row[1]}",
             }
             aliases = set()
 
             label_item = row[2]
-            if ';' in label_item:
-                label_split = label_item.split(';')
-                disease['label'] = label_split[0]
+            if ";" in label_item:
+                label_split = label_item.split(";")
+                disease["label"] = label_split[0]
                 aliases.add(label_split[1])
             else:
-                disease['label'] = row[2]
+                disease["label"] = row[2]
 
             if len(row) > 3:
-                aliases |= {t for t in row[3].split(';') if t}
+                aliases |= {t for t in row[3].split(";") if t}
             if len(row) > 4:
-                aliases |= {t for t in row[4].split(';') if t}
-            aliases = {alias[:-10] if alias.endswith(', INCLUDED') else alias
-                       for alias in aliases}
-            disease['aliases'] = [a.lstrip() for a in aliases]
+                aliases |= {t for t in row[4].split(";") if t}
+            aliases = {
+                alias[:-10] if alias.endswith(", INCLUDED") else alias
+                for alias in aliases
+            }
+            disease["aliases"] = [a.lstrip() for a in aliases]
 
             assert Disease(**disease)
             self._load_disease(disease)

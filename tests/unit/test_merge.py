@@ -1,12 +1,14 @@
 """Test merged record generation."""
 import pytest
+
 from disease.etl.merge import Merge
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope="module")
 def merge_handler(mock_database):
     """Provide Merge instance to test cases."""
-    class MergeHandler():
+
+    class MergeHandler:
         def __init__(self):
             self.merge = Merge(mock_database())
 
@@ -28,7 +30,7 @@ def merge_handler(mock_database):
     return MergeHandler()
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope="module")
 def neuroblastoma():
     """Create neuroblastoma fixture."""
     return {
@@ -47,7 +49,7 @@ def neuroblastoma():
             "NEUROBLASTOMA, MALIGNANT",
             "Neuroblastoma (NBL)",
             "neural Crest tumor, malignant",
-            "neuroblastoma, malignant"
+            "neuroblastoma, malignant",
         ],
         "associated_with": [
             "umls:C0027819",
@@ -60,13 +62,13 @@ def neuroblastoma():
             "meddra:10029260",
             "nifstd:birnlex_12631",
             "orphanet:635",
-            "umls:CN205405"
+            "umls:CN205405",
         ],
-        "pediatric": None
+        "pediatric": None,
     }
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope="module")
 def lnscc():
     """Create lung non small cell carcinoma fixture"""
     return {
@@ -101,13 +103,13 @@ def lnscc():
             "efo:0003060",
             "kegg.disease:05223",
             "HP:0030358",
-            "orphanet:488201"
+            "orphanet:488201",
         ],
-        "item_type": "merger"
+        "item_type": "merger",
     }
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope="module")
 def richter():
     """Create Richter Syndrome fixture"""
     return {
@@ -121,19 +123,19 @@ def richter():
             "Richter transformation",
             "Richter's Transformation",
             "Richter's syndrome",
-            "Richter's transformation"
+            "Richter's transformation",
         ],
         "associated_with": [
             "umls:C0349631",
             "gard:0007578",
             "gard:7578",
-            "icd10.cm:C91.1"
+            "icd10.cm:C91.1",
         ],
-        "item_type": "merger"
+        "item_type": "merger",
     }
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope="module")
 def ped_liposarcoma():
     """Create pediatric liposarcoma fixture."""
     return {
@@ -145,15 +147,15 @@ def ped_liposarcoma():
             "Liposarcoma",
             "Pediatric Liposarcoma",
             "childhood liposarcoma",
-            "pediatric liposarcoma"
+            "pediatric liposarcoma",
         ],
         "associated_with": ["umls:C0279984"],
         "pediatric_disease": True,
-        "item_type": "merger"
+        "item_type": "merger",
     }
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope="module")
 def teratoma():
     """Create fixture for adult cystic teratoma."""
     return {
@@ -167,7 +169,7 @@ def teratoma():
     }
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope="module")
 def mafd2():
     """Create a fixture for major affective disorder 2. Tests whether a
     deprecated DO reference is filtered out.
@@ -178,110 +180,110 @@ def mafd2():
         "concept_id": "mondo:0010648",
         "label": "major affective disorder 2",
         "aliases": [
-          "MANIC-DEPRESSIVE ILLNESS",
-          "MDX",
-          "MDI",
-          "MANIC-DEPRESSIVE PSYCHOSIS, X-LINKED",
-          "BPAD",
-          "BIPOLAR AFFECTIVE DISORDER",
-          "MAFD2",
-          "major affective disorder 2, X-linked dominant"
+            "MANIC-DEPRESSIVE ILLNESS",
+            "MDX",
+            "MDI",
+            "MANIC-DEPRESSIVE PSYCHOSIS, X-LINKED",
+            "BPAD",
+            "BIPOLAR AFFECTIVE DISORDER",
+            "MAFD2",
+            "major affective disorder 2, X-linked dominant",
         ],
-        "associated_with": [
-            "mesh:C564108"
-        ]
+        "associated_with": ["mesh:C564108"],
     }
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope="module")
 def record_id_groups():
     """Fixture for concept ID group input."""
     return {
-        'neuroblastoma': [
-            "ncit:C3270", "mondo:0005072", "DOID:769", "oncotree:NBL"
-        ],
-        'lnscc': [
-            "ncit:C2926", "mondo:0005233", "DOID:3908", "oncotree:NSCLC"
-        ],
-        'richter': [
-            "ncit:C35424", "mondo:0002083", "DOID:1703"
-        ],
-        'ped_liposarcoma': [
-            "ncit:C8091", "mondo:0003587", "DOID:5695"
-        ],
-        'teratoma': [
-            "ncit:C9012", "mondo:0004099", "DOID:7079"
-        ],
-        'mafd2': ["mondo:0010648", "DOID:0080221"],
+        "neuroblastoma": ["ncit:C3270", "mondo:0005072", "DOID:769", "oncotree:NBL"],
+        "lnscc": ["ncit:C2926", "mondo:0005233", "DOID:3908", "oncotree:NSCLC"],
+        "richter": ["ncit:C35424", "mondo:0002083", "DOID:1703"],
+        "ped_liposarcoma": ["ncit:C8091", "mondo:0003587", "DOID:5695"],
+        "teratoma": ["ncit:C9012", "mondo:0004099", "DOID:7079"],
+        "mafd2": ["mondo:0010648", "DOID:0080221"],
     }
 
 
 def compare_merged_records(actual, fixture):
     """Verify correctness of merged DB record."""
-    assert actual['concept_id'] == fixture['concept_id']
-    assert ('xrefs' in actual) == ('xrefs' in fixture)
-    if 'xrefs' in actual:
-        assert set(actual['xrefs']) == set(fixture['xrefs'])
+    assert actual["concept_id"] == fixture["concept_id"]
+    assert ("xrefs" in actual) == ("xrefs" in fixture)
+    if "xrefs" in actual:
+        assert set(actual["xrefs"]) == set(fixture["xrefs"])
 
-    assert actual['label_and_type'] == fixture['label_and_type']
+    assert actual["label_and_type"] == fixture["label_and_type"]
 
-    assert ('label' in actual) == ('label' in fixture)
-    if 'label' in actual or 'label' in fixture:
-        assert actual['label'] == fixture['label']
+    assert ("label" in actual) == ("label" in fixture)
+    if "label" in actual or "label" in fixture:
+        assert actual["label"] == fixture["label"]
 
-    assert ('aliases' in actual) == ('aliases' in fixture)
-    if 'aliases' in actual or 'aliases' in fixture:
-        assert set(actual['aliases']) == set(fixture['aliases'])
+    assert ("aliases" in actual) == ("aliases" in fixture)
+    if "aliases" in actual or "aliases" in fixture:
+        assert set(actual["aliases"]) == set(fixture["aliases"])
 
-    assert ('associated_with' in actual) == ('associated_with' in fixture)
-    if 'associated_with' in actual or 'associated_with' in fixture:
-        assert set(actual['associated_with']) == \
-            set(fixture['associated_with'])
+    assert ("associated_with" in actual) == ("associated_with" in fixture)
+    if "associated_with" in actual or "associated_with" in fixture:
+        assert set(actual["associated_with"]) == set(fixture["associated_with"])
 
-    assert ('pediatric_disease' in actual) == \
-        ('pediatric_disease' in fixture)
-    if 'pediatric_disease' in actual or 'pediatric_disease' in fixture:
-        assert actual['pediatric_disease'] == fixture['pediatric_disease']
+    assert ("pediatric_disease" in actual) == ("pediatric_disease" in fixture)
+    if "pediatric_disease" in actual or "pediatric_disease" in fixture:
+        assert actual["pediatric_disease"] == fixture["pediatric_disease"]
 
 
-def test_generate_merged_record(merge_handler, record_id_groups, neuroblastoma,
-                                lnscc, richter, ped_liposarcoma, teratoma,
-                                mafd2):
+def test_generate_merged_record(
+    merge_handler,
+    record_id_groups,
+    neuroblastoma,
+    lnscc,
+    richter,
+    ped_liposarcoma,
+    teratoma,
+    mafd2,
+):
     """Test generation of individual merged record."""
-    neuroblastoma_ids = record_id_groups['neuroblastoma']
+    neuroblastoma_ids = record_id_groups["neuroblastoma"]
     response, r_ids = merge_handler.generate_merged_record(neuroblastoma_ids)
     assert set(r_ids) == set(neuroblastoma_ids)
     compare_merged_records(response, neuroblastoma)
 
-    lnscc_ids = record_id_groups['lnscc']
+    lnscc_ids = record_id_groups["lnscc"]
     response, r_ids = merge_handler.generate_merged_record(lnscc_ids)
     assert set(r_ids) == set(lnscc_ids)
     compare_merged_records(response, lnscc)
 
-    richter_ids = record_id_groups['richter']
+    richter_ids = record_id_groups["richter"]
     response, r_ids = merge_handler.generate_merged_record(richter_ids)
     assert set(r_ids) == set(richter_ids)
     compare_merged_records(response, richter)
 
-    ped_liposarcoma_ids = record_id_groups['ped_liposarcoma']
+    ped_liposarcoma_ids = record_id_groups["ped_liposarcoma"]
     response, r_ids = merge_handler.generate_merged_record(ped_liposarcoma_ids)
     assert set(r_ids) == set(ped_liposarcoma_ids)
     compare_merged_records(response, ped_liposarcoma)
 
-    teratoma_ids = record_id_groups['teratoma']
+    teratoma_ids = record_id_groups["teratoma"]
     response, r_ids = merge_handler.generate_merged_record(teratoma_ids)
     assert set(r_ids) == set(teratoma_ids)
     compare_merged_records(response, teratoma)
 
-    mafd2_ids = record_id_groups['mafd2']
+    mafd2_ids = record_id_groups["mafd2"]
     response, r_ids = merge_handler.generate_merged_record(mafd2_ids)
     assert set(r_ids) == {"mondo:0010648"}
     compare_merged_records(response, mafd2)
 
 
-def test_create_merged_concepts(merge_handler, record_id_groups, neuroblastoma,
-                                lnscc, richter, ped_liposarcoma, teratoma,
-                                mafd2):
+def test_create_merged_concepts(
+    merge_handler,
+    record_id_groups,
+    neuroblastoma,
+    lnscc,
+    richter,
+    ped_liposarcoma,
+    teratoma,
+    mafd2,
+):
     """Test end-to-end creation and upload of merged concepts."""
     mondo_ids = [
         "mondo:0005072",
@@ -289,34 +291,28 @@ def test_create_merged_concepts(merge_handler, record_id_groups, neuroblastoma,
         "mondo:0002083",
         "mondo:0004099",
         "mondo:0003587",
-        "mondo:0010648"
+        "mondo:0010648",
     ]
     merge_handler.create_merged_concepts(mondo_ids)
 
     # check merged record generation and storage
     added_records = merge_handler.get_added_records()
     assert len(added_records) == 6
-    neuroblastoma_id = neuroblastoma['concept_id']
+    neuroblastoma_id = neuroblastoma["concept_id"]
     assert neuroblastoma_id in added_records
-    compare_merged_records(added_records[neuroblastoma_id],
-                           neuroblastoma)
-    lnscc_id = lnscc['concept_id']
+    compare_merged_records(added_records[neuroblastoma_id], neuroblastoma)
+    lnscc_id = lnscc["concept_id"]
     assert lnscc_id in added_records
-    compare_merged_records(added_records[lnscc_id],
-                           lnscc)
-    richter_id = richter['concept_id']
+    compare_merged_records(added_records[lnscc_id], lnscc)
+    richter_id = richter["concept_id"]
     assert richter_id in added_records
-    compare_merged_records(added_records[richter_id],
-                           richter)
-    ped_liposarcoma_id = ped_liposarcoma['concept_id']
+    compare_merged_records(added_records[richter_id], richter)
+    ped_liposarcoma_id = ped_liposarcoma["concept_id"]
     assert ped_liposarcoma_id in added_records
-    compare_merged_records(added_records[ped_liposarcoma_id],
-                           ped_liposarcoma)
-    teratoma_id = teratoma['concept_id']
+    compare_merged_records(added_records[ped_liposarcoma_id], ped_liposarcoma)
+    teratoma_id = teratoma["concept_id"]
     assert teratoma_id in added_records
-    compare_merged_records(added_records[teratoma_id],
-                           teratoma)
-    mafd2_id = mafd2['concept_id']
+    compare_merged_records(added_records[teratoma_id], teratoma)
+    mafd2_id = mafd2["concept_id"]
     assert mafd2_id in added_records
-    compare_merged_records(added_records[mafd2_id],
-                           mafd2)
+    compare_merged_records(added_records[mafd2_id], mafd2)

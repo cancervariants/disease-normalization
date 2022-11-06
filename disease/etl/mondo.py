@@ -1,10 +1,10 @@
 """Module to load disease data from Mondo Disease Ontology."""
 import owlready2 as owl
 
-from .base import OWLBase
 from disease import PREFIX_LOOKUP, logger
-from disease.schemas import SourceMeta, SourceName, NamespacePrefix
+from disease.schemas import NamespacePrefix, SourceMeta, SourceName
 
+from .base import OWLBase
 
 MONDO_PREFIX_LOOKUP = {
     # built-in sources
@@ -48,26 +48,28 @@ class Mondo(OWLBase):
 
     def _download_data(self):
         """Download Mondo thesaurus source file for loading into normalizer."""
-        logger.info('Downloading Mondo data...')
+        logger.info("Downloading Mondo data...")
         url = "http://purl.obolibrary.org/obo/mondo.owl"
         output_file = self._src_dir / f"mondo_{self._version}.owl"
         self._http_download(url, output_file)
-        logger.info('Finished downloading Mondo Disease Ontology')
+        logger.info("Finished downloading Mondo Disease Ontology")
 
     def _load_meta(self):
         """Load metadata"""
-        metadata = SourceMeta(data_license="CC BY 4.0",
-                              data_license_url="https://creativecommons.org/licenses/by/4.0/legalcode",  # noqa: E501
-                              version=self._version,
-                              data_url="https://mondo.monarchinitiative.org/pages/download/",  # noqa: E501
-                              rdp_url='http://reusabledata.org/monarch.html',
-                              data_license_attributes={
-                                  'non_commercial': False,
-                                  'share_alike': False,
-                                  'attribution': True
-                              })
+        metadata = SourceMeta(
+            data_license="CC BY 4.0",
+            data_license_url="https://creativecommons.org/licenses/by/4.0/legalcode",  # noqa: E501
+            version=self._version,
+            data_url="https://mondo.monarchinitiative.org/pages/download/",  # noqa: E501
+            rdp_url="http://reusabledata.org/monarch.html",
+            data_license_attributes={
+                "non_commercial": False,
+                "share_alike": False,
+                "attribution": True,
+            },
+        )
         params = dict(metadata)
-        params['src_name'] = SourceName.MONDO.value
+        params["src_name"] = SourceName.MONDO.value
         self.database.metadata.put_item(Item=params)
 
     def _transform_data(self):
@@ -84,8 +86,9 @@ class Mondo(OWLBase):
             try:
                 disease = mondo.search(iri=uri)[0]
             except TypeError:
-                logger.error(f"Mondo.transform_data could not retrieve class "
-                             f"for URI {uri}")
+                logger.error(
+                    f"Mondo.transform_data could not retrieve class " f"for URI {uri}"
+                )
                 continue
             try:
                 label = disease.label[0]
@@ -95,29 +98,29 @@ class Mondo(OWLBase):
 
             aliases = list({d for d in disease.hasExactSynonym if d != label})
             params = {
-                'concept_id': disease.id[0].lower(),
-                'label': label,
-                'aliases': aliases,
-                'xrefs': [],
-                'associated_with': [],
+                "concept_id": disease.id[0].lower(),
+                "label": label,
+                "aliases": aliases,
+                "xrefs": [],
+                "associated_with": [],
             }
 
             for ref in disease.hasDbXref:
-                prefix, id_no = ref.split(':', 1)
+                prefix, id_no = ref.split(":", 1)
                 normed_prefix = MONDO_PREFIX_LOOKUP.get(prefix, None)
                 if not normed_prefix:
                     continue
-                xref = f'{normed_prefix}:{id_no}'
+                xref = f"{normed_prefix}:{id_no}"
 
                 if normed_prefix.lower() in PREFIX_LOOKUP:
-                    params['xrefs'].append(xref)
+                    params["xrefs"].append(xref)
                 elif normed_prefix == NamespacePrefix.KEGG:
-                    xref = f'{normed_prefix}:H{id_no}'
-                    params['associated_with'].append(xref)
+                    xref = f"{normed_prefix}:H{id_no}"
+                    params["associated_with"].append(xref)
                 else:
-                    params['associated_with'].append(xref)
+                    params["associated_with"].append(xref)
 
             if disease.iri in peds_uris:
-                params['pediatric_disease'] = True
+                params["pediatric_disease"] = True
 
             self._load_disease(params)

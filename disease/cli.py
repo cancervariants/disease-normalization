@@ -1,24 +1,29 @@
 """This module provides a CLI util to make updates to normalizer database."""
-from timeit import default_timer as timer
 from os import environ
-from typing import Optional, List
+from timeit import default_timer as timer
+from typing import List, Optional
 
 import click
-from botocore.exceptions import ClientError
 from boto3.dynamodb.conditions import Key
+from botocore.exceptions import ClientError
 
 from disease import logger
-from disease.schemas import SourceName
+from disease.database import (
+    AWS_ENV_VAR_NAME,
+    SKIP_AWS_DB_ENV_NAME,
+    VALID_AWS_ENV_NAMES,
+    Database,
+    confirm_aws_db_use,
+)
+from disease.etl import DO, OMIM, Mondo, NCIt, OncoTree  # noqa: F401
 from disease.etl.merge import Merge
-from disease.database import Database, confirm_aws_db_use, SKIP_AWS_DB_ENV_NAME, \
-    VALID_AWS_ENV_NAMES, AWS_ENV_VAR_NAME
-from disease.etl import Mondo, NCIt, DO, OncoTree, OMIM  # noqa: F401
-
+from disease.schemas import SourceName
 
 # Use to lookup class object from source name. Should be one key-value pair
 # for every functioning ETL class.
-SOURCES_CLASS_LOOKUP = {s.value.lower(): eval(s.value)
-                        for s in SourceName.__members__.values()}
+SOURCES_CLASS_LOOKUP = {
+    s.value.lower(): eval(s.value) for s in SourceName.__members__.values()
+}
 
 
 class CLI:
@@ -27,36 +32,27 @@ class CLI:
     @staticmethod
     @click.command()
     @click.option(
-        '--normalizer',
-        help="The source(s) you wish to update separated by spaces."
+        "--normalizer", help="The source(s) you wish to update separated by spaces."
     )
     @click.option(
-        '--aws_instance',
+        "--aws_instance",
         help=" Must be `Dev`, `Staging`, or `Prod`. This determines the AWS instance to"
-             " use. `Dev` uses nonprod. `Staging` and `Prod` uses prod."
+        " use. `Dev` uses nonprod. `Staging` and `Prod` uses prod.",
+    )
+    @click.option("--db_url", help="URL endpoint for the application database.")
+    @click.option("--update_all", is_flag=True, help="Update all normalizer sources.")
+    @click.option(
+        "--update_merged", is_flag=True, help="Update concepts for /normalize endpoint."
     )
     @click.option(
-        '--db_url',
-        help="URL endpoint for the application database."
-    )
-    @click.option(
-        '--update_all',
-        is_flag=True,
-        help='Update all normalizer sources.'
-    )
-    @click.option(
-        '--update_merged',
-        is_flag=True,
-        help='Update concepts for /normalize endpoint.'
-    )
-    @click.option(
-        '--from_local',
+        "--from_local",
         is_flag=True,
         default=False,
-        help="Use most recent local source data instead of fetching latest versions."
+        help="Use most recent local source data instead of fetching latest versions.",
     )
-    def update_normalizer_db(normalizer, aws_instance, db_url, update_all,
-                             update_merged, from_local):
+    def update_normalizer_db(
+        normalizer, aws_instance, db_url, update_all, update_merged, from_local
+    ):
         """Update selected source(s) in the Disease Normalizer database."""
         # If SKIP_AWS_CONFIRMATION is accidentally set, we should verify that the
         # aws instance should actually be used
@@ -90,8 +86,9 @@ class CLI:
             if len(sources_to_update) == 0:
                 CLI()._help_msg()
 
-            invalid_sources = set(sources_to_update) - {src for src
-                                                        in SOURCES_CLASS_LOOKUP}
+            invalid_sources = set(sources_to_update) - {
+                src for src in SOURCES_CLASS_LOOKUP
+            }
             if len(invalid_sources) != 0:
                 raise Exception(f"Not valid sources: {invalid_sources}")
 
@@ -107,8 +104,9 @@ class CLI:
         ctx.exit()
 
     @staticmethod
-    def _update_sources(sources: List[str], db: Database, update_merged: bool,
-                        from_local: bool = False):
+    def _update_sources(
+        sources: List[str], db: Database, update_merged: bool, from_local: bool = False
+    ):
         """Update selected normalizer sources."""
         added_ids = []
         for source in sources:
@@ -137,8 +135,9 @@ class CLI:
             msg = f"Loaded {source} in {load_time:.5f} seconds."
             click.echo(msg)
             logger.info(msg)
-            msg = f"Total time for {source}: " \
-                  f"{(delete_time + load_time):.5f} seconds."
+            msg = (
+                f"Total time for {source}: " f"{(delete_time + load_time):.5f} seconds."
+            )
             click.echo(msg)
             logger.info(msg)
         if update_merged:
@@ -158,8 +157,10 @@ class CLI:
         click.echo("Constructing normalized records...")
         merge.create_merged_concepts(added_ids)
         end_merge = timer()
-        click.echo(f"Merged concept generation completed in"
-                   f" {(end_merge - start_merge):.5f} seconds.")
+        click.echo(
+            f"Merged concept generation completed in"
+            f" {(end_merge - start_merge):.5f} seconds."
+        )
 
     @staticmethod
     def _delete_merged_data(database: Database):
@@ -171,8 +172,8 @@ class CLI:
         try:
             while True:
                 with database.diseases.batch_writer(
-                        overwrite_by_pkeys=["label_and_type", "concept_id"]) \
-                        as batch:
+                    overwrite_by_pkeys=["label_and_type", "concept_id"]
+                ) as batch:
                     response = database.diseases.query(
                         IndexName="type_index",
                         KeyConditionExpression=Key("item_type").eq("merger"),
@@ -181,10 +182,12 @@ class CLI:
                     if not records:
                         break
                     for record in records:
-                        batch.delete_item(Key={
-                            "label_and_type": record["label_and_type"],
-                            "concept_id": record["concept_id"]
-                        })
+                        batch.delete_item(
+                            Key={
+                                "label_and_type": record["label_and_type"],
+                                "concept_id": record["concept_id"],
+                            }
+                        )
         except ClientError as e:
             click.echo(e.response["Error"]["Message"])
         end_delete = timer()
@@ -196,46 +199,49 @@ class CLI:
         # Delete source's metadata
         try:
             metadata = database.metadata.query(
-                KeyConditionExpression=Key(
-                    'src_name').eq(SourceName[f"{source.upper()}"].value)
+                KeyConditionExpression=Key("src_name").eq(
+                    SourceName[f"{source.upper()}"].value
+                )
             )
-            if metadata['Items']:
+            if metadata["Items"]:
                 database.metadata.delete_item(
-                    Key={'src_name': metadata['Items'][0]['src_name']},
+                    Key={"src_name": metadata["Items"][0]["src_name"]},
                     ConditionExpression="src_name = :src",
                     ExpressionAttributeValues={
-                        ':src': SourceName[f"{source.upper()}"].value}
+                        ":src": SourceName[f"{source.upper()}"].value
+                    },
                 )
         except ClientError as e:
-            click.echo(e.response['Error']['Message'])
+            click.echo(e.response["Error"]["Message"])
 
         # Delete source's data from diseases table
         try:
             while True:
                 response = database.diseases.query(
-                    IndexName='src_index',
-                    KeyConditionExpression=Key('src_name').eq(
-                        SourceName[f"{source.upper()}"].value)
+                    IndexName="src_index",
+                    KeyConditionExpression=Key("src_name").eq(
+                        SourceName[f"{source.upper()}"].value
+                    ),
                 )
 
-                records = response['Items']
+                records = response["Items"]
                 if not records:
                     break
 
                 with database.diseases.batch_writer(
-                        overwrite_by_pkeys=['label_and_type', 'concept_id']) \
-                        as batch:
+                    overwrite_by_pkeys=["label_and_type", "concept_id"]
+                ) as batch:
 
                     for record in records:
                         batch.delete_item(
                             Key={
-                                'label_and_type': record['label_and_type'],
-                                'concept_id': record['concept_id']
+                                "label_and_type": record["label_and_type"],
+                                "concept_id": record["concept_id"],
                             }
                         )
         except ClientError as e:
-            click.echo(e.response['Error']['Message'])
+            click.echo(e.response["Error"]["Message"])
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     CLI().update_normalizer_db()
