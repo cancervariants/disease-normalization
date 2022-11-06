@@ -160,4 +160,3 @@ dynamodb_local_latest/*
 
 # Build files
 Pipfile.lock
-pyproject.toml
