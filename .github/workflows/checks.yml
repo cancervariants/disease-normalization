@@ -1,4 +1,4 @@
-name: github-actions
+name: checks
 on: [push, pull_request]
 jobs:
   test:
@@ -12,7 +12,7 @@ jobs:
       TEST: DISEASE_TEST
     strategy:
       matrix:
-        python-version: ['3.8', '3.9', '3.10']
+        python-version: ['3.8', '3.9', '3.10', '3.11']
     steps:
     - uses: actions/checkout@v3
 
@@ -22,20 +22,19 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
     - name: Install dependencies
-      run: |
-          python3 -m pip install pipenv
-          pipenv install --dev
+      run: python3 -m pip install ".[dev,test]"
 
     - name: Build local DynamoDB
       run: |
           chmod +x ./tests/unit/dynamodb_build.bash
           ./tests/unit/dynamodb_build.bash
 
-    - name: Load and Test DynamoDB
-      run: |
-          pipenv run pytest tests/unit/test_database.py
+    - name: Load and test DynamoDB
+      run: PYTHONPATH=. pytest tests/unit/test_database.py
 
-    - run: pipenv run pytest tests/
+    - name: Run tests
+      run: PYTHONPATH=. pytest tests/
+
   lint:
     runs-on: ubuntu-latest
     env:
@@ -52,8 +51,13 @@ jobs:
         python-version: '3.10'
 
     - name: Install dependencies
-      run: |
-          python3 -m pip install pipenv
-          pipenv install --dev
-    - name: check style
-      run: pipenv run flake8
+      run: python3 -m pip install ".[dev]"
+
+    - name: flake8 check
+      run: flake8 disease/ tests/ setup.py
+
+    - name: black check
+      run: black --check disease/ tests/ setup.py
+
+    - name: isort check
+      run: isort --profile black --check disease/ tests/ setup.py

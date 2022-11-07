@@ -1,11 +1,10 @@
 """Disease Ontology ETL module."""
-import owlready2 as owl
 import bioversions
+import owlready2 as owl
 
 from disease import PREFIX_LOOKUP, logger
-from disease.schemas import SourceMeta, SourceName, NamespacePrefix
 from disease.etl.base import OWLBase
-
+from disease.schemas import NamespacePrefix, SourceMeta, SourceName
 
 DO_PREFIX_LOOKUP = {
     "EFO": NamespacePrefix.EFO.value,
@@ -35,10 +34,11 @@ class DO(OWLBase):
 
     def _download_data(self):
         """Download DO source file for loading into normalizer."""
-        logger.info('Retrieving source data for Disease Ontology')
+        logger.info("Retrieving source data for Disease Ontology")
         output_file = self._src_dir / f"do_{self._version}.owl"
-        self._http_download("http://purl.obolibrary.org/obo/doid/doid-merged.owl",
-                            output_file)
+        self._http_download(
+            "http://purl.obolibrary.org/obo/doid/doid-merged.owl", output_file
+        )
         logger.info("Successfully retrieved source data for Disease Ontology")
 
     def _load_meta(self):
@@ -52,17 +52,17 @@ class DO(OWLBase):
             "data_license_attributes": {
                 "non_commercial": False,
                 "share_alike": False,
-                "attribution": False
-            }
+                "attribution": False,
+            },
         }
         assert SourceMeta(**metadata_params)
-        metadata_params['src_name'] = SourceName.DO.value
+        metadata_params["src_name"] = SourceName.DO.value
         self.database.metadata.put_item(Item=metadata_params)
 
     def _transform_data(self):
         """Transform source data and send to loading method."""
         do = owl.get_ontology(self._data_file.absolute().as_uri()).load()
-        disease_uri = 'http://purl.obolibrary.org/obo/DOID_4'
+        disease_uri = "http://purl.obolibrary.org/obo/DOID_4"
         diseases = self._get_subclasses(
             disease_uri, owl.default_world.as_rdflib_graph()
         )
@@ -84,10 +84,10 @@ class DO(OWLBase):
             associated_with = []
             db_associated_with = set(disease_class.hasDbXref)
             for xref in db_associated_with:
-                prefix, id_no = xref.split(':', 1)
+                prefix, id_no = xref.split(":", 1)
                 normed_prefix = DO_PREFIX_LOOKUP.get(prefix, None)
                 if normed_prefix:
-                    xref_no = f'{normed_prefix}:{id_no}'
+                    xref_no = f"{normed_prefix}:{id_no}"
                     if normed_prefix.lower() in PREFIX_LOOKUP:
                         xrefs.append(xref_no)
                     else:
@@ -98,6 +98,6 @@ class DO(OWLBase):
                 "label": label,
                 "aliases": aliases,
                 "xrefs": xrefs,
-                "associated_with": associated_with
+                "associated_with": associated_with,
             }
             self._load_disease(disease)
