@@ -1,6 +1,6 @@
 """Create concept groups and merged records."""
 from timeit import default_timer as timer
-from typing import Dict, List, Set
+from typing import Dict, List, Set, Tuple
 
 from disease import logger
 from disease.database import Database
@@ -73,13 +73,13 @@ class Merge:
         logger.info("merged concept generation successful.")
         logger.debug(f"Generated and added concepts in {end - start} seconds)")
 
-    def _generate_merged_record(self, record_id_set: Set[str]) -> (Dict, List):
+    def _generate_merged_record(self, record_id_set: Set[str]) -> Tuple[Dict, List]:
         """Generate merged record from provided concept ID group.
         Where attributes are sets, they should be merged, and where they are
         scalars, assign from the highest-priority source where that attribute
         is non-null.
 
-        Priority is NCIt > Mondo > OncoTree> DO.
+        Priority is NCIt > Mondo > OMIM > OncoTree> DO.
 
         :param Set record_id_set: group of concept IDs
         :return: completed merged drug object to be stored in DB, as well as

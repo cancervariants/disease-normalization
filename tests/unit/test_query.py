@@ -62,8 +62,6 @@ def neuroblastoma():
                         "gard:0007185",
                         "icdo:9500/3",
                         "mesh:D009447",
-                        "meddra:10029260",
-                        "nifstd:birnlex_12631",
                         "orphanet:635",
                         "umls:CN205405",
                         "umls:C2751421",
@@ -290,33 +288,25 @@ def test_service_meta(query_handler):
     assert service_meta.name == "disease-normalizer"
     assert service_meta.version >= "0.2.0"
     assert isinstance(service_meta.response_datetime, datetime)
-    assert (
-        service_meta.url == "https://github.com/cancervariants/disease-normalization"
-    )  # noqa: E501
+    assert service_meta.url == "https://github.com/cancervariants/disease-normalization"
 
     response = query_handler.normalize(test_query)
     service_meta = response.service_meta_
     assert service_meta.name == "disease-normalizer"
     assert service_meta.version >= "0.2.0"
     assert isinstance(service_meta.response_datetime, datetime)
-    assert (
-        service_meta.url == "https://github.com/cancervariants/disease-normalization"
-    )  # noqa: E501
+    assert service_meta.url == "https://github.com/cancervariants/disease-normalization"
 
     response = query_handler.search("this-will-not-normalize")
     service_meta = response.service_meta_
     assert service_meta.name == "disease-normalizer"
     assert service_meta.version >= "0.2.0"
     assert isinstance(service_meta.response_datetime, datetime)
-    assert (
-        service_meta.url == "https://github.com/cancervariants/disease-normalization"
-    )  # noqa: E501
+    assert service_meta.url == "https://github.com/cancervariants/disease-normalization"
 
     response = query_handler.normalize("this-will-not-normalize")
     service_meta = response.service_meta_
     assert service_meta.name == "disease-normalizer"
     assert service_meta.version >= "0.2.0"
     assert isinstance(service_meta.response_datetime, datetime)
-    assert (
-        service_meta.url == "https://github.com/cancervariants/disease-normalization"
-    )  # noqa: E501
+    assert service_meta.url == "https://github.com/cancervariants/disease-normalization"

@@ -9,8 +9,8 @@ from pathlib import Path
 from typing import Callable, Dict, List, Optional, Set
 
 import bioversions
-import owlready2 as owl
 import requests
+from owlready2.rdflib_store import TripleLiteRDFlibGraph as RDFGraph
 
 from disease import APP_ROOT, ITEM_TYPES, SOURCES_FOR_MERGE, logger
 from disease.database import Database
@@ -226,13 +226,13 @@ class Base(ABC):
 class OWLBase(Base):
     """Base class for sources that use OWL files."""
 
-    def _get_subclasses(self, uri: str) -> Set[str]:
+    def _get_subclasses(self, uri: str, graph: RDFGraph) -> Set[str]:
         """Retrieve URIs for all terms that are subclasses of given URI.
 
-        :param str uri: URI for class
+        :param uri: URI for class
+        :param graph: RDFLib graph of ontology default world
         :return: Set of URIs (strings) for all subclasses of `uri`
         """
-        graph = owl.default_world.as_rdflib_graph()
         query = f"""
             SELECT ?c WHERE {{
                 ?c rdfs:subClassOf* <{uri}>
@@ -240,14 +240,16 @@ class OWLBase(Base):
             """
         return {item.c.toPython() for item in graph.query(query)}
 
-    def _get_by_property_value(self, prop: str, value: str) -> Set[str]:
+    def _get_by_property_value(
+        self, prop: str, value: str, graph: RDFGraph
+    ) -> Set[str]:
         """Get all classes with given value for a specific property.
 
-        :param str prop: property URI
-        :param str value: property value
+        :param prop: property URI
+        :param value: property value
+        :param graph: RDFLib graph of ontology default world
         :return: Set of URIs (as strings) matching given property/value
         """
-        graph = owl.default_world.as_rdflib_graph()
         query = f"""
             SELECT ?c WHERE {{
                 ?c <{prop}>
