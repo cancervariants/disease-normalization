@@ -38,12 +38,9 @@ def neuroblastoma():
         ],
         "associated_with": [
             "orphanet:635",
-            "nifstd:birnlex_12631",
             "umls:C0027819",
-            "gard:0007185",
-            "meddra:10029260",
-            "icdo:9500/3",
             "umls:CN205405",
+            "gard:0007185",
             "efo:0000621",
             "mesh:D009447"
         ],
@@ -126,8 +123,6 @@ def nsclc():
             "mesh:D002289",
             "umls:C0007131",
             "efo:0003060",
-            "kegg.disease:05223",
-            "HP:0030358",
             "orphanet:488201"
         ]
     })
@@ -272,7 +267,7 @@ def test_xref_match(mondo, neuroblastoma, richter_syndrome,
 def test_associated_with_match(mondo, neuroblastoma, richter_syndrome,
                                pediatric_liposarcoma, compare_records):
     """Test that associated_with search resolves to correct record."""
-    response = mondo.search('icdo:9500/3')
+    response = mondo.search("orphanet:635")
     assert response.match_type == MatchType.ASSOCIATED_WITH
     assert len(response.records) == 1
     actual_disease = response.records[0]

@@ -50,17 +50,15 @@ def neuroblastoma():
             "neuroblastoma, malignant"
         ],
         "associated_with": [
+            "efo:0000621",
+            "gard:0007185",
+            "gard:7185",
+            "icdo:9500/3",
+            "mesh:D009447",
+            "orphanet:635",
             "umls:C0027819",
             "umls:C2751421",
-            "icdo:9500/3",
-            "efo:0000621",
-            "gard:7185",
-            "gard:0007185",
-            "mesh:D009447",
-            "meddra:10029260",
-            "nifstd:birnlex_12631",
-            "orphanet:635",
-            "umls:CN205405"
+            "umls:CN205405",
         ],
         "pediatric": None
     }
@@ -100,7 +98,6 @@ def lnscc():
             "mesh:D002289",
             "efo:0003060",
             "kegg.disease:05223",
-            "HP:0030358",
             "orphanet:488201"
         ],
         "item_type": "merger"
@@ -178,14 +175,17 @@ def mafd2():
         "concept_id": "mondo:0010648",
         "label": "major affective disorder 2",
         "aliases": [
-          "MANIC-DEPRESSIVE ILLNESS",
-          "MDX",
-          "MDI",
-          "MANIC-DEPRESSIVE PSYCHOSIS, X-LINKED",
-          "BPAD",
           "BIPOLAR AFFECTIVE DISORDER",
+          "BPAD",
           "MAFD2",
+          "MANIC-DEPRESSIVE ILLNESS",
+          "MANIC-DEPRESSIVE PSYCHOSIS, X-LINKED",
+          "MDI",
+          "MDX",
           "major affective disorder 2, X-linked dominant"
+        ],
+        "xrefs": [
+            "omim:309200",
         ],
         "associated_with": [
             "mesh:C564108"
@@ -212,7 +212,7 @@ def record_id_groups():
         'teratoma': [
             "ncit:C9012", "mondo:0004099", "DOID:7079"
         ],
-        'mafd2': ["mondo:0010648", "DOID:0080221"],
+        "mafd2": ["mondo:0010648", "omim:309200"],
     }
 
 
@@ -275,11 +275,11 @@ def test_generate_merged_record(merge_handler, record_id_groups, neuroblastoma,
 
     mafd2_ids = record_id_groups['mafd2']
     response, r_ids = merge_handler.generate_merged_record(mafd2_ids)
-    assert set(r_ids) == {"mondo:0010648"}
+    assert set(r_ids) == {"mondo:0010648", "omim:309200"}
     compare_merged_records(response, mafd2)
 
 
-def test_create_merged_concepts(merge_handler, record_id_groups, neuroblastoma,
+def test_create_merged_concepts(merge_handler, neuroblastoma,
                                 lnscc, richter, ped_liposarcoma, teratoma,
                                 mafd2):
     """Test end-to-end creation and upload of merged concepts."""
@@ -318,5 +318,4 @@ def test_create_merged_concepts(merge_handler, record_id_groups, neuroblastoma,
                            teratoma)
     mafd2_id = mafd2['concept_id']
     assert mafd2_id in added_records
-    compare_merged_records(added_records[mafd2_id],
-                           mafd2)
+    compare_merged_records(added_records[mafd2_id], mafd2)
