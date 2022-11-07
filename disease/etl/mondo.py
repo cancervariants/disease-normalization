@@ -90,9 +90,7 @@ class Mondo(OWLBase):
         if ref.startswith("http"):
             if "snomedct" in ref:
                 return None
-            elif ref.startswith("http://purl.obo") or ref.startswith(
-                "http://www.orpha"
-            ):
+            elif ref.startswith(("http://purl.obo", "http://www.orpha")):
                 prefix, id_no = ref.split("_")
             else:
                 prefix, id_no = ref.rsplit("/", 1)
