@@ -23,9 +23,9 @@ class OncoTree(Base):
         """Load metadata"""
         metadata = SourceMeta(
             data_license="CC BY 4.0",
-            data_license_url="https://creativecommons.org/licenses/by/4.0/legalcode",  # noqa F401
+            data_license_url="https://creativecommons.org/licenses/by/4.0/legalcode",
             version=self._version,
-            data_url="http://oncotree.mskcc.org/#/home?tab=api",  # noqa: E501
+            data_url="http://oncotree.mskcc.org/#/home?tab=api",
             rdp_url=None,
             data_license_attributes={
                 "non_commercial": False,

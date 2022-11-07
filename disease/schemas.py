@@ -311,7 +311,7 @@ class ServiceMeta(BaseModel):
                 "name": "disease-normalizer",
                 "version": "0.1.0",
                 "response_datetime": "2021-04-05T16:44:15.367831",
-                "url": "https://github.com/cancervariants/disease-normalization",  # noqa: E501
+                "url": "https://github.com/cancervariants/disease-normalization",
             }
 
 
@@ -396,7 +396,7 @@ class NormalizationService(BaseModel):
                         "data_license": "CC0 1.0",
                         "data_license_url": "https://creativecommons.org/publicdomain/zero/1.0/legalcode",  # noqa: E501
                         "version": "20210305",
-                        "data_url": "http://www.obofoundry.org/ontology/doid.html",  # noqa: E501
+                        "data_url": "http://www.obofoundry.org/ontology/doid.html",
                         "rdp_url": None,
                         "data_license_attributes": {
                             "non_commercial": False,
@@ -409,7 +409,7 @@ class NormalizationService(BaseModel):
                     "name": "disease-normalizer",
                     "version": "0.1.0",
                     "response_datetime": "2021-04-05T16:44:15.367831",
-                    "url": "https://github.com/cancervariants/disease-normalization",  # noqa: E501
+                    "url": "https://github.com/cancervariants/disease-normalization",
                 },
             }
 
