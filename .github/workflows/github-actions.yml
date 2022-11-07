@@ -55,7 +55,11 @@ jobs:
       run: |
           python3 -m pip install pipenv
           pipenv install --dev
-    - name: check style
-      run: |
-          pipenv run flake8
-          pipenv run black --check
+    - name: flake8 check
+      run: pipenv run flake8
+
+    - name: black check
+      run: pipenv run black --check
+
+    - name: isort check
+      run: isort --profile black --check
