@@ -111,34 +111,35 @@ class CLI:
                         from_local: bool = False):
         """Update selected normalizer sources."""
         added_ids = []
-        for source in sources:
-            msg = f"Deleting {source}..."
+        for source_name in sources:
+            msg = f"Deleting {source_name}..."
             click.echo(f"\n{msg}")
             logger.info(msg)
             start_delete = timer()
-            CLI()._delete_data(source, db)
+            CLI()._delete_data(source_name, db)
             end_delete = timer()
             delete_time = end_delete - start_delete
-            msg = f"Deleted {source} in {delete_time:.5f} seconds."
+            msg = f"Deleted {source_name} in {delete_time:.5f} seconds."
             click.echo(f"{msg}\n")
             logger.info(msg)
 
-            msg = f"Loading {source}..."
+            msg = f"Loading {source_name}..."
             click.echo(msg)
             logger.info(msg)
             start_load = timer()
-            source = SOURCES_CLASS_LOOKUP[source](database=db)
+            source = SOURCES_CLASS_LOOKUP[source_name](database=db)
             if isinstance(source, Mondo):
                 added_ids = source.perform_etl(from_local)
             else:
                 source.perform_etl()
             end_load = timer()
             load_time = end_load - start_load
-            msg = f"Loaded {source} in {load_time:.5f} seconds."
+            msg = f"Loaded {source_name} in {load_time:.5f} seconds."
             click.echo(msg)
             logger.info(msg)
-            msg = f"Total time for {source}: " \
-                  f"{(delete_time + load_time):.5f} seconds."
+            msg = (
+                f"Total time for {source_name}: {(delete_time + load_time):.5f} seconds."  # noqa: E501
+            )
             click.echo(msg)
             logger.info(msg)
         if update_merged:
