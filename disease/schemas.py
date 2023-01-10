@@ -338,7 +338,7 @@ class NormalizationService(BaseModel):
                 "disease_descriptor": {
                     "id": "normalize:childhood%20leukemia",
                     "type": "DiseaseDescriptor",
-                    "disease": "ncit:C4989",
+                    "disease_id": "ncit:C4989",
                     "label": "Childhood Leukemia",
                     "xrefs": [
                         "mondo:0004355",

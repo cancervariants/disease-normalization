@@ -31,7 +31,7 @@ def neuroblastoma():
     return ValueObjectDescriptor(**{
         "id": "normalize.disease:Neuroblastoma",
         "type": "DiseaseDescriptor",
-        "disease": "ncit:C3270",
+        "disease_id": "ncit:C3270",
         "label": "Neuroblastoma",
         "xrefs": [
             "mondo:0005072",
@@ -79,7 +79,7 @@ def skin_myo():
     return ValueObjectDescriptor(**{
         "id": "normalize.disease:Skin Myoepithelioma",
         "type": "DiseaseDescriptor",
-        "disease": "ncit:C167370",
+        "disease_id": "ncit:C167370",
         "label": "Skin Myoepithelioma",
         "alternate_labels": ["Cutaneous Myoepithelioma"],
     })
@@ -93,7 +93,7 @@ def mafd2():
     return ValueObjectDescriptor(**{
         "id": "normalize.disease:MAFD2",
         "type": "DiseaseDescriptor",
-        "disease": "mondo:0010648",
+        "disease_id": "mondo:0010648",
         "label": "major affective disorder 2",
         "alternate_labels": [
             "MAFD2",
@@ -126,7 +126,7 @@ def compare_vod(actual, fixture):
     actual = actual.disease_descriptor
     assert actual.id == fixture.id
     assert actual.type == fixture.type
-    assert actual.disease == fixture.disease
+    assert actual.disease_id == fixture.disease_id
     assert actual.label == fixture.label
 
     assert (actual.xrefs is not None) == (fixture.xrefs is not None)
