@@ -118,8 +118,11 @@ class QueryHandler:
             try:
                 match = self.db.get_record_by_id(concept_id.lower(),
                                                  case_sensitive=False)
-                (response, src) = self._add_record(response, match, match_type)
-                matched_sources.add(src)
+                if match is None:
+                    logger.error(f"Reference to {concept_id} failed.")
+                else:
+                    (response, src) = self._add_record(response, match, match_type)
+                    matched_sources.add(src)
             except ClientError as e:
                 logger.error(e.response['Error']['Message'])
         return response, matched_sources

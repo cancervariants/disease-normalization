@@ -62,8 +62,6 @@ def neuroblastoma():
                     "gard:0007185",
                     "icdo:9500/3",
                     "mesh:D009447",
-                    "meddra:10029260",
-                    "nifstd:birnlex_12631",
                     "orphanet:635",
                     "umls:CN205405",
                     "umls:C2751421"

@@ -75,11 +75,12 @@ class NCIt(OWLBase):
         :return: uq_nodes with additions from above types added
         :rtype: Set[str]
         """
+        graph = owl.default_world.as_rdflib_graph()
         p106 = "http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#P106"
-        neopl = self._get_by_property_value(p106, "Neoplastic Process")
-        dos = self._get_by_property_value(p106, "Disease or Syndrome")
+        neopl = self._get_by_property_value(p106, "Neoplastic Process", graph)
+        dos = self._get_by_property_value(p106, "Disease or Syndrome", graph)
         p310 = "http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#P106"
-        retired = self._get_by_property_value(p310, "Retired_Concept")
+        retired = self._get_by_property_value(p310, "Retired_Concept", graph)
         uris = neopl.union(dos) - retired
         return uris
 
