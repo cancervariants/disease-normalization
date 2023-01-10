@@ -315,7 +315,7 @@ class QueryHandler:
         """
         sources_meta = {}
         vod = response['disease_descriptor']
-        ids = [vod['disease']] + vod.get('xrefs', [])
+        ids = [vod['disease_id']] + vod.get('xrefs', [])
         for concept_id in ids:
             prefix = concept_id.split(':')[0]
             src_name = PREFIX_LOOKUP[prefix.lower()]
@@ -337,7 +337,7 @@ class QueryHandler:
         vod = {
             'id': f'normalize.disease:{quote(query)}',
             'type': 'DiseaseDescriptor',
-            'disease': record['concept_id'],
+            'disease_id': record['concept_id'],
             'label': record['label'],
             'extensions': [],
         }
