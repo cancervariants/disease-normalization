@@ -2,6 +2,7 @@
 from itertools import groupby
 from typing import Dict, List, Optional
 
+import requests
 import owlready2 as owl
 from owlready2.rdflib_store import TripleLiteRDFlibGraph as RDFGraph
 
@@ -58,10 +59,21 @@ MONDO_PREFIX_LOOKUP = {
 class Mondo(OWLBase):
     """Gather and load data from Mondo."""
 
+    def get_latest_version(self) -> str:
+        """Get most recent version of MONDO from GitHub API.
+        :return: Most recent version, as a str
+        """
+        response = requests.get("https://api.github.com/repos/monarch-initiative/mondo/releases/latest")  # noqa: E501
+        if response.status_code == 200:
+            return response.json()["name"].replace("v", "")
+        else:
+            raise requests.HTTPError(f"Unable to retrieve MONDO version from GitHub "
+                                     f"API. Status code: {response.status_code}")
+
     def _download_data(self):
         """Download Mondo thesaurus source file for loading into normalizer."""
         logger.info('Downloading Mondo data...')
-        url = "http://purl.obolibrary.org/obo/mondo.owl"
+        url = f"http://purl.obolibrary.org/obo/mondo/releases/{self._version}/mondo.owl"
         output_file = self._src_dir / f"mondo_{self._version}.owl"
         self._http_download(url, output_file)
         logger.info('Finished downloading Mondo Disease Ontology')
