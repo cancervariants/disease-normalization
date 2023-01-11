@@ -100,7 +100,12 @@ class Mondo(OWLBase):
             elif "/" in ref:
                 prefix, id_no = ref.rsplit("/", 1)
             else:
-                prefix, id_no = ref.split(":")
+                try:
+                    prefix, id_no = ref.split(":")
+                except ValueError as e:
+                    logger.warning(f"{ref} raised a ValueError when trying to get "
+                                   f"prefix and ID: {e}")
+                    return None
         try:
             concept_id = f"{MONDO_PREFIX_LOOKUP[prefix]}:{id_no}"
         except KeyError:
