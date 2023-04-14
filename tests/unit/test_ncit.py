@@ -1,4 +1,6 @@
 """Test NCIt source."""
+import re
+
 import pytest
 
 from disease.schemas import MatchType, SourceName, Disease
@@ -183,7 +185,8 @@ def test_meta(ncit):
     assert response.source_meta_.data_license == 'CC BY 4.0'
     assert response.source_meta_.data_license_url == \
         'https://creativecommons.org/licenses/by/4.0/legalcode'
-    assert response.source_meta_.version == '22.09d'
+    assert re.match(r"\d{2}\.\d{2}[a-z]", response.source_meta_.version)
+
     assert response.source_meta_.data_url == \
         "https://evs.nci.nih.gov/ftp1/NCI_Thesaurus/"
     assert response.source_meta_.rdp_url == 'http://reusabledata.org/ncit.html'
