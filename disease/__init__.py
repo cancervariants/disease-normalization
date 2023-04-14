@@ -17,14 +17,6 @@ logger.setLevel(logging.DEBUG)
 logger.handlers = []
 
 
-class DownloadException(Exception):
-    """Exception for failures relating to source file downloads."""
-
-    def __init__(self, *args, **kwargs):
-        """Initialize exception."""
-        super().__init__(*args, **kwargs)
-
-
 from disease.schemas import SourceName, SourceIDAfterNamespace, NamespacePrefix, ItemTypes  # noqa: E402 E501
 ITEM_TYPES = {k.lower(): v.value for k, v in ItemTypes.__members__.items()}
 
