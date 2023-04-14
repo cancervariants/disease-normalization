@@ -1,13 +1,12 @@
 """Module to load disease data from Mondo Disease Ontology."""
 from itertools import groupby
 from typing import Dict, List, Optional
-from http import HTTPStatus
 
+import requests
 import owlready2 as owl
 from owlready2.rdflib_store import TripleLiteRDFlibGraph as RDFGraph
-import requests
 
-from .base import OWLBase, DownloadException
+from .base import OWLBase
 from disease import PREFIX_LOOKUP, logger
 from disease.schemas import SourceMeta, SourceName, NamespacePrefix
 
@@ -60,21 +59,23 @@ MONDO_PREFIX_LOOKUP = {
 class Mondo(OWLBase):
     """Gather and load data from Mondo."""
 
+    def get_latest_version(self) -> str:
+        """Get most recent version of MONDO from GitHub API.
+        :return: Most recent version, as a str
+        """
+        response = requests.get("https://api.github.com/repos/monarch-initiative/mondo/releases/latest")  # noqa: E501
+        if response.status_code == 200:
+            return response.json()["name"].replace("v", "")
+        else:
+            raise requests.HTTPError(f"Unable to retrieve MONDO version from GitHub "
+                                     f"API. Status code: {response.status_code}")
+
     def _download_data(self):
         """Download Mondo thesaurus source file for loading into normalizer."""
         logger.info('Downloading Mondo data...')
-        response = requests.get(
-            "https://api.github.com/repos/monarch-initiative/mondo/releases/latest"
-        )
-        if response.status_code != HTTPStatus.OK:
-            raise DownloadException
-        release_info = response.json()
-        for asset in release_info["assets"]:
-            if asset["name"] == "mondo.owl":
-                url = asset["browser_download_url"]
-                output_file = self._src_dir / f"mondo_{self._version}.owl"
-                self._http_download(url, output_file)
-                break
+        url = f"http://purl.obolibrary.org/obo/mondo/releases/{self._version}/mondo.owl"
+        output_file = self._src_dir / f"mondo_{self._version}.owl"
+        self._http_download(url, output_file)
         logger.info('Finished downloading Mondo Disease Ontology')
 
     def _load_meta(self):
@@ -92,20 +93,6 @@ class Mondo(OWLBase):
         params = dict(metadata)
         params['src_name'] = SourceName.MONDO.value
         self.database.metadata.put_item(Item=params)
-
-    def get_latest_version(self) -> str:
-        """Get most recent version of source data. Ideally, we could use Bioversions
-        to do this, but it seems that there's a holdup on how Mondo posts that data to
-        OLS, so here we are.
-        :return: most recent version, as a str
-        """
-        response = requests.get(
-            "https://api.github.com/repos/monarch-initiative/mondo/releases/latest"
-        )
-        if response.status_code != HTTPStatus.OK:
-            raise DownloadException
-        version = response.json()["name"]
-        return version[1:]  # drop the 'v'
 
     def _get_concept_id(self, ref: str) -> Optional[str]:
         """Format concept ID for given reference.
@@ -125,7 +112,12 @@ class Mondo(OWLBase):
             elif "/" in ref:
                 prefix, id_no = ref.rsplit("/", 1)
             else:
-                prefix, id_no = ref.split(":")
+                try:
+                    prefix, id_no = ref.split(":")
+                except ValueError as e:
+                    logger.warning(f"{ref} raised a ValueError when trying to get "
+                                   f"prefix and ID: {e}")
+                    return None
         try:
             concept_id = f"{MONDO_PREFIX_LOOKUP[prefix]}:{id_no}"
         except KeyError:
