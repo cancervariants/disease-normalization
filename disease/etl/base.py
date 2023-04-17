@@ -15,7 +15,6 @@ import requests
 from disease import SOURCES_FOR_MERGE, ITEM_TYPES, logger, APP_ROOT
 from disease.database import Database
 from disease.schemas import Disease
-from disease.etl.utils import DownloadException
 
 
 DEFAULT_DATA_PATH = APP_ROOT / "data"
@@ -218,6 +217,10 @@ class Base(ABC):
         self.database.add_record(disease)
         if self._store_ids:
             self._added_ids.append(concept_id)
+
+
+class DownloadException(Exception):
+    """Exception for failures relating to source file downloads."""
 
 
 class OWLBase(Base):

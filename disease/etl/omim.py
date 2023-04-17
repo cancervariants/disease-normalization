@@ -1,6 +1,6 @@
 """Module to load disease data from OMIM."""
-from .base import Base
-from disease import DownloadException, logger
+from .base import Base, DownloadException
+from disease import logger
 from disease.schemas import SourceMeta, SourceName, Disease, NamespacePrefix
 
 

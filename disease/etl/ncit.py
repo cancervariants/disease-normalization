@@ -6,8 +6,7 @@ import re
 
 from disease import logger
 from disease.schemas import SourceMeta, SourceName, NamespacePrefix
-from disease.etl.base import OWLBase
-from disease.etl.utils import DownloadException
+from disease.etl.base import OWLBase, DownloadException
 
 
 icdo_re = re.compile("[0-9]+/[0-9]+")
