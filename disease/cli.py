@@ -229,7 +229,6 @@ class CLI:
                 with database.diseases.batch_writer(
                     overwrite_by_pkeys=["label_and_type", "concept_id"]
                 ) as batch:
-
                     for record in records:
                         batch.delete_item(
                             Key={

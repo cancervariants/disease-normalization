@@ -14,7 +14,6 @@ from owlready2.rdflib_store import TripleLiteRDFlibGraph as RDFGraph
 
 from disease import APP_ROOT, ITEM_TYPES, SOURCES_FOR_MERGE, logger
 from disease.database import Database
-from disease.etl.utils import DownloadException
 from disease.schemas import Disease
 
 DEFAULT_DATA_PATH = APP_ROOT / "data"
@@ -221,6 +220,10 @@ class Base(ABC):
         self.database.add_record(disease)
         if self._store_ids:
             self._added_ids.append(concept_id)
+
+
+class DownloadException(Exception):
+    """Exception for failures relating to source file downloads."""
 
 
 class OWLBase(Base):
