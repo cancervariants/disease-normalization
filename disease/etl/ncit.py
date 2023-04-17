@@ -6,8 +6,7 @@ import owlready2 as owl
 import requests
 
 from disease import logger
-from disease.etl.base import OWLBase
-from disease.etl.utils import DownloadException
+from disease.etl.base import DownloadException, OWLBase
 from disease.schemas import NamespacePrefix, SourceMeta, SourceName
 
 icdo_re = re.compile("[0-9]+/[0-9]+")

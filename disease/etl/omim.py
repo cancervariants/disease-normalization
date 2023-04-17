@@ -1,8 +1,8 @@
 """Module to load disease data from OMIM."""
-from disease import DownloadException, logger
+from disease import logger
 from disease.schemas import Disease, NamespacePrefix, SourceMeta, SourceName
 
-from .base import Base
+from .base import Base, DownloadException
 
 
 class OMIM(Base):
