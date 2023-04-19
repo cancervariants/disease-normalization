@@ -57,14 +57,14 @@ terms_file = scripts_dir / "mondo_terms.txt"
 if not terms_file.exists():
     raise FileNotFoundError("Could not find mondo_terms.txt")
 
-# save compressed file as `fixture_mondo_XXXX-XX-XX.owl.tar.gz`
-outfile = test_data_dir / f"fixture_{mondo._data_file.name}"
+outfile = test_data_dir / mondo._data_file.name
 outfile.parent.mkdir(exist_ok=True)
 cmd_str = f"{robot_file} extract --method star --input {infile} --term-file {terms_file} --output {outfile}"  # noqa: E501
 
 subprocess.run(cmd_str, shell=True)
 
-tarball = outfile.parent / f"{outfile.name}.tar.gz"
+# save compressed file as `fixture_mondo_XXXX-XX-XX.owl.tar.gz`
+tarball = outfile.parent / f"fixture_{outfile.name}.tar.gz"
 
 with tarfile.open(tarball, "w:gz") as tar:
     tar.add(outfile, arcname=outfile.name)

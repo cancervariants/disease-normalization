@@ -6,23 +6,10 @@ import pytest
 from datetime import datetime
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope="module")
 def query_handler():
-    """Build query handler test fixture."""
-    class QueryGetter:
-
-        def __init__(self):
-            self.query_handler = QueryHandler()
-
-        def search(self, query_str, keyed=False, incl='', excl=''):
-            resp = self.query_handler.search(query_str=query_str, keyed=keyed,
-                                             incl=incl, excl=excl)
-            return resp
-
-        def normalize(self, query_str):
-            return self.query_handler.normalize(query_str)
-
-    return QueryGetter()
+    """Build query handler test fixture"""
+    return QueryHandler()
 
 
 @pytest.fixture(scope='module')
@@ -173,8 +160,7 @@ def test_query(query_handler):
     matches = resp.source_matches
     assert isinstance(matches, list)
     assert len(matches) == 5
-    ncit = list(filter(lambda m: m.source == SourceName.NCIT,
-                       matches))[0]
+    ncit = list(filter(lambda m: m.source == SourceName.NCIT, matches))[0]
     assert len(ncit.records) == 1
     ncit_record = ncit.records[0]
     assert ncit_record.label == 'Neuroblastoma'
@@ -194,8 +180,7 @@ def test_query_specify_query_handlers(query_handler):
     """Test inclusion and exclusion of sources in query."""
     # test full inclusion
     sources = 'ncit,mondo,do,oncotree,omim'
-    resp = query_handler.search('Neuroblastoma', keyed=True,
-                                incl=sources, excl='')
+    resp = query_handler.search('Neuroblastoma', keyed=True, incl=sources, excl='')
     matches = resp.source_matches
     assert len(matches) == 5
     assert SourceName.NCIT in matches
@@ -205,8 +190,7 @@ def test_query_specify_query_handlers(query_handler):
     assert SourceName.OMIM in matches
 
     # test full exclusion
-    resp = query_handler.search('Neuroblastoma', keyed=True,
-                                excl=sources)
+    resp = query_handler.search('Neuroblastoma', keyed=True, excl=sources)
     matches = resp.source_matches
     assert len(matches) == 0
 
@@ -214,8 +198,7 @@ def test_query_specify_query_handlers(query_handler):
     resp = query_handler.search('Neuroblastoma', keyed=True, excl='NCIt')
     matches = resp.source_matches
     assert SourceName.NCIT not in matches
-    resp = query_handler.search('Neuroblastoma', keyed=True,
-                                incl='nCiT')
+    resp = query_handler.search('Neuroblastoma', keyed=True, incl='nCiT')
     matches = resp.source_matches
     assert SourceName.NCIT in matches
 
@@ -225,8 +208,9 @@ def test_query_specify_query_handlers(query_handler):
 
     # test error for supplying both incl and excl args
     with pytest.raises(InvalidParameterException):
-        resp = query_handler.search('Neuroblastoma', keyed=True,
-                                    incl='mondo', excl='ncit')
+        resp = query_handler.search(
+            'Neuroblastoma', keyed=True, incl='mondo', excl='ncit'
+        )
 
 
 def test_normalize_query(query_handler, neuroblastoma, mafd2):

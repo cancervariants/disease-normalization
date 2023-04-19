@@ -16,8 +16,8 @@ def pytest_collection_modifyitems(items):
     When creating new test modules, be sure to add them here.
     """
     MODULE_ORDER = [
-        "test_do",
         "test_mondo",
+        "test_do",
         "test_ncit",
         "test_omim",
         "test_oncotree",
@@ -60,8 +60,8 @@ def db():
 
 
 def decompress_mondo_tar():
-    """Mondo data was hard to subset down to a reasonably commmit-able size, so it's
-    stored as a tarball instead. We'll need to decompress it.
+    """Mondo fixture data was hard to subset down to a reasonably commmit-able size, so
+    it's stored as a tarball instead. We'll need to decompress it.
 
     This method expects to find a single tarball in the test mondo directory. If
     there's already a decompressed OWL file there too, it won't do any redundant work.
