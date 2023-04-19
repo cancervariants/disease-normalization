@@ -81,11 +81,12 @@ def decompress_mondo_tar():
 
 
 @pytest.fixture(scope="session")
-def test_source(
-    db: Database, test_data: Path
-):
+def test_source(db: Database, test_data: Path):
     """Provide query endpoint for testing sources. If DISEASE_TEST is set, will try to
     load DB from test data.
+
+    :param db: database fixture
+    :param test_data: test data directory location
     :return: factory function that takes an ETL class instance and returns a query
     endpoint.
     """

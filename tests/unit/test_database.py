@@ -2,14 +2,14 @@
 from boto3.dynamodb.conditions import Key
 
 
-def test_tables_created(db):  # noqa: F811
+def test_tables_created(db):
     """Check that disease_concepts and disease_metadata are created."""
     existing_tables = db.dynamodb_client.list_tables()["TableNames"]
     assert "disease_concepts" in existing_tables
     assert "disease_metadata" in existing_tables
 
 
-def test_item_type(db):  # noqa: F811
+def test_item_type(db):
     """Check that objects are tagged with item_type attribute."""
     filter_exp = Key("label_and_type").eq("ncit:c2926##identity")
     item = db.diseases.query(KeyConditionExpression=filter_exp)["Items"][0]
