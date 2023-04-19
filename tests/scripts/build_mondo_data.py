@@ -1,22 +1,29 @@
-"""Construct test data for DO source."""
+"""Construct test data for Mondo source.
+
+This saves a tar file named `fixture_mondo_XXXX-XX-XX.ow.tar.gz` in the test data
+directory, because the OWL output is still too large to commit to the repo. Methods
+using it should a) make sure to check for files with the `fixture_` prefix, and b)
+remember to decompress it.
+"""
 from http import HTTPStatus
 import os
+import tarfile
 import subprocess
 from pathlib import Path
 
 import requests
 
-from disease.etl import DO
+from disease.etl import Mondo
 from disease.database import Database
 
 
-do = DO(Database())
-do._extract_data()
+mondo = Mondo(Database())
+mondo._extract_data()
 
-infile = do._data_file.absolute()
+infile = mondo._data_file.absolute()
 
 scripts_dir = Path(__file__).resolve().parent
-test_data_dir = scripts_dir.parent / "data" / "do"
+test_data_dir = scripts_dir.parent / "data" / "mondo"
 
 robot_file = scripts_dir / "robot"
 if not robot_file.exists():
@@ -46,12 +53,18 @@ if not robot_jar.exists():
     with open(robot_jar, "wb") as f:
         f.write(jar_response.content)
 
-terms_file = scripts_dir / "do_terms.txt"
+terms_file = scripts_dir / "mondo_terms.txt"
 if not terms_file.exists():
-    raise FileNotFoundError("Could not find do_terms.txt")
+    raise FileNotFoundError("Could not find mondo_terms.txt")
 
-outfile = test_data_dir / do._data_file.name
+# save compressed file as `fixture_mondo_XXXX-XX-XX.owl.tar.gz`
+outfile = test_data_dir / f"fixture_{mondo._data_file.name}"
 outfile.parent.mkdir(exist_ok=True)
 cmd_str = f"{robot_file} extract --method star --input {infile} --term-file {terms_file} --output {outfile}"  # noqa: E501
 
 subprocess.run(cmd_str, shell=True)
+
+tarball = outfile.parent / f"{outfile.name}.tar.gz"
+
+with tarfile.open(tarball, "w:gz") as tar:
+    tar.add(outfile, arcname=outfile.name)

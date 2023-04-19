@@ -7,5 +7,6 @@ repos:
     - id: flake8
       additional_dependencies: [flake8-docstrings]
     - id: check-added-large-files
+      args: ['--maxkb=2500']
     - id: detect-private-key
 

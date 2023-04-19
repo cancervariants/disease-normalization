@@ -2,24 +2,15 @@
 import re
 
 import pytest
+from disease.etl.omim import OMIM
 
-from disease.schemas import MatchType, SourceName, Disease
-from disease.query import QueryHandler
+from disease.schemas import MatchType, Disease
 
 
 @pytest.fixture(scope='module')
-def omim():
+def omim(test_source):
     """Build OMIM ETL test fixture."""
-    class QueryGetter:
-
-        def __init__(self):
-            self.query_handler = QueryHandler()
-
-        def search(self, query_str):
-            response = self.query_handler.search(query_str, keyed=True,
-                                                 incl='omim')
-            return response.source_matches[SourceName.OMIM]
-    return QueryGetter()
+    return test_source(OMIM)
 
 
 @pytest.fixture(scope='module')
@@ -80,103 +71,55 @@ def lall():
     })
 
 
-def test_concept_id_match(omim, mafd2, acute_ll, lall, compare_records):
+def test_concept_id_match(omim, mafd2, acute_ll, lall, compare_response):
     """Test concept ID search resolution."""
     response = omim.search('omim:309200')
-    assert response.match_type == MatchType.CONCEPT_ID
-    assert len(response.records) == 1
-    actual_disease = response.records[0]
-    compare_records(actual_disease, mafd2)
+    compare_response(response, MatchType.CONCEPT_ID, mafd2)
 
     response = omim.search('omim:613065')
-    assert response.match_type == MatchType.CONCEPT_ID
-    assert len(response.records) == 1
-    actual_disease = response.records[0]
-    compare_records(actual_disease, acute_ll)
+    compare_response(response, MatchType.CONCEPT_ID, acute_ll)
 
     response = omim.search('omim:247640')
-    assert response.match_type == MatchType.CONCEPT_ID
-    assert len(response.records) == 1
-    actual_disease = response.records[0]
-    compare_records(actual_disease, lall)
+    compare_response(response, MatchType.CONCEPT_ID, lall)
 
 
-def test_label_match(omim, mafd2, acute_ll, lall, compare_records):
+def test_label_match(omim, mafd2, acute_ll, lall, compare_response):
     """Test label search resolution."""
     response = omim.search('MAJOR AFFECTIVE DISORDER 2')
-    assert response.match_type == MatchType.LABEL
-    assert len(response.records) == 1
-    actual_disease = response.records[0]
-    compare_records(actual_disease, mafd2)
+    compare_response(response, MatchType.LABEL, mafd2)
 
     response = omim.search('LEUKEMIA, ACUTE LYMPHOBLASTIC')
-    assert response.match_type == MatchType.LABEL
-    assert len(response.records) == 1
-    actual_disease = response.records[0]
-    compare_records(actual_disease, acute_ll)
+    compare_response(response, MatchType.LABEL, acute_ll)
 
-    response = omim.search('lymphoblastic leukemia, acute, with lymphomatous features')  # noqa: E501
-    assert response.match_type == MatchType.LABEL
-    assert len(response.records) == 1
-    actual_disease = response.records[0]
-    compare_records(actual_disease, lall)
+    response = omim.search('lymphoblastic leukemia, acute, with lymphomatous features')
+    compare_response(response, MatchType.LABEL, lall)
 
 
-def test_alias_match(omim, mafd2, acute_ll, lall, compare_records):
+def test_alias_match(omim, mafd2, acute_ll, lall, compare_response):
     """Test alias search resolution."""
     response = omim.search('bipolar affective disorder')
-    assert response.match_type == MatchType.ALIAS
-    assert len(response.records) >= 1
-    actual_disease = None
-    for record in response.records:
-        if record.label == 'MAJOR AFFECTIVE DISORDER 2':
-            actual_disease = record
-    compare_records(actual_disease, mafd2)
+    compare_response(response, MatchType.ALIAS, mafd2)
 
     response = omim.search('bpad')
-    assert response.match_type == MatchType.ALIAS
-    assert len(response.records) >= 1
-    actual_disease = None
-    for record in response.records:
-        if record.label == 'MAJOR AFFECTIVE DISORDER 2':
-            actual_disease = record
-    compare_records(actual_disease, mafd2)
+    compare_response(response, MatchType.ALIAS, mafd2)
 
     response = omim.search('mafd2')
-    assert response.match_type == MatchType.ALIAS
-    assert len(response.records) == 1
-    actual_disease = response.records[0]
-    compare_records(actual_disease, mafd2)
+    compare_response(response, MatchType.ALIAS, mafd2)
 
     response = omim.search('all')
-    assert response.match_type == MatchType.ALIAS
-    assert len(response.records) == 1
-    actual_disease = response.records[0]
-    compare_records(actual_disease, acute_ll)
+    compare_response(response, MatchType.ALIAS, acute_ll)
 
     response = omim.search('LEUKEMIA, ACUTE LYMPHOCYTIC, SUSCEPTIBILITY TO, 1')
-    assert response.match_type == MatchType.ALIAS
-    assert len(response.records) == 1
-    actual_disease = response.records[0]
-    compare_records(actual_disease, acute_ll)
+    compare_response(response, MatchType.ALIAS, acute_ll)
 
-    response = omim.search('LEUKEMIA, B-CELL ACUTE LYMPHOBLASTIC, SUSCEPTIBILITY TO')  # noqa: E501
-    assert response.match_type == MatchType.ALIAS
-    assert len(response.records) == 1
-    actual_disease = response.records[0]
-    compare_records(actual_disease, acute_ll)
+    response = omim.search('LEUKEMIA, B-CELL ACUTE LYMPHOBLASTIC, SUSCEPTIBILITY TO')
+    compare_response(response, MatchType.ALIAS, acute_ll)
 
     response = omim.search('lymphomatous all')
-    assert response.match_type == MatchType.ALIAS
-    assert len(response.records) == 1
-    actual_disease = response.records[0]
-    compare_records(actual_disease, lall)
+    compare_response(response, MatchType.ALIAS, lall)
 
     response = omim.search('lall')
-    assert response.match_type == MatchType.ALIAS
-    assert len(response.records) == 1
-    actual_disease = response.records[0]
-    compare_records(actual_disease, lall)
+    compare_response(response, MatchType.ALIAS, lall)
 
 
 def test_meta(omim):
@@ -186,8 +129,8 @@ def test_meta(omim):
     assert response.source_meta_.data_license_url == \
         'https://omim.org/help/agreement'
     assert re.match(r"\d{4}-\d{2}-\d{2}", response.source_meta_.version)
-    assert response.source_meta_.data_url == 'https://www.omim.org/downloads'  # noqa: E501
-    assert response.source_meta_.rdp_url == 'http://reusabledata.org/omim.html'  # noqa: E501
+    assert response.source_meta_.data_url == 'https://www.omim.org/downloads'
+    assert response.source_meta_.rdp_url == 'http://reusabledata.org/omim.html'
     assert response.source_meta_.data_license_attributes == {
         "non_commercial": False,
         "share_alike": True,

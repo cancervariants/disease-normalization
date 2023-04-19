@@ -118,6 +118,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+.python-version
 
 # Spyder project settings
 .spyderproject
@@ -160,4 +161,7 @@ dynamodb_local_latest/*
 
 # Build files
 Pipfile.lock
-pyproject.toml
+
+# Misc
+tests/data/mondo/*.owl
+tests/scripts/robot*

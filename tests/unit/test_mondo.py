@@ -2,24 +2,15 @@
 import re
 
 import pytest
+from disease.etl.mondo import Mondo
 
-from disease.schemas import MatchType, SourceName, Disease
-from disease.query import QueryHandler
+from disease.schemas import MatchType, Disease
 
 
 @pytest.fixture(scope='module')
-def mondo():
+def mondo(test_source):
     """Build Mondo ETL test fixture."""
-    class QueryGetter:
-
-        def __init__(self):
-            self.query_handler = QueryHandler()
-
-        def search(self, query_str):
-            response = self.query_handler.search(query_str, keyed=True,
-                                                 incl="mondo")
-            return response.source_matches[SourceName.MONDO]
-    return QueryGetter()
+    return test_source(Mondo)
 
 
 @pytest.fixture(scope='module')
@@ -131,31 +122,19 @@ def nsclc():
 
 
 def test_concept_id_match(mondo, neuroblastoma, richter_syndrome,
-                          pediatric_liposarcoma, compare_records):
+                          pediatric_liposarcoma, compare_response):
     """Test that concept ID search resolves to correct record"""
     response = mondo.search('mondo:0005072')
-    assert response.match_type == MatchType.CONCEPT_ID
-    assert len(response.records) == 1
-    actual_disease = response.records[0]
-    compare_records(actual_disease, neuroblastoma)
+    compare_response(response, MatchType.CONCEPT_ID, neuroblastoma)
 
     response = mondo.search('mondo:0002083')
-    assert response.match_type == MatchType.CONCEPT_ID
-    assert len(response.records) == 1
-    actual_disease = response.records[0]
-    compare_records(actual_disease, richter_syndrome)
+    compare_response(response, MatchType.CONCEPT_ID, richter_syndrome)
 
     response = mondo.search('MONDO:0005072')
-    assert response.match_type == MatchType.CONCEPT_ID
-    assert len(response.records) == 1
-    actual_disease = response.records[0]
-    compare_records(actual_disease, neuroblastoma)
+    compare_response(response, MatchType.CONCEPT_ID, neuroblastoma)
 
     response = mondo.search('mondo:0003587')
-    assert response.match_type == MatchType.CONCEPT_ID
-    assert len(response.records) == 1
-    actual_disease = response.records[0]
-    compare_records(actual_disease, pediatric_liposarcoma)
+    compare_response(response, MatchType.CONCEPT_ID, pediatric_liposarcoma)
 
     response = mondo.search('0002083')
     assert response.match_type == MatchType.NO_MATCH

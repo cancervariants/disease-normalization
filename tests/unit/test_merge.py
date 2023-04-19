@@ -1,31 +1,54 @@
 """Test merged record generation."""
+import os
+from typing import Any, Dict
+
 import pytest
+from disease.database import AWS_ENV_VAR_NAME, Database
+from disease.etl.do import DO
+
 from disease.etl.merge import Merge
+from disease.etl.mondo import Mondo
+from disease.etl.ncit import NCIt
+from disease.etl.omim import OMIM
+from disease.etl.oncotree import OncoTree
 
 
-@pytest.fixture(scope='module')
-def merge_handler(mock_database):
-    """Provide Merge instance to test cases."""
-    class MergeHandler():
-        def __init__(self):
-            self.merge = Merge(mock_database())
+def merge_instance(test_source):
+    """Provide fixture for ETL merge class"""
+    update_db = os.environ.get("THERAPY_TEST", "").lower() == "true"
+    if update_db and os.environ.get(AWS_ENV_VAR_NAME):
+        assert False, (
+            f"Running the full therapy ETL pipeline test on an AWS environment is "
+            f"forbidden -- either unset {AWS_ENV_VAR_NAME} or unset THERAPY_TEST"
+        )
 
-        def get_merge(self):
-            return self.merge
+    class TrackingDatabase(Database):
+        """Provide injection for DB instance to track added/updated records"""
 
-        def create_merged_concepts(self, record_ids):
-            return self.merge.create_merged_concepts(record_ids)
+        def __init__(self, **kwargs):
+            self.additions = {}
+            self.updates = {}
+            super().__init__(**kwargs)
 
-        def get_added_records(self):
-            return self.merge._database.added_records
+        def add_record(self, record: Dict, record_type: str):
+            if update_db:
+                super().add_record(record, record_type)
+            self.additions[record["concept_id"]] = record
 
-        def get_updates(self):
-            return self.merge._database.updates
+        def update_record(
+            self, concept_id: str, field: str, new_value: Any,  # noqa: ANN401
+            item_type: str = "identity"
+        ):
+            if update_db:
+                super().update_record(concept_id, field, new_value, item_type)
+            self.updates[concept_id] = {field: new_value}
 
-        def generate_merged_record(self, record_id_set):
-            return self.merge._generate_merged_record(record_id_set)
+    if update_db:
+        for SourceClass in (DO, Mondo, NCIt, OncoTree, OMIM):
+            test_source(SourceClass)
 
-    return MergeHandler()
+    m = Merge(TrackingDatabase())
+    return m
 
 
 @pytest.fixture(scope='module')
