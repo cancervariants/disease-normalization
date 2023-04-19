@@ -26,8 +26,8 @@ jobs:
 
     - name: Build local DynamoDB
       run: |
-          chmod +x ./tests/scripts/dynamodb_run.bash
-          ./tests/scripts/dynamodb_run.bash
+          chmod +x ./tests/scripts/dynamodb_run.sh
+          ./tests/scripts/dynamodb_run.sh
 
     - name: Load and Test DynamoDB
       run: python3 -m pytest
