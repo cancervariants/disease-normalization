@@ -3,23 +3,14 @@ import re
 
 import pytest
 
-from disease.query import QueryHandler
-from disease.schemas import Disease, MatchType, SourceName
+from disease.etl.ncit import NCIt
+from disease.schemas import Disease, MatchType
 
 
 @pytest.fixture(scope="module")
-def ncit():
+def ncit(test_source):
     """Build NCIt ETL test fixture."""
-
-    class QueryGetter:
-        def __init__(self):
-            self.query_handler = QueryHandler()
-
-        def search(self, query_str):
-            response = self.query_handler.search(query_str, keyed=True, incl="ncit")
-            return response.source_matches[SourceName.NCIT]
-
-    return QueryGetter()
+    return test_source(NCIt)
 
 
 @pytest.fixture(scope="module")
@@ -72,115 +63,70 @@ def nsclc():
     )
 
 
-def test_concept_id_match(ncit, neuroblastoma, nsclc, compare_records):
+def test_concept_id_match(ncit, neuroblastoma, nsclc, compare_response):
     """Test that concept ID search resolves to correct record"""
     response = ncit.search("ncit:C3270")
-    assert response.match_type == MatchType.CONCEPT_ID
-    assert len(response.records) == 1
-    actual_disease = response.records[0]
-    compare_records(actual_disease, neuroblastoma)
+    compare_response(response, MatchType.CONCEPT_ID, neuroblastoma)
 
     response = ncit.search("ncit:c2926")
-    assert response.match_type == MatchType.CONCEPT_ID
-    assert len(response.records) == 1
-    actual_disease = response.records[0]
-    compare_records(actual_disease, nsclc)
+    compare_response(response, MatchType.CONCEPT_ID, nsclc)
 
     response = ncit.search("NCIT:C2926")
-    assert response.match_type == MatchType.CONCEPT_ID
-    assert len(response.records) == 1
-    actual_disease = response.records[0]
-    compare_records(actual_disease, nsclc)
+    compare_response(response, MatchType.CONCEPT_ID, nsclc)
 
     response = ncit.search("C3270")
-    assert response.match_type == MatchType.CONCEPT_ID
-    assert len(response.records) == 1
-    actual_disease = response.records[0]
-    compare_records(actual_disease, neuroblastoma)
+    compare_response(response, MatchType.CONCEPT_ID, neuroblastoma)
 
     response = ncit.search("3270")
     assert response.match_type == MatchType.NO_MATCH
 
 
-def test_label_match(ncit, neuroblastoma, nsclc, compare_records):
+def test_label_match(ncit, neuroblastoma, nsclc, compare_response):
     """Test that label search resolves to correct record."""
     response = ncit.search("Neuroblastoma")
-    assert response.match_type == MatchType.LABEL
-    assert len(response.records) == 1
-    actual_disease = response.records[0]
-    compare_records(actual_disease, neuroblastoma)
+    compare_response(response, MatchType.LABEL, neuroblastoma)
 
     response = ncit.search("NEUROBLASTOMA")
-    assert response.match_type == MatchType.LABEL
-    assert len(response.records) == 1
-    actual_disease = response.records[0]
-    compare_records(actual_disease, neuroblastoma)
+    compare_response(response, MatchType.LABEL, neuroblastoma)
 
     response = ncit.search("lung non-small cell carcinoma")
-    assert response.match_type == MatchType.LABEL
-    assert len(response.records) == 1
-    actual_disease = response.records[0]
-    compare_records(actual_disease, nsclc)
+    compare_response(response, MatchType.LABEL, nsclc)
 
     response = ncit.search("lung non small cell carcinoma")
     assert response.match_type == MatchType.NO_MATCH
 
 
-def test_alias_match(ncit, neuroblastoma, nsclc, compare_records):
+def test_alias_match(ncit, neuroblastoma, nsclc, compare_response):
     """Test that alias search resolves to correct record."""
     response = ncit.search("neuroblastoma, nos")
-    assert response.match_type == MatchType.ALIAS
-    assert len(response.records) == 1
-    actual_disease = response.records[0]
-    compare_records(actual_disease, neuroblastoma)
+    compare_response(response, MatchType.ALIAS, neuroblastoma)
 
     response = ncit.search("neuroblastoma (Schwannian Stroma-Poor)")
-    assert response.match_type == MatchType.ALIAS
-    assert len(response.records) == 1
-    actual_disease = response.records[0]
-    compare_records(actual_disease, neuroblastoma)
+    compare_response(response, MatchType.ALIAS, neuroblastoma)
 
     response = ncit.search("Neuroblastoma, Malignant")
-    assert response.match_type == MatchType.ALIAS
-    assert len(response.records) == 1
-    actual_disease = response.records[0]
-    compare_records(actual_disease, neuroblastoma)
+    compare_response(response, MatchType.ALIAS, neuroblastoma)
 
     response = ncit.search("Neural Crest Tumor, Malignant")
-    assert response.match_type == MatchType.ALIAS
-    assert len(response.records) == 1
-    actual_disease = response.records[0]
-    compare_records(actual_disease, neuroblastoma)
+    compare_response(response, MatchType.ALIAS, neuroblastoma)
 
     response = ncit.search("nsclc")
-    assert response.match_type == MatchType.ALIAS
-    assert len(response.records) == 1
-    actual_disease = response.records[0]
-    compare_records(actual_disease, nsclc)
+    compare_response(response, MatchType.ALIAS, nsclc)
 
     response = ncit.search("NSCLC - Non-Small Cell Lung Cancer")
-    assert response.match_type == MatchType.ALIAS
-    assert len(response.records) == 1
-    actual_disease = response.records[0]
-    compare_records(actual_disease, nsclc)
+    compare_response(response, MatchType.ALIAS, nsclc)
 
     response = ncit.search("neuroblastoma nbl")
     assert response.match_type == MatchType.NO_MATCH
 
 
-def test_associated_with_match(ncit, neuroblastoma, nsclc, compare_records):
+def test_associated_with_match(ncit, neuroblastoma, nsclc, compare_response):
     """Test that associated_with search resolves to correct record."""
     response = ncit.search("icdo:9500/3")
-    assert response.match_type == MatchType.ASSOCIATED_WITH
-    assert len(response.records) == 1
-    actual_disease = response.records[0]
-    compare_records(actual_disease, neuroblastoma)
+    compare_response(response, MatchType.ASSOCIATED_WITH, neuroblastoma)
 
     response = ncit.search("umls:C0007131")
-    assert response.match_type == MatchType.ASSOCIATED_WITH
-    assert len(response.records) == 1
-    actual_disease = response.records[0]
-    compare_records(actual_disease, nsclc)
+    compare_response(response, MatchType.ASSOCIATED_WITH, nsclc)
 
 
 def test_meta(ncit):
@@ -192,7 +138,6 @@ def test_meta(ncit):
         == "https://creativecommons.org/licenses/by/4.0/legalcode"
     )
     assert re.match(r"\d{2}\.\d{2}[a-z]", response.source_meta_.version)
-
     assert (
         response.source_meta_.data_url == "https://evs.nci.nih.gov/ftp1/NCI_Thesaurus/"
     )

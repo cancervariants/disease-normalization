@@ -1,0 +1,19 @@
+# Copyright (c) 1966-2023 Johns Hopkins University. Use of this file adheres to the terms specified at https://omim.org/help/agreement
+# Generated: 2023-04-13
+# Prefix	MIM Number	Preferred Title; symbol	Alternative Title(s); symbol(s)	Included Title(s); symbols
+NULL	247640	LYMPHOBLASTIC LEUKEMIA, ACUTE, WITH LYMPHOMATOUS FEATURES; LALL	LYMPHOMATOUS ALL	
+Percent	309200	MAJOR AFFECTIVE DISORDER 2; MAFD2	MANIC-DEPRESSIVE ILLNESS; MDI;; MANIC-DEPRESSIVE PSYCHOSIS, X-LINKED; MDX;; BIPOLAR AFFECTIVE DISORDER; BPAD	
+Percent	613065	LEUKEMIA, ACUTE LYMPHOBLASTIC; ALL		LEUKEMIA, ACUTE LYMPHOBLASTIC, SUSCEPTIBILITY TO, 1, INCLUDED;; ALL1, INCLUDED;; LEUKEMIA, ACUTE LYMPHOCYTIC, SUSCEPTIBILITY TO, 1, INCLUDED;; LEUKEMIA, B-CELL ACUTE LYMPHOBLASTIC, SUSCEPTIBILITY TO, INCLUDED;; LEUKEMIA, T-CELL ACUTE LYMPHOBLASTIC, SUSCEPTIBILITY TO, INCLUDED;; LEUKEMIA, ACUTE LYMPHOBLASTIC, B-HYPERDIPLOID, SUSCEPTIBILITY TO, INCLUDED
+#
+#
+#
+#
+# MIM number prefix:
+# ------------------
+# Asterisk (*)  Gene
+# Plus (+)  Gene and phenotype, combined
+# Number Sign (#)  Phenotype, molecular basis known
+# Percent (%)  Phenotype or locus, molecular basis unknown
+# NULL (<null>)  Other, mainly phenotypes with suspected mendelian basis
+# Caret (^)  Entry has been removed from the database or moved to another entry
+#

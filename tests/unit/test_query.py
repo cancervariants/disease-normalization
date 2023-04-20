@@ -10,22 +10,8 @@ from disease.schemas import MatchType, SourceName
 
 @pytest.fixture(scope="module")
 def query_handler():
-    """Build query handler test fixture."""
-
-    class QueryGetter:
-        def __init__(self):
-            self.query_handler = QueryHandler()
-
-        def search(self, query_str, keyed=False, incl="", excl=""):
-            resp = self.query_handler.search(
-                query_str=query_str, keyed=keyed, incl=incl, excl=excl
-            )
-            return resp
-
-        def normalize(self, query_str):
-            return self.query_handler.normalize(query_str)
-
-    return QueryGetter()
+    """Build query handler test fixture"""
+    return QueryHandler()
 
 
 @pytest.fixture(scope="module")
