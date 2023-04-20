@@ -2,12 +2,12 @@
 from disease.query import QueryHandler
 
 
-def test_emit_warnings():
+def test_emit_warnings(database):
     """Test that emit_warnings works correctly."""
     expected_warnings = {
         'nbsp': 'Query contains non breaking space characters.'
     }
-    query_handler = QueryHandler()
+    query_handler = QueryHandler(database)
 
     # Test emit no warnings
     actual_warnings = query_handler._emit_warnings('CISPLATIN')

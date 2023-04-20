@@ -8,7 +8,7 @@ from owlready2.rdflib_store import TripleLiteRDFlibGraph as RDFGraph
 
 from .base import OWLBase
 from disease import PREFIX_LOOKUP, logger
-from disease.schemas import SourceMeta, SourceName, NamespacePrefix
+from disease.schemas import SourceMeta, NamespacePrefix
 
 
 MONDO_PREFIX_LOOKUP = {
@@ -90,9 +90,7 @@ class Mondo(OWLBase):
                                   'share_alike': False,
                                   'attribution': True
                               })
-        params = dict(metadata)
-        params['src_name'] = SourceName.MONDO.value
-        self.database.metadata.put_item(Item=params)
+        self._database.add_source_metadata(self._src_name, metadata)
 
     def _get_concept_id(self, ref: str) -> Optional[str]:
         """Format concept ID for given reference.

@@ -8,11 +8,21 @@ jobs:
       AWS_SECRET_ACCESS_KEY: ${{ secrets.DUMMY_AWS_SECRET_ACCESS_KEY }}
       AWS_DEFAULT_REGION: us-east-2
       AWS_DEFAULT_OUTPUT: text
-      DISEASE_NORM_DB_URL: http://localhost:8002
+      DISEASE_NORM_DB_URL: ${{ matrix.db_url }}
       DISEASE_TEST: true
     strategy:
       matrix:
+        db_url: ["http://localhost:8000", "postgres://postgres:postgres@localhost:5432/disease_normalizer_test"]
         python-version: ['3.8', '3.9', '3.10']
+    services:
+      postgres:
+        image: postgres:14
+        env:
+          POSTGRES_USER: 'postgres'
+          POSTGRES_DB: 'disease_normalizer_test'
+          POSTGRES_PASSWORD: 'postgres'
+        posts:
+          - 5432:5432
     steps:
     - uses: actions/checkout@v3
 
@@ -25,6 +35,7 @@ jobs:
       run: python3 -m pip install ".[dev,test]"
 
     - name: Build local DynamoDB server
+      if: ${{ env.DISEASE_NORM_DB_URL == 'http://localhost:8000' }}
       run: |
           chmod +x ./tests/scripts/dynamodb_run.sh
           ./tests/scripts/dynamodb_run.sh

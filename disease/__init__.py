@@ -17,8 +17,8 @@ logger.setLevel(logging.DEBUG)
 logger.handlers = []
 
 
-from disease.schemas import SourceName, SourceIDAfterNamespace, NamespacePrefix, ItemTypes  # noqa: E402 E501
-ITEM_TYPES = {k.lower(): v.value for k, v in ItemTypes.__members__.items()}
+from disease.schemas import SourceName, SourceIDAfterNamespace, NamespacePrefix, RefType  # noqa: E402 E501
+ITEM_TYPES = {k.lower(): v.value for k, v in RefType.__members__.items()}
 
 # use to lookup source name from lower-case string
 # technically the same as PREFIX_LOOKUP, but source namespace prefixes

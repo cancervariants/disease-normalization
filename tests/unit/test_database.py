@@ -1,16 +1,35 @@
 """Test DynamoDB"""
-from boto3.dynamodb.conditions import Key
+import os
+
+import pytest
 
 
-def test_tables_created(db):
-    """Check that disease_concepts and disease_metadata are created."""
-    existing_tables = db.dynamodb_client.list_tables()["TableNames"]
-    assert "disease_concepts" in existing_tables
-    assert "disease_metadata" in existing_tables
+def test_tables_created(db_fixture):
+    """Check that required tables are created."""
+    existing_tables = db_fixture.db.list_tables()
+    if db_fixture.__class__.__name__ == "PostgresDatabase":
+        assert set(existing_tables) == {
+            "disease_associations",
+            "disease_labels",
+            "disease_aliases",
+            "disease_xrefs",
+            "disease_concepts",
+            "disease_merged",
+            "disease_sources",
+        }
+    else:
+        assert 'disease_concepts' in existing_tables
+        assert 'disease_metadata' in existing_tables
 
 
+IS_DDB = not os.environ.get("DISEASE_NORM_DB_URL", "").lower().startswith("postgres")
+
+
+@pytest.mark.skipif(not IS_DDB, reason="only applies to DynamoDB in test env")
 def test_item_type(db):
     """Check that objects are tagged with item_type attribute."""
+    from boto3.dynamodb.conditions import Key
+
     filter_exp = Key("label_and_type").eq("ncit:c2926##identity")
     item = db.diseases.query(KeyConditionExpression=filter_exp)["Items"][0]
     assert "item_type" in item

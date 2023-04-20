@@ -3,7 +3,7 @@ import json
 
 from .base import Base
 from disease import logger
-from disease.schemas import SourceMeta, SourceName, NamespacePrefix, Disease
+from disease.schemas import SourceMeta, NamespacePrefix, Disease
 
 
 class OncoTree(Base):
@@ -30,9 +30,7 @@ class OncoTree(Base):
                                   'share_alike': False,
                                   'attribution': True
                               })
-        params = dict(metadata)
-        params['src_name'] = SourceName.ONCOTREE.value
-        self.database.metadata.put_item(Item=params)
+        self._database.add_source_metadata(self._src_name, metadata)
 
     def _traverse_tree(self, disease_node):
         """Traverse JSON tree and load diseases where possible.

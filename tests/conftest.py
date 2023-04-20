@@ -5,7 +5,8 @@ from typing import List, Optional
 import pytest
 from pathlib import Path
 
-from disease.database import AWS_ENV_VAR_NAME, Database
+from disease.database import AWS_ENV_VAR_NAME, create_db
+from disease.database.database import AbstractDatabase
 from disease.etl.base import Base
 from disease.query import QueryHandler
 from disease.schemas import Disease, MatchType, MatchesKeyed, SourceName
@@ -34,6 +35,8 @@ def pytest_collection_modifyitems(items):
 TEST_ROOT = Path(__file__).resolve().parents[1]
 TEST_DATA_DIRECTORY = TEST_ROOT / "tests" / "data"
 
+IS_TEST_ENV = os.environ.get("DISEASE_TEST", "").lower() == "true"
+
 
 @pytest.fixture(scope="session")
 def test_data():
@@ -42,22 +45,14 @@ def test_data():
 
 
 @pytest.fixture(scope="session", autouse=True)
-def db():
+def database():
     """Provide a database instance to be used by tests."""
-    database = Database()
-    if os.environ.get("DISEASE_TEST", "").lower() == "true":
+    db = create_db()
+    if IS_TEST_ENV:
         if os.environ.get(AWS_ENV_VAR_NAME):
-            assert False, (
-                f"Cannot have both DISEASE_TEST and {AWS_ENV_VAR_NAME} set."
-            )
-        existing_tables = database.dynamodb_client.list_tables()["TableNames"]
-        if "disease_concepts" in existing_tables:
-            database.dynamodb_client.delete_table(TableName="disease_concepts")
-        if "disease_metadata" in existing_tables:
-            database.dynamodb_client.delete_table(TableName="disease_metadata")
-        existing_tables = database.dynamodb_client.list_tables()["TableNames"]
-        database.create_diseases_table(existing_tables)
-        database.create_meta_data_table(existing_tables)
+            assert False, f"Cannot have both DISEASE_TEST and {AWS_ENV_VAR_NAME} set."
+        db.drop_db()
+        db.initialize_db()
     return database
 
 
@@ -85,7 +80,7 @@ def decompress_mondo_tar():
 
 
 @pytest.fixture(scope="session")
-def test_source(db: Database, test_data: Path):
+def test_source(database: AbstractDatabase, test_data: Path):
     """Provide query endpoint for testing sources. If DISEASE_TEST is set, will try to
     load DB from test data.
 
@@ -95,17 +90,23 @@ def test_source(db: Database, test_data: Path):
     endpoint.
     """
     def test_source_factory(EtlClass: Base):
-        if os.environ.get("DISEASE_TEST", "").lower() == "true":
-            test_class = EtlClass(db, test_data)  # type: ignore
-            if EtlClass.__name__ == SourceName.MONDO:  # type: ignore
-                decompress_mondo_tar()
-            test_class.perform_etl(use_existing=True)
-            test_class.database.flush_batch()
+        is_test = os.environ.get("DISEASE_TEST", "").lower() == "true"
+        if is_test:
+            if os.environ.get(AWS_ENV_VAR_NAME):
+                assert False, (
+                    f"Cannot have both DISEASE_TEST and {AWS_ENV_VAR_NAME} set."
+                )
+            else:
+                test_class = EtlClass(database, test_data)  # type: ignore
+                if EtlClass.__name__ == SourceName.MONDO:  # type: ignore
+                    decompress_mondo_tar()
+                test_class.perform_etl(use_existing=True)
+                test_class.database.flush_batch()
 
         class QueryGetter:
 
             def __init__(self):
-                self.query_handler = QueryHandler()
+                self.query_handler = QueryHandler(database)
                 self._src_name = EtlClass.__name__  # type: ignore
 
             def search(self, query_str: str):
