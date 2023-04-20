@@ -8,7 +8,7 @@ from pathlib import Path
 from disease.database import AWS_ENV_VAR_NAME, Database
 from disease.etl.base import Base
 from disease.query import QueryHandler
-from disease.schemas import Disease, MatchType, MatchesKeyed
+from disease.schemas import Disease, MatchType, MatchesKeyed, SourceName
 
 
 def pytest_collection_modifyitems(items):
@@ -26,6 +26,8 @@ def pytest_collection_modifyitems(items):
         "test_query",
         "test_emit_warnings",
     ]
+    # remember to add new test modules to the order constant:
+    assert len(MODULE_ORDER) == len(list(Path(__file__).parent.rglob("test_*.py")))
     items.sort(key=lambda i: MODULE_ORDER.index(i.module.__name__))
 
 
@@ -65,6 +67,8 @@ def decompress_mondo_tar():
 
     This method expects to find a single tarball in the test mondo directory. If
     there's already a decompressed OWL file there too, it won't do any redundant work.
+    This does mean that you might have to manually delete your local copy of the OWL
+    file if a new version of the tarfile is committed to the repo.
     """
     mondo_data_dir = TEST_DATA_DIRECTORY / "mondo"
     if len(list(mondo_data_dir.glob("mondo_*.owl"))) > 0:
@@ -93,7 +97,7 @@ def test_source(db: Database, test_data: Path):
     def test_source_factory(EtlClass: Base):
         if os.environ.get("DISEASE_TEST", "").lower() == "true":
             test_class = EtlClass(db, test_data)  # type: ignore
-            if EtlClass.__name__ == "Mondo":  # type: ignore
+            if EtlClass.__name__ == SourceName.Mondo:  # type: ignore
                 decompress_mondo_tar()
             test_class.perform_etl(use_existing=True)
             test_class.database.flush_batch()
