@@ -1,31 +1,50 @@
 """Test merged record generation."""
+import os
+from typing import Any, Dict
+
 import pytest
-from disease.etl.merge import Merge
+from disease.database import AWS_ENV_VAR_NAME, Database
+
+from disease.etl import DO, Mondo, NCIt, OMIM, OncoTree, Merge
 
 
-@pytest.fixture(scope='module')
-def merge_handler(mock_database):
-    """Provide Merge instance to test cases."""
-    class MergeHandler():
-        def __init__(self):
-            self.merge = Merge(mock_database())
+@pytest.fixture(scope="module")
+def merge_instance(test_source):
+    """Provide fixture for ETL merge class"""
+    update_db = os.environ.get("DISEASE_TEST", "").lower() == "true"
+    if update_db and os.environ.get(AWS_ENV_VAR_NAME):
+        assert False, (
+            f"Running the full disease ETL pipeline test on an AWS environment is "
+            f"forbidden -- either unset {AWS_ENV_VAR_NAME} or unset DISEASE_TEST"
+        )
 
-        def get_merge(self):
-            return self.merge
+    class TrackingDatabase(Database):
+        """Provide injection for DB instance to track added/updated records"""
 
-        def create_merged_concepts(self, record_ids):
-            return self.merge.create_merged_concepts(record_ids)
+        def __init__(self, **kwargs):
+            self.additions = {}
+            self.updates = {}
+            super().__init__(**kwargs)
 
-        def get_added_records(self):
-            return self.merge._database.added_records
+        def add_record(self, record: Dict, record_type: str):
+            if update_db:
+                super().add_record(record, record_type)
+            self.additions[record["concept_id"]] = record
 
-        def get_updates(self):
-            return self.merge._database.updates
+        def update_record(
+            self, concept_id: str, field: str, new_value: Any,  # noqa: ANN401
+            item_type: str = "identity"
+        ):
+            if update_db:
+                super().update_record(concept_id, field, new_value, item_type)
+            self.updates[concept_id] = {field: new_value}
 
-        def generate_merged_record(self, record_id_set):
-            return self.merge._generate_merged_record(record_id_set)
+    if update_db:
+        for SourceClass in (DO, Mondo, NCIt, OncoTree, OMIM):
+            test_source(SourceClass)
 
-    return MergeHandler()
+    m = Merge(TrackingDatabase())
+    return m
 
 
 @pytest.fixture(scope='module')
@@ -235,51 +254,49 @@ def compare_merged_records(actual, fixture):
 
     assert ('associated_with' in actual) == ('associated_with' in fixture)
     if 'associated_with' in actual or 'associated_with' in fixture:
-        assert set(actual['associated_with']) == \
-            set(fixture['associated_with'])
+        assert set(actual['associated_with']) == set(fixture['associated_with'])
 
-    assert ('pediatric_disease' in actual) == \
-        ('pediatric_disease' in fixture)
+    assert ('pediatric_disease' in actual) == ('pediatric_disease' in fixture)
     if 'pediatric_disease' in actual or 'pediatric_disease' in fixture:
         assert actual['pediatric_disease'] == fixture['pediatric_disease']
 
 
-def test_generate_merged_record(merge_handler, record_id_groups, neuroblastoma,
+def test_generate_merged_record(merge_instance, record_id_groups, neuroblastoma,
                                 lnscc, richter, ped_liposarcoma, teratoma,
                                 mafd2):
     """Test generation of individual merged record."""
     neuroblastoma_ids = record_id_groups['neuroblastoma']
-    response, r_ids = merge_handler.generate_merged_record(neuroblastoma_ids)
+    response, r_ids = merge_instance._generate_merged_record(neuroblastoma_ids)
     assert set(r_ids) == set(neuroblastoma_ids)
     compare_merged_records(response, neuroblastoma)
 
     lnscc_ids = record_id_groups['lnscc']
-    response, r_ids = merge_handler.generate_merged_record(lnscc_ids)
+    response, r_ids = merge_instance._generate_merged_record(lnscc_ids)
     assert set(r_ids) == set(lnscc_ids)
     compare_merged_records(response, lnscc)
 
     richter_ids = record_id_groups['richter']
-    response, r_ids = merge_handler.generate_merged_record(richter_ids)
+    response, r_ids = merge_instance._generate_merged_record(richter_ids)
     assert set(r_ids) == set(richter_ids)
     compare_merged_records(response, richter)
 
     ped_liposarcoma_ids = record_id_groups['ped_liposarcoma']
-    response, r_ids = merge_handler.generate_merged_record(ped_liposarcoma_ids)
+    response, r_ids = merge_instance._generate_merged_record(ped_liposarcoma_ids)
     assert set(r_ids) == set(ped_liposarcoma_ids)
     compare_merged_records(response, ped_liposarcoma)
 
     teratoma_ids = record_id_groups['teratoma']
-    response, r_ids = merge_handler.generate_merged_record(teratoma_ids)
+    response, r_ids = merge_instance._generate_merged_record(teratoma_ids)
     assert set(r_ids) == set(teratoma_ids)
     compare_merged_records(response, teratoma)
 
     mafd2_ids = record_id_groups['mafd2']
-    response, r_ids = merge_handler.generate_merged_record(mafd2_ids)
+    response, r_ids = merge_instance._generate_merged_record(mafd2_ids)
     assert set(r_ids) == {"mondo:0010648", "omim:309200"}
     compare_merged_records(response, mafd2)
 
 
-def test_create_merged_concepts(merge_handler, neuroblastoma,
+def test_create_merged_concepts(merge_instance, neuroblastoma,
                                 lnscc, richter, ped_liposarcoma, teratoma,
                                 mafd2):
     """Test end-to-end creation and upload of merged concepts."""
@@ -291,31 +308,34 @@ def test_create_merged_concepts(merge_handler, neuroblastoma,
         "mondo:0003587",
         "mondo:0010648"
     ]
-    merge_handler.create_merged_concepts(mondo_ids)
+    merge_instance.create_merged_concepts(mondo_ids)
+    merge_instance._database.flush_batch()
 
     # check merged record generation and storage
-    added_records = merge_handler.get_added_records()
+    added_records = merge_instance._database.additions
+
     assert len(added_records) == 6
+
     neuroblastoma_id = neuroblastoma['concept_id']
     assert neuroblastoma_id in added_records
-    compare_merged_records(added_records[neuroblastoma_id],
-                           neuroblastoma)
+    compare_merged_records(added_records[neuroblastoma_id], neuroblastoma)
+
     lnscc_id = lnscc['concept_id']
     assert lnscc_id in added_records
-    compare_merged_records(added_records[lnscc_id],
-                           lnscc)
+    compare_merged_records(added_records[lnscc_id], lnscc)
+
     richter_id = richter['concept_id']
     assert richter_id in added_records
-    compare_merged_records(added_records[richter_id],
-                           richter)
+    compare_merged_records(added_records[richter_id], richter)
+
     ped_liposarcoma_id = ped_liposarcoma['concept_id']
     assert ped_liposarcoma_id in added_records
-    compare_merged_records(added_records[ped_liposarcoma_id],
-                           ped_liposarcoma)
+    compare_merged_records(added_records[ped_liposarcoma_id], ped_liposarcoma)
+
     teratoma_id = teratoma['concept_id']
     assert teratoma_id in added_records
-    compare_merged_records(added_records[teratoma_id],
-                           teratoma)
+    compare_merged_records(added_records[teratoma_id], teratoma)
+
     mafd2_id = mafd2['concept_id']
     assert mafd2_id in added_records
     compare_merged_records(added_records[mafd2_id], mafd2)

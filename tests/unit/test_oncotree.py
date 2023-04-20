@@ -1,23 +1,14 @@
 """Test Oncotree ETL methods."""
 import pytest
+from disease.etl.oncotree import OncoTree
 
-from disease.schemas import MatchType, SourceName, Disease
-from disease.query import QueryHandler
+from disease.schemas import MatchType, Disease
 
 
 @pytest.fixture(scope='module')
-def oncotree():
+def oncotree(test_source):
     """Build OncoTree ETL test fixture."""
-    class QueryGetter:
-
-        def __init__(self):
-            self.query_handler = QueryHandler()
-
-        def search(self, query_str):
-            response = self.query_handler.search(query_str, keyed=True,
-                                                 incl="oncotree")
-            return response.source_matches[SourceName.ONCOTREE]
-    return QueryGetter()
+    return test_source(OncoTree)
 
 
 @pytest.fixture(scope='module')
@@ -59,78 +50,46 @@ def ipn():
     })
 
 
-def test_concept_id_match(oncotree, neuroblastoma, nsclc, ipn,
-                          compare_records):
+def test_concept_id_match(oncotree, neuroblastoma, nsclc, ipn, compare_response):
     """Test that concept ID search resolves to correct record"""
     response = oncotree.search('oncotree:NBL')
-    assert response.match_type == MatchType.CONCEPT_ID
-    assert len(response.records) == 1
-    actual_disease = response.records[0]
-    compare_records(actual_disease, neuroblastoma)
+    compare_response(response, MatchType.CONCEPT_ID, neuroblastoma)
 
     response = oncotree.search('oncotree:NSCLC')
-    assert response.match_type == MatchType.CONCEPT_ID
-    assert len(response.records) == 1
-    actual_disease = response.records[0]
-    compare_records(actual_disease, nsclc)
+    compare_response(response, MatchType.CONCEPT_ID, nsclc)
 
     response = oncotree.search('oncotree:icpn')
-    assert response.match_type == MatchType.CONCEPT_ID
-    assert len(response.records) == 1
-    actual_disease = response.records[0]
-    compare_records(actual_disease, ipn)
+    compare_response(response, MatchType.CONCEPT_ID, ipn)
 
     response = oncotree.search('oncotree:ICPN')
-    assert response.match_type == MatchType.CONCEPT_ID
-    assert len(response.records) == 1
-    actual_disease = response.records[0]
-    compare_records(actual_disease, ipn)
+    compare_response(response, MatchType.CONCEPT_ID, ipn)
 
     response = oncotree.search('ipn')
     assert response.match_type == MatchType.NO_MATCH
 
 
-def test_label_match(oncotree, neuroblastoma, nsclc, ipn, compare_records):
+def test_label_match(oncotree, neuroblastoma, nsclc, ipn, compare_response):
     """Test that label search resolves to correct record."""
     response = oncotree.search('Neuroblastoma')
-    assert response.match_type == MatchType.LABEL
-    assert len(response.records) == 1
-    actual_disease = response.records[0]
-    compare_records(actual_disease, neuroblastoma)
+    compare_response(response, MatchType.LABEL, neuroblastoma)
 
     response = oncotree.search('NEUROBLASTOMA')
-    assert response.match_type == MatchType.LABEL
-    assert len(response.records) == 1
-    actual_disease = response.records[0]
-    compare_records(actual_disease, neuroblastoma)
+    compare_response(response, MatchType.LABEL, neuroblastoma)
 
     response = oncotree.search('non-small cell lung cancer')
-    assert response.match_type == MatchType.LABEL
-    assert len(response.records) == 1
-    actual_disease = response.records[0]
-    compare_records(actual_disease, nsclc)
+    compare_response(response, MatchType.LABEL, nsclc)
 
     response = oncotree.search('intracholecystic papillary neoplasm')
-    assert response.match_type == MatchType.LABEL
-    assert len(response.records) == 1
-    actual_disease = response.records[0]
-    compare_records(actual_disease, ipn)
+    compare_response(response, MatchType.LABEL, ipn)
 
 
-def test_associated_with_match(oncotree, neuroblastoma, nsclc,
-                               compare_records):
+def test_associated_with_match(oncotree, neuroblastoma, nsclc, compare_response):
     """Test that associated_with search resolves to correct record."""
     response = oncotree.search('umls:c0027819')
-    assert response.match_type == MatchType.ASSOCIATED_WITH
-    assert len(response.records) == 1
-    actual_disease = response.records[0]
-    compare_records(actual_disease, neuroblastoma)
+    compare_response(response, MatchType.ASSOCIATED_WITH, neuroblastoma)
 
     response = oncotree.search('umls:C0007131')
-    assert response.match_type == MatchType.ASSOCIATED_WITH
-    assert len(response.records) == 1
-    actual_disease = response.records[0]
-    compare_records(actual_disease, nsclc)
+    compare_response(response, MatchType.ASSOCIATED_WITH, nsclc)
 
 
 def test_meta(oncotree):

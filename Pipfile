@@ -18,6 +18,8 @@ coveralls = "*"
 coverage = "*"
 ipykernel = "*"
 matplotlib = "*"
+lxml = "*"
+xmlformatter = "*"
 
 [packages]
 pydantic = "*"

@@ -41,11 +41,21 @@ pre-commit install
 
 ### Running unit tests
 
-Running unit tests is as easy as pytest.
+Tests are provided via pytest.
 
 ```commandline
-pipenv run pytest
+pytest
 ```
+
+By default, tests will employ an existing DynamoDB database. For test environments where this is unavailable (e.g. in CI), the `DISEASE_TEST` environment variable can be set to initialize a local DynamoDB instance with miniature versions of input data files before tests are executed.
+
+
+```comandline
+export DISEASE_TEST=true
+pytest
+```
+
+Sometimes, sources will update their data, and our test fixtures and data will become incorrect. The `tests/scripts/` subdirectory includes scripts to rebuild data files, although most fixtures will need to be updated manually.
 
 ### Updating the disease normalization database
 
