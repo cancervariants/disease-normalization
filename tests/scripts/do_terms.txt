@@ -1,0 +1,5 @@
+http://purl.obolibrary.org/obo/DOID_769
+http://purl.obolibrary.org/obo/DOID_5695
+http://purl.obolibrary.org/obo/DOID_1703
+http://purl.obolibrary.org/obo/DOID_7079
+http://purl.obolibrary.org/obo/DOID_3908

@@ -1,0 +1,36 @@
+"""Build OMIM test data."""
+import csv
+from pathlib import Path
+
+from disease.database import Database
+from disease.etl import OMIM
+
+TEST_IDS = [
+    "309200",
+    "613065",
+    "247640",
+]
+
+omim = OMIM(Database())
+omim._extract_data()
+TEST_DATA_DIR = Path(__file__).resolve().parents[1] / "data" / "omim"
+outfile_path = TEST_DATA_DIR / omim._data_file.name
+outfile_path.parent.mkdir(exist_ok=True)
+
+with open(omim._data_file, "r") as f:
+    rows = list(csv.reader(f, delimiter="\t"))
+
+write_rows = []
+
+# get headers
+write_rows.append(rows.pop(0))
+write_rows.append(rows.pop(0))
+write_rows.append(rows.pop(0))
+
+for row in rows:
+    if row[0].startswith("#") or row[1] in TEST_IDS:
+        write_rows.append(row)
+
+with open(outfile_path, "w") as f:
+    writer = csv.writer(f, delimiter="\t")
+    writer.writerows(write_rows)

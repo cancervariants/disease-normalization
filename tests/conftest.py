@@ -1,135 +1,196 @@
 """Pytest test config tools."""
-import json
+import os
+import tarfile
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import List, Optional
 
 import pytest
 
-from disease.database import Database
-from disease.schemas import Disease
+from disease.database import AWS_ENV_VAR_NAME, Database
+from disease.etl.base import Base
+from disease.query import QueryHandler
+from disease.schemas import Disease, MatchesKeyed, MatchType, SourceName
+
+
+def pytest_collection_modifyitems(items):
+    """Modify test items in place to ensure test modules run in a given order.
+    When creating new test modules, be sure to add them here.
+    """
+    MODULE_ORDER = [
+        "test_mondo",
+        "test_do",
+        "test_ncit",
+        "test_omim",
+        "test_oncotree",
+        "test_merge",
+        "test_database",
+        "test_query",
+        "test_emit_warnings",
+    ]
+    # remember to add new test modules to the order constant:
+    assert len(MODULE_ORDER) == len(list(Path(__file__).parent.rglob("test_*.py")))
+    items.sort(key=lambda i: MODULE_ORDER.index(i.module.__name__))
+
 
 TEST_ROOT = Path(__file__).resolve().parents[1]
+TEST_DATA_DIRECTORY = TEST_ROOT / "tests" / "data"
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="session")
+def test_data():
+    """Provide test data location to test modules"""
+    return TEST_DATA_DIRECTORY
+
+
+@pytest.fixture(scope="session", autouse=True)
+def db():
+    """Provide a database instance to be used by tests."""
+    database = Database()
+    if os.environ.get("DISEASE_TEST", "").lower() == "true":
+        if os.environ.get(AWS_ENV_VAR_NAME):
+            assert False, f"Cannot have both DISEASE_TEST and {AWS_ENV_VAR_NAME} set."
+        existing_tables = database.dynamodb_client.list_tables()["TableNames"]
+        if "disease_concepts" in existing_tables:
+            database.dynamodb_client.delete_table(TableName="disease_concepts")
+        if "disease_metadata" in existing_tables:
+            database.dynamodb_client.delete_table(TableName="disease_metadata")
+        existing_tables = database.dynamodb_client.list_tables()["TableNames"]
+        database.create_diseases_table(existing_tables)
+        database.create_meta_data_table(existing_tables)
+    return database
+
+
+def decompress_mondo_tar():
+    """Mondo fixture data was hard to subset down to a reasonably commmit-able size, so
+    it's stored as a tarball instead. We'll need to decompress it.
+
+    This method expects to find a single tarball in the test mondo directory. If
+    there's already a decompressed OWL file there too, it won't do any redundant work.
+    This does mean that you might have to manually delete your local copy of the OWL
+    file if a new version of the tarfile is committed to the repo.
+    """
+    mondo_data_dir = TEST_DATA_DIRECTORY / "mondo"
+    if len(list(mondo_data_dir.glob("mondo_*.owl"))) > 0:
+        return
+    tarball = list(mondo_data_dir.glob("fixture_mondo_*.owl.tar.gz"))[0]
+    with tarfile.open(tarball, "r:gz") as tar:
+        for member in tar.getmembers():
+            if member.name.endswith(".owl"):
+                member.name = os.path.basename(member.name)
+                tar.extract(member, path=mondo_data_dir)
+                break
+        else:
+            raise FileNotFoundError("Unable to find compressed Mondo OWL file")
+
+
+@pytest.fixture(scope="session")
+def test_source(db: Database, test_data: Path):
+    """Provide query endpoint for testing sources. If DISEASE_TEST is set, will try to
+    load DB from test data.
+
+    :param db: database fixture
+    :param test_data: test data directory location
+    :return: factory function that takes an ETL class instance and returns a query
+    endpoint.
+    """
+
+    def test_source_factory(EtlClass: Base):
+        if os.environ.get("DISEASE_TEST", "").lower() == "true":
+            test_class = EtlClass(db, test_data)  # type: ignore
+            if EtlClass.__name__ == SourceName.MONDO:  # type: ignore
+                decompress_mondo_tar()
+            test_class.perform_etl(use_existing=True)
+            test_class.database.flush_batch()
+
+        class QueryGetter:
+            def __init__(self):
+                self.query_handler = QueryHandler()
+                self._src_name = EtlClass.__name__  # type: ignore
+
+            def search(self, query_str: str):
+                resp = self.query_handler.search(
+                    query_str, keyed=True, incl=self._src_name
+                )
+                return resp.source_matches[self._src_name]
+
+        return QueryGetter()
+
+    return test_source_factory
+
+
+def _compare_records(actual: Disease, fixt: Disease):
+    """Check that identity records are identical."""
+    assert actual.concept_id == fixt.concept_id
+    assert actual.label == fixt.label
+
+    assert (actual.aliases is None) == (fixt.aliases is None)
+    if (actual.aliases is not None) and (fixt.aliases is not None):
+        assert set(actual.aliases) == set(fixt.aliases)
+
+    assert (actual.xrefs is None) == (fixt.xrefs is None)
+    if (actual.xrefs is not None) and (fixt.xrefs is not None):
+        assert set(actual.xrefs) == set(fixt.xrefs)
+
+    assert (actual.associated_with is None) == (fixt.associated_with is None)
+    if (actual.associated_with is not None) and (fixt.associated_with is not None):
+        assert set(actual.associated_with) == set(fixt.associated_with)
+
+    assert (actual.pediatric_disease is None) == (fixt.pediatric_disease is None)
+    if (actual.pediatric_disease is not None) and (fixt.pediatric_disease is not None):
+        assert actual.pediatric_disease == fixt.pediatric_disease
+
+
+@pytest.fixture(scope="session")
 def compare_records():
-    """Provide compare_records method to test classes"""
-
-    def compare_records(actual_record: Disease, fixture_record: Disease):
-        """Check that identity records are identical."""
-        assert actual_record.concept_id == fixture_record.concept_id
-        assert (actual_record.label is None) == (fixture_record.label is None)
-        if actual_record.label or fixture_record.label:
-            assert actual_record.label == fixture_record.label
-        assert (actual_record.aliases is None) == (fixture_record.aliases is None)
-        if actual_record.aliases and fixture_record.aliases:
-            assert set(actual_record.aliases) == set(fixture_record.aliases)
-        assert (actual_record.xrefs is None) == (fixture_record.xrefs is None)
-        if actual_record.xrefs and fixture_record.xrefs:
-            assert set(actual_record.xrefs) == set(fixture_record.xrefs)
-        assert (actual_record.associated_with is None) == (
-            fixture_record.associated_with is None
-        )
-        if actual_record.associated_with and fixture_record.associated_with:
-            assert set(actual_record.associated_with) == set(
-                fixture_record.associated_with
-            )
-
-    return compare_records
+    """Provide record comparison function"""
+    return _compare_records
 
 
-@pytest.fixture(scope="module")
-def mock_database():
-    """Return MockDatabase object."""
+def _compare_response(
+    response: MatchesKeyed,
+    match_type: MatchType,
+    fixture: Optional[Disease] = None,
+    fixture_list: Optional[List[Disease]] = None,
+    num_records: int = 0,
+):
+    """Check that test response is correct. Only 1 of {fixture, fixture_list}
+    should be passed as arguments. num_records should only be passed with fixture_list.
 
-    class MockDatabase(Database):
-        """Mock database object to use in test cases."""
+    :param Dict response: response object returned by QueryHandler
+    :param MatchType match_type: expected match type
+    :param Disease fixture: single Disease object to match response against
+    :param List[Disease] fixture_list: multiple Disease objects to match response
+        against
+    :param int num_records: expected number of records in response. If not given, tests
+        for number of fixture Diseases given (ie, 1 for single fixture and length of
+        fixture_list otherwise)
+    """
+    if fixture and fixture_list:
+        raise Exception("Args provided for both `fixture` and `fixture_list`")
+    elif not fixture and not fixture_list:
+        raise Exception("Must pass 1 of {fixture, fixture_list}")
+    if fixture and num_records:
+        raise Exception("`num_records` should only be given with `fixture_list`.")
 
-        def __init__(self):
-            """Initialize mock database object. This class's method's shadow the
-            actual Database class methods.
-            `self.records` loads preexisting DB items.
-            `self.added_records` stores add record requests, with the
-            concept_id as the key and the complete record as the value.
-            `self.updates` stores update requests, with the concept_id as the
-            key and the updated attribute and new value as the value.
-            """
-            infile = TEST_ROOT / "tests" / "unit" / "data" / "diseases.json"
-            with open(infile, "r") as f:
-                records_json = json.load(f)
-            self.records = {}
-            for record in records_json:
-                self.records[record["label_and_type"]] = {record["concept_id"]: record}
-            self.added_records: Dict[str, Dict[Any, Any]] = {}
-            self.updates: Dict[str, Dict[Any, Any]] = {}
-            meta = TEST_ROOT / "tests" / "unit" / "data" / "metadata.json"
-            with open(meta, "r") as f:
-                meta_json = json.load(f)
-            self.cached_sources = {}
-            for src in meta_json:
-                name = src["src_name"]
-                self.cached_sources[name] = src
-                del self.cached_sources[name]["src_name"]
-
-        def get_record_by_id(
-            self, record_id: str, case_sensitive: bool = True, merge: bool = False
-        ) -> Optional[Dict]:
-            """Fetch record corresponding to provided concept ID.
-            :param str record_id: concept ID for disease record
-            :param bool case_sensitive: if true, performs exact lookup, which
-                is more efficient. Otherwise, performs filter operation, which
-                doesn't require correct casing.
-            :param bool merge: if true, retrieve merged record
-            :return: complete record, if match is found; None otherwise
-            """
-            if merge:
-                label_and_type = f"{record_id.lower()}##merger"
+    assert response.match_type == match_type
+    if fixture:
+        assert len(response.records) == 1
+        _compare_records(response.records[0], fixture)
+    elif fixture_list:
+        if not num_records:
+            assert len(response.records) == len(fixture_list)
+        else:
+            assert len(response.records) == num_records
+        for fixt in fixture_list:
+            for record in response.records:
+                if fixt.concept_id == record.concept_id:
+                    _compare_records(record, fixt)
+                    break
             else:
-                label_and_type = f"{record_id.lower()}##identity"
-            record_lookup_sk = self.records.get(label_and_type)
-            if record_lookup_sk:
-                if case_sensitive:
-                    record = record_lookup_sk.get(record_id)
-                    if record:
-                        return record.copy()
-                    else:
-                        return None
-                elif record_lookup_sk.values():
-                    return list(record_lookup_sk.values())[0].copy()
-            return None
+                assert False  # test fixture not found in response
 
-        def get_records_by_type(self, query: str, match_type: str) -> List[Dict]:
-            """Retrieve records for given query and match type.
-            :param query: string to match against
-            :param str match_type: type of match to look for. Should be one
-                of "alias" or "label" (use get_record_by_id for
-                concept ID lookup)
-            :return: list of matching records. Empty if lookup fails.
-            """
-            assert match_type in ("alias", "label")
-            label_and_type = f"{query}##{match_type.lower()}"
-            records_lookup = self.records.get(label_and_type, None)
-            if records_lookup:
-                return [v.copy() for v in records_lookup.values()]
-            else:
-                return []
 
-        def add_record(self, record: Dict, record_type: str = "identity"):
-            """Store add record request sent to database.
-            :param Dict record: record (of any type) to upload. Must include
-                `concept_id` key. If record is of the `identity` type, the
-                concept_id must be correctly-cased.
-            :param str record_type: ignored by this function
-            """
-            self.added_records[record["concept_id"]] = record
-
-        def update_record(self, concept_id: str, attribute: str, new_value: Any):
-            """Store update request sent to database.
-            :param str concept_id: record to update
-            :param str attribute: name of field to update
-            :param Any new_value: new value
-            """
-            assert f"{concept_id.lower()}##identity" in self.records
-            self.updates[concept_id] = {attribute: new_value}
-
-    return MockDatabase
+@pytest.fixture(scope="session")
+def compare_response():
+    """Provide response comparison function"""
+    return _compare_response

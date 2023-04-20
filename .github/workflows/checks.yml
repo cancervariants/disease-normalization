@@ -8,8 +8,8 @@ jobs:
       AWS_SECRET_ACCESS_KEY: ${{ secrets.DUMMY_AWS_SECRET_ACCESS_KEY }}
       AWS_DEFAULT_REGION: us-east-2
       AWS_DEFAULT_OUTPUT: text
-      DISEASE_NORM_DB_URL: http://localhost:8000
-      TEST: DISEASE_TEST
+      DISEASE_NORM_DB_URL: http://localhost:8002
+      DISEASE_TEST: true
     strategy:
       matrix:
         python-version: ['3.8', '3.9', '3.10', '3.11']
@@ -24,16 +24,13 @@ jobs:
     - name: Install dependencies
       run: python3 -m pip install ".[dev,test]"
 
-    - name: Build local DynamoDB
+    - name: Build local DynamoDB server
       run: |
-          chmod +x ./tests/unit/dynamodb_build.bash
-          ./tests/unit/dynamodb_build.bash
-
-    - name: Load and test DynamoDB
-      run: PYTHONPATH=. pytest tests/unit/test_database.py
+          chmod +x ./tests/scripts/dynamodb_run.sh
+          ./tests/scripts/dynamodb_run.sh
 
     - name: Run tests
-      run: PYTHONPATH=. pytest tests/
+      run: python3 -m pytest
 
   lint:
     runs-on: ubuntu-latest

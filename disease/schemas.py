@@ -21,7 +21,7 @@ class MatchType(IntEnum):
     NO_MATCH = 0
 
 
-class SourceName(Enum):
+class SourceName(str, Enum):
     """Define string constraints to ensure consistent capitalization."""
 
     NCIT = "NCIt"
