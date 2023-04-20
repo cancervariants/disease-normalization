@@ -169,7 +169,7 @@ class PostgresDatabase(AbstractDatabase):
     def _create_tables(self) -> None:
         """Create all tables, indexes, and views."""
         logger.debug("Creating new disease normalizer tables.")
-        tables_query = (SCRIPTS_DIR / "create_tables_query.sql").read_bytes()
+        tables_query = (SCRIPTS_DIR / "create_tables.sql").read_bytes()
 
         with self.conn.cursor() as cur:
             cur.execute(tables_query)
