@@ -97,7 +97,7 @@ def test_source(db: Database, test_data: Path):
     def test_source_factory(EtlClass: Base):
         if os.environ.get("DISEASE_TEST", "").lower() == "true":
             test_class = EtlClass(db, test_data)  # type: ignore
-            if EtlClass.__name__ == SourceName.Mondo:  # type: ignore
+            if EtlClass.__name__ == SourceName.MONDO:  # type: ignore
                 decompress_mondo_tar()
             test_class.perform_etl(use_existing=True)
             test_class.database.flush_batch()
