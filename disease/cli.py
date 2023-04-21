@@ -127,7 +127,7 @@ def _load_source(
     :param n: name of source
     :param db: database instance
     :param delete_time: time taken (in seconds) to run deletion
-    :param processed_ids: in-progress list of processed gene IDs
+    :param processed_ids: in-progress list of processed disease IDs
     :param from_local: if true, use locally available data
     """
     msg = f"Loading {n.value}..."
@@ -170,7 +170,7 @@ def _load_merge(db: AbstractDatabase, processed_ids: Set[str]) -> None:
     """Load merged concepts
 
     :param db: database instance
-    :param processed_ids: in-progress list of processed gene IDs
+    :param processed_ids: in-progress list of processed disease IDs
     """
     start = timer()
     _delete_normalized_data(db)
@@ -220,7 +220,7 @@ def update_normalizer_db(
     normalizer: str, aws_instance: bool, db_url: str, update_all: bool,
     update_merged: bool, from_local: bool
 ) -> None:
-    """Update selected normalizer source(s) in the gene database.
+    """Update selected normalizer source(s) in the disease database.
 
     :param normalizer: names of sources to update, comma-separated
     :param aws_instance: if true, use cloud instance

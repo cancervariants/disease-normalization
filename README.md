@@ -11,7 +11,7 @@ The Disease Normalizer is available via PyPI:
 pip install disease-normalizer[dev]
 ```
 
-The `[dev]` argument tells pip to install packages to fulfill the dependencies of the `gene.etl` package.
+The `[dev]` argument tells pip to install packages to fulfill the dependencies of the `disease.etl` package.
 
 ### External requirements
 
@@ -62,7 +62,7 @@ As described above, all source data other than OMIM can be acquired automaticall
 
 To update one source, simply set `--normalizer` to the source you wish to update. The normalizer will check to see if local source data is up-to-date, acquire the most recent data if not, and use it to populate the database.
 
-For example, run the following to acquire the latest NCIt data if necessary, and update the NCIt gene records in the normalizer database:
+For example, run the following to acquire the latest NCIt data if necessary, and update the NCIt disease records in the normalizer database:
 
 ```commandline
 disease_norm_update --normalizer="ncit"
@@ -87,7 +87,7 @@ To create merged concept groups, use the `--update_merged` flag with the `--upda
 python3 -m disease.cli --update_all --update_merged
 ```
 
-### Starting the gene normalization service
+### Starting the disease normalization service
 
 Once the Disease Normalizer database has been loaded, from the project root, run the following:
 

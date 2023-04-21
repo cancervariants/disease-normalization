@@ -81,7 +81,6 @@ class PostgresDatabase(AbstractDatabase):
         :raise DatabaseWriteException: if called in a protected setting with
             confirmation silenced.
         """
-        breakpoint()
         try:
             if not self._check_delete_okay():
                 return
