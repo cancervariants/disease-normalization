@@ -30,7 +30,7 @@ class Base(ABC):
         """
         self._src_name = SourceName(self.__class__.__name__)
         self._database = database
-        self._src_dir: Path = Path(data_path / self._src_name.value)
+        self._src_dir: Path = Path(data_path / self._src_name.value.lower())
         self._store_ids = self.__class__.__name__ in SOURCES_FOR_MERGE
         if self._store_ids:
             self._added_ids = []
