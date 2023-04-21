@@ -4,7 +4,7 @@ import atexit
 import logging
 import os
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Set
+from typing import Any, Dict, List, Optional, Set, Union
 import tempfile
 from datetime import datetime
 
@@ -12,8 +12,7 @@ import psycopg
 from psycopg.errors import UndefinedTable, UniqueViolation
 import requests
 
-from disease.database import AbstractDatabase, DatabaseException, \
-    DatabaseReadException, DatabaseWriteException
+from disease.database import AbstractDatabase, DatabaseException, DatabaseWriteException
 from disease.schemas import RefType, SourceMeta, SourceName
 
 
@@ -82,6 +81,7 @@ class PostgresDatabase(AbstractDatabase):
         :raise DatabaseWriteException: if called in a protected setting with
             confirmation silenced.
         """
+        breakpoint()
         try:
             if not self._check_delete_okay():
                 return
@@ -107,9 +107,15 @@ class PostgresDatabase(AbstractDatabase):
     def initialize_db(self) -> None:
         """Check if DB is set up. If not, create tables/indexes/views."""
         tables = self.list_tables()
-        expected_tables = ["disease_associations", "disease_sources", "disease_labels",
-                           "disease_concepts", "disease_symbols",
-                           "disease_aliases", "disease_merged"]
+        expected_tables = [
+            "disease_aliases",
+            "disease_associations",
+            "disease_concepts",
+            "disease_labels",
+            "disease_merged",
+            "disease_sources",
+            "disease_xrefs",
+        ]
         for table in expected_tables:
             if table not in tables:
                 logger.info(
@@ -175,10 +181,11 @@ class PostgresDatabase(AbstractDatabase):
             cur.execute(tables_query)
             self.conn.commit()
 
-    def get_source_metadata(self, src_name: SourceName) -> Dict:
+    def get_source_metadata(self, src_name: Union[str, SourceName]) -> Optional[Dict]:
         """Get license, versioning, data lookup, etc information for a source.
 
         :param src_name: name of the source to get data for
+        :return: Dict containing metadata if lookup is successful
         """
         if isinstance(src_name, SourceName):
             src_name = src_name.value
@@ -191,7 +198,7 @@ class PostgresDatabase(AbstractDatabase):
             cur.execute(metadata_query, [src_name])
             metadata_result = cur.fetchone()
             if not metadata_result:
-                raise DatabaseReadException(f"{src_name} metadata lookup failed")
+                return None
             metadata = {
                 "data_license": metadata_result[1],
                 "data_license_url": metadata_result[2],
@@ -202,8 +209,7 @@ class PostgresDatabase(AbstractDatabase):
                     "non_commercial": metadata_result[6],
                     "attribution": metadata_result[7],
                     "share_alike": metadata_result[8],
-                },
-                "genome_assemblies": metadata_result[9]
+                }
             }
             self._cached_sources[src_name] = metadata
             return metadata
@@ -309,14 +315,25 @@ class PostgresDatabase(AbstractDatabase):
         else:
             return []
 
-    def get_all_concept_ids(self) -> Set[str]:
+    def get_all_concept_ids(self, source: Optional[SourceName] = None) -> Set[str]:
         """Retrieve concept IDs for use in generating normalized records.
 
+        :param source: optionally, just get all IDs for a specific source
         :return: Set of concept IDs as strings.
         """
-        ids_query = "SELECT concept_id FROM disease_concepts;"
+        if source is not None:
+            ids_query = """
+                SELECT concept_id FROM disease_concepts dc
+                LEFT JOIN disease_sources ds ON ds.name = dc.source
+                WHERE ds.name = %s;
+            """
+        else:
+            ids_query = "SELECT concept_id FROM disease_concepts;"
         with self.conn.cursor() as cur:
-            cur.execute(ids_query)
+            if source is None:
+                cur.execute(ids_query)
+            else:
+                cur.execute(ids_query, (source, ))
             ids_tuple = cur.fetchall()
         return {i[0] for i in ids_tuple}
 
@@ -334,7 +351,7 @@ class PostgresDatabase(AbstractDatabase):
                     name, data_license, data_license_url, version, data_url, rdp_url,
                     data_license_nc, data_license_attr, data_license_sa
                 )
-                VALUES ( %s, %s, %s, %s, %s, %s, %s, %s, %s, %s );
+                VALUES ( %s, %s, %s, %s, %s, %s, %s, %s, %s );
                 """,
                 [
                     src_name.value,
@@ -368,7 +385,7 @@ class PostgresDatabase(AbstractDatabase):
             try:
                 cur.execute(record_query, [
                     concept_id,
-                    record["src_name"],
+                    src_name.value,
                     record.get("pediatric_disease")
                 ])
                 cur.execute(insert_label, [record["label"], concept_id])

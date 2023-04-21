@@ -1,299 +1,274 @@
 """Test merged record generation."""
-# import os
-# from typing import Any, Dict
-#
-# import pytest
-# from disease.database import AWS_ENV_VAR_NAME
-#
-# from disease.etl import DO, Mondo, NCIt, OMIM, OncoTree, Merge
+import os
+
+import pytest
+from disease.database import AWS_ENV_VAR_NAME
+
+from disease.etl import DO, Mondo, NCIt, OMIM, OncoTree, Merge
+from disease.schemas import SourceName
 
 
-# @pytest.fixture(scope="module")
-# def merge_instance(test_source):
-#     """Provide fixture for ETL merge class"""
-#     update_db = os.environ.get("DISEASE_TEST", "").lower() == "true"
-#     if update_db and os.environ.get(AWS_ENV_VAR_NAME):
-#         assert False, (
-#             f"Running the full disease ETL pipeline test on an AWS environment is "
-#             f"forbidden -- either unset {AWS_ENV_VAR_NAME} or unset DISEASE_TEST"
-#         )
-#
-#     class TrackingDatabase(Database):
-#         """Provide injection for DB instance to track added/updated records"""
-#
-#         def __init__(self, **kwargs):
-#             self.additions = {}
-#             self.updates = {}
-#             super().__init__(**kwargs)
-#
-#         def add_record(self, record: Dict, record_type: str):
-#             if update_db:
-#                 super().add_record(record, record_type)
-#             self.additions[record["concept_id"]] = record
-#
-#         def update_record(
-#             self, concept_id: str, field: str, new_value: Any,  # noqa: ANN401
-#             item_type: str = "identity"
-#         ):
-#             if update_db:
-#                 super().update_record(concept_id, field, new_value, item_type)
-#             self.updates[concept_id] = {field: new_value}
-#
-#     if update_db:
-#         for SourceClass in (DO, Mondo, NCIt, OncoTree, OMIM):
-#             test_source(SourceClass)
-#
-#     m = Merge(TrackingDatabase())
-#     return m
-#
-#
-# @pytest.fixture(scope='module')
-# def neuroblastoma():
-#     """Create neuroblastoma fixture."""
-#     return {
-#         "label_and_type": "ncit:c3270##merger",
-#         "concept_id": "ncit:C3270",
-#         "item_type": "merger",
-#         "xrefs": ["mondo:0005072", "oncotree:NBL", "DOID:769"],
-#         "label": "Neuroblastoma",
-#         "aliases": [
-#             "neuroblastoma",
-#             "Neural Crest Tumor, Malignant",
-#             "Neuroblastoma (Schwannian Stroma-poor)",
-#             "neuroblastoma (Schwannian Stroma-poor)",
-#             "Neuroblastoma (Schwannian Stroma-Poor)",
-#             "Neuroblastoma, NOS",
-#             "NEUROBLASTOMA, MALIGNANT",
-#             "Neuroblastoma (NBL)",
-#             "neural Crest tumor, malignant",
-#             "neuroblastoma, malignant"
-#         ],
-#         "associated_with": [
-#             "efo:0000621",
-#             "gard:0007185",
-#             "gard:7185",
-#             "icdo:9500/3",
-#             "mesh:D009447",
-#             "orphanet:635",
-#             "umls:C0027819",
-#             "umls:C2751421",
-#             "umls:CN205405",
-#         ],
-#         "pediatric": None
-#     }
-#
-#
-# @pytest.fixture(scope='module')
-# def lnscc():
-#     """Create lung non small cell carcinoma fixture"""
-#     return {
-#         "label_and_type": "ncit:c2926##merger",
-#         "concept_id": "ncit:C2926",
-#         "xrefs": ["mondo:0005233", "oncotree:NSCLC", "DOID:3908"],
-#         "label": "Lung Non-Small Cell Carcinoma",
-#         "aliases": [
-#             "NSCLC - Non-Small Cell Lung Cancer",
-#             "NSCLC - non-small cell lung cancer",
-#             "NSCLC",
-#             "Non Small Cell Lung Cancer NOS",
-#             "Non-Small Cell Cancer of Lung",
-#             "Non-Small Cell Cancer of the Lung",
-#             "Non-Small Cell Carcinoma of Lung",
-#             "Non-Small Cell Carcinoma of the Lung",
-#             "Non-Small Cell Lung Cancer",
-#             "Non-Small Cell Lung Carcinoma",
-#             "Non-small cell lung cancer",
-#             "Non-small cell lung cancer, NOS",
-#             "non-small cell cancer of lung",
-#             "non-small cell cancer of the lung",
-#             "non-small cell carcinoma of lung",
-#             "non-small cell carcinoma of the lung",
-#             "non-small cell lung cancer",
-#             "non-small cell lung carcinoma (disease)",
-#             "non-small cell lung carcinoma",
-#         ],
-#         "associated_with": [
-#             "umls:C0007131",
-#             "mesh:D002289",
-#             "efo:0003060",
-#             "kegg.disease:05223",
-#             "orphanet:488201"
-#         ],
-#         "item_type": "merger"
-#     }
-#
-#
-# @pytest.fixture(scope='module')
-# def richter():
-#     """Create Richter Syndrome fixture"""
-#     return {
-#         "label_and_type": "ncit:c35424##merger",
-#         "concept_id": "ncit:C35424",
-#         "xrefs": ["mondo:0002083", "DOID:1703"],
-#         "label": "Richter Syndrome",
-#         "aliases": [
-#             "Richter's Syndrome",
-#             "Richter syndrome",
-#             "Richter transformation",
-#             "Richter's Transformation",
-#             "Richter's syndrome",
-#             "Richter's transformation"
-#         ],
-#         "associated_with": [
-#             "umls:C0349631",
-#             "gard:0007578",
-#             "gard:7578",
-#             "icd10.cm:C91.1"
-#         ],
-#         "item_type": "merger"
-#     }
-#
-#
-# @pytest.fixture(scope='module')
-# def ped_liposarcoma():
-#     """Create pediatric liposarcoma fixture."""
-#     return {
-#         "label_and_type": "ncit:c8091##merger",
-#         "concept_id": "ncit:C8091",
-#         "xrefs": ["mondo:0003587", "DOID:5695"],
-#         "label": "Childhood Liposarcoma",
-#         "aliases": [
-#             "Liposarcoma",
-#             "Pediatric Liposarcoma",
-#             "childhood liposarcoma",
-#             "pediatric liposarcoma"
-#         ],
-#         "associated_with": ["umls:C0279984"],
-#         "pediatric_disease": True,
-#         "item_type": "merger"
-#     }
-#
-#
-# @pytest.fixture(scope='module')
-# def teratoma():
-#     """Create fixture for adult cystic teratoma."""
-#     return {
-#         "label_and_type": "ncit:c9012##merger",
-#         "concept_id": "ncit:C9012",
-#         "xrefs": ["mondo:0004099", "DOID:7079"],
-#         "label": "Adult Cystic Teratoma",
-#         "aliases": ["Adult cystic teratoma", "cystic teratoma of adults"],
-#         "associated_with": ["icdo:9080/0", "umls:C1368888"],
-#         "item_type": "merger",
-#     }
-#
-#
-# @pytest.fixture(scope='module')
-# def mafd2():
-#     """Create a fixture for major affective disorder 2. Tests whether a
-#     deprecated DO reference is filtered out.
-#     """
-#     return {
-#         "label_and_type": "mondo:0010648##merger",
-#         "item_type": "merger",
-#         "concept_id": "mondo:0010648",
-#         "label": "major affective disorder 2",
-#         "aliases": [
-#           "BIPOLAR AFFECTIVE DISORDER",
-#           "BPAD",
-#           "MAFD2",
-#           "MANIC-DEPRESSIVE ILLNESS",
-#           "MANIC-DEPRESSIVE PSYCHOSIS, X-LINKED",
-#           "MDI",
-#           "MDX",
-#           "major affective disorder 2, X-linked dominant"
-#         ],
-#         "xrefs": [
-#             "omim:309200",
-#         ],
-#         "associated_with": [
-#             "mesh:C564108"
-#         ]
-#     }
-#
-#
-# @pytest.fixture(scope='module')
-# def record_id_groups():
-#     """Fixture for concept ID group input."""
-#     return {
-#         'neuroblastoma': [
-#             "ncit:C3270", "mondo:0005072", "DOID:769", "oncotree:NBL"
-#         ],
-#         'lnscc': [
-#             "ncit:C2926", "mondo:0005233", "DOID:3908", "oncotree:NSCLC"
-#         ],
-#         'richter': [
-#             "ncit:C35424", "mondo:0002083", "DOID:1703"
-#         ],
-#         'ped_liposarcoma': [
-#             "ncit:C8091", "mondo:0003587", "DOID:5695"
-#         ],
-#         'teratoma': [
-#             "ncit:C9012", "mondo:0004099", "DOID:7079"
-#         ],
-#         "mafd2": ["mondo:0010648", "omim:309200"],
-#     }
-#
-#
-# def compare_merged_records(actual, fixture):
-#     """Verify correctness of merged DB record."""
-#     assert actual['concept_id'] == fixture['concept_id']
-#     assert ('xrefs' in actual) == ('xrefs' in fixture)
-#     if 'xrefs' in actual:
-#         assert set(actual['xrefs']) == set(fixture['xrefs'])
-#
-#     assert actual['label_and_type'] == fixture['label_and_type']
-#
-#     assert ('label' in actual) == ('label' in fixture)
-#     if 'label' in actual or 'label' in fixture:
-#         assert actual['label'] == fixture['label']
-#
-#     assert ('aliases' in actual) == ('aliases' in fixture)
-#     if 'aliases' in actual or 'aliases' in fixture:
-#         assert set(actual['aliases']) == set(fixture['aliases'])
-#
-#     assert ('associated_with' in actual) == ('associated_with' in fixture)
-#     if 'associated_with' in actual or 'associated_with' in fixture:
-#         assert set(actual['associated_with']) == set(fixture['associated_with'])
-#
-#     assert ('pediatric_disease' in actual) == ('pediatric_disease' in fixture)
-#     if 'pediatric_disease' in actual or 'pediatric_disease' in fixture:
-#         assert actual['pediatric_disease'] == fixture['pediatric_disease']
-#
-#
-# def test_generate_merged_record(merge_instance, record_id_groups, neuroblastoma,
-#                                 lnscc, richter, ped_liposarcoma, teratoma,
-#                                 mafd2):
-#     """Test generation of individual merged record."""
-#     neuroblastoma_ids = record_id_groups['neuroblastoma']
-#     response, r_ids = merge_instance._generate_merged_record(neuroblastoma_ids)
-#     assert set(r_ids) == set(neuroblastoma_ids)
-#     compare_merged_records(response, neuroblastoma)
-#
-#     lnscc_ids = record_id_groups['lnscc']
-#     response, r_ids = merge_instance._generate_merged_record(lnscc_ids)
-#     assert set(r_ids) == set(lnscc_ids)
-#     compare_merged_records(response, lnscc)
-#
-#     richter_ids = record_id_groups['richter']
-#     response, r_ids = merge_instance._generate_merged_record(richter_ids)
-#     assert set(r_ids) == set(richter_ids)
-#     compare_merged_records(response, richter)
-#
-#     ped_liposarcoma_ids = record_id_groups['ped_liposarcoma']
-#     response, r_ids = merge_instance._generate_merged_record(ped_liposarcoma_ids)
-#     assert set(r_ids) == set(ped_liposarcoma_ids)
-#     compare_merged_records(response, ped_liposarcoma)
-#
-#     teratoma_ids = record_id_groups['teratoma']
-#     response, r_ids = merge_instance._generate_merged_record(teratoma_ids)
-#     assert set(r_ids) == set(teratoma_ids)
-#     compare_merged_records(response, teratoma)
-#
-#     mafd2_ids = record_id_groups['mafd2']
-#     response, r_ids = merge_instance._generate_merged_record(mafd2_ids)
-#     assert set(r_ids) == {"mondo:0010648", "omim:309200"}
-#     compare_merged_records(response, mafd2)
+@pytest.fixture(scope="module")
+def merge_instance(test_source, database):
+    """Provide fixture for ETL merge class"""
+    update_db = os.environ.get("DISEASE_TEST", "").lower() == "true"
+    if update_db and os.environ.get(AWS_ENV_VAR_NAME):
+        assert False, (
+            f"Running the full disease ETL pipeline test on an AWS environment is "
+            f"forbidden -- either unset {AWS_ENV_VAR_NAME} or unset DISEASE_TEST"
+        )
+
+    if update_db:
+        for SourceClass in (Mondo, DO, NCIt, OncoTree, OMIM):
+            if not database.get_source_metadata(SourceName(SourceClass.__name__)):
+                test_source(SourceClass)
+
+    concept_ids = database.get_all_concept_ids()
+    m = Merge(database)
+    if update_db:
+        m.create_merged_concepts(concept_ids)
+    return m
+
+
+@pytest.fixture(scope='module')
+def neuroblastoma():
+    """Create neuroblastoma fixture."""
+    return {
+        "concept_id": "ncit:C3270",
+        "item_type": "merger",
+        "xrefs": ["mondo:0005072", "oncotree:NBL", "DOID:769"],
+        "label": "Neuroblastoma",
+        "aliases": [
+            "neuroblastoma",
+            "Neural Crest Tumor, Malignant",
+            "Neuroblastoma (Schwannian Stroma-poor)",
+            "neuroblastoma (Schwannian Stroma-poor)",
+            "Neuroblastoma (Schwannian Stroma-Poor)",
+            "Neuroblastoma, NOS",
+            "NEUROBLASTOMA, MALIGNANT",
+            "Neuroblastoma (NBL)",
+            "neural Crest tumor, malignant",
+            "neuroblastoma, malignant"
+        ],
+        "associated_with": [
+            "efo:0000621",
+            "gard:0007185",
+            "gard:7185",
+            "icdo:9500/3",
+            "mesh:D009447",
+            "orphanet:635",
+            "umls:C0027819",
+            "umls:C2751421",
+            "umls:CN205405",
+        ],
+        "pediatric": None
+    }
+
+
+@pytest.fixture(scope='module')
+def lnscc():
+    """Create lung non small cell carcinoma fixture"""
+    return {
+        "concept_id": "ncit:C2926",
+        "xrefs": ["mondo:0005233", "oncotree:NSCLC", "DOID:3908"],
+        "label": "Lung Non-Small Cell Carcinoma",
+        "aliases": [
+            "NSCLC - Non-Small Cell Lung Cancer",
+            "NSCLC - non-small cell lung cancer",
+            "NSCLC",
+            "Non Small Cell Lung Cancer NOS",
+            "Non-Small Cell Cancer of Lung",
+            "Non-Small Cell Cancer of the Lung",
+            "Non-Small Cell Carcinoma of Lung",
+            "Non-Small Cell Carcinoma of the Lung",
+            "Non-Small Cell Lung Cancer",
+            "Non-Small Cell Lung Carcinoma",
+            "Non-small cell lung cancer",
+            "Non-small cell lung cancer, NOS",
+            "non-small cell cancer of lung",
+            "non-small cell cancer of the lung",
+            "non-small cell carcinoma of lung",
+            "non-small cell carcinoma of the lung",
+            "non-small cell lung cancer",
+            "non-small cell lung carcinoma (disease)",
+            "non-small cell lung carcinoma",
+        ],
+        "associated_with": [
+            "umls:C0007131",
+            "mesh:D002289",
+            "efo:0003060",
+            "kegg.disease:05223",
+            "orphanet:488201"
+        ],
+        "item_type": "merger"
+    }
+
+
+@pytest.fixture(scope='module')
+def richter():
+    """Create Richter Syndrome fixture"""
+    return {
+        "concept_id": "ncit:C35424",
+        "xrefs": ["mondo:0002083", "DOID:1703"],
+        "label": "Richter Syndrome",
+        "aliases": [
+            "Richter's Syndrome",
+            "Richter syndrome",
+            "Richter transformation",
+            "Richter's Transformation",
+            "Richter's syndrome",
+            "Richter's transformation"
+        ],
+        "associated_with": [
+            "umls:C0349631",
+            "gard:0007578",
+            "gard:7578",
+            "icd10.cm:C91.1"
+        ],
+        "item_type": "merger"
+    }
+
+
+@pytest.fixture(scope='module')
+def ped_liposarcoma():
+    """Create pediatric liposarcoma fixture."""
+    return {
+        "concept_id": "ncit:C8091",
+        "xrefs": ["mondo:0003587", "DOID:5695"],
+        "label": "Childhood Liposarcoma",
+        "aliases": [
+            "Liposarcoma",
+            "Pediatric Liposarcoma",
+            "childhood liposarcoma",
+            "pediatric liposarcoma"
+        ],
+        "associated_with": ["umls:C0279984"],
+        "pediatric_disease": True,
+        "item_type": "merger"
+    }
+
+
+@pytest.fixture(scope='module')
+def teratoma():
+    """Create fixture for adult cystic teratoma."""
+    return {
+        "concept_id": "ncit:C9012",
+        "xrefs": ["mondo:0004099", "DOID:7079"],
+        "label": "Adult Cystic Teratoma",
+        "aliases": ["Adult cystic teratoma", "cystic teratoma of adults"],
+        "associated_with": ["icdo:9080/0", "umls:C1368888"],
+        "item_type": "merger",
+    }
+
+
+@pytest.fixture(scope='module')
+def mafd2():
+    """Create a fixture for major affective disorder 2. Tests whether a
+    deprecated DO reference is filtered out.
+    """
+    return {
+        "item_type": "merger",
+        "concept_id": "mondo:0010648",
+        "label": "major affective disorder 2",
+        "aliases": [
+          "BIPOLAR AFFECTIVE DISORDER",
+          "BPAD",
+          "MAFD2",
+          "MANIC-DEPRESSIVE ILLNESS",
+          "MANIC-DEPRESSIVE PSYCHOSIS, X-LINKED",
+          "MDI",
+          "MDX",
+          "major affective disorder 2, X-linked dominant"
+        ],
+        "xrefs": [
+            "omim:309200",
+        ],
+        "associated_with": [
+            "mesh:C564108"
+        ]
+    }
+
+
+@pytest.fixture(scope='module')
+def record_id_groups():
+    """Fixture for concept ID group input."""
+    return {
+        'neuroblastoma': [
+            "ncit:C3270", "mondo:0005072", "DOID:769", "oncotree:NBL"
+        ],
+        'lnscc': [
+            "ncit:C2926", "mondo:0005233", "DOID:3908", "oncotree:NSCLC"
+        ],
+        'richter': [
+            "ncit:C35424", "mondo:0002083", "DOID:1703"
+        ],
+        'ped_liposarcoma': [
+            "ncit:C8091", "mondo:0003587", "DOID:5695"
+        ],
+        'teratoma': [
+            "ncit:C9012", "mondo:0004099", "DOID:7079"
+        ],
+        "mafd2": ["mondo:0010648", "omim:309200"],
+    }
+
+
+def compare_merged_records(actual, fixture):
+    """Verify correctness of merged DB record."""
+    assert actual['concept_id'] == fixture['concept_id']
+    assert ('xrefs' in actual) == ('xrefs' in fixture)
+    if 'xrefs' in actual:
+        assert set(actual['xrefs']) == set(fixture['xrefs'])
+
+    assert ('label' in actual) == ('label' in fixture)
+    if 'label' in actual or 'label' in fixture:
+        assert actual['label'] == fixture['label']
+
+    assert ('aliases' in actual) == ('aliases' in fixture)
+    if 'aliases' in actual or 'aliases' in fixture:
+        assert set(actual['aliases']) == set(fixture['aliases'])
+
+    assert ('associated_with' in actual) == ('associated_with' in fixture)
+    if 'associated_with' in actual or 'associated_with' in fixture:
+        assert set(actual['associated_with']) == set(fixture['associated_with'])
+
+    assert ('pediatric_disease' in actual) == ('pediatric_disease' in fixture)
+    if 'pediatric_disease' in actual or 'pediatric_disease' in fixture:
+        assert actual['pediatric_disease'] == fixture['pediatric_disease']
+
+
+def test_generate_merged_record(merge_instance, record_id_groups, neuroblastoma,
+                                lnscc, richter, ped_liposarcoma, teratoma,
+                                mafd2):
+    """Test generation of individual merged record."""
+    neuroblastoma_ids = record_id_groups['neuroblastoma']
+    response, r_ids = merge_instance._generate_merged_record(neuroblastoma_ids)
+    assert set(r_ids) == set(neuroblastoma_ids)
+    compare_merged_records(response, neuroblastoma)
+
+    lnscc_ids = record_id_groups['lnscc']
+    response, r_ids = merge_instance._generate_merged_record(lnscc_ids)
+    assert set(r_ids) == set(lnscc_ids)
+    compare_merged_records(response, lnscc)
+
+    richter_ids = record_id_groups['richter']
+    response, r_ids = merge_instance._generate_merged_record(richter_ids)
+    assert set(r_ids) == set(richter_ids)
+    compare_merged_records(response, richter)
+
+    ped_liposarcoma_ids = record_id_groups['ped_liposarcoma']
+    response, r_ids = merge_instance._generate_merged_record(ped_liposarcoma_ids)
+    assert set(r_ids) == set(ped_liposarcoma_ids)
+    compare_merged_records(response, ped_liposarcoma)
+
+    teratoma_ids = record_id_groups['teratoma']
+    response, r_ids = merge_instance._generate_merged_record(teratoma_ids)
+    assert set(r_ids) == set(teratoma_ids)
+    compare_merged_records(response, teratoma)
+
+    mafd2_ids = record_id_groups['mafd2']
+    response, r_ids = merge_instance._generate_merged_record(mafd2_ids)
+    assert set(r_ids) == {"mondo:0010648", "omim:309200"}
+    compare_merged_records(response, mafd2)
 #
 #
 # def test_create_merged_concepts(merge_instance, neuroblastoma,

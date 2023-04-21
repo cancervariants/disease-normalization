@@ -64,7 +64,6 @@ class QueryHandler:
         :return: Tuple containing updated response object, and string
             containing name of the source of the match
         """
-        del item['label_and_type']
         disease = Disease(**item)
         src_name = item['src_name']
 

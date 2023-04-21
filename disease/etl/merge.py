@@ -59,7 +59,7 @@ class Merge:
                              f"{group} for concept {record_id}")
                 continue
             self._database.add_merged_record(merged_record)
-            merge_ref = merged_record['concept_id'].lower()
+            merge_ref = merged_record['concept_id']
 
             for concept_id in merged_ids:
                 self._database.update_merge_ref(concept_id, merge_ref)

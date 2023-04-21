@@ -30,7 +30,7 @@ class Base(ABC):
         """
         self._src_name = SourceName(self.__class__.__name__)
         self._database = database
-        self._src_dir: Path = Path(data_path / self._src_name)
+        self._src_dir: Path = Path(data_path / self._src_name.value)
         self._store_ids = self.__class__.__name__ in SOURCES_FOR_MERGE
         if self._store_ids:
             self._added_ids = []
@@ -44,6 +44,7 @@ class Base(ABC):
         self._extract_data(use_existing)
         self._load_meta()
         self._transform_data()
+        self._database.complete_write_transaction()
         if self._store_ids:
             return self._added_ids
         else:
@@ -144,7 +145,7 @@ class Base(ABC):
     def _get_latest_data_file(self) -> Path:
         """Acquire most recent source data file."""
         self._version = self.get_latest_version()
-        fglob = f"{self._src_name}_{self._version}.*"
+        fglob = f"{self._src_name.lower()}_{self._version}.*"
         latest = list(self._src_dir.glob(fglob))
         if not latest:
             self._download_data()

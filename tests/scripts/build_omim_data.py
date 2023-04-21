@@ -2,7 +2,7 @@
 import csv
 from pathlib import Path
 
-from disease.database import Database
+from disease.database import create_db
 from disease.etl import OMIM
 
 
@@ -12,7 +12,7 @@ TEST_IDS = [
     "247640",
 ]
 
-omim = OMIM(Database())
+omim = OMIM(create_db())
 omim._extract_data()
 TEST_DATA_DIR = Path(__file__).resolve().parents[1] / "data" / "omim"
 outfile_path = TEST_DATA_DIR / omim._data_file.name

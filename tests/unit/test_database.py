@@ -4,10 +4,10 @@ import os
 import pytest
 
 
-def test_tables_created(db_fixture):
+def test_tables_created(database):
     """Check that required tables are created."""
-    existing_tables = db_fixture.db.list_tables()
-    if db_fixture.__class__.__name__ == "PostgresDatabase":
+    existing_tables = database.list_tables()
+    if database.__class__.__name__ == "PostgresDatabase":
         assert set(existing_tables) == {
             "disease_associations",
             "disease_labels",

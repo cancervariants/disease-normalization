@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS disease_sources (
     rdp_url TEXT,
     data_license_nc BOOLEAN NOT NULL,
     data_license_attr BOOLEAN NOT NULL,
-    data_license_sa BOOLEAN NOT NULL,
+    data_license_sa BOOLEAN NOT NULL
 );
 CREATE TABLE IF NOT EXISTS disease_merged (
     concept_id VARCHAR(127) PRIMARY KEY,

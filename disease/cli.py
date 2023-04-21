@@ -6,7 +6,7 @@ from typing import Collection, Optional, List, Set
 
 import click
 
-from disease import SOURCES_LOWER_LOOKUP, logger
+from disease import SOURCES_FOR_MERGE, SOURCES_LOWER_LOOKUP, logger
 from disease.database.database import AbstractDatabase, DatabaseException, \
     DatabaseReadException, DatabaseWriteException, create_db
 from disease.schemas import SourceName
@@ -175,7 +175,9 @@ def _load_merge(db: AbstractDatabase, processed_ids: Set[str]) -> None:
     start = timer()
     _delete_normalized_data(db)
     if not processed_ids:
-        processed_ids = db.get_all_concept_ids()
+        processed_ids = set()
+        for source in SOURCES_FOR_MERGE:
+            processed_ids |= db.get_all_concept_ids(source)
     merge = Merge(database=db)
     click.echo("Constructing normalized records...")
     merge.create_merged_concepts(processed_ids)

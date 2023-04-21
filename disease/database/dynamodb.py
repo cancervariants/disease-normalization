@@ -6,7 +6,7 @@ from pathlib import Path
 import sys
 from typing import Any, Dict, List, Optional, Set, Union
 import boto3
-from boto3.dynamodb.conditions import Key
+from boto3.dynamodb.conditions import Equals, Key, Attr
 from botocore.exceptions import ClientError
 
 import click
@@ -215,10 +215,11 @@ class DynamoDbDatabase(AbstractDatabase):
         self._create_diseases_table(existing_tables)
         self._create_meta_data_table(existing_tables)
 
-    def get_source_metadata(self, src_name: Union[str, SourceName]) -> Dict:
+    def get_source_metadata(self, src_name: Union[str, SourceName]) -> Optional[Dict]:
         """Get license, versioning, data lookup, etc information for a source.
 
         :param src_name: name of the source to get data for
+        :return: Dict containing metadata if lookup is successful
         """
         if isinstance(src_name, SourceName):
             src_name = src_name.value
@@ -285,16 +286,19 @@ class DynamoDbDatabase(AbstractDatabase):
                          f"{e.response['Error']['Message']}")
             return []
 
-    def get_all_concept_ids(self) -> Set[str]:
+    def get_all_concept_ids(self, source: Optional[SourceName] = None) -> Set[str]:
         """Retrieve concept IDs for use in generating normalized records.
 
+        :param source: optionally, just get all IDs for a specific source
         :return: List of concept IDs as strings.
         """
         last_evaluated_key = None
         concept_ids = []
-        params = {
-            'ProjectionExpression': 'concept_id',
+        params: Dict[str, Union[str, Equals]] = {
+            "ProjectionExpression": "concept_id",
         }
+        if source is not None:
+            params["FilterExpression"] = Attr("src_name").eq(source.value)
         while True:
             if last_evaluated_key:
                 response = self.diseases.scan(

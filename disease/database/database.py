@@ -84,10 +84,11 @@ class AbstractDatabase(abc.ABC):
         """
 
     @abc.abstractmethod
-    def get_source_metadata(self, src_name: Union[str, SourceName]) -> Dict:
+    def get_source_metadata(self, src_name: Union[str, SourceName]) -> Optional[Dict]:
         """Get license, versioning, data lookup, etc information for a source.
 
         :param src_name: name of the source to get data for
+        :return: Dict containing metadata if lookup is successful
         """
 
     @abc.abstractmethod
@@ -114,9 +115,10 @@ class AbstractDatabase(abc.ABC):
         """
 
     @abc.abstractmethod
-    def get_all_concept_ids(self) -> Set[str]:
+    def get_all_concept_ids(self, source: Optional[SourceName] = None) -> Set[str]:
         """Retrieve all available concept IDs for use in generating normalized records.
 
+        :param source: optionally, just get all IDs for a specific source
         :return: List of concept IDs as strings.
         """
 

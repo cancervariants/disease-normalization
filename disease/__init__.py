@@ -40,4 +40,4 @@ NAMESPACE_LOOKUP = {v.value.lower(): NamespacePrefix[k].value
                     if v.value != ''}
 
 # Use for checking whether to pull IDs for merge group generation
-SOURCES_FOR_MERGE = {SourceName.MONDO.value}
+SOURCES_FOR_MERGE = {SourceName.MONDO}

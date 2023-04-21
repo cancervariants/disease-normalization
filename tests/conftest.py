@@ -38,22 +38,20 @@ TEST_DATA_DIRECTORY = TEST_ROOT / "tests" / "data"
 IS_TEST_ENV = os.environ.get("DISEASE_TEST", "").lower() == "true"
 
 
-@pytest.fixture(scope="session")
-def test_data():
-    """Provide test data location to test modules"""
-    return TEST_DATA_DIRECTORY
-
-
 @pytest.fixture(scope="session", autouse=True)
 def database():
-    """Provide a database instance to be used by tests."""
+    """Provide a database instance to be used by tests.
+
+    This fixture is responsible for checking that we aren't about to overwrite any
+    production databases.
+    """
     db = create_db()
     if IS_TEST_ENV:
         if os.environ.get(AWS_ENV_VAR_NAME):
             assert False, f"Cannot have both DISEASE_TEST and {AWS_ENV_VAR_NAME} set."
         db.drop_db()
         db.initialize_db()
-    return database
+    return db
 
 
 def decompress_mondo_tar():
@@ -80,28 +78,21 @@ def decompress_mondo_tar():
 
 
 @pytest.fixture(scope="session")
-def test_source(database: AbstractDatabase, test_data: Path):
+def test_source(database: AbstractDatabase):
     """Provide query endpoint for testing sources. If DISEASE_TEST is set, will try to
     load DB from test data.
 
     :param db: database fixture
-    :param test_data: test data directory location
     :return: factory function that takes an ETL class instance and returns a query
     endpoint.
     """
     def test_source_factory(EtlClass: Base):
-        is_test = os.environ.get("DISEASE_TEST", "").lower() == "true"
-        if is_test:
-            if os.environ.get(AWS_ENV_VAR_NAME):
-                assert False, (
-                    f"Cannot have both DISEASE_TEST and {AWS_ENV_VAR_NAME} set."
-                )
-            else:
-                test_class = EtlClass(database, test_data)  # type: ignore
-                if EtlClass.__name__ == SourceName.MONDO:  # type: ignore
-                    decompress_mondo_tar()
-                test_class.perform_etl(use_existing=True)
-                test_class.database.flush_batch()
+        if IS_TEST_ENV:
+            test_class = EtlClass(database, TEST_DATA_DIRECTORY)  # type: ignore
+            if EtlClass.__name__ == SourceName.MONDO:  # type: ignore
+                decompress_mondo_tar()
+            test_class.perform_etl(use_existing=True)
+            test_class._database.complete_write_transaction()
 
         class QueryGetter:
 
