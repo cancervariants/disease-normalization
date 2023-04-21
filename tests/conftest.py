@@ -4,12 +4,15 @@ import tarfile
 from typing import List, Optional
 import pytest
 from pathlib import Path
+import logging
 
 from disease.database import AWS_ENV_VAR_NAME, create_db
 from disease.database.database import AbstractDatabase
 from disease.etl.base import Base
 from disease.query import QueryHandler
 from disease.schemas import Disease, MatchType, MatchesKeyed, SourceName
+
+_logger = logging.getLogger(__name__)
 
 
 def pytest_collection_modifyitems(items):
@@ -35,18 +38,24 @@ def pytest_collection_modifyitems(items):
 TEST_ROOT = Path(__file__).resolve().parents[1]
 TEST_DATA_DIRECTORY = TEST_ROOT / "tests" / "data"
 
-IS_TEST_ENV = os.environ.get("DISEASE_TEST", "").lower() == "true"
+
+@pytest.fixture(scope="session")
+def is_test_env():
+    """If true, currently in test environment (i.e. okay to overwrite DB). Downstream
+    users should also make sure to check if in a production environment.
+    """
+    return os.environ.get("DISEASE_TEST", "").lower() == "true"
 
 
 @pytest.fixture(scope="session", autouse=True)
-def database():
+def database(is_test_env):
     """Provide a database instance to be used by tests.
 
     This fixture is responsible for checking that we aren't about to overwrite any
     production databases.
     """
     db = create_db()
-    if IS_TEST_ENV:
+    if is_test_env:
         if os.environ.get(AWS_ENV_VAR_NAME):
             assert False, f"Cannot have both DISEASE_TEST and {AWS_ENV_VAR_NAME} set."
         db.drop_db()
@@ -78,7 +87,7 @@ def decompress_mondo_tar():
 
 
 @pytest.fixture(scope="session")
-def test_source(database: AbstractDatabase):
+def test_source(database: AbstractDatabase, is_test_env: bool):
     """Provide query endpoint for testing sources. If DISEASE_TEST is set, will try to
     load DB from test data.
 
@@ -87,7 +96,8 @@ def test_source(database: AbstractDatabase):
     endpoint.
     """
     def test_source_factory(EtlClass: Base):
-        if IS_TEST_ENV:
+        if is_test_env:
+            _logger.debug(f"Reloading DB with data from {TEST_DATA_DIRECTORY}")
             test_class = EtlClass(database, TEST_DATA_DIRECTORY)  # type: ignore
             if EtlClass.__name__ == SourceName.MONDO:  # type: ignore
                 decompress_mondo_tar()

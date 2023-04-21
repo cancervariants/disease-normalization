@@ -19,13 +19,14 @@ class Merge:
         self._groups = []  # list of tuples: (mondo_concept_id, set_of_ids)
 
     def create_merged_concepts(self, record_ids: Collection[str]):
-        """Create concept groups, generate merged concept records, and
-        update database.
+        """Create concept groups, generate merged concept records, and update database.
+        Our normalization protocols only generate record ID sets that include Mondo
+        terms, meaning only Mondo IDs should be submitted to this method.
 
         :param record_ids: concept identifiers from which groups should be generated.
         """
         # build groups
-        logger.info(f'Generating record ID sets from {len(record_ids)} records')  # noqa E501
+        logger.info(f'Generating record ID sets from {len(record_ids)} records')
         start = timer()
         for concept_id in record_ids:
             try:
@@ -63,6 +64,7 @@ class Merge:
 
             for concept_id in merged_ids:
                 self._database.update_merge_ref(concept_id, merge_ref)
+        self._database.complete_write_transaction()
         end = timer()
         logger.info("merged concept generation successful.")
         logger.debug(f'Generated and added concepts in {end - start} seconds)')

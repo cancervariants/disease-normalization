@@ -1,31 +1,40 @@
 """Test merged record generation."""
 import os
+from typing import Callable
 
 import pytest
+from disease import SOURCES_FOR_MERGE
 from disease.database import AWS_ENV_VAR_NAME
+from disease.database.database import AbstractDatabase
 
 from disease.etl import DO, Mondo, NCIt, OMIM, OncoTree, Merge
 from disease.schemas import SourceName
 
 
 @pytest.fixture(scope="module")
-def merge_instance(test_source, database):
-    """Provide fixture for ETL merge class"""
-    update_db = os.environ.get("DISEASE_TEST", "").lower() == "true"
-    if update_db and os.environ.get(AWS_ENV_VAR_NAME):
-        assert False, (
-            f"Running the full disease ETL pipeline test on an AWS environment is "
-            f"forbidden -- either unset {AWS_ENV_VAR_NAME} or unset DISEASE_TEST"
-        )
+def merge_instance(test_source: Callable, database: AbstractDatabase,
+                   is_test_env: bool):
+    """Provide fixture for ETL merge class.
 
-    if update_db:
-        for SourceClass in (Mondo, DO, NCIt, OncoTree, OMIM):
-            if not database.get_source_metadata(SourceName(SourceClass.__name__)):
-                test_source(SourceClass)
+    If in a test environment (e.g. CI) this method will attempt to load any missing
+    source data, and then perform merged record generation.
+    """
+    if is_test_env:
+        if os.environ.get(AWS_ENV_VAR_NAME):
+            assert False, (
+                f"Running the full disease ETL pipeline test on an AWS environment is "
+                f"forbidden -- either unset {AWS_ENV_VAR_NAME} or unset DISEASE_TEST"
+            )
+        else:
+            for SourceClass in (Mondo, DO, NCIt, OncoTree, OMIM):
+                if not database.get_source_metadata(SourceName(SourceClass.__name__)):
+                    test_source(SourceClass)
 
-    concept_ids = database.get_all_concept_ids()
     m = Merge(database)
-    if update_db:
+    if is_test_env:
+        concept_ids = set()
+        for source in SOURCES_FOR_MERGE:
+            concept_ids |= database.get_all_concept_ids(source)
         m.create_merged_concepts(concept_ids)
     return m
 
