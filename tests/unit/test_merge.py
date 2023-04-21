@@ -5,20 +5,20 @@ from typing import Callable
 import pytest
 from disease import SOURCES_FOR_MERGE
 from disease.database import AWS_ENV_VAR_NAME
-from disease.database.database import AbstractDatabase
+from disease.database.database import create_db
 
 from disease.etl import DO, Mondo, NCIt, OMIM, OncoTree, Merge
 from disease.schemas import SourceName
 
 
 @pytest.fixture(scope="module")
-def merge_instance(test_source: Callable, database: AbstractDatabase,
-                   is_test_env: bool):
+def merge_instance(test_source: Callable, is_test_env: bool):
     """Provide fixture for ETL merge class.
 
     If in a test environment (e.g. CI) this method will attempt to load any missing
     source data, and then perform merged record generation.
     """
+    database = create_db()
     if is_test_env:
         if os.environ.get(AWS_ENV_VAR_NAME):
             assert False, (

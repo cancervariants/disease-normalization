@@ -37,29 +37,33 @@ def pytest_collection_modifyitems(items):
 
 TEST_ROOT = Path(__file__).resolve().parents[1]
 TEST_DATA_DIRECTORY = TEST_ROOT / "tests" / "data"
+IS_TEST_ENV = os.environ.get("DISEASE_TEST", "").lower() == "true"
+
+
+def pytest_sessionstart():
+    """Wipe DB before testing if in test environment."""
+    if IS_TEST_ENV:
+        if os.environ.get(AWS_ENV_VAR_NAME):
+            assert False, f"Cannot have both DISEASE_TEST and {AWS_ENV_VAR_NAME} set."
+        db = create_db()
+        db.drop_db()
+        db.initialize_db()
 
 
 @pytest.fixture(scope="session")
 def is_test_env():
     """If true, currently in test environment (i.e. okay to overwrite DB). Downstream
     users should also make sure to check if in a production environment.
+
+    Provided here to be accessible directly within test modules.
     """
-    return os.environ.get("DISEASE_TEST", "").lower() == "true"
+    return IS_TEST_ENV
 
 
-@pytest.fixture(scope="session", autouse=True)
-def database(is_test_env):
-    """Provide a database instance to be used by tests.
-
-    This fixture is responsible for checking that we aren't about to overwrite any
-    production databases.
-    """
+@pytest.fixture(scope="module")
+def database():
+    """Provide a database instance to be used by tests."""
     db = create_db()
-    if is_test_env:
-        if os.environ.get(AWS_ENV_VAR_NAME):
-            assert False, f"Cannot have both DISEASE_TEST and {AWS_ENV_VAR_NAME} set."
-        db.drop_db()
-        db.initialize_db()
     return db
 
 
@@ -86,7 +90,7 @@ def decompress_mondo_tar():
             raise FileNotFoundError("Unable to find compressed Mondo OWL file")
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="module")
 def test_source(database: AbstractDatabase, is_test_env: bool):
     """Provide query endpoint for testing sources. If DISEASE_TEST is set, will try to
     load DB from test data.

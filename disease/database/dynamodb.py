@@ -499,7 +499,6 @@ class DynamoDbDatabase(AbstractDatabase):
 
     def complete_write_transaction(self) -> None:
         """Conclude transaction or batch writing if relevant."""
-        _logger.debug("flushing DynamoDB batch writer")
         self.batch.__exit__(*sys.exc_info())
         self.batch = self.diseases.batch_writer()
 

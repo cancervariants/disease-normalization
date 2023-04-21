@@ -5,7 +5,7 @@ from disease.etl.oncotree import OncoTree
 from disease.schemas import MatchType, Disease
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope="module")
 def oncotree(test_source):
     """Build OncoTree ETL test fixture."""
     return test_source(OncoTree)

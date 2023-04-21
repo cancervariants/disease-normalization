@@ -7,7 +7,7 @@ from disease.etl.omim import OMIM
 from disease.schemas import MatchType, Disease
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope="module")
 def omim(test_source):
     """Build OMIM ETL test fixture."""
     return test_source(OMIM)
