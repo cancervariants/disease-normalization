@@ -4,8 +4,7 @@ from typing import Dict, Set, Optional, Tuple
 
 from disease.database.database import AbstractDatabase
 from .version import __version__
-from disease import NAMESPACE_LOOKUP, PREFIX_LOOKUP, SOURCES_LOWER_LOOKUP,\
-    ITEM_TYPES, logger
+from disease import NAMESPACE_LOOKUP, PREFIX_LOOKUP, SOURCES_LOWER_LOOKUP, logger
 from disease.schemas import Disease, RefType, MatchType, SourceName, ServiceMeta, \
     NormalizationService, SearchService
 from botocore.exceptions import ClientError
@@ -201,7 +200,7 @@ class QueryHandler:
         if len(sources) == 0:
             return response
 
-        for match_type in ITEM_TYPES.values():
+        for match_type in RefType:
             (response, sources) = self._check_match_type(query, response,
                                                          sources, match_type)
             if len(sources) == 0:

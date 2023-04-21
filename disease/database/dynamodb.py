@@ -16,8 +16,8 @@ from disease.database.database import AWS_ENV_VAR_NAME, SKIP_AWS_DB_ENV_NAME, \
     DatabaseReadException, DatabaseWriteException, confirm_aws_db_use
 from disease.schemas import RefType, SourceMeta, SourceName
 
-logger = logging.getLogger()
-logger.setLevel(logging.DEBUG)
+_logger = logging.getLogger()
+_logger.setLevel(logging.DEBUG)
 
 
 class DynamoDbDatabase(AbstractDatabase):
@@ -260,9 +260,9 @@ class DynamoDbDatabase(AbstractDatabase):
                 del record["label_and_type"]
                 return record
         except ClientError as e:
-            logger.error(f"boto3 client error on get_records_by_id for "
-                         f"search term {concept_id}: "
-                         f"{e.response['Error']['Message']}")
+            _logger.error(f"boto3 client error on get_records_by_id for "
+                          f"search term {concept_id}: "
+                          f"{e.response['Error']['Message']}")
             return None
         except (KeyError, IndexError):  # record doesn't exist
             return None
@@ -281,9 +281,9 @@ class DynamoDbDatabase(AbstractDatabase):
             matches = self.diseases.query(KeyConditionExpression=filter_exp)
             return [m["concept_id"] for m in matches.get("Items", None)]
         except ClientError as e:
-            logger.error(f"boto3 client error on get_refs_by_type for "
-                         f"search term {search_term}: "
-                         f"{e.response['Error']['Message']}")
+            _logger.error(f"boto3 client error on get_refs_by_type for "
+                          f"search term {search_term}: "
+                          f"{e.response['Error']['Message']}")
             return []
 
     def get_all_concept_ids(self, source: Optional[SourceName] = None) -> Set[str]:
@@ -342,8 +342,8 @@ class DynamoDbDatabase(AbstractDatabase):
         try:
             self.batch.put_item(Item=record)
         except ClientError as e:
-            logger.error("boto3 client error on add_record for "
-                         f"{concept_id}: {e.response['Error']['Message']}")
+            _logger.error("boto3 client error on add_record for "
+                          f"{concept_id}: {e.response['Error']['Message']}")
         for attr_type, item_type in ITEM_TYPES.items():
             if attr_type in record:
                 value = record.get(attr_type)
@@ -372,8 +372,8 @@ class DynamoDbDatabase(AbstractDatabase):
         try:
             self.batch.put_item(Item=record)
         except ClientError as e:
-            logger.error("boto3 client error on add_record for "
-                         f"{concept_id}: {e.response['Error']['Message']}")
+            _logger.error("boto3 client error on add_record for "
+                          f"{concept_id}: {e.response['Error']['Message']}")
 
     def _add_ref_record(self, term: str, concept_id: str, ref_type: str,
                         src_name: SourceName) -> None:
@@ -395,9 +395,9 @@ class DynamoDbDatabase(AbstractDatabase):
         try:
             self.batch.put_item(Item=record)
         except ClientError as e:
-            logger.error(f"boto3 client error adding reference {term} for "
-                         f"{concept_id} with match type {ref_type}: "
-                         f"{e.response['Error']['Message']}")
+            _logger.error(f"boto3 client error adding reference {term} for "
+                          f"{concept_id} with match type {ref_type}: "
+                          f"{e.response['Error']['Message']}")
 
     def update_merge_ref(self, concept_id: str, merge_ref: Any) -> None:
         """Update the merged record reference of an individual record to a new value.
@@ -426,8 +426,8 @@ class DynamoDbDatabase(AbstractDatabase):
                     f"No such record exists for keys {label_and_type}, {concept_id}"
                 )
             else:
-                logger.error(f"boto3 client error in `database.update_record()`: "
-                             f"{e.response['Error']['Message']}")
+                _logger.error(f"boto3 client error in `database.update_record()`: "
+                              f"{e.response['Error']['Message']}")
 
     def delete_normalized_concepts(self) -> None:
         """Remove merged records from the database. Use when performing a new update
@@ -499,6 +499,7 @@ class DynamoDbDatabase(AbstractDatabase):
 
     def complete_write_transaction(self) -> None:
         """Conclude transaction or batch writing if relevant."""
+        _logger.debug("flushing DynamoDB batch writer")
         self.batch.__exit__(*sys.exc_info())
         self.batch = self.diseases.batch_writer()
 

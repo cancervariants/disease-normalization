@@ -90,13 +90,13 @@ class PostgresDatabase(AbstractDatabase):
         drop_query = """
         DROP MATERIALIZED VIEW IF EXISTS record_lookup_view;
         DROP TABLE IF EXISTS
-            disease_associations,
-            disease_labels,
             disease_aliases,
-            disease_xrefs,
+            disease_associations,
             disease_concepts,
+            disease_labels,
             disease_merged,
-            disease_sources;
+            disease_sources,
+            disease_xrefs;
         """
         with self.conn.cursor() as cur:
             cur.execute(drop_query)
