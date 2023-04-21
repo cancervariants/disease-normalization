@@ -12,7 +12,7 @@ jobs:
       DISEASE_TEST: true
     strategy:
       matrix:
-        db_url: ["http://localhost:8000", "postgres://postgres:postgres@localhost:5432/disease_normalizer_test"]
+        db_url: ["http://localhost:8002", "postgres://postgres:postgres@localhost:5432/disease_normalizer_test"]
         python-version: ['3.8', '3.9', '3.10']
     services:
       postgres:
@@ -35,7 +35,7 @@ jobs:
       run: python3 -m pip install ".[dev,test]"
 
     - name: Build local DynamoDB server
-      if: ${{ env.DISEASE_NORM_DB_URL == 'http://localhost:8000' }}
+      if: ${{ env.DISEASE_NORM_DB_URL == 'http://localhost:8002' }}
       run: |
           chmod +x ./tests/scripts/dynamodb_run.sh
           ./tests/scripts/dynamodb_run.sh
