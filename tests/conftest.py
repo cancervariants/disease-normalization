@@ -107,7 +107,6 @@ def test_source(database: AbstractDatabase, is_test_env: bool):
             if EtlClass.__name__ == SourceName.MONDO:  # type: ignore
                 decompress_mondo_tar()
             test_class.perform_etl(use_existing=True)
-            # test_class._database.complete_write_transaction()
 
         class QueryGetter:
 
