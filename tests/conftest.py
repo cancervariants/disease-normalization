@@ -64,7 +64,8 @@ def is_test_env():
 def database():
     """Provide a database instance to be used by tests."""
     db = create_db()
-    return db
+    yield db
+    db.close_connection()
 
 
 def decompress_mondo_tar():
