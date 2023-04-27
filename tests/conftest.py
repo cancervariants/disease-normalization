@@ -96,7 +96,8 @@ def test_source(database: AbstractDatabase, is_test_env: bool):
     """Provide query endpoint for testing sources. If DISEASE_TEST is set, will try to
     load DB from test data.
 
-    :param db: database fixture
+    :param database: test database instance
+    :param is_test_env: if true, load from test data
     :return: factory function that takes an ETL class instance and returns a query
     endpoint.
     """
