@@ -102,7 +102,7 @@ def test_source(database: AbstractDatabase, is_test_env: bool):
     endpoint.
     """
     def test_source_factory(EtlClass: Base):
-        if is_test_env:
+        if IS_TEST_ENV:
             _logger.debug(f"Reloading DB with data from {TEST_DATA_DIRECTORY}")
             test_class = EtlClass(database, TEST_DATA_DIRECTORY)  # type: ignore
             if EtlClass.__name__ == SourceName.MONDO:  # type: ignore
