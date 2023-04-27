@@ -277,7 +277,8 @@ class PostgresDatabase(AbstractDatabase):
                          merge: bool = False) -> Optional[Dict]:
         """Fetch record corresponding to provided concept ID
         :param str concept_id: concept ID for disease record
-        :param bool case_sensitive:
+        :param bool case_sensitive: not used by this implementation -- lookups use
+        case-insensitive index
         :param bool merge: if true, look for merged record; look for identity record
         otherwise.
         :return: complete disease record, if match is found; None otherwise
