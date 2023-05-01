@@ -1,4 +1,4 @@
-CREATE MATERIALIZED VIEW IF NOT EXISTS record_lookup_view AS
+CREATE MATERIALIZED VIEW record_lookup_view AS
 SELECT dc.concept_id,
        dl.label,
        da.aliases,

@@ -77,10 +77,29 @@ class AbstractDatabase(abc.ABC):
         """
 
     @abc.abstractmethod
+    def check_schema_initialized(self) -> bool:
+        """Check if database schema is properly initialized.
+
+        :return: True if DB appears to be fully initialized, False otherwise
+        """
+
+    @abc.abstractmethod
+    def check_tables_populated(self) -> bool:
+        """Perform rudimentary checks to see if tables are populated.
+        Emphasis is on rudimentary -- if some fiendish element has deleted half of the
+        disease aliases, this method won't pick it up. It just wants to see if a few
+        critical tables have at least a small number of records.
+
+        :return: True if queries successful, false if DB appears empty
+        """
+
+    @abc.abstractmethod
     def initialize_db(self) -> None:
         """Perform all necessary parts of database setup. Should be tolerant of
         existing content -- ie, this method is also responsible for checking whether
         the DB is already set up.
+
+        :raise DatabaseInitializationException: if initialization fails
         """
 
     @abc.abstractmethod

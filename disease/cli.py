@@ -21,6 +21,32 @@ SOURCES_CLASS_LOOKUP = {s.value.lower(): eval(s.value)
 
 
 @click.command()
+@click.option("--db_url", help="URL endpoint for the application database.")
+@click.option("--verbose", "-v", is_flag=True, help="Print result to console if set.")
+def check_db(db_url: str, verbose: bool = False) -> None:
+    """Perform basic checks on DB health and population. Exits with status code 1
+    if DB schema is uninitialized or if critical tables appear to be empty.
+
+    \f
+    :param db_url: URL to normalizer database
+    :param verbose: if true, print result to console
+    """  # noqa: D301
+    db = create_db(db_url, False)
+    if not db.check_schema_initialized():
+        if verbose:
+            click.echo("Health check failed: DB schema uninitialized.")
+        click.get_current_context().exit(1)
+
+    if not db.check_tables_populated():
+        if verbose:
+            click.echo("Health check failed: DB is incompletely populated.")
+        click.get_current_context().exit(1)
+
+    if verbose:
+        click.echo("DB health check successful: tables appear complete.")
+
+
+@click.command()
 @click.option("--data_url", help="URL to data dump")
 @click.option("--db_url", help="URL endpoint for the application database.")
 def update_from_remote(data_url: Optional[str], db_url: str) -> None:
@@ -161,6 +187,7 @@ def _delete_normalized_data(database: AbstractDatabase) -> None:
         database.delete_normalized_concepts()
     except (DatabaseReadException, DatabaseWriteException) as e:
         click.echo(f"Encountered exception during normalized data deletion: {e}")
+        click.get_current_context().exit(1)
     end_delete = timer()
     delete_time = end_delete - start_delete
     click.echo(f"Deleted normalized records in {delete_time:.5f} seconds.")
@@ -222,13 +249,14 @@ def update_normalizer_db(
 ) -> None:
     """Update selected normalizer source(s) in the disease database.
 
+    \f
     :param normalizer: names of sources to update, comma-separated
     :param aws_instance: if true, use cloud instance
     :param db_url: URI pointing to database
     :param update_all: if true, update all sources (ignore `normalizer` parameter)
     :param update_merged: if true, update normalized records
     :param from_local: if true, use locally available data only
-    """
+    """  # noqa: D301
     db = create_db(db_url, aws_instance)
 
     if update_all:

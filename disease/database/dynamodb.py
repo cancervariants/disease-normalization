@@ -104,116 +104,151 @@ class DynamoDbDatabase(AbstractDatabase):
         for table_name in existing_tables:
             self.dynamodb.Table(table_name).delete()
 
-    def _create_diseases_table(self, existing_tables: List[str]):
-        """Create Diseases table if non-existent.
-
-        :param List[str] existing_tables: table names already in DB
-        """
-        table_name = 'disease_concepts'
-        if table_name not in existing_tables:
-            self.dynamodb.create_table(
-                TableName=table_name,
-                KeySchema=[
-                    {
-                        'AttributeName': 'label_and_type',
-                        'KeyType': 'HASH'  # Partition key
-                    },
-                    {
-                        'AttributeName': 'concept_id',
-                        'KeyType': 'RANGE'  # Sort key
-                    }
-                ],
-                AttributeDefinitions=[
-                    {
-                        'AttributeName': 'label_and_type',
-                        'AttributeType': 'S'
-                    },
-                    {
-                        'AttributeName': 'concept_id',
-                        'AttributeType': 'S'
-                    },
-                    {
-                        'AttributeName': 'src_name',
-                        'AttributeType': 'S'
-                    },
-                    {
-                        'AttributeName': 'item_type',
-                        'AttributeType': 'S'
-                    }
-
-                ],
-                GlobalSecondaryIndexes=[
-                    {
-                        'IndexName': 'src_index',
-                        'KeySchema': [
-                            {
-                                'AttributeName': 'src_name',
-                                'KeyType': 'HASH'
-                            }
-                        ],
-                        'Projection': {
-                            'ProjectionType': 'KEYS_ONLY'
-                        },
-                        'ProvisionedThroughput': {
-                            'ReadCapacityUnits': 10,
-                            'WriteCapacityUnits': 10
-                        }
-                    },
-                    {
-                        'IndexName': 'item_type_index',
-                        'KeySchema': [
-                            {
-                                'AttributeName': 'item_type',
-                                'KeyType': 'HASH'
-                            }
-                        ],
-                        'Projection': {
-                            'ProjectionType': 'KEYS_ONLY'
-                        },
-                        'ProvisionedThroughput': {
-                            'ReadCapacityUnits': 10,
-                            'WriteCapacityUnits': 10
-                        }
-                    }
-                ],
-                ProvisionedThroughput={
-                    'ReadCapacityUnits': 10,
-                    'WriteCapacityUnits': 10
+    def _create_diseases_table(self):
+        """Create Diseases table."""
+        self.dynamodb.create_table(
+            TableName="disease_concepts",
+            KeySchema=[
+                {
+                    'AttributeName': 'label_and_type',
+                    'KeyType': 'HASH'  # Partition key
+                },
+                {
+                    'AttributeName': 'concept_id',
+                    'KeyType': 'RANGE'  # Sort key
                 }
-            )
-
-    def _create_meta_data_table(self, existing_tables: List[str]) -> None:
-        """Create MetaData table if non-existent.
-
-        :param List[str] existing_tables: table names already in DB
-        """
-        table_name = 'disease_metadata'
-        if table_name not in existing_tables:
-            self.dynamodb.create_table(
-                TableName=table_name,
-                KeySchema=[
-                    {
-                        'AttributeName': 'src_name',
-                        'KeyType': 'HASH'  # Partition key
-                    }
-                ],
-                AttributeDefinitions=[
-                    {
-                        'AttributeName': 'src_name',
-                        'AttributeType': 'S'
-                    },
-                ],
-                ProvisionedThroughput={
-                    'ReadCapacityUnits': 10,
-                    'WriteCapacityUnits': 10
+            ],
+            AttributeDefinitions=[
+                {
+                    'AttributeName': 'label_and_type',
+                    'AttributeType': 'S'
+                },
+                {
+                    'AttributeName': 'concept_id',
+                    'AttributeType': 'S'
+                },
+                {
+                    'AttributeName': 'src_name',
+                    'AttributeType': 'S'
+                },
+                {
+                    'AttributeName': 'item_type',
+                    'AttributeType': 'S'
                 }
-            )
+
+            ],
+            GlobalSecondaryIndexes=[
+                {
+                    'IndexName': 'src_index',
+                    'KeySchema': [
+                        {
+                            'AttributeName': 'src_name',
+                            'KeyType': 'HASH'
+                        }
+                    ],
+                    'Projection': {
+                        'ProjectionType': 'KEYS_ONLY'
+                    },
+                    'ProvisionedThroughput': {
+                        'ReadCapacityUnits': 10,
+                        'WriteCapacityUnits': 10
+                    }
+                },
+                {
+                    'IndexName': 'item_type_index',
+                    'KeySchema': [
+                        {
+                            'AttributeName': 'item_type',
+                            'KeyType': 'HASH'
+                        }
+                    ],
+                    'Projection': {
+                        'ProjectionType': 'KEYS_ONLY'
+                    },
+                    'ProvisionedThroughput': {
+                        'ReadCapacityUnits': 10,
+                        'WriteCapacityUnits': 10
+                    }
+                }
+            ],
+            ProvisionedThroughput={
+                'ReadCapacityUnits': 10,
+                'WriteCapacityUnits': 10
+            }
+        )
+
+    def _create_meta_data_table(self) -> None:
+        """Create MetaData table."""
+        self.dynamodb.create_table(
+            TableName="disease_metadata",
+            KeySchema=[
+                {
+                    'AttributeName': 'src_name',
+                    'KeyType': 'HASH'  # Partition key
+                }
+            ],
+            AttributeDefinitions=[
+                {
+                    'AttributeName': 'src_name',
+                    'AttributeType': 'S'
+                },
+            ],
+            ProvisionedThroughput={
+                'ReadCapacityUnits': 10,
+                'WriteCapacityUnits': 10
+            }
+        )
+
+    def check_schema_initialized(self) -> bool:
+        """Check if database schema is properly initialized.
+
+        :return: True if DB appears to be fully initialized, False otherwise
+        """
+        existing_tables = self.list_tables()
+        exists = "disease_concepts" in existing_tables and \
+            "disease_metadata" in existing_tables
+        if not exists:
+            _logger.info("Disease tables are missing or unavailable.")
+        return exists
+
+    def check_tables_populated(self) -> bool:
+        """Perform rudimentary checks to see if tables are populated.
+        Emphasis is on rudimentary -- if some fiendish element has deleted half of the
+        disease aliases, this method won't pick it up. It just wants to see if a few
+        critical tables have at least a small number of records.
+
+        :return: True if queries successful, false if DB appears empty
+        """
+        sources = self.metadata.scan().get("Items", [])
+        if len(sources) < len(SourceName):
+            _logger.info("Disease sources table is missing expected sources.")
+            return False
+
+        records = self.diseases.query(
+            IndexName="item_type_index",
+            KeyConditionExpression=Key("item_type").eq("identity"),
+            Limit=1
+        )
+        if len(records.get("Items", [])) < 1:
+            _logger.info("Disease records index is empty.")
+            return False
+
+        normalized_records = self.diseases.query(
+            IndexName="item_type_index",
+            KeyConditionExpression=Key("item_type").eq("merger"),
+            Limit=1
+        )
+        if len(normalized_records.get("Items", [])) < 1:
+            _logger.info("Normalized disease records index is empty.")
+            return False
+
+        return True
 
     def initialize_db(self) -> None:
-        """Create disease_concepts and disease_metadata tables."""
-        existing_tables = self.list_tables()
-        self._create_diseases_table(existing_tables)
-        self._create_meta_data_table(existing_tables)
+        """Create disease_concepts and disease_metadata tables if needed."""
+        if not self.check_schema_initialized():
+            self._create_diseases_table()
+            self._create_meta_data_table()
 
     def get_source_metadata(self, src_name: Union[str, SourceName]) -> Optional[Dict]:
         """Get license, versioning, data lookup, etc information for a source.

@@ -9,7 +9,8 @@ import tempfile
 from datetime import datetime
 
 import psycopg
-from psycopg.errors import UndefinedTable, UniqueViolation
+from psycopg.errors import DuplicateObject, DuplicateTable, UndefinedTable, \
+    UniqueViolation
 import requests
 
 from disease.database import AbstractDatabase, DatabaseException, DatabaseWriteException
@@ -17,7 +18,6 @@ from disease.schemas import RefType, SourceMeta, SourceName
 
 
 logger = logging.getLogger()
-logger.setLevel(logging.DEBUG)
 
 
 SCRIPTS_DIR = Path(__file__).parent / "postgresql"
@@ -103,28 +103,90 @@ class PostgresDatabase(AbstractDatabase):
             self.conn.commit()
         logger.info("Dropped all existing disease normalizer tables.")
 
+    def check_schema_initialized(self) -> bool:
+        """Check if database schema is properly initialized.
+
+        :return: True if DB appears to be fully initialized, False otherwise
+        """
+        try:
+            with self.conn.cursor() as cur:
+                cur.execute((SCRIPTS_DIR / "create_tables.sql").read_bytes())
+        except DuplicateTable:
+            self.conn.rollback()
+        else:
+            logger.info("Disease table existence check failed.")
+            self.conn.rollback()
+            return False
+        try:
+            with self.conn.cursor() as cur:
+                cur.execute((SCRIPTS_DIR / "add_fkeys.sql").read_bytes())
+        except DuplicateObject:
+            self.conn.rollback()
+        else:
+            logger.info("Disease foreign key existence check failed.")
+            self.conn.rollback()
+            return False
+        try:
+            with self.conn.cursor() as cur:
+                cur.execute(
+                    (SCRIPTS_DIR / "create_record_lookup_view.sql").read_bytes()
+                )
+        except DuplicateTable:
+            self.conn.rollback()
+        else:
+            logger.info("Disease normalized view lookup failed.")
+            self.conn.rollback()
+            return False
+        try:
+            with self.conn.cursor() as cur:
+                cur.execute((SCRIPTS_DIR / "add_indexes.sql").read_bytes())
+        except DuplicateTable:
+            self.conn.rollback()
+        else:
+            logger.info("Disease indexes check failed.")
+            self.conn.rollback()
+            return False
+
+        return True
+
+    def check_tables_populated(self) -> bool:
+        """Perform rudimentary checks to see if tables are populated.
+        Emphasis is on rudimentary -- if some fiendish element has deleted half of the
+        disease aliases, this method won't pick it up. It just wants to see if a few
+        critical tables have at least a small number of records.
+
+        :return: True if queries successful, false if DB appears empty
+        """
+        with self.conn.cursor() as cur:
+            cur.execute("SELECT name FROM disease_sources;")
+            results = cur.fetchall()
+        if len(results) < len(SourceName):
+            logger.info("Disease sources table is missing expected sources.")
+            return False
+
+        with self.conn.cursor() as cur:
+            cur.execute("SELECT COUNT(1) FROM disease_concepts LIMIT 1;")
+            result = cur.fetchone()
+        if not result or result[0] < 1:
+            logger.info("Disease records table is empty.")
+            return False
+
+        with self.conn.cursor() as cur:
+            cur.execute("SELECT COUNT(1) FROM disease_merged LIMIT 1;")
+            result = cur.fetchone()
+        if not result or result[0] < 1:
+            logger.info("Normalized disease records table is empty.")
+            return False
+
+        return True
+
     def initialize_db(self) -> None:
         """Check if DB is set up. If not, create tables/indexes/views."""
-        tables = self.list_tables()
-        expected_tables = [
-            "disease_aliases",
-            "disease_associations",
-            "disease_concepts",
-            "disease_labels",
-            "disease_merged",
-            "disease_sources",
-            "disease_xrefs",
-        ]
-        for table in expected_tables:
-            if table not in tables:
-                logger.info(
-                    f"{table} was missing -- resetting disease normalizer tables"
-                )
-                self.drop_db()
-                self._create_tables()
-                self._create_views()
-                self._add_indexes()
-                break
+        if not self.check_schema_initialized():
+            self.drop_db()
+            self._create_tables()
+            self._create_views()
+            self._add_indexes()
 
     def _create_views(self) -> None:
         """Create materialized views."""
