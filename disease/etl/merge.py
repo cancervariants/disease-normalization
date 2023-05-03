@@ -105,8 +105,7 @@ class Merge:
             'associated_with': set()
         }
         if len(records) > 1:
-            merged_properties['xrefs'] = [r['concept_id'] for r
-                                          in records[1:]]
+            merged_properties['xrefs'] = list({r['concept_id'] for r in records[1:]})
 
         set_fields = ['aliases', 'associated_with']
         scalar_fields = ['label', 'pediatric_disease']

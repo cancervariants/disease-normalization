@@ -58,20 +58,33 @@ class PostgresDatabase(AbstractDatabase):
 
         atexit.register(self.close_connection)
 
+    _list_tables_query = b"""
+    SELECT table_name FROM information_schema.tables
+    WHERE table_schema = 'public'
+    AND table_type = 'BASE TABLE';
+    """
+
     def list_tables(self) -> List[str]:
         """Return names of tables in database.
 
         :return: Table names in database
         """
         with self.conn.cursor() as cur:
-            cur.execute(
-                """SELECT table_name FROM information_schema.tables
-                WHERE table_schema = 'public'
-                AND table_type = 'BASE TABLE';
-                """
-            )
+            cur.execute(self._list_tables_query)
             tables = cur.fetchall()
         return [t[0] for t in tables]
+
+    _drop_db_query = b"""
+    DROP MATERIALIZED VIEW IF EXISTS record_lookup_view;
+    DROP TABLE IF EXISTS
+        disease_aliases,
+        disease_associations,
+        disease_concepts,
+        disease_labels,
+        disease_merged,
+        disease_sources,
+        disease_xrefs;
+    """
 
     def drop_db(self) -> None:
         """Perform complete teardown of DB. Useful for quickly resetting all data or
@@ -87,19 +100,8 @@ class PostgresDatabase(AbstractDatabase):
         except DatabaseWriteException as e:
             raise e
 
-        drop_query = """
-        DROP MATERIALIZED VIEW IF EXISTS record_lookup_view;
-        DROP TABLE IF EXISTS
-            disease_aliases,
-            disease_associations,
-            disease_concepts,
-            disease_labels,
-            disease_merged,
-            disease_sources,
-            disease_xrefs;
-        """
         with self.conn.cursor() as cur:
-            cur.execute(drop_query)
+            cur.execute(self._drop_db_query)
             self.conn.commit()
         logger.info("Dropped all existing disease normalizer tables.")
 
@@ -149,6 +151,10 @@ class PostgresDatabase(AbstractDatabase):
 
         return True
 
+    _check_sources_query = b"SELECT name FROM disease_sources;"
+    _check_concepts_query = b"SELECT COUNT(1) FROM gene_concepts LIMIT 1;"
+    _check_merged_query = b"SELECT COUNT(1) FROM gene_merged LIMIT 1;"
+
     def check_tables_populated(self) -> bool:
         """Perform rudimentary checks to see if tables are populated.
         Emphasis is on rudimentary -- if some fiendish element has deleted half of the
@@ -158,21 +164,21 @@ class PostgresDatabase(AbstractDatabase):
         :return: True if queries successful, false if DB appears empty
         """
         with self.conn.cursor() as cur:
-            cur.execute("SELECT name FROM disease_sources;")
+            cur.execute(self._check_sources_query)
             results = cur.fetchall()
         if len(results) < len(SourceName):
             logger.info("Disease sources table is missing expected sources.")
             return False
 
         with self.conn.cursor() as cur:
-            cur.execute("SELECT COUNT(1) FROM disease_concepts LIMIT 1;")
+            cur.execute(self._check_concepts_query)
             result = cur.fetchone()
         if not result or result[0] < 1:
             logger.info("Disease records table is empty.")
             return False
 
         with self.conn.cursor() as cur:
-            cur.execute("SELECT COUNT(1) FROM disease_merged LIMIT 1;")
+            cur.execute(self._check_merged_query)
             result = cur.fetchone()
         if not result or result[0] < 1:
             logger.info("Normalized disease records table is empty.")
@@ -195,6 +201,8 @@ class PostgresDatabase(AbstractDatabase):
             cur.execute(create_view_query)
             self.conn.commit()
 
+    _refresh_views_query = b"REFRESH MATERIALIZED VIEW record_lookup_view;"
+
     def _refresh_views(self) -> None:
         """Update materialized views.
 
@@ -202,7 +210,7 @@ class PostgresDatabase(AbstractDatabase):
         either check beforehand or catch psycopg.UndefinedTable.
         """
         with self.conn.cursor() as cur:
-            cur.execute("REFRESH MATERIALIZED VIEW record_lookup_view;")
+            cur.execute(self._refresh_views_query)
             self.conn.commit()
 
     def _add_fkeys(self) -> None:
@@ -242,6 +250,8 @@ class PostgresDatabase(AbstractDatabase):
             cur.execute(tables_query)
             self.conn.commit()
 
+    _source_metadata_query = b"SELECT * FROM disease_sources WHERE name = %s;"
+
     def get_source_metadata(self, src_name: Union[str, SourceName]) -> Optional[Dict]:
         """Get license, versioning, data lookup, etc information for a source.
 
@@ -254,9 +264,8 @@ class PostgresDatabase(AbstractDatabase):
         if src_name in self._cached_sources:
             return self._cached_sources[src_name]
 
-        metadata_query = "SELECT * FROM disease_sources WHERE name = %s;"
         with self.conn.cursor() as cur:
-            cur.execute(metadata_query, [src_name])
+            cur.execute(self._source_metadata_query, [src_name])
             metadata_result = cur.fetchone()
             if not metadata_result:
                 return None
@@ -275,6 +284,8 @@ class PostgresDatabase(AbstractDatabase):
             self._cached_sources[src_name] = metadata
             return metadata
 
+    _record_query = b"SELECT * FROM record_lookup_view WHERE lower(concept_id) = %s;"
+
     def _get_record(self, concept_id: str, case_sensitive: bool) -> Optional[Dict]:
         """Retrieve non-merged record. The query is pretty different, so this method
         is broken out for PostgreSQL.
@@ -284,11 +295,10 @@ class PostgresDatabase(AbstractDatabase):
             index, so this parameter isn't used by Postgres
         :return: complete record object if successful
         """
-        query = "SELECT * FROM record_lookup_view WHERE lower(concept_id) = %s;"
         concept_id_param = concept_id.lower()
 
         with self.conn.cursor() as cur:
-            cur.execute(query, [concept_id_param])
+            cur.execute(self._record_query, [concept_id_param])
             result = cur.fetchone()
         if not result:
             return None
@@ -306,6 +316,8 @@ class PostgresDatabase(AbstractDatabase):
         }
         return {k: v for k, v in disease_record.items() if v}
 
+    _merged_record_query = b"SELECT * FROM disease_merged WHERE lower(concept_id) = %s;"
+
     def _get_merged_record(
         self, concept_id: str, case_sensitive: bool
     ) -> Optional[Dict]:
@@ -317,9 +329,8 @@ class PostgresDatabase(AbstractDatabase):
         :return: normalized record if successful
         """
         concept_id = concept_id.lower()
-        query = "SELECT * FROM disease_merged WHERE lower(concept_id) = %s;"
         with self.conn.cursor() as cur:
-            cur.execute(query, [concept_id])
+            cur.execute(self._merged_record_query, [concept_id])
             result = cur.fetchone()
         if not result:
             return None
@@ -350,6 +361,13 @@ class PostgresDatabase(AbstractDatabase):
         else:
             return self._get_record(concept_id, case_sensitive)
 
+    _ref_types_query = {
+        RefType.LABEL: b"SELECT concept_id FROM disease_labels WHERE lower(label) = %s;",  # noqa: E501
+        RefType.ALIASES: b"SELECT concept_id FROM disease_aliases WHERE lower(alias) = %s;",  # noqa: E501
+        RefType.XREFS: "SELECT concept_id FROM disease_xrefs WHERE lower(xref) = %s;",
+        RefType.ASSOCIATED_WITH: "SELECT concept_id FROM disease_associations WHERE lower(associated_with) = %s;"  # noqa: E501
+    }
+
     def get_refs_by_type(self, search_term: str, ref_type: RefType) -> List[str]:
         """Retrieve concept IDs for records matching the user's query. Other methods
         are responsible for actually retrieving full records.
@@ -358,15 +376,8 @@ class PostgresDatabase(AbstractDatabase):
         :param ref_type: type of match to look for.
         :return: list of associated concept IDs. Empty if lookup fails.
         """
-        if ref_type == RefType.LABEL:
-            query = "SELECT concept_id FROM disease_labels WHERE lower(label) = %s;"
-        elif ref_type == RefType.ALIASES:
-            query = "SELECT concept_id FROM disease_aliases WHERE lower(alias) = %s;"
-        elif ref_type == RefType.XREFS:
-            query = "SELECT concept_id FROM disease_xrefs WHERE lower(xref) = %s;"
-        elif ref_type == RefType.ASSOCIATED_WITH:
-            query = "SELECT concept_id FROM disease_associations WHERE lower(associated_with) = %s;"  # noqa: E501
-        else:
+        query = self._ref_types_query.get(ref_type)
+        if not query:
             raise ValueError("invalid reference type")
 
         with self.conn.cursor() as cur:
@@ -377,6 +388,13 @@ class PostgresDatabase(AbstractDatabase):
         else:
             return []
 
+    _source_ids_query = b"""
+    SELECT concept_id FROM disease_concepts dc
+    LEFT JOIN disease_sources ds ON ds.name = dc.source
+    WHERE ds.name = %s;
+    """
+    _all_ids_query = b"SELECT concept_id FROM disease_concepts;"
+
     def get_all_concept_ids(self, source: Optional[SourceName] = None) -> Set[str]:
         """Retrieve concept IDs for use in generating normalized records.
 
@@ -384,13 +402,9 @@ class PostgresDatabase(AbstractDatabase):
         :return: Set of concept IDs as strings.
         """
         if source is not None:
-            ids_query = """
-                SELECT concept_id FROM disease_concepts dc
-                LEFT JOIN disease_sources ds ON ds.name = dc.source
-                WHERE ds.name = %s;
-            """
+            ids_query = self._source_ids_query
         else:
-            ids_query = "SELECT concept_id FROM disease_concepts;"
+            ids_query = self._all_ids_query
         with self.conn.cursor() as cur:
             if source is None:
                 cur.execute(ids_query)
@@ -398,6 +412,14 @@ class PostgresDatabase(AbstractDatabase):
                 cur.execute(ids_query, (source, ))
             ids_tuple = cur.fetchall()
         return {i[0] for i in ids_tuple}
+
+    _add_source_metadata_query = b"""
+    INSERT INTO disease_sources(
+        name, data_license, data_license_url, version, data_url, rdp_url,
+        data_license_nc, data_license_attr, data_license_sa
+    )
+    VALUES ( %s, %s, %s, %s, %s, %s, %s, %s, %s );
+    """
 
     def add_source_metadata(self, src_name: SourceName, meta: SourceMeta) -> None:
         """Add new source metadata entry.
@@ -408,13 +430,7 @@ class PostgresDatabase(AbstractDatabase):
         """
         with self.conn.cursor() as cur:
             cur.execute(
-                """
-                INSERT INTO disease_sources(
-                    name, data_license, data_license_url, version, data_url, rdp_url,
-                    data_license_nc, data_license_attr, data_license_sa
-                )
-                VALUES ( %s, %s, %s, %s, %s, %s, %s, %s, %s );
-                """,
+                self._add_source_metadata_query,
                 [
                     src_name.value,
                     meta.data_license, meta.data_license_url, meta.version,
@@ -426,55 +442,55 @@ class PostgresDatabase(AbstractDatabase):
             )
         self.conn.commit()
 
+    _add_record_query = b"""
+        INSERT INTO disease_concepts (concept_id, source, pediatric_disease)
+        VALUES (%s, %s, %s);
+    """
+    _insert_label_query = b"INSERT INTO disease_labels (label, concept_id) VALUES (%s, %s)"  # noqa: E501
+    _insert_alias_query = b"INSERT INTO disease_aliases (alias, concept_id) VALUES (%s, %s)"  # noqa: E501
+    _insert_xref_query = b"INSERT INTO disease_xrefs (xref, concept_id) VALUES (%s, %s)"
+    _insert_assoc_query = b"INSERT INTO disease_associations (associated_with, concept_id) VALUES (%s, %s)"  # noqa: E501
+
     def add_record(self, record: Dict, src_name: SourceName) -> None:
         """Add new record to database.
 
         :param record: record to upload
         :param src_name: name of source for record. Not used by PostgreSQL instance.
         """
-        record_query = """
-            INSERT INTO disease_concepts (concept_id, source, pediatric_disease)
-            VALUES (%s, %s, %s);
-        """
-
-        insert_label = "INSERT INTO disease_labels (label, concept_id) VALUES (%s, %s)"
-        insert_alias = "INSERT INTO disease_aliases (alias, concept_id) VALUES (%s, %s)"
-        insert_xref = "INSERT INTO disease_xrefs (xref, concept_id) VALUES (%s, %s)"
-        insert_assoc = "INSERT INTO disease_associations (associated_with, concept_id) VALUES (%s, %s)"  # noqa: E501
-
         concept_id = record["concept_id"]
         with self.conn.cursor() as cur:
             try:
-                cur.execute(record_query, [
+                cur.execute(self._add_record_query, [
                     concept_id,
                     src_name.value,
                     record.get("pediatric_disease")
                 ])
-                cur.execute(insert_label, [record["label"], concept_id])
+                cur.execute(self._insert_label_query, [record["label"], concept_id])
                 for a in record.get("aliases", []):
-                    cur.execute(insert_alias, [a, concept_id])
+                    cur.execute(self._insert_alias_query, [a, concept_id])
                 for x in record.get("xrefs", []):
-                    cur.execute(insert_xref, [x, concept_id])
+                    cur.execute(self._insert_xref_query, [x, concept_id])
                 for a in record.get("associated_with", []):
-                    cur.execute(insert_assoc, [a, concept_id])
+                    cur.execute(self._insert_assoc_query, [a, concept_id])
                 self.conn.commit()
             except UniqueViolation:
                 logger.error(f"Record with ID {concept_id} already exists")
                 self.conn.rollback()
+
+    _add_merged_record_query = b"""
+    INSERT INTO disease_merged (
+        concept_id, label, aliases, associated_with, xrefs, pediatric_disease
+    )
+    VALUES (%s, %s, %s, %s, %s, %s);
+    """
 
     def add_merged_record(self, record: Dict) -> None:
         """Add merged record to database.
 
         :param record: merged record to add
         """
-        record_query = """
-        INSERT INTO disease_merged (
-            concept_id, label, aliases, associated_with, xrefs, pediatric_disease
-        )
-        VALUES (%s, %s, %s, %s, %s, %s);
-        """
         with self.conn.cursor() as cur:
-            cur.execute(record_query, [
+            cur.execute(self._add_merged_record_query, [
                 record["concept_id"],
                 record["label"],
                 record.get("aliases"),
@@ -484,6 +500,12 @@ class PostgresDatabase(AbstractDatabase):
             ])
             self.conn.commit()
 
+    _update_merge_ref_query = b"""
+    UPDATE disease_concepts
+    SET merge_ref = %(merge_ref)s
+    WHERE concept_id = %(concept_id)s;
+    """
+
     def update_merge_ref(self, concept_id: str, merge_ref: Any) -> None:
         """Update the merged record reference of an individual record to a new value.
 
@@ -491,14 +513,9 @@ class PostgresDatabase(AbstractDatabase):
         :param merge_ref: new ref value
         :raise DatabaseWriteException: if attempting to update non-existent record
         """
-        update_query = """
-            UPDATE disease_concepts
-            SET merge_ref = %(merge_ref)s
-            WHERE concept_id = %(concept_id)s;
-        """
         with self.conn.cursor() as cur:
             cur.execute(
-                update_query,
+                self._update_merge_ref_query,
                 {"merge_ref": merge_ref, "concept_id": concept_id}
             )
             row_count = cur.rowcount
@@ -517,20 +534,47 @@ class PostgresDatabase(AbstractDatabase):
         It would be faster to drop the entire table and do a cascading delete onto the
         merge_ref column in disease_concepts, but that requires an exclusive access lock
         on the DB, which can be annoying (ie you couldn't have multiple processes
-        accessing it, or PgAdmin, etc...)
+        accessing it, or PgAdmin, etc...). Instead, we'll take down each merge table
+        dependency and rebuild afterwards.
 
         :raise DatabaseReadException: if DB client requires separate read calls and
             encounters a failure in the process
         :raise DatabaseWriteException: if deletion call fails
         """
-        query = """
-            UPDATE disease_concepts SET merge_ref = NULL;
-            DELETE FROM disease_merged;
-        """
         with self.conn.cursor() as cur:
-            cur.execute(query)
-            self.conn.commit()
-        self._create_tables()
+            cur.execute((SCRIPTS_DIR / "delete_normalized_concepts.sql").read_bytes())
+        self.conn.commit()
+
+    _drop_aliases_query = b"""
+    DELETE FROM disease_aliases WHERE id IN (
+        SELECT da.id FROM disease_aliases da LEFT JOIN disease_concepts dc
+            ON dc.concept_id = da.concept_id
+        WHERE dc.source = %s
+    );
+    """
+    _drop_associations_query = b"""
+    DELETE FROM disease_associations WHERE id IN (
+        SELECT da.id FROM disease_associations da LEFT JOIN disease_concepts dc
+            ON dc.concept_id = da.concept_id
+        WHERE dc.source = %s
+    );
+    """
+    _drop_labels_query = b"""
+    DELETE FROM disease_labels WHERE id IN (
+        SELECT ds.id FROM disease_labels ds LEFT JOIN disease_concepts dc
+            ON dc.concept_id = ds.concept_id
+        WHERE dc.source = %s
+    );
+    """
+    _drop_xrefs_query = b"""
+    DELETE FROM disease_xrefs WHERE id IN (
+        SELECT dx.id FROM disease_xrefs dx LEFT JOIN disease_concepts dc
+            ON dc.concept_id = dx.concept_id
+        WHERE dc.source = %s
+    );
+    """
+    _drop_concepts_query = b"DELETE FROM disease_concepts WHERE source = %s;"
+    _drop_source_query = b"DELETE FROM disease_sources ds WHERE ds.name = %s;"
 
     def delete_source(self, src_name: SourceName) -> None:
         """Delete all data for a source. Use when updating source data.
@@ -547,47 +591,17 @@ class PostgresDatabase(AbstractDatabase):
         :param src_name: name of source to delete
         :raise DatabaseWriteException: if deletion call fails
         """
-        drop_aliases_query = """
-        DELETE FROM disease_aliases WHERE id IN (
-            SELECT da.id FROM disease_aliases da LEFT JOIN disease_concepts dc
-                ON dc.concept_id = da.concept_id
-            WHERE dc.source = %s
-        );
-        """
-        drop_associations_query = """
-        DELETE FROM disease_associations WHERE id IN (
-            SELECT da.id FROM disease_associations da LEFT JOIN disease_concepts dc
-                ON dc.concept_id = da.concept_id
-            WHERE dc.source = %s
-        );
-        """
-        drop_labels_query = """
-        DELETE FROM disease_labels WHERE id IN (
-            SELECT ds.id FROM disease_labels ds LEFT JOIN disease_concepts dc
-                ON dc.concept_id = ds.concept_id
-            WHERE dc.source = %s
-        );
-        """
-        drop_xrefs_query = """
-        DELETE FROM disease_xrefs WHERE id IN (
-            SELECT dx.id FROM disease_xrefs dx LEFT JOIN disease_concepts dc
-                ON dc.concept_id = dx.concept_id
-            WHERE dc.source = %s
-        );
-        """
         with self.conn.cursor() as cur:
-            cur.execute(drop_aliases_query, [src_name.value])
-            cur.execute(drop_associations_query, [src_name.value])
-            cur.execute(drop_labels_query, [src_name.value])
-            cur.execute(drop_xrefs_query, [src_name.value])
+            cur.execute(self._drop_aliases_query, [src_name.value])
+            cur.execute(self._drop_associations_query, [src_name.value])
+            cur.execute(self._drop_labels_query, [src_name.value])
+            cur.execute(self._drop_xrefs_query, [src_name.value])
         self._drop_fkeys()
         self._drop_indexes()
 
-        drop_concepts_query = "DELETE FROM disease_concepts WHERE source = %s;"
-        drop_source_query = "DELETE FROM disease_sources ds WHERE ds.name = %s;"
         with self.conn.cursor() as cur:
-            cur.execute(drop_concepts_query, [src_name.value])
-            cur.execute(drop_source_query, [src_name.value])
+            cur.execute(self._drop_concepts_query, [src_name.value])
+            cur.execute(self._drop_source_query, [src_name.value])
             self.conn.commit()
 
         self._add_fkeys()
