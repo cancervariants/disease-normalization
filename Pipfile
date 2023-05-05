@@ -7,7 +7,7 @@ name = "pypi"
 disease-normalizer = {editable = true, path = "."}
 bioversions = "*"
 requests = "*"
-owlready2 = "*"
+owlready2 = "==0.40"
 rdflib = "*"
 pytest = "*"
 pytest-cov = "*"
