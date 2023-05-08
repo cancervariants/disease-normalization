@@ -325,7 +325,7 @@ class DynamoDbDatabase(AbstractDatabase):
         """Retrieve concept IDs for use in generating normalized records.
 
         :param source: optionally, just get all IDs for a specific source
-        :return: List of concept IDs as strings.
+        :return: Set of concept IDs as strings.
         """
         last_evaluated_key = None
         concept_ids = []

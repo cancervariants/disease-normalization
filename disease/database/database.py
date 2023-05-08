@@ -138,7 +138,7 @@ class AbstractDatabase(abc.ABC):
         """Retrieve all available concept IDs for use in generating normalized records.
 
         :param source: optionally, just get all IDs for a specific source
-        :return: List of concept IDs as strings.
+        :return: Set of concept IDs as strings.
         """
 
     @abc.abstractmethod
@@ -263,19 +263,8 @@ def create_db(
     :param aws_instance: use hosted DynamoDB instance, not local DB
     :return: constructed Database instance
     """
-    # If SKIP_AWS_CONFIRMATION is accidentally set, we should verify that the
-    # aws instance should actually be used
-    invalid_aws_msg = f"{AWS_ENV_VAR_NAME} must be set to one of {VALID_AWS_ENV_NAMES}"
-    aws_env_var_set = False
-    if AWS_ENV_VAR_NAME in environ:
-        aws_env_var_set = True
-        assert environ[AWS_ENV_VAR_NAME] in VALID_AWS_ENV_NAMES, invalid_aws_msg
-        confirm_aws_db_use(environ[AWS_ENV_VAR_NAME].upper())
-
+    aws_env_var_set = AWS_ENV_VAR_NAME in environ
     if aws_env_var_set or aws_instance:
-        assert AWS_ENV_VAR_NAME in environ, invalid_aws_msg
-        environ[SKIP_AWS_DB_ENV_NAME] = "true"  # this is already checked above
-
         from disease.database.dynamodb import DynamoDbDatabase
         db = DynamoDbDatabase()
     else:
