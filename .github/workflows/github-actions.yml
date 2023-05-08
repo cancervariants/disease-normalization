@@ -12,7 +12,7 @@ jobs:
       DISEASE_TEST: true
     strategy:
       matrix:
-        db_url: ["http://localhost:8002", "postgres://postgres:postgres@localhost:5432/disease_normalizer_test"]
+        db_url: ["http://localhost:8000", "postgres://postgres:postgres@localhost:5432/disease_normalizer_test"]
         python-version: ['3.8', '3.9', '3.10']
     services:
       postgres:
@@ -26,25 +26,33 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    - name: Setup Python
+    - name: Set up Python
       uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
 
-    - name: Install dependencies
-      run: python3 -m pip install ".[dev,test]"
-
-    - name: Build local DynamoDB server
-      if: ${{ env.DISEASE_NORM_DB_URL == 'http://localhost:8002' }}
+    - name: Build local DynamoDB
+      if: ${{ env.GENE_NORM_DB_URL == 'http://localhost:8000' }}
       run: |
-          chmod +x ./tests/scripts/dynamodb_run.sh
-          ./tests/scripts/dynamodb_run.sh
+        chmod +x ./tests/unit/dynamodb_build.bash
+        ./tests/unit/dynamodb_build.bash
+
+    - name: Install DynamoDB dependencies
+      if: ${{ env.GENE_NORM_DB_URL == 'http://localhost:8000' }}
+      run: python3 -m pip install ".[etl,test]"
+
+    - name: Install PG dependencies
+      if: ${{ env.GENE_NORM_DB_URL != 'http://localhost:8000' }}
+      run: python3 -m pip install ".[pg,etl,test]"
 
     - name: Run tests
-      run: python3 -m pytest
+      run: python3 -m pytest tests/
 
   lint:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.8', '3.9', '3.10']
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.DUMMY_AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.DUMMY_AWS_SECRET_ACCESS_KEY }}
@@ -56,10 +64,10 @@ jobs:
     - name: Setup Python
       uses: actions/setup-python@v4
       with:
-        python-version: '3.10'
+        python-version: ${{ matrix.python-version }}
 
     - name: Install dependencies
       run: python3 -m pip install ".[dev]"
 
     - name: check style
-      run: python3 -m flake8
+      run: python3 -m flake8 disease/ tests/ setup.py

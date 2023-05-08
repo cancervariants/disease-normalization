@@ -8,15 +8,14 @@ The Disease Normalizer is available via PyPI:
 
 ```commandline
 
-pip install disease-normalizer[dev]
+pip install disease-normalizer[etl,pg]
 ```
 
-The `[dev]` argument tells pip to install packages to fulfill the dependencies of the `disease.etl` package.
+The [etl,pg] argument tells pip to install packages to fulfill the dependencies of the gene.etl package and the PostgreSQL data storage implementation alongside the default DynamoDB data storage implementation.
 
 ### External requirements
 
 The Disease Normalizer can retrieve most required data itself. The exception is disease terms from OMIM, for which a source file must be manually acquired and placed in the `disease/data/omim` folder within the library root. In order to access OMIM data, users must submit a request [here](https://www.omim.org/downloads). Once approved, the relevant OMIM file (`mimTitles.txt`) should be renamed according to the convention `omim_YYYYMMDD.tsv`, where `YYYYMMDD` indicates the date that the file was generated, and placed in the appropriate location.
-
 
 ### Database Initialization
 
@@ -115,6 +114,16 @@ cd disease-normalization
 pipenv shell
 pipenv update
 pipenv install --dev
+```
+
+Alternatively, install the `pg`, `etl`, `dev`, and test dependency groups in a virtual environment:
+
+```commandline
+git clone https://github.com/cancervariants/gene-normalization
+cd gene-normalization
+python3 -m virtualenv venv
+source venv/bin/activate
+pip install -e ".[pg,etl,dev,test]"
 ```
 
 ### Init coding style tests
