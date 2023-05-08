@@ -34,8 +34,8 @@ jobs:
     - name: Build local DynamoDB
       if: ${{ env.DISEASE_NORM_DB_URL == 'http://localhost:8002' }}
       run: |
-        chmod +x ./tests/scripts/dynamodb_run.bash
-        ./tests/scripts/dynamodb_run.bash
+        chmod +x ./tests/scripts/dynamodb_run.sh
+        ./tests/scripts/dynamodb_run.sh
 
     - name: Install DynamoDB dependencies
       if: ${{ env.DISEASE_NORM_DB_URL == 'http://localhost:8002' }}
