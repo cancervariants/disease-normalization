@@ -283,17 +283,16 @@ class DynamoDbDatabase(AbstractDatabase):
             else:
                 pk = f'{concept_id.lower()}##identity'
             if case_sensitive:
-                match = self.diseases.get_item(Key={
+                record = self.diseases.get_item(Key={
                     'label_and_type': pk,
                     'concept_id': concept_id
                 })
-                return match['Item']
             else:
                 exp = Key('label_and_type').eq(pk)
                 response = self.diseases.query(KeyConditionExpression=exp)
                 record = response['Items'][0]
-                del record["label_and_type"]
-                return record
+            del record["label_and_type"]
+            return record
         except ClientError as e:
             _logger.error(f"boto3 client error on get_records_by_id for "
                           f"search term {concept_id}: "
