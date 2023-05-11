@@ -283,10 +283,13 @@ class DynamoDbDatabase(AbstractDatabase):
             else:
                 pk = f'{concept_id.lower()}##identity'
             if case_sensitive:
-                record = self.diseases.get_item(Key={
+                response = self.diseases.get_item(Key={
                     'label_and_type': pk,
                     'concept_id': concept_id
                 })
+                record = response.get("Item")
+                if not record:
+                    return None
             else:
                 exp = Key('label_and_type').eq(pk)
                 response = self.diseases.query(KeyConditionExpression=exp)
