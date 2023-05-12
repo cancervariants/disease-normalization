@@ -165,3 +165,5 @@ Pipfile.lock
 # Misc
 tests/data/mondo/*.owl
 tests/scripts/robot*
+analysis/civic-data/*.json
+analysis/pmkb-data/*.json

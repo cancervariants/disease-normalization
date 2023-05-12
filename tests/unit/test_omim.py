@@ -7,7 +7,7 @@ from disease.etl.omim import OMIM
 from disease.schemas import MatchType, Disease
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope="module")
 def omim(test_source):
     """Build OMIM ETL test fixture."""
     return test_source(OMIM)
@@ -97,10 +97,7 @@ def test_label_match(omim, mafd2, acute_ll, lall, compare_response):
 
 def test_alias_match(omim, mafd2, acute_ll, lall, compare_response):
     """Test alias search resolution."""
-    response = omim.search('bipolar affective disorder')
-    compare_response(response, MatchType.ALIAS, mafd2)
-
-    response = omim.search('bpad')
+    response = omim.search('manic-depressive psychosis, x-linked')
     compare_response(response, MatchType.ALIAS, mafd2)
 
     response = omim.search('mafd2')

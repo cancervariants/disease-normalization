@@ -4,11 +4,15 @@ import tarfile
 from typing import List, Optional
 import pytest
 from pathlib import Path
+import logging
 
-from disease.database import AWS_ENV_VAR_NAME, Database
+from disease.database import AWS_ENV_VAR_NAME, create_db
+from disease.database.database import AbstractDatabase
 from disease.etl.base import Base
 from disease.query import QueryHandler
 from disease.schemas import Disease, MatchType, MatchesKeyed, SourceName
+
+_logger = logging.getLogger(__name__)
 
 
 def pytest_collection_modifyitems(items):
@@ -33,32 +37,35 @@ def pytest_collection_modifyitems(items):
 
 TEST_ROOT = Path(__file__).resolve().parents[1]
 TEST_DATA_DIRECTORY = TEST_ROOT / "tests" / "data"
+IS_TEST_ENV = os.environ.get("DISEASE_TEST", "").lower() == "true"
+
+
+def pytest_sessionstart():
+    """Wipe DB before testing if in test environment."""
+    if IS_TEST_ENV:
+        if os.environ.get(AWS_ENV_VAR_NAME):
+            assert False, f"Cannot have both DISEASE_TEST and {AWS_ENV_VAR_NAME} set."
+        db = create_db()
+        db.drop_db()
+        db.initialize_db()
 
 
 @pytest.fixture(scope="session")
-def test_data():
-    """Provide test data location to test modules"""
-    return TEST_DATA_DIRECTORY
+def is_test_env():
+    """If true, currently in test environment (i.e. okay to overwrite DB). Downstream
+    users should also make sure to check if in a production environment.
+
+    Provided here to be accessible directly within test modules.
+    """
+    return IS_TEST_ENV
 
 
-@pytest.fixture(scope="session", autouse=True)
-def db():
+@pytest.fixture(scope="module")
+def database():
     """Provide a database instance to be used by tests."""
-    database = Database()
-    if os.environ.get("DISEASE_TEST", "").lower() == "true":
-        if os.environ.get(AWS_ENV_VAR_NAME):
-            assert False, (
-                f"Cannot have both DISEASE_TEST and {AWS_ENV_VAR_NAME} set."
-            )
-        existing_tables = database.dynamodb_client.list_tables()["TableNames"]
-        if "disease_concepts" in existing_tables:
-            database.dynamodb_client.delete_table(TableName="disease_concepts")
-        if "disease_metadata" in existing_tables:
-            database.dynamodb_client.delete_table(TableName="disease_metadata")
-        existing_tables = database.dynamodb_client.list_tables()["TableNames"]
-        database.create_diseases_table(existing_tables)
-        database.create_meta_data_table(existing_tables)
-    return database
+    db = create_db()
+    yield db
+    db.close_connection()
 
 
 def decompress_mondo_tar():
@@ -84,28 +91,28 @@ def decompress_mondo_tar():
             raise FileNotFoundError("Unable to find compressed Mondo OWL file")
 
 
-@pytest.fixture(scope="session")
-def test_source(db: Database, test_data: Path):
+@pytest.fixture(scope="module")
+def test_source(database: AbstractDatabase, is_test_env: bool):
     """Provide query endpoint for testing sources. If DISEASE_TEST is set, will try to
     load DB from test data.
 
-    :param db: database fixture
-    :param test_data: test data directory location
+    :param database: test database instance
+    :param is_test_env: if true, load from test data
     :return: factory function that takes an ETL class instance and returns a query
     endpoint.
     """
     def test_source_factory(EtlClass: Base):
-        if os.environ.get("DISEASE_TEST", "").lower() == "true":
-            test_class = EtlClass(db, test_data)  # type: ignore
+        if IS_TEST_ENV:
+            _logger.debug(f"Reloading DB with data from {TEST_DATA_DIRECTORY}")
+            test_class = EtlClass(database, TEST_DATA_DIRECTORY)  # type: ignore
             if EtlClass.__name__ == SourceName.MONDO:  # type: ignore
                 decompress_mondo_tar()
             test_class.perform_etl(use_existing=True)
-            test_class.database.flush_batch()
 
         class QueryGetter:
 
             def __init__(self):
-                self.query_handler = QueryHandler()
+                self.query_handler = QueryHandler(database)
                 self._src_name = EtlClass.__name__  # type: ignore
 
             def search(self, query_str: str):

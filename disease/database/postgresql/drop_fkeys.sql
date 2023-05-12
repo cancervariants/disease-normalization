@@ -1,0 +1,4 @@
+ALTER TABLE disease_aliases DROP CONSTRAINT disease_aliases_concept_id_fkey;
+ALTER TABLE disease_associations DROP CONSTRAINT disease_associations_concept_id_fkey;
+ALTER TABLE disease_labels DROP CONSTRAINT disease_labels_concept_id_fkey;
+ALTER TABLE disease_xrefs DROP CONSTRAINT disease_xrefs_concept_id_fkey;

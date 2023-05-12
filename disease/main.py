@@ -1,5 +1,6 @@
 """Main application for FastAPI"""
 from disease import __version__
+from disease.database.database import create_db
 from disease.query import QueryHandler, InvalidParameterException
 from disease.schemas import SearchService, NormalizationService
 from fastapi import FastAPI, HTTPException, Query
@@ -8,7 +9,9 @@ import html
 from typing import Optional
 
 
-query_handler = QueryHandler()
+db = create_db()
+query_handler = QueryHandler(db)
+
 app = FastAPI(
     docs_url="/disease",
     openapi_url="/disease/openapi.json",

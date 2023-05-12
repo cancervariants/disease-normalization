@@ -7,9 +7,9 @@ from datetime import datetime
 
 
 @pytest.fixture(scope="module")
-def query_handler():
+def query_handler(database):
     """Build query handler test fixture"""
-    return QueryHandler()
+    return QueryHandler(database)
 
 
 @pytest.fixture(scope='module')
