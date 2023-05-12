@@ -152,8 +152,8 @@ class PostgresDatabase(AbstractDatabase):
         return True
 
     _check_sources_query = b"SELECT name FROM disease_sources;"
-    _check_concepts_query = b"SELECT COUNT(1) FROM gene_concepts LIMIT 1;"
-    _check_merged_query = b"SELECT COUNT(1) FROM gene_merged LIMIT 1;"
+    _check_concepts_query = b"SELECT COUNT(1) FROM disease_concepts LIMIT 1;"
+    _check_merged_query = b"SELECT COUNT(1) FROM disease_merged LIMIT 1;"
 
     def check_tables_populated(self) -> bool:
         """Perform rudimentary checks to see if tables are populated.
