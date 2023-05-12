@@ -1,52 +1,41 @@
 """Test merged record generation."""
 import os
-from typing import Any, Dict
+from typing import Callable
 
 import pytest
 
-from disease.database import AWS_ENV_VAR_NAME, Database
+from disease import SOURCES_FOR_MERGE
+from disease.database import AWS_ENV_VAR_NAME
+from disease.database.database import create_db
 from disease.etl import DO, OMIM, Merge, Mondo, NCIt, OncoTree
+from disease.schemas import SourceName
 
 
 @pytest.fixture(scope="module")
-def merge_instance(test_source):
-    """Provide fixture for ETL merge class"""
-    update_db = os.environ.get("DISEASE_TEST", "").lower() == "true"
-    if update_db and os.environ.get(AWS_ENV_VAR_NAME):
-        assert False, (
-            f"Running the full disease ETL pipeline test on an AWS environment is "
-            f"forbidden -- either unset {AWS_ENV_VAR_NAME} or unset DISEASE_TEST"
-        )
+def merge_instance(test_source: Callable, is_test_env: bool):
+    """Provide fixture for ETL merge class.
 
-    class TrackingDatabase(Database):
-        """Provide injection for DB instance to track added/updated records"""
+    If in a test environment (e.g. CI) this method will attempt to load any missing
+    source data, and then perform merged record generation.
+    """
+    database = create_db()
+    if is_test_env:
+        if os.environ.get(AWS_ENV_VAR_NAME):
+            assert False, (
+                f"Running the full disease ETL pipeline test on an AWS environment is "
+                f"forbidden -- either unset {AWS_ENV_VAR_NAME} or unset DISEASE_TEST"
+            )
+        else:
+            for SourceClass in (Mondo, DO, NCIt, OncoTree, OMIM):
+                if not database.get_source_metadata(SourceName(SourceClass.__name__)):
+                    test_source(SourceClass)
 
-        def __init__(self, **kwargs):
-            self.additions = {}
-            self.updates = {}
-            super().__init__(**kwargs)
-
-        def add_record(self, record: Dict, record_type: str):
-            if update_db:
-                super().add_record(record, record_type)
-            self.additions[record["concept_id"]] = record
-
-        def update_record(
-            self,
-            concept_id: str,
-            field: str,
-            new_value: Any,  # noqa: ANN401
-            item_type: str = "identity",
-        ):
-            if update_db:
-                super().update_record(concept_id, field, new_value, item_type)
-            self.updates[concept_id] = {field: new_value}
-
-    if update_db:
-        for SourceClass in (DO, Mondo, NCIt, OncoTree, OMIM):
-            test_source(SourceClass)
-
-    m = Merge(TrackingDatabase())
+    m = Merge(database)
+    if is_test_env:
+        concept_ids = set()
+        for source in SOURCES_FOR_MERGE:
+            concept_ids |= database.get_all_concept_ids(source)
+        m.create_merged_concepts(concept_ids)
     return m
 
 
@@ -54,7 +43,6 @@ def merge_instance(test_source):
 def neuroblastoma():
     """Create neuroblastoma fixture."""
     return {
-        "label_and_type": "ncit:c3270##merger",
         "concept_id": "ncit:C3270",
         "item_type": "merger",
         "xrefs": ["mondo:0005072", "oncotree:NBL", "DOID:769"],
@@ -90,7 +78,6 @@ def neuroblastoma():
 def lnscc():
     """Create lung non small cell carcinoma fixture"""
     return {
-        "label_and_type": "ncit:c2926##merger",
         "concept_id": "ncit:C2926",
         "xrefs": ["mondo:0005233", "oncotree:NSCLC", "DOID:3908"],
         "label": "Lung Non-Small Cell Carcinoma",
@@ -130,7 +117,6 @@ def lnscc():
 def richter():
     """Create Richter Syndrome fixture"""
     return {
-        "label_and_type": "ncit:c35424##merger",
         "concept_id": "ncit:C35424",
         "xrefs": ["mondo:0002083", "DOID:1703"],
         "label": "Richter Syndrome",
@@ -156,7 +142,6 @@ def richter():
 def ped_liposarcoma():
     """Create pediatric liposarcoma fixture."""
     return {
-        "label_and_type": "ncit:c8091##merger",
         "concept_id": "ncit:C8091",
         "xrefs": ["mondo:0003587", "DOID:5695"],
         "label": "Childhood Liposarcoma",
@@ -176,7 +161,6 @@ def ped_liposarcoma():
 def teratoma():
     """Create fixture for adult cystic teratoma."""
     return {
-        "label_and_type": "ncit:c9012##merger",
         "concept_id": "ncit:C9012",
         "xrefs": ["mondo:0004099", "DOID:7079"],
         "label": "Adult Cystic Teratoma",
@@ -192,7 +176,6 @@ def mafd2():
     deprecated DO reference is filtered out.
     """
     return {
-        "label_and_type": "mondo:0010648##merger",
         "item_type": "merger",
         "concept_id": "mondo:0010648",
         "label": "major affective disorder 2",
@@ -232,8 +215,6 @@ def compare_merged_records(actual, fixture):
     assert ("xrefs" in actual) == ("xrefs" in fixture)
     if "xrefs" in actual:
         assert set(actual["xrefs"]) == set(fixture["xrefs"])
-
-    assert actual["label_and_type"] == fixture["label_and_type"]
 
     assert ("label" in actual) == ("label" in fixture)
     if "label" in actual or "label" in fixture:
@@ -292,48 +273,3 @@ def test_generate_merged_record(
     response, r_ids = merge_instance._generate_merged_record(mafd2_ids)
     assert set(r_ids) == {"mondo:0010648", "omim:309200"}
     compare_merged_records(response, mafd2)
-
-
-def test_create_merged_concepts(
-    merge_instance, neuroblastoma, lnscc, richter, ped_liposarcoma, teratoma, mafd2
-):
-    """Test end-to-end creation and upload of merged concepts."""
-    mondo_ids = [
-        "mondo:0005072",
-        "mondo:0005233",
-        "mondo:0002083",
-        "mondo:0004099",
-        "mondo:0003587",
-        "mondo:0010648",
-    ]
-    merge_instance.create_merged_concepts(mondo_ids)
-    merge_instance._database.flush_batch()
-
-    # check merged record generation and storage
-    added_records = merge_instance._database.additions
-
-    assert len(added_records) == 6
-
-    neuroblastoma_id = neuroblastoma["concept_id"]
-    assert neuroblastoma_id in added_records
-    compare_merged_records(added_records[neuroblastoma_id], neuroblastoma)
-
-    lnscc_id = lnscc["concept_id"]
-    assert lnscc_id in added_records
-    compare_merged_records(added_records[lnscc_id], lnscc)
-
-    richter_id = richter["concept_id"]
-    assert richter_id in added_records
-    compare_merged_records(added_records[richter_id], richter)
-
-    ped_liposarcoma_id = ped_liposarcoma["concept_id"]
-    assert ped_liposarcoma_id in added_records
-    compare_merged_records(added_records[ped_liposarcoma_id], ped_liposarcoma)
-
-    teratoma_id = teratoma["concept_id"]
-    assert teratoma_id in added_records
-    compare_merged_records(added_records[teratoma_id], teratoma)
-
-    mafd2_id = mafd2["concept_id"]
-    assert mafd2_id in added_records
-    compare_merged_records(added_records[mafd2_id], mafd2)

@@ -13,10 +13,10 @@ from pathlib import Path
 
 import requests
 
-from disease.database import Database
+from disease.database import create_db
 from disease.etl import Mondo
 
-mondo = Mondo(Database())
+mondo = Mondo(create_db())
 mondo._extract_data()
 
 infile = mondo._data_file.absolute()

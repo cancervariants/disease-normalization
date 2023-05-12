@@ -16,14 +16,14 @@ logger.setLevel(logging.DEBUG)
 logger.handlers = []
 
 
-from disease.schemas import (  # noqa: E402
-    ItemTypes,
+from disease.schemas import (  # noqa: E402 E501
     NamespacePrefix,
+    RefType,
     SourceIDAfterNamespace,
     SourceName,
 )
 
-ITEM_TYPES = {k.lower(): v.value for k, v in ItemTypes.__members__.items()}
+ITEM_TYPES = {k.lower(): v.value for k, v in RefType.__members__.items()}
 
 # use to lookup source name from lower-case string
 # technically the same as PREFIX_LOOKUP, but source namespace prefixes
@@ -50,4 +50,4 @@ NAMESPACE_LOOKUP = {
 }
 
 # Use for checking whether to pull IDs for merge group generation
-SOURCES_FOR_MERGE = {SourceName.MONDO.value}
+SOURCES_FOR_MERGE = {SourceName.MONDO}

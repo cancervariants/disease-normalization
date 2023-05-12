@@ -1,35 +1,32 @@
 """Create concept groups and merged records."""
 from timeit import default_timer as timer
-from typing import Dict, List, Set, Tuple
+from typing import Collection, Dict, List, Set, Tuple
 
 from disease import logger
-from disease.database import Database
+from disease.database.database import AbstractDatabase
 from disease.schemas import SourcePriority
 
 
 class Merge:
     """Handles record merging."""
 
-    def __init__(self, database: Database):
+    def __init__(self, database: AbstractDatabase):
         """Initialize Merge instance.
 
-        :param Database database: db instance to use for record retrieval
-            and creation.
+        :param Database database: db instance to use for record retrieval and creation.
         """
         self._database = database
         self._groups = []  # list of tuples: (mondo_concept_id, set_of_ids)
 
-    def create_merged_concepts(self, record_ids: List[str]):
-        """Create concept groups, generate merged concept records, and
-        update database.
+    def create_merged_concepts(self, record_ids: Collection[str]):
+        """Create concept groups, generate merged concept records, and update database.
+        Our normalization protocols only generate record ID sets that include Mondo
+        terms, meaning only Mondo IDs should be submitted to this method.
 
-        :param List[str] record_ids: concept identifiers from which groups
-            should be generated.
+        :param record_ids: concept identifiers from which groups should be generated.
         """
         # build groups
-        logger.info(
-            f"Generating record ID sets from {len(record_ids)} records"
-        )  # noqa E501
+        logger.info(f"Generating record ID sets from {len(record_ids)} records")
         start = timer()
         for concept_id in record_ids:
             try:
@@ -50,6 +47,7 @@ class Merge:
                 group = {concept_id}
             self._groups.append((concept_id, group))
         end = timer()
+        self._database.complete_write_transaction()
         logger.debug(f"Built record ID sets in {end - start} seconds")
 
         # build merged concepts
@@ -64,11 +62,12 @@ class Merge:
                     f"{group} for concept {record_id}"
                 )
                 continue
-            self._database.add_record(merged_record, "merger")
-            merge_ref = merged_record["concept_id"].lower()
+            self._database.add_merged_record(merged_record)
+            merge_ref = merged_record["concept_id"]
 
             for concept_id in merged_ids:
-                self._database.update_record(concept_id, "merge_ref", merge_ref)
+                self._database.update_merge_ref(concept_id, merge_ref)
+        self._database.complete_write_transaction()
         end = timer()
         logger.info("merged concept generation successful.")
         logger.debug(f"Generated and added concepts in {end - start} seconds)")
@@ -112,7 +111,7 @@ class Merge:
             "associated_with": set(),
         }
         if len(records) > 1:
-            merged_properties["xrefs"] = [r["concept_id"] for r in records[1:]]
+            merged_properties["xrefs"] = list({r["concept_id"] for r in records[1:]})
 
         set_fields = ["aliases", "associated_with"]
         scalar_fields = ["label", "pediatric_disease"]
@@ -131,7 +130,4 @@ class Merge:
             else:
                 del merged_properties[field]
 
-        merged_properties[
-            "label_and_type"
-        ] = f'{merged_properties["concept_id"].lower()}##merger'
         return merged_properties, final_ids

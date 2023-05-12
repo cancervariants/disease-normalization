@@ -7,7 +7,7 @@ import requests
 from owlready2.rdflib_store import TripleLiteRDFlibGraph as RDFGraph
 
 from disease import PREFIX_LOOKUP, logger
-from disease.schemas import NamespacePrefix, SourceMeta, SourceName
+from disease.schemas import NamespacePrefix, SourceMeta
 
 from .base import OWLBase
 
@@ -84,9 +84,9 @@ class Mondo(OWLBase):
         """Load metadata"""
         metadata = SourceMeta(
             data_license="CC BY 4.0",
-            data_license_url="https://creativecommons.org/licenses/by/4.0/legalcode",
+            data_license_url="https://creativecommons.org/licenses/by/4.0/legalcode",  # noqa: E501
             version=self._version,
-            data_url="https://mondo.monarchinitiative.org/pages/download/",
+            data_url="https://mondo.monarchinitiative.org/pages/download/",  # noqa: E501
             rdp_url="http://reusabledata.org/monarch.html",
             data_license_attributes={
                 "non_commercial": False,
@@ -94,9 +94,7 @@ class Mondo(OWLBase):
                 "attribution": True,
             },
         )
-        params = dict(metadata)
-        params["src_name"] = SourceName.MONDO.value
-        self.database.metadata.put_item(Item=params)
+        self._database.add_source_metadata(self._src_name, metadata)
 
     def _get_concept_id(self, ref: str) -> Optional[str]:
         """Format concept ID for given reference.
