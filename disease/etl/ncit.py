@@ -68,9 +68,7 @@ class NCIt(OWLBase):
                 "attribution": True,
             },
         )
-        params = dict(metadata)
-        params["src_name"] = SourceName.NCIT.value
-        self.database.metadata.put_item(Item=params)
+        self._database.add_source_metadata(self._src_name, metadata)
 
     def _get_disease_classes(self) -> Set[str]:
         """Get all nodes with semantic_type 'Neoplastic Process' or 'Disease

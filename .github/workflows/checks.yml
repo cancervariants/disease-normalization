@@ -8,32 +8,51 @@ jobs:
       AWS_SECRET_ACCESS_KEY: ${{ secrets.DUMMY_AWS_SECRET_ACCESS_KEY }}
       AWS_DEFAULT_REGION: us-east-2
       AWS_DEFAULT_OUTPUT: text
-      DISEASE_NORM_DB_URL: http://localhost:8002
+      DISEASE_NORM_DB_URL: ${{ matrix.db_url }}
       DISEASE_TEST: true
     strategy:
       matrix:
+        db_url: ["http://localhost:8002", "postgres://postgres:postgres@localhost:5432/disease_normalizer_test"]
         python-version: ['3.8', '3.9', '3.10', '3.11']
+    services:
+      postgres:
+        image: postgres:14
+        env:
+          POSTGRES_USER: 'postgres'
+          POSTGRES_DB: 'disease_normalizer_test'
+          POSTGRES_PASSWORD: 'postgres'
+        ports:
+          - 5432:5432
     steps:
     - uses: actions/checkout@v3
 
-    - name: Setup Python
+    - name: Set up Python
       uses: actions/setup-python@v4
       with:
-          python-version: ${{ matrix.python-version }}
+        python-version: ${{ matrix.python-version }}
 
-    - name: Install dependencies
-      run: python3 -m pip install ".[dev,test]"
-
-    - name: Build local DynamoDB server
+    - name: Build local DynamoDB
+      if: ${{ env.DISEASE_NORM_DB_URL == 'http://localhost:8002' }}
       run: |
-          chmod +x ./tests/scripts/dynamodb_run.sh
-          ./tests/scripts/dynamodb_run.sh
+        chmod +x ./tests/scripts/dynamodb_run.sh
+        ./tests/scripts/dynamodb_run.sh
+
+    - name: Install DynamoDB dependencies
+      if: ${{ env.DISEASE_NORM_DB_URL == 'http://localhost:8002' }}
+      run: python3 -m pip install ".[etl,test]"
+
+    - name: Install PG dependencies
+      if: ${{ env.DISEASE_NORM_DB_URL != 'http://localhost:8002' }}
+      run: python3 -m pip install ".[pg,etl,test]"
 
     - name: Run tests
-      run: python3 -m pytest
+      run: python3 -m pytest tests/
 
   lint:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.8', '3.9', '3.10', '3.11']
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.DUMMY_AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.DUMMY_AWS_SECRET_ACCESS_KEY }}
@@ -45,7 +64,7 @@ jobs:
     - name: Setup Python
       uses: actions/setup-python@v4
       with:
-        python-version: '3.10'
+        python-version: ${{ matrix.python-version }}
 
     - name: Install dependencies
       run: python3 -m pip install ".[dev]"

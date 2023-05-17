@@ -6,10 +6,10 @@ from pathlib import Path
 
 import requests
 
-from disease.database import Database
+from disease.database import create_db
 from disease.etl import DO
 
-do = DO(Database())
+do = DO(create_db())
 do._extract_data()
 
 infile = do._data_file.absolute()

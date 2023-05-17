@@ -6,21 +6,15 @@ from urllib.parse import quote
 
 from botocore.exceptions import ClientError
 
-from disease import (
-    ITEM_TYPES,
-    NAMESPACE_LOOKUP,
-    PREFIX_LOOKUP,
-    SOURCES_LOWER_LOOKUP,
-    logger,
-)
-from disease.database import Database
+from disease import NAMESPACE_LOOKUP, PREFIX_LOOKUP, SOURCES_LOWER_LOOKUP, logger
+from disease.database.database import AbstractDatabase
 from disease.schemas import (
     Disease,
     MatchType,
     NormalizationService,
+    RefType,
     SearchService,
     ServiceMeta,
-    SourceMeta,
     SourceName,
 )
 
@@ -42,12 +36,12 @@ class QueryHandler:
     and normalizes query input.
     """
 
-    def __init__(self, db_url: str = "", db_region: str = "us-east-2"):
+    def __init__(self, database: AbstractDatabase):
         """Initialize Normalizer instance.
-        :param str db_url: URL to database source.
-        :param str db_region: AWS default region.
+
+        :param database: storage backend to query against
         """
-        self.db = Database(db_url=db_url, region_name=db_region)
+        self.db = database
 
     def _emit_warnings(self, query_str) -> Optional[Dict]:
         """Emit warnings if query contains non breaking space characters.
@@ -63,26 +57,11 @@ class QueryHandler:
             )
         return warnings
 
-    def _fetch_meta(self, src_name: str) -> SourceMeta:
-        """Fetch metadata for src_name.
-        :param str src_name: name of source to get metadata for
-        :return: Meta object containing source metadata
-        """
-        if src_name in self.db.cached_sources.keys():
-            return self.db.cached_sources[src_name]
-        else:
-            try:
-                db_response = self.db.metadata.get_item(Key={"src_name": src_name})
-                response = SourceMeta(**db_response["Item"])
-                self.db.cached_sources[src_name] = response
-                return response
-            except ClientError as e:
-                logger.error(e.response["Error"]["Message"])
-
     def _add_record(
         self, response: Dict[str, Dict], item: Dict, match_type: str
     ) -> Tuple[Dict, str]:
         """Add individual record to response object
+
         :param Dict[str, Dict] response: in-progress response object to return
             to client
         :param Dict item: Item retrieved from DynamoDB
@@ -90,7 +69,6 @@ class QueryHandler:
         :return: Tuple containing updated response object, and string
             containing name of the source of the match
         """
-        del item["label_and_type"]
         disease = Disease(**item)
         src_name = item["src_name"]
 
@@ -101,7 +79,7 @@ class QueryHandler:
             matches[src_name] = {
                 "match_type": MatchType[match_type.upper()],
                 "records": [disease],
-                "source_meta_": self._fetch_meta(src_name),
+                "source_meta_": self.db.get_source_metadata(src_name),
             }
         elif matches[src_name]["match_type"] == MatchType[match_type.upper()]:
             matches[src_name]["records"].append(disease)
@@ -113,12 +91,12 @@ class QueryHandler:
     ) -> Tuple[Dict, Set]:
         """Return matched Disease records as a structured response for a given
         collection of concept IDs.
+
         :param Dict[str, Dict] response: in-progress response object to return
             to client.
         :param List[str] concept_ids: List of concept IDs to build from.
             Should be all lower-case.
-        :param str match_type: record should be assigned this type of
-            match.
+        :param str match_type: record should be assigned this type of match.
         :return: response Dict with records filled in via provided concept
             IDs, and Set of source names of matched records
         """
@@ -139,6 +117,7 @@ class QueryHandler:
 
     def _fill_no_matches(self, resp: Dict[str, Dict]) -> Dict:
         """Fill all empty source_matches slots with NO_MATCH results.
+
         :param Dict[str, Dict] resp: incoming response object
         :return: response object with empty source slots filled with
                 NO_MATCH results and corresponding source metadata
@@ -148,14 +127,15 @@ class QueryHandler:
                 resp["source_matches"][src_name] = {
                     "match_type": MatchType.NO_MATCH,
                     "records": [],
-                    "source_meta_": self._fetch_meta(src_name),
+                    "source_meta_": self.db.get_source_metadata(src_name),
                 }
         return resp
 
     def _check_concept_id(
         self, query: str, resp: Dict, sources: Set[str]
-    ) -> (Dict, Set):
+    ) -> Tuple[Dict, Set]:
         """Check query for concept ID match. Should only find 0 or 1 matches.
+
         :param str query: search string
         :param Dict resp: in-progress response object to return to client
         :param Set[str] sources: remaining unmatched sources
@@ -178,21 +158,23 @@ class QueryHandler:
         return resp, sources
 
     def _check_match_type(
-        self, query: str, resp: Dict, sources: Set[str], match_type: str
+        self, query: str, resp: Dict, sources: Set[str], match_type: RefType
     ) -> Tuple[Dict, Set]:
         """Check query for selected match type.
+
         :param str query: search string
         :param Dict resp: in-progress response object to return to client
         :param Set[str] sources: remaining unmatched sources
-        :param str match_type: Match type to check for. Should be one of
+        :param RefType match_type: Match type to check for. Should be one of
             {'label', 'alias', 'xref', 'associated_with'}
         :return: Tuple with updated resp object and updated set of unmatched
                  sources
         """
-        matches = self.db.get_records_by_type(query, match_type)
-        if matches:
-            concept_ids = {i["concept_id"] for i in matches}
-            (resp, matched_srcs) = self._fetch_records(resp, concept_ids, match_type)
+        matching_ids = self.db.get_refs_by_type(query, match_type)
+        if matching_ids:
+            (resp, matched_srcs) = self._fetch_records(
+                resp, set(matching_ids), match_type
+            )
             sources = sources - matched_srcs
         return resp, sources
 
@@ -218,7 +200,7 @@ class QueryHandler:
         if len(sources) == 0:
             return response
 
-        for match_type in ITEM_TYPES.values():
+        for match_type in RefType:
             (response, sources) = self._check_match_type(
                 query, response, sources, match_type
             )
@@ -265,7 +247,7 @@ class QueryHandler:
         """
         sources = dict()
         for k, v in SOURCES_LOWER_LOOKUP.items():
-            if self.db.metadata.get_item(Key={"src_name": v}).get("Item"):
+            if self.db.get_source_metadata(v):
                 sources[k] = v
         if not incl and not excl:
             query_sources = set(sources.values())
@@ -325,7 +307,7 @@ class QueryHandler:
             prefix = concept_id.split(":")[0]
             src_name = PREFIX_LOOKUP[prefix.lower()]
             if src_name not in sources_meta:
-                sources_meta[src_name] = self._fetch_meta(src_name)
+                sources_meta[src_name] = self.db.get_source_metadata(src_name)
         response["source_meta_"] = sources_meta
         return response
 
@@ -374,7 +356,7 @@ class QueryHandler:
         response = self._add_merged_meta(response)
         return NormalizationService(**response)
 
-    def _record_order(self, record: Dict) -> (int, str):
+    def _record_order(self, record: Dict) -> Tuple[int, str]:
         """Construct priority order for matching. Only called by sort().
 
         :param Dict record: individual record item in iterable to sort
@@ -418,6 +400,7 @@ class QueryHandler:
         """
         # prepare basic response
         response = {
+            "match_type": MatchType.NO_MATCH,
             "query": query,
             "warnings": self._emit_warnings(query),
             "service_meta_": ServiceMeta(
@@ -426,7 +409,6 @@ class QueryHandler:
             ),
         }
         if query == "":
-            response["match_type"] = MatchType.NO_MATCH
             return NormalizationService(**response)
         query_str = query.lower().strip()
 
@@ -452,18 +434,19 @@ class QueryHandler:
                 non_merged_match = (record, "concept_id")
 
         # check other match types
-        for match_type in ["label", "alias", "xref", "associated_with"]:
+        for match_type in RefType:
             # get matches list for match tier
-            query_matches = self.db.get_records_by_type(query_str, match_type)
-            query_matches = [
-                self.db.get_record_by_id(m["concept_id"], case_sensitive=False)
-                for m in query_matches
+            matching_refs = self.db.get_refs_by_type(query_str, match_type)
+            matching_records = [
+                self.db.get_record_by_id(ref, False) for ref in matching_refs
             ]
-            query_matches.sort(key=self._record_order)
+            matching_records.sort(key=self._record_order)  # type: ignore
 
             # attempt merge ref resolution until successful
-            for match in query_matches:
-                record = self.db.get_record_by_id(match["concept_id"], False)
+            for match in matching_records:
+                record = self.db.get_record_by_id(
+                    match["concept_id"], False  # type: ignore
+                )
                 if record:
                     if "merge_ref" in record:
                         merge = self.db.get_record_by_id(
@@ -486,6 +469,4 @@ class QueryHandler:
             match_type = MatchType[non_merged_match[1].upper()]
             return self._add_vod(response, non_merged_match[0], query, match_type)
 
-        if not query_matches:
-            response["match_type"] = MatchType.NO_MATCH
         return NormalizationService(**response)

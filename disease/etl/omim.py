@@ -1,8 +1,7 @@
 """Module to load disease data from OMIM."""
 from disease import logger
-from disease.schemas import Disease, NamespacePrefix, SourceMeta, SourceName
-
-from .base import Base, DownloadException
+from disease.etl.base import Base, DownloadException
+from disease.schemas import NamespacePrefix, SourceMeta
 
 
 class OMIM(Base):
@@ -47,9 +46,7 @@ class OMIM(Base):
                 "attribution": True,
             },
         )
-        params = dict(metadata)
-        params["src_name"] = SourceName.OMIM.value
-        self.database.metadata.put_item(Item=params)
+        self._database.add_source_metadata(self._src_name, metadata)
 
     def _transform_data(self):
         """Modulate data and prepare for loading."""
@@ -82,5 +79,4 @@ class OMIM(Base):
             }
             disease["aliases"] = [a.lstrip() for a in aliases]
 
-            assert Disease(**disease)
             self._load_disease(disease)

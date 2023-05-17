@@ -4,7 +4,7 @@ import owlready2 as owl
 
 from disease import PREFIX_LOOKUP, logger
 from disease.etl.base import OWLBase
-from disease.schemas import NamespacePrefix, SourceMeta, SourceName
+from disease.schemas import NamespacePrefix, SourceMeta
 
 DO_PREFIX_LOOKUP = {
     "EFO": NamespacePrefix.EFO.value,
@@ -43,21 +43,19 @@ class DO(OWLBase):
 
     def _load_meta(self):
         """Load metadata"""
-        metadata_params = {
-            "data_license": "CC0 1.0",
-            "data_license_url": "https://creativecommons.org/publicdomain/zero/1.0/legalcode",  # noqa: E501
-            "version": self._version,
-            "data_url": "http://www.obofoundry.org/ontology/doid.html",
-            "rdp_url": None,
-            "data_license_attributes": {
+        metadata = SourceMeta(
+            data_license="CC0 1.0",
+            data_license_url="https://creativecommons.org/publicdomain/zero/1.0/legalcode",  # noqa: E501
+            version=self._version,
+            data_url="http://www.obofoundry.org/ontology/doid.html",
+            rdp_url=None,
+            data_license_attributes={
                 "non_commercial": False,
                 "share_alike": False,
                 "attribution": False,
             },
-        }
-        assert SourceMeta(**metadata_params)
-        metadata_params["src_name"] = SourceName.DO.value
-        self.database.metadata.put_item(Item=metadata_params)
+        )
+        self._database.add_source_metadata(self._src_name, metadata)
 
     def _transform_data(self):
         """Transform source data and send to loading method."""

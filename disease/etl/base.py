@@ -13,8 +13,8 @@ import requests
 from owlready2.rdflib_store import TripleLiteRDFlibGraph as RDFGraph
 
 from disease import APP_ROOT, ITEM_TYPES, SOURCES_FOR_MERGE, logger
-from disease.database import Database
-from disease.schemas import Disease
+from disease.database import AbstractDatabase
+from disease.schemas import Disease, SourceName
 
 DEFAULT_DATA_PATH = APP_ROOT / "data"
 
@@ -22,14 +22,14 @@ DEFAULT_DATA_PATH = APP_ROOT / "data"
 class Base(ABC):
     """The ETL base class."""
 
-    def __init__(self, database: Database, data_path: Path = DEFAULT_DATA_PATH):
+    def __init__(self, database: AbstractDatabase, data_path: Path = DEFAULT_DATA_PATH):
         """Extract from sources.
-        :param database: DDB client
+        :param database: database client
         :param data_path: location of data directory
         """
-        self.name = self.__class__.__name__.lower()
-        self.database = database
-        self._src_dir: Path = Path(data_path / self.name)
+        self._src_name = SourceName(self.__class__.__name__)
+        self._database = database
+        self._src_dir: Path = Path(data_path / self._src_name.value.lower())
         self._store_ids = self.__class__.__name__ in SOURCES_FOR_MERGE
         if self._store_ids:
             self._added_ids = []
@@ -43,6 +43,7 @@ class Base(ABC):
         self._extract_data(use_existing)
         self._load_meta()
         self._transform_data()
+        self._database.complete_write_transaction()
         if self._store_ids:
             return self._added_ids
         else:
@@ -53,7 +54,7 @@ class Base(ABC):
         sources not added to Bioversions yet, or other special-case sources.
         :return: most recent version, as a str
         """
-        return bioversions.get_version(self.name)
+        return bioversions.get_version(self._src_name)
 
     @abstractmethod
     def _download_data(self):
@@ -149,7 +150,7 @@ class Base(ABC):
     def _get_latest_data_file(self) -> Path:
         """Acquire most recent source data file."""
         self._version = self.get_latest_version()
-        fglob = f"{self.name}_{self._version}.*"
+        fglob = f"{self._src_name.lower()}_{self._version}.*"
         latest = list(self._src_dir.glob(fglob))
         if not latest:
             self._download_data()
@@ -194,7 +195,7 @@ class Base(ABC):
         assert Disease(**disease)
         concept_id = disease["concept_id"]
 
-        for attr_type, item_type in ITEM_TYPES.items():
+        for attr_type in ITEM_TYPES:
             if attr_type in disease:
                 value = disease[attr_type]
                 if value is not None and value != []:
@@ -209,15 +210,13 @@ class Base(ABC):
                                 del disease[attr_type]
                                 continue
 
-                    for item in items:
-                        self.database.add_ref_record(item, concept_id, item_type)
                 else:
                     del disease[attr_type]
 
         if "pediatric_disease" in disease and disease["pediatric_disease"] is None:
             del disease["pediatric_disease"]
 
-        self.database.add_record(disease)
+        self._database.add_record(disease, self._src_name)
         if self._store_ids:
             self._added_ids.append(concept_id)
 
