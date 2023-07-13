@@ -1,6 +1,6 @@
 # Disease Normalizer
 
-Services and guidelines for normalizing disease terms
+Services and guidelines for normalizing disease terms.
 
 ## Installation
 
