@@ -125,8 +125,7 @@
     <!-- http://purl.obolibrary.org/obo/RO_0001000 -->
 
     <owl:ObjectProperty rdf:about="http://purl.obolibrary.org/obo/RO_0001000">
-        <oboInOwl:id>RO:0001000</oboInOwl:id>
-        <rdfs:label>derives from</rdfs:label>
+        <rdfs:label xml:lang="en">derives from</rdfs:label>
     </owl:ObjectProperty>
     
 
@@ -134,7 +133,6 @@
     <!-- http://purl.obolibrary.org/obo/RO_0004026 -->
 
     <owl:ObjectProperty rdf:about="http://purl.obolibrary.org/obo/RO_0004026">
-        <oboInOwl:id>RO:0004026</oboInOwl:id>
         <rdfs:label>disease has location</rdfs:label>
     </owl:ObjectProperty>
     
@@ -277,7 +275,6 @@
     <!-- http://purl.obolibrary.org/obo/CL_0000988 -->
 
     <owl:Class rdf:about="http://purl.obolibrary.org/obo/CL_0000988">
-        <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/CL_0000548"/>
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/CL_0002371"/>
         <rdfs:label>hematopoietic cell</rdfs:label>
     </owl:Class>
@@ -305,7 +302,7 @@
     <!-- http://purl.obolibrary.org/obo/CL_0002371 -->
 
     <owl:Class rdf:about="http://purl.obolibrary.org/obo/CL_0002371">
-        <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/CL_0000003"/>
+        <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/CL_0000548"/>
         <rdfs:label>somatic cell</rdfs:label>
     </owl:Class>
     
@@ -792,11 +789,11 @@
         <oboInOwl:hasDbXref>NCI:C3377</oboInOwl:hasDbXref>
         <oboInOwl:hasDbXref>SNOMEDCT_US_2022_09_01:126600002</oboInOwl:hasDbXref>
         <oboInOwl:hasDbXref>UMLS_CUI:C0037579</oboInOwl:hasDbXref>
+        <oboInOwl:hasExactSynonym>mesenchymal tissue neoplasm</oboInOwl:hasExactSynonym>
         <oboInOwl:hasExactSynonym xml:lang="en">neoplasm of soft tissue</oboInOwl:hasExactSynonym>
         <oboInOwl:hasExactSynonym xml:lang="en">neoplasm of soft tissues</oboInOwl:hasExactSynonym>
         <oboInOwl:hasExactSynonym xml:lang="en">soft tissue benign neoplasm</oboInOwl:hasExactSynonym>
         <oboInOwl:hasExactSynonym xml:lang="en">tumor of the soft tissue</oboInOwl:hasExactSynonym>
-        <oboInOwl:hasExactSynonym>mesenchymal tissue neoplasm</oboInOwl:hasExactSynonym>
         <oboInOwl:hasOBONamespace>disease_ontology</oboInOwl:hasOBONamespace>
         <oboInOwl:id>DOID:0060123</oboInOwl:id>
         <oboInOwl:inSubset rdf:resource="http://purl.obolibrary.org/obo/doid#NCIthesaurus"/>
@@ -1332,8 +1329,8 @@
         <oboInOwl:hasDbXref>UMLS_CUI:C0027656</oboInOwl:hasDbXref>
         <oboInOwl:hasExactSynonym xml:lang="en">Tumour of connective tissue</oboInOwl:hasExactSynonym>
         <oboInOwl:hasExactSynonym xml:lang="en">connective tissue neoplasm</oboInOwl:hasExactSynonym>
-        <oboInOwl:hasExactSynonym xml:lang="en">neoplasm of connective tissues</oboInOwl:hasExactSynonym>
         <oboInOwl:hasExactSynonym>mesenchymal tissue malignant neoplasm</oboInOwl:hasExactSynonym>
+        <oboInOwl:hasExactSynonym xml:lang="en">neoplasm of connective tissues</oboInOwl:hasExactSynonym>
         <oboInOwl:hasOBONamespace>disease_ontology</oboInOwl:hasOBONamespace>
         <oboInOwl:id>DOID:201</oboInOwl:id>
         <oboInOwl:inSubset rdf:resource="http://purl.obolibrary.org/obo/doid#TopNodes_DOcancerslim"/>
