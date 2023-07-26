@@ -116,7 +116,6 @@ def nsclc():
             "mesh:D002289",
             "umls:C0007131",
             "efo:0003060",
-            "orphanet:488201"
         ]
     })
 
