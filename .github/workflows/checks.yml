@@ -12,8 +12,7 @@ jobs:
       DISEASE_TEST: true
     strategy:
       matrix:
-        # db_url: ["http://localhost:8002", "postgres://postgres:postgres@localhost:5432/disease_normalizer_test"]
-        db_url: ["postgres://postgres:postgres@localhost:5432/disease_normalizer_test"]
+        db_url: ["http://localhost:8002", "postgres://postgres:postgres@localhost:5432/disease_normalizer_test"]
         python-version: ['3.8', '3.9', '3.10', '3.11']
     services:
       postgres:
