@@ -1,4 +1,4 @@
-"""Test the therapy querying method."""
+"""Test the disease querying method."""
 from ga4gh.vrsatile.pydantic.vrsatile_models import ValueObjectDescriptor
 from disease.query import QueryHandler, InvalidParameterException
 from disease.schemas import MatchType, SourceName
