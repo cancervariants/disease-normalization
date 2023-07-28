@@ -114,7 +114,7 @@ merged_q_descr = "Disease to normalize."
 def normalize(q: str = Query(..., description=merged_q_descr)):
     """Return strongest-match normalized concept for query string provided by
     user.
-    :param q: therapy search term
+    :param q: disease search term
     """
     try:
         response = query_handler.normalize(q)

@@ -95,7 +95,7 @@ class Base(ABC):
             file requires additional action, e.g. it's a zip file.
         """
         if handler:
-            dl_path = Path(tempfile.gettempdir()) / "therapy_dl_tmp"
+            dl_path = Path(tempfile.gettempdir()) / "disease_dl_tmp"
         else:
             dl_path = outfile_path
         # use stream to avoid saving download completely to memory
@@ -177,7 +177,7 @@ class Base(ABC):
                     f"Unable to parse version value from {src_name} source data file "
                     f"located at {self._data_file.absolute().as_uri()} -- "
                     "check filename against schema defined in README: "
-                    "https://github.com/cancervariants/therapy-normalization#update-sources"  # noqa: E501
+                    "https://github.com/cancervariants/disease-normalization#adding-and-refreshing-data"  # noqa: E501
                 )
         else:
             self._data_file = self._get_latest_data_file()

@@ -1,4 +1,4 @@
-"""Test the therapy querying method."""
+"""Test the disease querying method."""
 from datetime import datetime
 
 import pytest
