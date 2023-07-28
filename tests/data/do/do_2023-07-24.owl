@@ -10,10 +10,10 @@
      xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
      xmlns:oboInOwl="http://www.geneontology.org/formats/oboInOwl#">
     <owl:Ontology rdf:about="http://purl.obolibrary.org/obo/doid/doid-merged.owl"/>
-    
 
 
-    <!-- 
+
+    <!--
     ///////////////////////////////////////////////////////////////////////////////////////
     //
     // Annotation properties
@@ -21,82 +21,82 @@
     ///////////////////////////////////////////////////////////////////////////////////////
      -->
 
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/IAO_0000115 -->
 
     <owl:AnnotationProperty rdf:about="http://purl.obolibrary.org/obo/IAO_0000115"/>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/OBI_9991118 -->
 
     <owl:AnnotationProperty rdf:about="http://purl.obolibrary.org/obo/OBI_9991118"/>
-    
+
 
 
     <!-- http://purl.org/dc/elements/1.1/type -->
 
     <owl:AnnotationProperty rdf:about="http://purl.org/dc/elements/1.1/type"/>
-    
+
 
 
     <!-- http://www.geneontology.org/formats/oboInOwl#created_by -->
 
     <owl:AnnotationProperty rdf:about="http://www.geneontology.org/formats/oboInOwl#created_by"/>
-    
+
 
 
     <!-- http://www.geneontology.org/formats/oboInOwl#creation_date -->
 
     <owl:AnnotationProperty rdf:about="http://www.geneontology.org/formats/oboInOwl#creation_date"/>
-    
+
 
 
     <!-- http://www.geneontology.org/formats/oboInOwl#hasAlternativeId -->
 
     <owl:AnnotationProperty rdf:about="http://www.geneontology.org/formats/oboInOwl#hasAlternativeId"/>
-    
+
 
 
     <!-- http://www.geneontology.org/formats/oboInOwl#hasDbXref -->
 
     <owl:AnnotationProperty rdf:about="http://www.geneontology.org/formats/oboInOwl#hasDbXref"/>
-    
+
 
 
     <!-- http://www.geneontology.org/formats/oboInOwl#hasExactSynonym -->
 
     <owl:AnnotationProperty rdf:about="http://www.geneontology.org/formats/oboInOwl#hasExactSynonym"/>
-    
+
 
 
     <!-- http://www.geneontology.org/formats/oboInOwl#hasOBONamespace -->
 
     <owl:AnnotationProperty rdf:about="http://www.geneontology.org/formats/oboInOwl#hasOBONamespace"/>
-    
+
 
 
     <!-- http://www.geneontology.org/formats/oboInOwl#hasRelatedSynonym -->
 
     <owl:AnnotationProperty rdf:about="http://www.geneontology.org/formats/oboInOwl#hasRelatedSynonym"/>
-    
+
 
 
     <!-- http://www.geneontology.org/formats/oboInOwl#id -->
 
     <owl:AnnotationProperty rdf:about="http://www.geneontology.org/formats/oboInOwl#id"/>
-    
+
 
 
     <!-- http://www.geneontology.org/formats/oboInOwl#inSubset -->
 
     <owl:AnnotationProperty rdf:about="http://www.geneontology.org/formats/oboInOwl#inSubset"/>
-    
 
 
-    <!-- 
+
+    <!--
     ///////////////////////////////////////////////////////////////////////////////////////
     //
     // Object Properties
@@ -104,7 +104,7 @@
     ///////////////////////////////////////////////////////////////////////////////////////
      -->
 
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/IDO_0000664 -->
@@ -119,28 +119,26 @@
         <owl:annotatedTarget>Relating the disease to it’s causation (disease and disorder).</owl:annotatedTarget>
         <oboInOwl:hasDbXref>url:http://purl.obolibrary.org/obo/IDO_0000664</oboInOwl:hasDbXref>
     </owl:Axiom>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/RO_0001000 -->
 
     <owl:ObjectProperty rdf:about="http://purl.obolibrary.org/obo/RO_0001000">
-        <oboInOwl:id>RO:0001000</oboInOwl:id>
-        <rdfs:label>derives from</rdfs:label>
+        <rdfs:label xml:lang="en">derives from</rdfs:label>
     </owl:ObjectProperty>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/RO_0004026 -->
 
     <owl:ObjectProperty rdf:about="http://purl.obolibrary.org/obo/RO_0004026">
-        <oboInOwl:id>RO:0004026</oboInOwl:id>
         <rdfs:label>disease has location</rdfs:label>
     </owl:ObjectProperty>
-    
 
 
-    <!-- 
+
+    <!--
     ///////////////////////////////////////////////////////////////////////////////////////
     //
     // Classes
@@ -148,7 +146,7 @@
     ///////////////////////////////////////////////////////////////////////////////////////
      -->
 
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/CL_0000000 -->
@@ -157,7 +155,7 @@
         <oboInOwl:id>CL:0000000</oboInOwl:id>
         <rdfs:label>cell</rdfs:label>
     </owl:Class>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/CL_0000003 -->
@@ -166,7 +164,7 @@
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/CL_0000000"/>
         <rdfs:label>native cell</rdfs:label>
     </owl:Class>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/CL_0000039 -->
@@ -175,7 +173,7 @@
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/CL_0000003"/>
         <rdfs:label>germ line cell</rdfs:label>
     </owl:Class>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/CL_0000066 -->
@@ -184,7 +182,7 @@
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/CL_0000548"/>
         <rdfs:label>epithelial cell</rdfs:label>
     </owl:Class>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/CL_0000219 -->
@@ -193,7 +191,7 @@
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/CL_0000003"/>
         <rdfs:label>motile cell</rdfs:label>
     </owl:Class>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/CL_0000226 -->
@@ -203,7 +201,7 @@
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/CL_0002242"/>
         <rdfs:label>single nucleate cell</rdfs:label>
     </owl:Class>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/CL_0000255 -->
@@ -212,7 +210,7 @@
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/CL_0000003"/>
         <rdfs:label>eukaryotic cell</rdfs:label>
     </owl:Class>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/CL_0000542 -->
@@ -222,7 +220,7 @@
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/CL_0000842"/>
         <rdfs:label>lymphocyte</rdfs:label>
     </owl:Class>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/CL_0000548 -->
@@ -232,7 +230,7 @@
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/CL_0000255"/>
         <rdfs:label>animal cell</rdfs:label>
     </owl:Class>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/CL_0000586 -->
@@ -241,7 +239,7 @@
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/CL_0000039"/>
         <rdfs:label>germ cell</rdfs:label>
     </owl:Class>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/CL_0000738 -->
@@ -252,7 +250,7 @@
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/CL_0002242"/>
         <rdfs:label>leukocyte</rdfs:label>
     </owl:Class>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/CL_0000842 -->
@@ -262,7 +260,7 @@
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/CL_0000738"/>
         <rdfs:label>mononuclear cell</rdfs:label>
     </owl:Class>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/CL_0000945 -->
@@ -271,17 +269,16 @@
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/CL_0000542"/>
         <rdfs:label>lymphocyte of B lineage</rdfs:label>
     </owl:Class>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/CL_0000988 -->
 
     <owl:Class rdf:about="http://purl.obolibrary.org/obo/CL_0000988">
-        <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/CL_0000548"/>
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/CL_0002371"/>
         <rdfs:label>hematopoietic cell</rdfs:label>
     </owl:Class>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/CL_0002242 -->
@@ -290,7 +287,7 @@
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/CL_0000003"/>
         <rdfs:label>nucleate cell</rdfs:label>
     </owl:Class>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/CL_0002321 -->
@@ -299,16 +296,16 @@
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/CL_0000548"/>
         <rdfs:label>embryonic cell (metazoa)</rdfs:label>
     </owl:Class>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/CL_0002371 -->
 
     <owl:Class rdf:about="http://purl.obolibrary.org/obo/CL_0002371">
-        <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/CL_0000003"/>
+        <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/CL_0000548"/>
         <rdfs:label>somatic cell</rdfs:label>
     </owl:Class>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/DOID_0050161 -->
@@ -342,7 +339,7 @@
         <dc:type rdf:resource="http://purl.obolibrary.org/obo/ECO_0007638"/>
         <oboInOwl:hasDbXref>url:http://en.wikipedia.org/wiki/lower_respiratory_tract</oboInOwl:hasDbXref>
     </owl:Axiom>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/DOID_0050615 -->
@@ -373,7 +370,7 @@
         <dc:type rdf:resource="http://purl.obolibrary.org/obo/ECO_0007638"/>
         <oboInOwl:hasDbXref>url:http://en.wikipedia.org/wiki/Respiratory_tract_neoplasm</oboInOwl:hasDbXref>
     </owl:Axiom>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/DOID_0050621 -->
@@ -404,7 +401,7 @@
         <dc:type rdf:resource="http://purl.obolibrary.org/obo/ECO_0007638"/>
         <oboInOwl:hasDbXref>url:http://en.wikipedia.org/wiki/Respiratory_system</oboInOwl:hasDbXref>
     </owl:Axiom>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/DOID_0050686 -->
@@ -425,7 +422,7 @@
         <owl:annotatedTarget>A cancer that is classified based on the organ it starts in.</owl:annotatedTarget>
         <oboInOwl:hasDbXref>url:https://www.cancer.gov/types/by-body-location</oboInOwl:hasDbXref>
     </owl:Axiom>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/DOID_0050687 -->
@@ -458,7 +455,7 @@
         <dc:type rdf:resource="http://purl.obolibrary.org/obo/ECO_0007638"/>
         <oboInOwl:hasDbXref>url:http://en.wikipedia.org/wiki/Cancer</oboInOwl:hasDbXref>
     </owl:Axiom>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/DOID_0060058 -->
@@ -513,7 +510,7 @@
         <oboInOwl:hasDbXref>url:http://www.lymphoma.org/site/pp.asp?c=bkLTKaOQLmK8E&amp;b=6300161</oboInOwl:hasDbXref>
         <oboInOwl:hasDbXref>url:http://www.nlm.nih.gov/medlineplus/lymphoma.html</oboInOwl:hasDbXref>
     </owl:Axiom>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/DOID_0060072 -->
@@ -542,7 +539,7 @@
         <oboInOwl:hasDbXref>url:http://en.wikipedia.org/wiki/Benign_neoplasm</oboInOwl:hasDbXref>
         <oboInOwl:hasDbXref>url:http://www.nlm.nih.gov/medlineplus/benigntumors.html</oboInOwl:hasDbXref>
     </owl:Axiom>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/DOID_0060073 -->
@@ -575,7 +572,7 @@
         <dc:type rdf:resource="http://purl.obolibrary.org/obo/ECO_0007638"/>
         <oboInOwl:hasDbXref>url:http://en.wikipedia.org/wiki/Lymphatic_system</oboInOwl:hasDbXref>
     </owl:Axiom>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/DOID_0060083 -->
@@ -610,7 +607,7 @@
         <dc:type rdf:resource="http://purl.obolibrary.org/obo/ECO_0007638"/>
         <oboInOwl:hasDbXref>url:http://en.wikipedia.org/wiki/Immune_system</oboInOwl:hasDbXref>
     </owl:Axiom>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/DOID_0060084 -->
@@ -642,7 +639,7 @@
         <dc:type rdf:resource="http://purl.obolibrary.org/obo/ECO_0007638"/>
         <oboInOwl:hasDbXref>url:http://en.wikipedia.org/wiki/Benign_tumor</oboInOwl:hasDbXref>
     </owl:Axiom>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/DOID_0060085 -->
@@ -664,7 +661,7 @@
         <dc:type rdf:resource="http://purl.obolibrary.org/obo/ECO_0007636"/>
         <oboInOwl:hasDbXref>url:http://ncit.nci.nih.gov/ncitbrowser/ConceptReport.jsp?dictionary=NCI_Thesaurus&amp;version=14.07d&amp;code=C367</oboInOwl:hasDbXref>
     </owl:Axiom>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/DOID_0060099 -->
@@ -697,7 +694,7 @@
         <dc:type rdf:resource="http://purl.obolibrary.org/obo/ECO_0007638"/>
         <oboInOwl:hasDbXref>url:http://en.wikipedia.org/wiki/Musculoskeletal_system</oboInOwl:hasDbXref>
     </owl:Axiom>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/DOID_0060100 -->
@@ -732,7 +729,7 @@
         <dc:type rdf:resource="http://purl.obolibrary.org/obo/ECO_0007638"/>
         <oboInOwl:hasDbXref>url:http://en.wikipedia.org/wiki/Musculoskeletal_system#Diseases_and_disorders</oboInOwl:hasDbXref>
     </owl:Axiom>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/DOID_0060115 -->
@@ -765,7 +762,7 @@
         <dc:type rdf:resource="http://purl.obolibrary.org/obo/ECO_0007638"/>
         <oboInOwl:hasDbXref>url:http://en.wikipedia.org/wiki/Nervous_system</oboInOwl:hasDbXref>
     </owl:Axiom>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/DOID_0060123 -->
@@ -792,11 +789,11 @@
         <oboInOwl:hasDbXref>NCI:C3377</oboInOwl:hasDbXref>
         <oboInOwl:hasDbXref>SNOMEDCT_US_2022_09_01:126600002</oboInOwl:hasDbXref>
         <oboInOwl:hasDbXref>UMLS_CUI:C0037579</oboInOwl:hasDbXref>
+        <oboInOwl:hasExactSynonym>mesenchymal tissue neoplasm</oboInOwl:hasExactSynonym>
         <oboInOwl:hasExactSynonym xml:lang="en">neoplasm of soft tissue</oboInOwl:hasExactSynonym>
         <oboInOwl:hasExactSynonym xml:lang="en">neoplasm of soft tissues</oboInOwl:hasExactSynonym>
         <oboInOwl:hasExactSynonym xml:lang="en">soft tissue benign neoplasm</oboInOwl:hasExactSynonym>
         <oboInOwl:hasExactSynonym xml:lang="en">tumor of the soft tissue</oboInOwl:hasExactSynonym>
-        <oboInOwl:hasExactSynonym>mesenchymal tissue neoplasm</oboInOwl:hasExactSynonym>
         <oboInOwl:hasOBONamespace>disease_ontology</oboInOwl:hasOBONamespace>
         <oboInOwl:id>DOID:0060123</oboInOwl:id>
         <oboInOwl:inSubset rdf:resource="http://purl.obolibrary.org/obo/doid#NCIthesaurus"/>
@@ -809,7 +806,7 @@
         <dc:type rdf:resource="http://purl.obolibrary.org/obo/ECO_0007638"/>
         <oboInOwl:hasDbXref>url:http://en.wikipedia.org/wiki/Connective_tissue_neoplasm</oboInOwl:hasDbXref>
     </owl:Axiom>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/DOID_0080601 -->
@@ -827,7 +824,7 @@
         <owl:annotatedTarget>A benign neoplasm that derives_from germ cells.</owl:annotatedTarget>
         <oboInOwl:hasDbXref>url:https://en.wikipedia.org/wiki/Germ_cell_tumor</oboInOwl:hasDbXref>
     </owl:Axiom>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/DOID_0080602 -->
@@ -871,7 +868,7 @@
         <owl:annotatedTarget>A germ cell benign neoplasm that derives_from mature tissue elements or a limited amount of immature tissue elements.</owl:annotatedTarget>
         <oboInOwl:hasDbXref>url:https://ncit.nci.nih.gov/ncitbrowser/ConceptReport.jsp?dictionary=NCI_Thesaurus&amp;code=C67107&amp;ns=ncit</oboInOwl:hasDbXref>
     </owl:Axiom>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/DOID_1037 -->
@@ -904,7 +901,7 @@
         <dc:type rdf:resource="http://purl.obolibrary.org/obo/ECO_0007641"/>
         <oboInOwl:hasDbXref>url:http://www.cancer.gov/dictionary?CdrID=616067</oboInOwl:hasDbXref>
     </owl:Axiom>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/DOID_1040 -->
@@ -962,7 +959,7 @@
         <oboInOwl:hasDbXref>url:http://en.wikipedia.org/wiki/B-cell_chronic_lymphocytic_leukemia</oboInOwl:hasDbXref>
         <oboInOwl:hasDbXref>url:http://www.cancer.gov/dictionary?cdrid=346545</oboInOwl:hasDbXref>
     </owl:Axiom>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/DOID_1115 -->
@@ -1007,7 +1004,7 @@
         <oboInOwl:hasDbXref>url:http://en.wikipedia.org/wiki/Sarcoma</oboInOwl:hasDbXref>
         <oboInOwl:hasDbXref>url:http://www.cancer.gov/dictionary?CdrID=45562</oboInOwl:hasDbXref>
     </owl:Axiom>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/DOID_1192 -->
@@ -1052,7 +1049,7 @@
         <dc:type rdf:resource="http://purl.obolibrary.org/obo/ECO_0007638"/>
         <oboInOwl:hasDbXref>url:http://en.wikipedia.org/wiki/Peripheral_nervous_system</oboInOwl:hasDbXref>
     </owl:Axiom>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/DOID_1240 -->
@@ -1085,7 +1082,7 @@
         <oboInOwl:hasDbXref>url:http://en.wikipedia.org/wiki/Leukemia</oboInOwl:hasDbXref>
         <oboInOwl:hasDbXref>url:http://www.cancer.gov/dictionary?CdrID=45343</oboInOwl:hasDbXref>
     </owl:Axiom>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/DOID_1324 -->
@@ -1143,7 +1140,7 @@
         <dc:type rdf:resource="http://purl.obolibrary.org/obo/ECO_0007638"/>
         <oboInOwl:hasDbXref>url:http://en.wikipedia.org/wiki/Lung_cancer</oboInOwl:hasDbXref>
     </owl:Axiom>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/DOID_14566 -->
@@ -1168,7 +1165,7 @@
         <dc:type rdf:resource="http://purl.obolibrary.org/obo/ECO_0007638"/>
         <oboInOwl:hasDbXref>url:http://en.wikipedia.org/w/index.php?title=Cell_proliferation</oboInOwl:hasDbXref>
     </owl:Axiom>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/DOID_1579 -->
@@ -1210,7 +1207,7 @@
         <oboInOwl:hasDbXref>url:http://en.wikipedia.org/wiki/File:Respiratory_system_complete_en.svg</oboInOwl:hasDbXref>
         <oboInOwl:hasDbXref>url:http://www2.merriam-webster.com/cgi-bin/mwmednlm?book=Medical&amp;va=respiratory%20system</oboInOwl:hasDbXref>
     </owl:Axiom>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/DOID_162 -->
@@ -1249,7 +1246,7 @@
         <oboInOwl:hasDbXref>url:http://en.wikipedia.org/wiki/cancer</oboInOwl:hasDbXref>
         <oboInOwl:hasDbXref>url:http://www2.merriam-webster.com/cgi-bin/mwmednlm?book=Medical&amp;va=cancer</oboInOwl:hasDbXref>
     </owl:Axiom>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/DOID_17 -->
@@ -1288,7 +1285,7 @@
         <dc:type rdf:resource="http://purl.obolibrary.org/obo/ECO_0007638"/>
         <oboInOwl:hasDbXref>url:http://en.wikipedia.org/wiki/Human_musculoskeletal_system#Diseases_and_disorders</oboInOwl:hasDbXref>
     </owl:Axiom>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/DOID_1703 -->
@@ -1307,7 +1304,7 @@
         <oboInOwl:inSubset rdf:resource="http://purl.obolibrary.org/obo/doid#NCIthesaurus"/>
         <rdfs:label>Richter&apos;s syndrome</rdfs:label>
     </owl:Class>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/DOID_201 -->
@@ -1332,8 +1329,8 @@
         <oboInOwl:hasDbXref>UMLS_CUI:C0027656</oboInOwl:hasDbXref>
         <oboInOwl:hasExactSynonym xml:lang="en">Tumour of connective tissue</oboInOwl:hasExactSynonym>
         <oboInOwl:hasExactSynonym xml:lang="en">connective tissue neoplasm</oboInOwl:hasExactSynonym>
-        <oboInOwl:hasExactSynonym xml:lang="en">neoplasm of connective tissues</oboInOwl:hasExactSynonym>
         <oboInOwl:hasExactSynonym>mesenchymal tissue malignant neoplasm</oboInOwl:hasExactSynonym>
+        <oboInOwl:hasExactSynonym xml:lang="en">neoplasm of connective tissues</oboInOwl:hasExactSynonym>
         <oboInOwl:hasOBONamespace>disease_ontology</oboInOwl:hasOBONamespace>
         <oboInOwl:id>DOID:201</oboInOwl:id>
         <oboInOwl:inSubset rdf:resource="http://purl.obolibrary.org/obo/doid#TopNodes_DOcancerslim"/>
@@ -1346,7 +1343,7 @@
         <dc:type rdf:resource="http://purl.obolibrary.org/obo/ECO_0007638"/>
         <oboInOwl:hasDbXref>url:http://en.wikipedia.org/wiki/Connective_tissue</oboInOwl:hasDbXref>
     </owl:Axiom>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/DOID_2531 -->
@@ -1401,7 +1398,7 @@
         <oboInOwl:hasDbXref>url:http://en.wikipedia.org/wiki/Blood_cancer</oboInOwl:hasDbXref>
         <oboInOwl:hasDbXref>url:http://www.cancer.gov/dictionary/?CdrID=45708</oboInOwl:hasDbXref>
     </owl:Axiom>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/DOID_2621 -->
@@ -1424,7 +1421,7 @@
         <dc:type rdf:resource="http://purl.obolibrary.org/obo/ECO_0007638"/>
         <oboInOwl:hasDbXref>url:http://en.wikipedia.org/wiki/Autonomic_nervous_system</oboInOwl:hasDbXref>
     </owl:Axiom>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/DOID_2660 -->
@@ -1447,7 +1444,7 @@
         <dc:type rdf:resource="http://purl.obolibrary.org/obo/ECO_0007645"/>
         <oboInOwl:hasDbXref>url:https://www.ncbi.nlm.nih.gov/pubmed/23905455</oboInOwl:hasDbXref>
     </owl:Axiom>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/DOID_2914 -->
@@ -1487,7 +1484,7 @@
         <dc:type rdf:resource="http://purl.obolibrary.org/obo/ECO_0007638"/>
         <oboInOwl:hasDbXref>url:http://en.wikipedia.org/wiki/Immune_system</oboInOwl:hasDbXref>
     </owl:Axiom>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/DOID_2994 -->
@@ -1527,7 +1524,7 @@
         <dc:type rdf:resource="http://purl.obolibrary.org/obo/ECO_0007638"/>
         <oboInOwl:hasDbXref>url:http://en.wikipedia.org/wiki/Germ_cell_tumor</oboInOwl:hasDbXref>
     </owl:Axiom>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/DOID_305 -->
@@ -1576,7 +1573,7 @@
         <dc:type rdf:resource="http://purl.obolibrary.org/obo/ECO_0007638"/>
         <oboInOwl:hasDbXref>url:http://en.wikipedia.org/wiki/Carcinoma</oboInOwl:hasDbXref>
     </owl:Axiom>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/DOID_3093 -->
@@ -1624,7 +1621,7 @@
         <dc:type rdf:resource="http://purl.obolibrary.org/obo/ECO_0007638"/>
         <oboInOwl:hasDbXref>url:http://en.wikipedia.org/wiki/Nervous_system_disease</oboInOwl:hasDbXref>
     </owl:Axiom>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/DOID_3095 -->
@@ -1653,7 +1650,7 @@
         <dc:type rdf:resource="http://purl.obolibrary.org/obo/ECO_0007638"/>
         <oboInOwl:hasDbXref>url:http://en.wikipedia.org/wiki/Germ_cell</oboInOwl:hasDbXref>
     </owl:Axiom>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/DOID_3168 -->
@@ -1706,7 +1703,7 @@
         <dc:type rdf:resource="http://purl.obolibrary.org/obo/ECO_0007638"/>
         <oboInOwl:hasDbXref>url:http://en.wikipedia.org/wiki/Squamous-cell_carcinoma</oboInOwl:hasDbXref>
     </owl:Axiom>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/DOID_3301 -->
@@ -1745,7 +1742,7 @@
         <dc:type rdf:resource="http://purl.obolibrary.org/obo/ECO_0007638"/>
         <oboInOwl:hasDbXref>url:http://en.wikipedia.org/wiki/Gonadoblastoma</oboInOwl:hasDbXref>
     </owl:Axiom>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/DOID_3307 -->
@@ -1794,7 +1791,7 @@
         <dc:type rdf:resource="http://purl.obolibrary.org/obo/ECO_0007638"/>
         <oboInOwl:hasDbXref>url:http://en.wikipedia.org/wiki/Teratoma</oboInOwl:hasDbXref>
     </owl:Axiom>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/DOID_3308 -->
@@ -1838,7 +1835,7 @@
         <dc:type rdf:resource="http://purl.obolibrary.org/obo/ECO_0007638"/>
         <oboInOwl:hasDbXref>url:http://en.wikipedia.org/wiki/Embryonal_carcinoma</oboInOwl:hasDbXref>
     </owl:Axiom>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/DOID_3382 -->
@@ -1868,7 +1865,7 @@
         <dc:type rdf:resource="http://purl.obolibrary.org/obo/ECO_0007638"/>
         <oboInOwl:hasDbXref>url:http://en.wikipedia.org/wiki/Liposarcoma</oboInOwl:hasDbXref>
     </owl:Axiom>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/DOID_3683 -->
@@ -1897,7 +1894,7 @@
         <oboInOwl:inSubset rdf:resource="http://purl.obolibrary.org/obo/doid#NCIthesaurus"/>
         <rdfs:label>lung benign neoplasm</rdfs:label>
     </owl:Class>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/DOID_3905 -->
@@ -1932,7 +1929,7 @@
         <dc:type rdf:resource="http://purl.obolibrary.org/obo/ECO_0007637"/>
         <oboInOwl:hasDbXref>url:https://merck.com/mmpe/sec05/ch062/ch062b.html</oboInOwl:hasDbXref>
     </owl:Axiom>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/DOID_3908 -->
@@ -1962,7 +1959,7 @@
         <dc:type rdf:resource="http://purl.obolibrary.org/obo/ECO_0007638"/>
         <oboInOwl:hasDbXref>url:http://en.wikipedia.org/wiki/Non-small-cell_lung_carcinoma</oboInOwl:hasDbXref>
     </owl:Axiom>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/DOID_4 -->
@@ -1986,7 +1983,7 @@
         <dc:type rdf:resource="http://purl.obolibrary.org/obo/ECO_0007645"/>
         <oboInOwl:hasDbXref>url:https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3041577/</oboInOwl:hasDbXref>
     </owl:Axiom>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/DOID_5695 -->
@@ -2002,7 +1999,7 @@
         <oboInOwl:inSubset rdf:resource="http://purl.obolibrary.org/obo/doid#NCIthesaurus"/>
         <rdfs:label>childhood liposarcoma</rdfs:label>
     </owl:Class>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/DOID_574 -->
@@ -2043,7 +2040,7 @@
         <dc:type rdf:resource="http://purl.obolibrary.org/obo/ECO_0007638"/>
         <oboInOwl:hasDbXref>url:http://en.wikipedia.org/w/index.php?title=Peripheral_neuropathy&amp;redirect=no</oboInOwl:hasDbXref>
     </owl:Axiom>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/DOID_65 -->
@@ -2080,7 +2077,7 @@
         <dc:type rdf:resource="http://purl.obolibrary.org/obo/ECO_0007637"/>
         <oboInOwl:hasDbXref>url:http://www.niams.nih.gov/Health_Info/Scleroderma/default.asp</oboInOwl:hasDbXref>
     </owl:Axiom>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/DOID_688 -->
@@ -2106,7 +2103,7 @@
         <dc:type rdf:resource="http://purl.obolibrary.org/obo/ECO_0007641"/>
         <oboInOwl:hasDbXref>url:http://www.cancer.gov/dictionary/?CdrID=44250</oboInOwl:hasDbXref>
     </owl:Axiom>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/DOID_7 -->
@@ -2132,7 +2129,7 @@
         <dc:type rdf:resource="http://purl.obolibrary.org/obo/ECO_0007643"/>
         <oboInOwl:hasDbXref>url:http://www2.merriam-webster.com/cgi-bin/mwmednlm?book=Medical&amp;va=anatomic</oboInOwl:hasDbXref>
     </owl:Axiom>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/DOID_7079 -->
@@ -2155,7 +2152,7 @@
         <dc:type rdf:resource="http://purl.obolibrary.org/obo/ECO_0007645"/>
         <oboInOwl:hasDbXref>url:https://www.ncbi.nlm.nih.gov/pubmed/27038684</oboInOwl:hasDbXref>
     </owl:Axiom>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/DOID_74 -->
@@ -2206,7 +2203,7 @@
         <oboInOwl:hasDbXref>url:http://en.wikipedia.org/wiki/Hematopathology</oboInOwl:hasDbXref>
         <oboInOwl:hasDbXref>url:https://www.ncbi.nlm.nih.gov/books/NBK1741/</oboInOwl:hasDbXref>
     </owl:Axiom>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/DOID_75 -->
@@ -2250,7 +2247,7 @@
         <oboInOwl:hasDbXref>url:http://en.wikipedia.org/wiki/Lymphatic_disease</oboInOwl:hasDbXref>
         <oboInOwl:hasDbXref>url:http://www.nlm.nih.gov/medlineplus/lymphaticdiseases.html</oboInOwl:hasDbXref>
     </owl:Axiom>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/DOID_769 -->
@@ -2282,7 +2279,7 @@ OMIM mapping confirmed by DO. [SN].</rdfs:comment>
         <dc:type rdf:resource="http://purl.obolibrary.org/obo/ECO_0007637"/>
         <oboInOwl:hasDbXref>url:http://www.cancer.gov/cancertopics/types/neuroblastoma</oboInOwl:hasDbXref>
     </owl:Axiom>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/DOID_850 -->
@@ -2326,7 +2323,7 @@ OMIM mapping confirmed by DO. [SN].</rdfs:comment>
         <oboInOwl:hasDbXref>url:http://www.niehs.nih.gov/health/topics/conditions/lung-disease/index.cfm</oboInOwl:hasDbXref>
         <oboInOwl:hasDbXref>url:http://www.nlm.nih.gov/medlineplus/ency/article/000066.htm</oboInOwl:hasDbXref>
     </owl:Axiom>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/DOID_863 -->
@@ -2366,7 +2363,7 @@ OMIM mapping confirmed by DO. [SN].</rdfs:comment>
         <dc:type rdf:resource="http://purl.obolibrary.org/obo/ECO_0007638"/>
         <oboInOwl:hasDbXref>url:http://en.wikipedia.org/wiki/Nervous_system</oboInOwl:hasDbXref>
     </owl:Axiom>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/DOID_9500 -->
@@ -2401,7 +2398,7 @@ OMIM mapping confirmed by DO. [SN].</rdfs:comment>
         <dc:type rdf:resource="http://purl.obolibrary.org/obo/ECO_0007636"/>
         <oboInOwl:hasDbXref>url:https://rarediseases.org/rare-diseases/leukocyte-adhesion-deficiency-syndromes/</oboInOwl:hasDbXref>
     </owl:Axiom>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/UBERON_0000010 -->
@@ -2410,7 +2407,7 @@ OMIM mapping confirmed by DO. [SN].</rdfs:comment>
         <oboInOwl:id>UBERON:0000010</oboInOwl:id>
         <rdfs:label>peripheral nervous system</rdfs:label>
     </owl:Class>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/UBERON_0000924 -->
@@ -2419,7 +2416,7 @@ OMIM mapping confirmed by DO. [SN].</rdfs:comment>
         <oboInOwl:id>UBERON:0000924</oboInOwl:id>
         <rdfs:label>ectoderm</rdfs:label>
     </owl:Class>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/UBERON_0000925 -->
@@ -2428,7 +2425,7 @@ OMIM mapping confirmed by DO. [SN].</rdfs:comment>
         <oboInOwl:id>UBERON:0000925</oboInOwl:id>
         <rdfs:label>endoderm</rdfs:label>
     </owl:Class>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/UBERON_0000926 -->
@@ -2437,7 +2434,7 @@ OMIM mapping confirmed by DO. [SN].</rdfs:comment>
         <oboInOwl:id>UBERON:0000926</oboInOwl:id>
         <rdfs:label>mesoderm</rdfs:label>
     </owl:Class>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/UBERON_0001004 -->
@@ -2446,7 +2443,7 @@ OMIM mapping confirmed by DO. [SN].</rdfs:comment>
         <oboInOwl:id>UBERON:0001004</oboInOwl:id>
         <rdfs:label>respiratory system</rdfs:label>
     </owl:Class>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/UBERON_0001016 -->
@@ -2455,7 +2452,7 @@ OMIM mapping confirmed by DO. [SN].</rdfs:comment>
         <oboInOwl:id>UBERON:0001016</oboInOwl:id>
         <rdfs:label>nervous system</rdfs:label>
     </owl:Class>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/UBERON_0001558 -->
@@ -2464,7 +2461,7 @@ OMIM mapping confirmed by DO. [SN].</rdfs:comment>
         <oboInOwl:id>UBERON:0001558</oboInOwl:id>
         <rdfs:label>lower respiratory tract</rdfs:label>
     </owl:Class>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/UBERON_0001744 -->
@@ -2473,7 +2470,7 @@ OMIM mapping confirmed by DO. [SN].</rdfs:comment>
         <oboInOwl:id>UBERON:0001744</oboInOwl:id>
         <rdfs:label>lymphoid tissue</rdfs:label>
     </owl:Class>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/UBERON_0002048 -->
@@ -2482,7 +2479,7 @@ OMIM mapping confirmed by DO. [SN].</rdfs:comment>
         <oboInOwl:id>UBERON:0002048</oboInOwl:id>
         <rdfs:label>lung</rdfs:label>
     </owl:Class>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/UBERON_0002204 -->
@@ -2491,7 +2488,7 @@ OMIM mapping confirmed by DO. [SN].</rdfs:comment>
         <oboInOwl:id>UBERON:0002204</oboInOwl:id>
         <rdfs:label>musculoskeletal system</rdfs:label>
     </owl:Class>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/UBERON_0002384 -->
@@ -2500,7 +2497,7 @@ OMIM mapping confirmed by DO. [SN].</rdfs:comment>
         <oboInOwl:id>UBERON:0002384</oboInOwl:id>
         <rdfs:label>connective tissue</rdfs:label>
     </owl:Class>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/UBERON_0002390 -->
@@ -2509,7 +2506,7 @@ OMIM mapping confirmed by DO. [SN].</rdfs:comment>
         <oboInOwl:id>UBERON:0002390</oboInOwl:id>
         <rdfs:label>hematopoietic system</rdfs:label>
     </owl:Class>
-    
+
 
 
     <!-- http://purl.obolibrary.org/obo/UBERON_0002405 -->
@@ -2523,4 +2520,3 @@ OMIM mapping confirmed by DO. [SN].</rdfs:comment>
 
 
 <!-- Generated by the OWL API (version 4.5.25) https://github.com/owlcs/owlapi -->
-
