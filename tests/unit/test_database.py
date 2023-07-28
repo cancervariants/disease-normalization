@@ -18,8 +18,8 @@ def test_tables_created(database):
             "disease_sources",
         }
     else:
-        assert "disease_concepts" in existing_tables
-        assert "disease_metadata" in existing_tables
+        assert database.disease_concepts_table in existing_tables
+        assert database.disease_metadata_table in existing_tables
 
 
 IS_DDB = not os.environ.get("DISEASE_NORM_DB_URL", "").lower().startswith("postgres")
