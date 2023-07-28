@@ -59,15 +59,15 @@ The Disease Normalizer currently uses data from the following sources:
 
 As described above, all source data other than OMIM can be acquired automatically.
 
-To update one source, simply set `--normalizer` to the source you wish to update. The normalizer will check to see if local source data is up-to-date, acquire the most recent data if not, and use it to populate the database.
+To update one source, simply set `--sources` to the source you wish to update. The normalizer will check to see if local source data is up-to-date, acquire the most recent data if not, and use it to populate the database.
 
 For example, run the following to acquire the latest NCIt data if necessary, and update the NCIt disease records in the normalizer database:
 
 ```commandline
-disease_norm_update --normalizer="ncit"
+disease_norm_update --sources="ncit"
 ```
 
-To update multiple sources, you can use the `--normalizer` option with the source names separated by spaces.
+To update multiple sources, you can use the `--sources` option with the source names separated by spaces.
 
 #### Update all sources
 
