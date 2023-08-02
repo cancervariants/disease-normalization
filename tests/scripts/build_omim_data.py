@@ -5,7 +5,6 @@ from pathlib import Path
 from disease.database import create_db
 from disease.etl import OMIM
 
-
 TEST_IDS = [
     "309200",
     "613065",

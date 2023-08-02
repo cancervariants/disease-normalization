@@ -1,21 +1,24 @@
 """Provide PostgreSQL client."""
-import tarfile
 import atexit
 import logging
 import os
-from pathlib import Path
-from typing import Any, Dict, List, Optional, Set, Union
+import tarfile
 import tempfile
 from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Set, Union
 
 import psycopg
-from psycopg.errors import DuplicateObject, DuplicateTable, UndefinedTable, \
-    UniqueViolation
 import requests
+from psycopg.errors import (
+    DuplicateObject,
+    DuplicateTable,
+    UndefinedTable,
+    UniqueViolation,
+)
 
 from disease.database import AbstractDatabase, DatabaseException, DatabaseWriteException
 from disease.schemas import RefType, SourceMeta, SourceName
-
 
 logger = logging.getLogger()
 
@@ -279,7 +282,7 @@ class PostgresDatabase(AbstractDatabase):
                     "non_commercial": metadata_result[6],
                     "attribution": metadata_result[7],
                     "share_alike": metadata_result[8],
-                }
+                },
             }
             self._cached_sources[src_name] = metadata
             return metadata
@@ -346,8 +349,9 @@ class PostgresDatabase(AbstractDatabase):
         }
         return {k: v for k, v in merged_record.items() if v}
 
-    def get_record_by_id(self, concept_id: str, case_sensitive: bool = True,
-                         merge: bool = False) -> Optional[Dict]:
+    def get_record_by_id(
+        self, concept_id: str, case_sensitive: bool = True, merge: bool = False
+    ) -> Optional[Dict]:
         """Fetch record corresponding to provided concept ID
         :param str concept_id: concept ID for disease record
         :param bool case_sensitive: not used by this implementation -- lookups use
@@ -365,7 +369,7 @@ class PostgresDatabase(AbstractDatabase):
         RefType.LABEL: b"SELECT concept_id FROM disease_labels WHERE lower(label) = %s;",  # noqa: E501
         RefType.ALIASES: b"SELECT concept_id FROM disease_aliases WHERE lower(alias) = %s;",  # noqa: E501
         RefType.XREFS: "SELECT concept_id FROM disease_xrefs WHERE lower(xref) = %s;",
-        RefType.ASSOCIATED_WITH: "SELECT concept_id FROM disease_associations WHERE lower(associated_with) = %s;"  # noqa: E501
+        RefType.ASSOCIATED_WITH: "SELECT concept_id FROM disease_associations WHERE lower(associated_with) = %s;",  # noqa: E501
     }
 
     def get_refs_by_type(self, search_term: str, ref_type: RefType) -> List[str]:
@@ -381,7 +385,7 @@ class PostgresDatabase(AbstractDatabase):
             raise ValueError("invalid reference type")
 
         with self.conn.cursor() as cur:
-            cur.execute(query, (search_term.lower(), ))
+            cur.execute(query, (search_term.lower(),))
             concept_ids = cur.fetchall()
         if concept_ids:
             return [i[0] for i in concept_ids]
@@ -409,7 +413,7 @@ class PostgresDatabase(AbstractDatabase):
             if source is None:
                 cur.execute(ids_query)
             else:
-                cur.execute(ids_query, (source, ))
+                cur.execute(ids_query, (source,))
             ids_tuple = cur.fetchall()
         return {i[0] for i in ids_tuple}
 
@@ -433,12 +437,15 @@ class PostgresDatabase(AbstractDatabase):
                 self._add_source_metadata_query,
                 [
                     src_name.value,
-                    meta.data_license, meta.data_license_url, meta.version,
-                    meta.data_url, meta.rdp_url,
+                    meta.data_license,
+                    meta.data_license_url,
+                    meta.version,
+                    meta.data_url,
+                    meta.rdp_url,
                     meta.data_license_attributes["non_commercial"],
                     meta.data_license_attributes["attribution"],
                     meta.data_license_attributes["share_alike"],
-                ]
+                ],
             )
         self.conn.commit()
 
@@ -446,8 +453,12 @@ class PostgresDatabase(AbstractDatabase):
         INSERT INTO disease_concepts (concept_id, source, pediatric_disease)
         VALUES (%s, %s, %s);
     """
-    _insert_label_query = b"INSERT INTO disease_labels (label, concept_id) VALUES (%s, %s)"  # noqa: E501
-    _insert_alias_query = b"INSERT INTO disease_aliases (alias, concept_id) VALUES (%s, %s)"  # noqa: E501
+    _insert_label_query = (
+        b"INSERT INTO disease_labels (label, concept_id) VALUES (%s, %s)"  # noqa: E501
+    )
+    _insert_alias_query = (
+        b"INSERT INTO disease_aliases (alias, concept_id) VALUES (%s, %s)"  # noqa: E501
+    )
     _insert_xref_query = b"INSERT INTO disease_xrefs (xref, concept_id) VALUES (%s, %s)"
     _insert_assoc_query = b"INSERT INTO disease_associations (associated_with, concept_id) VALUES (%s, %s)"  # noqa: E501
 
@@ -460,11 +471,10 @@ class PostgresDatabase(AbstractDatabase):
         concept_id = record["concept_id"]
         with self.conn.cursor() as cur:
             try:
-                cur.execute(self._add_record_query, [
-                    concept_id,
-                    src_name.value,
-                    record.get("pediatric_disease")
-                ])
+                cur.execute(
+                    self._add_record_query,
+                    [concept_id, src_name.value, record.get("pediatric_disease")],
+                )
                 cur.execute(self._insert_label_query, [record["label"], concept_id])
                 for a in record.get("aliases", []):
                     cur.execute(self._insert_alias_query, [a, concept_id])
@@ -490,14 +500,17 @@ class PostgresDatabase(AbstractDatabase):
         :param record: merged record to add
         """
         with self.conn.cursor() as cur:
-            cur.execute(self._add_merged_record_query, [
-                record["concept_id"],
-                record["label"],
-                record.get("aliases"),
-                record.get("associated_with"),
-                record.get("xrefs"),
-                record.get("pediatric_disease")
-            ])
+            cur.execute(
+                self._add_merged_record_query,
+                [
+                    record["concept_id"],
+                    record["label"],
+                    record.get("aliases"),
+                    record.get("associated_with"),
+                    record.get("xrefs"),
+                    record.get("pediatric_disease"),
+                ],
+            )
             self.conn.commit()
 
     _update_merge_ref_query = b"""
@@ -506,7 +519,7 @@ class PostgresDatabase(AbstractDatabase):
     WHERE concept_id = %(concept_id)s;
     """
 
-    def update_merge_ref(self, concept_id: str, merge_ref: Any) -> None:
+    def update_merge_ref(self, concept_id: str, merge_ref: Any) -> None:  # noqa: ANN401
         """Update the merged record reference of an individual record to a new value.
 
         :param concept_id: record to update
@@ -516,7 +529,7 @@ class PostgresDatabase(AbstractDatabase):
         with self.conn.cursor() as cur:
             cur.execute(
                 self._update_merge_ref_query,
-                {"merge_ref": merge_ref, "concept_id": concept_id}
+                {"merge_ref": merge_ref, "concept_id": concept_id},
             )
             row_count = cur.rowcount
             self.conn.commit()
@@ -676,7 +689,9 @@ class PostgresDatabase(AbstractDatabase):
         :raise DatabaseException: if psql call fails
         """
         if not output_directory.is_dir() or not output_directory.exists():
-            raise ValueError(f"Output location {output_directory} isn't a directory or doesn't exist")  # noqa: E501
+            raise ValueError(
+                f"Output location {output_directory} isn't a directory or doesn't exist"
+            )  # noqa: E501
         now = datetime.now().strftime("%Y%m%d%H%M%S")
         output_location = output_directory / f"disease_norm_{now}.sql"
         user = self.conn.info.user

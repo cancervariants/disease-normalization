@@ -1,21 +1,20 @@
 """A base class for extraction, transformation, and loading of data."""
+import ftplib
+import os
+import re
 import tempfile
 import zipfile
-import os
 from abc import ABC, abstractmethod
-from typing import Set, Dict, List, Optional, Callable
 from pathlib import Path
-import re
-import ftplib
+from typing import Callable, Dict, List, Optional, Set
 
-from owlready2.rdflib_store import TripleLiteRDFlibGraph as RDFGraph
 import bioversions
 import requests
+from owlready2.rdflib_store import TripleLiteRDFlibGraph as RDFGraph
 
-from disease import SOURCES_FOR_MERGE, ITEM_TYPES, logger, APP_ROOT
+from disease import APP_ROOT, ITEM_TYPES, SOURCES_FOR_MERGE, logger
 from disease.database import AbstractDatabase
 from disease.schemas import Disease, SourceName
-
 
 DEFAULT_DATA_PATH = APP_ROOT / "data"
 
@@ -23,7 +22,9 @@ DEFAULT_DATA_PATH = APP_ROOT / "data"
 class Base(ABC):
     """The ETL base class."""
 
-    def __init__(self, database: AbstractDatabase, data_path: Path = DEFAULT_DATA_PATH):
+    def __init__(
+        self, database: AbstractDatabase, data_path: Path = DEFAULT_DATA_PATH
+    ) -> None:
         """Extract from sources.
         :param database: database client
         :param data_path: location of data directory
@@ -58,7 +59,7 @@ class Base(ABC):
         return bioversions.get_version(self._src_name)
 
     @abstractmethod
-    def _download_data(self):
+    def _download_data(self) -> None:
         """Download source data."""
         raise NotImplementedError
 
@@ -70,8 +71,9 @@ class Base(ABC):
         """
         with zipfile.ZipFile(dl_path, "r") as zip_ref:
             if len(zip_ref.filelist) > 1:
-                files = sorted(zip_ref.filelist, key=lambda z: z.file_size,
-                               reverse=True)
+                files = sorted(
+                    zip_ref.filelist, key=lambda z: z.file_size, reverse=True
+                )
                 target = files[0]
             else:
                 target = zip_ref.filelist[0]
@@ -80,8 +82,12 @@ class Base(ABC):
         os.remove(dl_path)
 
     @staticmethod
-    def _http_download(url: str, outfile_path: Path, headers: Optional[Dict] = None,
-                       handler: Optional[Callable[[Path, Path], None]] = None) -> None:
+    def _http_download(
+        url: str,
+        outfile_path: Path,
+        headers: Optional[Dict] = None,
+        handler: Optional[Callable[[Path, Path], None]] = None,
+    ) -> None:
         """Perform HTTP download of remote data file.
         :param str url: URL to retrieve file from
         :param Path outfile_path: path to where file should be saved. Must be an actual
@@ -126,8 +132,9 @@ class Base(ABC):
             logger.error(f"FTP download failed: {e}")
             raise Exception(e)
 
-    def _parse_version(self, file_path: Path, pattern: Optional[re.Pattern] = None
-                       ) -> str:
+    def _parse_version(
+        self, file_path: Path, pattern: Optional[re.Pattern] = None
+    ) -> str:
         """Get version number from provided file path.
         :param Path file_path: path to located source data file
         :param Optional[re.Pattern] pattern: regex pattern to use
@@ -178,17 +185,17 @@ class Base(ABC):
             self._data_file = self._get_latest_data_file()
 
     @abstractmethod
-    def _transform_data(self, *args, **kwargs):
+    def _transform_data(self, *args, **kwargs) -> None:  # noqa: ANN002
         raise NotImplementedError
 
     @abstractmethod
-    def _load_meta(self, *args, **kwargs):
+    def _load_meta(self, *args, **kwargs) -> None:  # noqa: ANN002
         raise NotImplementedError
 
-    def _load_disease(self, disease: Dict):
+    def _load_disease(self, disease: Dict) -> None:
         """Load individual disease record."""
         assert Disease(**disease)
-        concept_id = disease['concept_id']
+        concept_id = disease["concept_id"]
 
         for attr_type in ITEM_TYPES:
             if attr_type in disease:
@@ -199,7 +206,7 @@ class Base(ABC):
                     else:
                         disease[attr_type] = list(set(value))
                         items = {item.lower() for item in value}
-                        if attr_type == 'aliases':
+                        if attr_type == "aliases":
                             if len(items) > 20:
                                 logger.debug(f"{concept_id} has > 20 aliases.")
                                 del disease[attr_type]
@@ -208,15 +215,15 @@ class Base(ABC):
                 else:
                     del disease[attr_type]
 
-        if 'pediatric_disease' in disease and disease['pediatric_disease'] is None:
-            del disease['pediatric_disease']
+        if "pediatric_disease" in disease and disease["pediatric_disease"] is None:
+            del disease["pediatric_disease"]
 
         self._database.add_record(disease, self._src_name)
         if self._store_ids:
             self._added_ids.append(concept_id)
 
 
-class DownloadException(Exception):
+class DownloadException(Exception):  # noqa: N818
     """Exception for failures relating to source file downloads."""
 
 

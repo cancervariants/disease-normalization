@@ -1,16 +1,17 @@
 """Pytest test config tools."""
+import logging
 import os
 import tarfile
-from typing import List, Optional
-import pytest
 from pathlib import Path
-import logging
+from typing import List, Optional
+
+import pytest
 
 from disease.database import AWS_ENV_VAR_NAME, create_db
 from disease.database.database import AbstractDatabase
 from disease.etl.base import Base
 from disease.query import QueryHandler
-from disease.schemas import Disease, MatchType, MatchesKeyed, SourceName
+from disease.schemas import Disease, MatchesKeyed, MatchType, SourceName
 
 _logger = logging.getLogger(__name__)
 
@@ -19,7 +20,7 @@ def pytest_collection_modifyitems(items):
     """Modify test items in place to ensure test modules run in a given order.
     When creating new test modules, be sure to add them here.
     """
-    MODULE_ORDER = [
+    MODULE_ORDER = [  # noqa: N806
         "test_mondo",
         "test_do",
         "test_ncit",
@@ -101,7 +102,8 @@ def test_source(database: AbstractDatabase, is_test_env: bool):
     :return: factory function that takes an ETL class instance and returns a query
     endpoint.
     """
-    def test_source_factory(EtlClass: Base):
+
+    def test_source_factory(EtlClass: Base):  # noqa: N803
         if IS_TEST_ENV:
             _logger.debug(f"Reloading DB with data from {TEST_DATA_DIRECTORY}")
             test_class = EtlClass(database, TEST_DATA_DIRECTORY)  # type: ignore
@@ -110,7 +112,6 @@ def test_source(database: AbstractDatabase, is_test_env: bool):
             test_class.perform_etl(use_existing=True)
 
         class QueryGetter:
-
             def __init__(self):
                 self.query_handler = QueryHandler(database)
                 self._src_name = EtlClass.__name__  # type: ignore
@@ -155,8 +156,11 @@ def compare_records():
 
 
 def _compare_response(
-    response: MatchesKeyed, match_type: MatchType, fixture: Optional[Disease] = None,
-    fixture_list: Optional[List[Disease]] = None, num_records: int = 0
+    response: MatchesKeyed,
+    match_type: MatchType,
+    fixture: Optional[Disease] = None,
+    fixture_list: Optional[List[Disease]] = None,
+    num_records: int = 0,
 ):
     """Check that test response is correct. Only 1 of {fixture, fixture_list}
     should be passed as arguments. num_records should only be passed with fixture_list.

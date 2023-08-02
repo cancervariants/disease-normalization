@@ -1,19 +1,28 @@
 """Provide DynamoDB client."""
 import atexit
 import logging
+import sys
 from os import environ
 from pathlib import Path
-import sys
 from typing import Any, Dict, List, Optional, Set, Union
+
 import boto3
-from boto3.dynamodb.conditions import Equals, Key, Attr
+import click
+from boto3.dynamodb.conditions import Attr, Equals, Key
 from botocore.exceptions import ClientError
 
-import click
 from disease import ITEM_TYPES, PREFIX_LOOKUP
-from disease.database.database import AWS_ENV_VAR_NAME, SKIP_AWS_DB_ENV_NAME, \
-    VALID_AWS_ENV_NAMES, AbstractDatabase, AwsEnvName, DatabaseException, \
-    DatabaseReadException, DatabaseWriteException, confirm_aws_db_use
+from disease.database.database import (
+    AWS_ENV_VAR_NAME,
+    SKIP_AWS_DB_ENV_NAME,
+    VALID_AWS_ENV_NAMES,
+    AbstractDatabase,
+    AwsEnvName,
+    DatabaseException,
+    DatabaseReadException,
+    DatabaseWriteException,
+    confirm_aws_db_use,
+)
 from disease.schemas import RefType, SourceMeta, SourceName
 
 _logger = logging.getLogger()
@@ -23,7 +32,7 @@ _logger.setLevel(logging.DEBUG)
 class DynamoDbDatabase(AbstractDatabase):
     """Database class employing DynamoDB."""
 
-    def __init__(self, db_url: Optional[str] = None, **db_args):
+    def __init__(self, db_url: Optional[str] = None, **db_args) -> None:
         """Initialize Database class.
 
         :param str db_url: URL endpoint for DynamoDB source
@@ -41,19 +50,23 @@ class DynamoDbDatabase(AbstractDatabase):
 
         if AWS_ENV_VAR_NAME in environ:
             if "DISEASE_TEST" in environ:
-                raise DatabaseException(f"Cannot have both DISEASE_TEST and {AWS_ENV_VAR_NAME} set.")  # noqa: E501
+                raise DatabaseException(
+                    f"Cannot have both DISEASE_TEST and {AWS_ENV_VAR_NAME} set."
+                )  # noqa: E501
 
             aws_env = environ[AWS_ENV_VAR_NAME]
             if aws_env not in VALID_AWS_ENV_NAMES:
-                raise DatabaseException(f"{AWS_ENV_VAR_NAME} must be one of {VALID_AWS_ENV_NAMES}")  # noqa: E501
+                raise DatabaseException(
+                    f"{AWS_ENV_VAR_NAME} must be one of {VALID_AWS_ENV_NAMES}"
+                )  # noqa: E501
 
             skip_confirmation = environ.get(SKIP_AWS_DB_ENV_NAME)
-            if (not skip_confirmation) or (skip_confirmation and skip_confirmation != "true"):  # noqa: E501
+            if (not skip_confirmation) or (
+                skip_confirmation and skip_confirmation != "true"
+            ):  # noqa: E501
                 confirm_aws_db_use(environ[AWS_ENV_VAR_NAME])
 
-            boto_params = {
-                "region_name": region_name
-            }
+            boto_params = {"region_name": region_name}
 
             if aws_env == AwsEnvName.DEVELOPMENT:
                 self.disease_concepts_table = environ.get(
@@ -65,18 +78,15 @@ class DynamoDbDatabase(AbstractDatabase):
         else:
             if db_url:
                 endpoint_url = db_url
-            elif 'DISEASE_NORM_DB_URL' in environ:
-                endpoint_url = environ['DISEASE_NORM_DB_URL']
+            elif "DISEASE_NORM_DB_URL" in environ:
+                endpoint_url = environ["DISEASE_NORM_DB_URL"]
             else:
-                endpoint_url = 'http://localhost:8000'
+                endpoint_url = "http://localhost:8000"
             click.echo(f"***Using Disease Database Endpoint: {endpoint_url}***")
-            boto_params = {
-                'region_name': region_name,
-                'endpoint_url': endpoint_url
-            }
+            boto_params = {"region_name": region_name, "endpoint_url": endpoint_url}
 
-        self.dynamodb = boto3.resource('dynamodb', **boto_params)
-        self.dynamodb_client = boto3.client('dynamodb', **boto_params)
+        self.dynamodb = boto3.resource("dynamodb", **boto_params)
+        self.dynamodb_client = boto3.client("dynamodb", **boto_params)
 
         # Only create tables for local instance
         envs_do_not_create_tables = {AWS_ENV_VAR_NAME, "DISEASE_TEST"}
@@ -94,7 +104,7 @@ class DynamoDbDatabase(AbstractDatabase):
 
         :return: Table names in DynamoDB
         """
-        return self.dynamodb_client.list_tables()['TableNames']
+        return self.dynamodb_client.list_tables()["TableNames"]
 
     def drop_db(self) -> None:
         """Delete all tables from database. Requires manual confirmation.
@@ -112,77 +122,41 @@ class DynamoDbDatabase(AbstractDatabase):
         for table_name in existing_tables:
             self.dynamodb.Table(table_name).delete()
 
-    def _create_diseases_table(self):
+    def _create_diseases_table(self) -> None:
         """Create Diseases table."""
         self.dynamodb.create_table(
             TableName=self.disease_concepts_table,
             KeySchema=[
-                {
-                    'AttributeName': 'label_and_type',
-                    'KeyType': 'HASH'  # Partition key
-                },
-                {
-                    'AttributeName': 'concept_id',
-                    'KeyType': 'RANGE'  # Sort key
-                }
+                {"AttributeName": "label_and_type", "KeyType": "HASH"},  # Partition key
+                {"AttributeName": "concept_id", "KeyType": "RANGE"},  # Sort key
             ],
             AttributeDefinitions=[
-                {
-                    'AttributeName': 'label_and_type',
-                    'AttributeType': 'S'
-                },
-                {
-                    'AttributeName': 'concept_id',
-                    'AttributeType': 'S'
-                },
-                {
-                    'AttributeName': 'src_name',
-                    'AttributeType': 'S'
-                },
-                {
-                    'AttributeName': 'item_type',
-                    'AttributeType': 'S'
-                }
-
+                {"AttributeName": "label_and_type", "AttributeType": "S"},
+                {"AttributeName": "concept_id", "AttributeType": "S"},
+                {"AttributeName": "src_name", "AttributeType": "S"},
+                {"AttributeName": "item_type", "AttributeType": "S"},
             ],
             GlobalSecondaryIndexes=[
                 {
-                    'IndexName': 'src_index',
-                    'KeySchema': [
-                        {
-                            'AttributeName': 'src_name',
-                            'KeyType': 'HASH'
-                        }
-                    ],
-                    'Projection': {
-                        'ProjectionType': 'KEYS_ONLY'
+                    "IndexName": "src_index",
+                    "KeySchema": [{"AttributeName": "src_name", "KeyType": "HASH"}],
+                    "Projection": {"ProjectionType": "KEYS_ONLY"},
+                    "ProvisionedThroughput": {
+                        "ReadCapacityUnits": 10,
+                        "WriteCapacityUnits": 10,
                     },
-                    'ProvisionedThroughput': {
-                        'ReadCapacityUnits': 10,
-                        'WriteCapacityUnits': 10
-                    }
                 },
                 {
-                    'IndexName': 'item_type_index',
-                    'KeySchema': [
-                        {
-                            'AttributeName': 'item_type',
-                            'KeyType': 'HASH'
-                        }
-                    ],
-                    'Projection': {
-                        'ProjectionType': 'KEYS_ONLY'
+                    "IndexName": "item_type_index",
+                    "KeySchema": [{"AttributeName": "item_type", "KeyType": "HASH"}],
+                    "Projection": {"ProjectionType": "KEYS_ONLY"},
+                    "ProvisionedThroughput": {
+                        "ReadCapacityUnits": 10,
+                        "WriteCapacityUnits": 10,
                     },
-                    'ProvisionedThroughput': {
-                        'ReadCapacityUnits': 10,
-                        'WriteCapacityUnits': 10
-                    }
-                }
+                },
             ],
-            ProvisionedThroughput={
-                'ReadCapacityUnits': 10,
-                'WriteCapacityUnits': 10
-            }
+            ProvisionedThroughput={"ReadCapacityUnits": 10, "WriteCapacityUnits": 10},
         )
 
     def _create_meta_data_table(self) -> None:
@@ -190,21 +164,12 @@ class DynamoDbDatabase(AbstractDatabase):
         self.dynamodb.create_table(
             TableName=self.disease_metadata_table,
             KeySchema=[
-                {
-                    'AttributeName': 'src_name',
-                    'KeyType': 'HASH'  # Partition key
-                }
+                {"AttributeName": "src_name", "KeyType": "HASH"}  # Partition key
             ],
             AttributeDefinitions=[
-                {
-                    'AttributeName': 'src_name',
-                    'AttributeType': 'S'
-                },
+                {"AttributeName": "src_name", "AttributeType": "S"},
             ],
-            ProvisionedThroughput={
-                'ReadCapacityUnits': 10,
-                'WriteCapacityUnits': 10
-            }
+            ProvisionedThroughput={"ReadCapacityUnits": 10, "WriteCapacityUnits": 10},
         )
 
     def check_schema_initialized(self) -> bool:
@@ -213,8 +178,10 @@ class DynamoDbDatabase(AbstractDatabase):
         :return: True if DB appears to be fully initialized, False otherwise
         """
         existing_tables = self.list_tables()
-        exists = self.disease_concepts_table in existing_tables and \
-            self.disease_metadata_table in existing_tables
+        exists = (
+            self.disease_concepts_table in existing_tables
+            and self.disease_metadata_table in existing_tables
+        )
         if not exists:
             _logger.info("Disease tables are missing or unavailable.")
         return exists
@@ -235,7 +202,7 @@ class DynamoDbDatabase(AbstractDatabase):
         records = self.diseases.query(
             IndexName="item_type_index",
             KeyConditionExpression=Key("item_type").eq("identity"),
-            Limit=1
+            Limit=1,
         )
         if len(records.get("Items", [])) < 1:
             _logger.info("Disease records index is empty.")
@@ -244,7 +211,7 @@ class DynamoDbDatabase(AbstractDatabase):
         normalized_records = self.diseases.query(
             IndexName="item_type_index",
             KeyConditionExpression=Key("item_type").eq("merger"),
-            Limit=1
+            Limit=1,
         )
         if len(normalized_records.get("Items", [])) < 1:
             _logger.info("Normalized disease records index is empty.")
@@ -273,9 +240,9 @@ class DynamoDbDatabase(AbstractDatabase):
             self._cached_sources[src_name] = metadata
             return metadata
 
-    def get_record_by_id(self, concept_id: str,
-                         case_sensitive: bool = True,
-                         merge: bool = False) -> Optional[Dict]:
+    def get_record_by_id(
+        self, concept_id: str, case_sensitive: bool = True, merge: bool = False
+    ) -> Optional[Dict]:
         """Fetch record corresponding to provided concept ID
         :param str concept_id: concept ID for disease record
         :param bool case_sensitive: if true, performs exact lookup, which is more
@@ -287,27 +254,28 @@ class DynamoDbDatabase(AbstractDatabase):
         """
         try:
             if merge:
-                pk = f'{concept_id.lower()}##merger'
+                pk = f"{concept_id.lower()}##merger"
             else:
-                pk = f'{concept_id.lower()}##identity'
+                pk = f"{concept_id.lower()}##identity"
             if case_sensitive:
-                response = self.diseases.get_item(Key={
-                    'label_and_type': pk,
-                    'concept_id': concept_id
-                })
+                response = self.diseases.get_item(
+                    Key={"label_and_type": pk, "concept_id": concept_id}
+                )
                 record = response.get("Item")
                 if not record:
                     return None
             else:
-                exp = Key('label_and_type').eq(pk)
+                exp = Key("label_and_type").eq(pk)
                 response = self.diseases.query(KeyConditionExpression=exp)
-                record = response['Items'][0]
+                record = response["Items"][0]
             del record["label_and_type"]
             return record
         except ClientError as e:
-            _logger.error(f"boto3 client error on get_records_by_id for "
-                          f"search term {concept_id}: "
-                          f"{e.response['Error']['Message']}")
+            _logger.error(
+                f"boto3 client error on get_records_by_id for "
+                f"search term {concept_id}: "
+                f"{e.response['Error']['Message']}"
+            )
             return None
         except (KeyError, IndexError):  # record doesn't exist
             return None
@@ -326,9 +294,11 @@ class DynamoDbDatabase(AbstractDatabase):
             matches = self.diseases.query(KeyConditionExpression=filter_exp)
             return [m["concept_id"] for m in matches.get("Items", None)]
         except ClientError as e:
-            _logger.error(f"boto3 client error on get_refs_by_type for "
-                          f"search term {search_term}: "
-                          f"{e.response['Error']['Message']}")
+            _logger.error(
+                f"boto3 client error on get_refs_by_type for "
+                f"search term {search_term}: "
+                f"{e.response['Error']['Message']}"
+            )
             return []
 
     def get_all_concept_ids(self, source: Optional[SourceName] = None) -> Set[str]:
@@ -351,10 +321,10 @@ class DynamoDbDatabase(AbstractDatabase):
                 )
             else:
                 response = self.diseases.scan(**params)
-            records = response['Items']
+            records = response["Items"]
             for record in records:
-                concept_ids.append(record['concept_id'])
-            last_evaluated_key = response.get('LastEvaluatedKey')
+                concept_ids.append(record["concept_id"])
+            last_evaluated_key = response.get("LastEvaluatedKey")
             if not last_evaluated_key:
                 break
         return set(concept_ids)
@@ -387,8 +357,10 @@ class DynamoDbDatabase(AbstractDatabase):
         try:
             self.batch.put_item(Item=record)
         except ClientError as e:
-            _logger.error("boto3 client error on add_record for "
-                          f"{concept_id}: {e.response['Error']['Message']}")
+            _logger.error(
+                "boto3 client error on add_record for "
+                f"{concept_id}: {e.response['Error']['Message']}"
+            )
         for attr_type, item_type in ITEM_TYPES.items():
             if attr_type in record:
                 value = record.get(attr_type)
@@ -417,11 +389,14 @@ class DynamoDbDatabase(AbstractDatabase):
         try:
             self.batch.put_item(Item=record)
         except ClientError as e:
-            _logger.error("boto3 client error on add_record for "
-                          f"{concept_id}: {e.response['Error']['Message']}")
+            _logger.error(
+                "boto3 client error on add_record for "
+                f"{concept_id}: {e.response['Error']['Message']}"
+            )
 
-    def _add_ref_record(self, term: str, concept_id: str, ref_type: str,
-                        src_name: SourceName) -> None:
+    def _add_ref_record(
+        self, term: str, concept_id: str, ref_type: str, src_name: SourceName
+    ) -> None:
         """Add auxiliary/reference record to database.
 
         :param str term: referent term
@@ -440,11 +415,13 @@ class DynamoDbDatabase(AbstractDatabase):
         try:
             self.batch.put_item(Item=record)
         except ClientError as e:
-            _logger.error(f"boto3 client error adding reference {term} for "
-                          f"{concept_id} with match type {ref_type}: "
-                          f"{e.response['Error']['Message']}")
+            _logger.error(
+                f"boto3 client error adding reference {term} for "
+                f"{concept_id} with match type {ref_type}: "
+                f"{e.response['Error']['Message']}"
+            )
 
-    def update_merge_ref(self, concept_id: str, merge_ref: Any) -> None:
+    def update_merge_ref(self, concept_id: str, merge_ref: Any) -> None:  # noqa: ANN401
         """Update the merged record reference of an individual record to a new value.
 
         :param concept_id: record to update
@@ -452,18 +429,17 @@ class DynamoDbDatabase(AbstractDatabase):
         :raise DatabaseWriteException: if attempting to update non-existent record
         """
         label_and_type = f"{concept_id.lower()}##identity"
-        key = {
-            "label_and_type": label_and_type,
-            "concept_id": concept_id
-        }
+        key = {"label_and_type": label_and_type, "concept_id": concept_id}
         update_expression = "set merge_ref=:r"
-        update_values = {':r': merge_ref.lower()}
+        update_values = {":r": merge_ref.lower()}
         condition_expression = "attribute_exists(label_and_type)"
         try:
-            self.diseases.update_item(Key=key,
-                                      UpdateExpression=update_expression,
-                                      ExpressionAttributeValues=update_values,
-                                      ConditionExpression=condition_expression)
+            self.diseases.update_item(
+                Key=key,
+                UpdateExpression=update_expression,
+                ExpressionAttributeValues=update_values,
+                ConditionExpression=condition_expression,
+            )
         except ClientError as e:
             code = e.response.get("Error", {}).get("Code")
             if code == "ConditionalCheckFailedException":
@@ -471,8 +447,10 @@ class DynamoDbDatabase(AbstractDatabase):
                     f"No such record exists for keys {label_and_type}, {concept_id}"
                 )
             else:
-                _logger.error(f"boto3 client error in `database.update_record()`: "
-                              f"{e.response['Error']['Message']}")
+                _logger.error(
+                    f"boto3 client error in `database.update_record()`: "
+                    f"{e.response['Error']['Message']}"
+                )
 
     def delete_normalized_concepts(self) -> None:
         """Remove merged records from the database. Use when performing a new update
@@ -497,10 +475,12 @@ class DynamoDbDatabase(AbstractDatabase):
                 if not records:
                     break
                 for record in records:
-                    batch.delete_item(Key={
-                        "label_and_type": record["label_and_type"],
-                        "concept_id": record["concept_id"]
-                    })
+                    batch.delete_item(
+                        Key={
+                            "label_and_type": record["label_and_type"],
+                            "concept_id": record["concept_id"],
+                        }
+                    )
 
     def delete_source(self, src_name: SourceName) -> None:
         """Delete all data for a source. Use when updating source data.
@@ -514,9 +494,7 @@ class DynamoDbDatabase(AbstractDatabase):
             try:
                 response = self.diseases.query(
                     IndexName="src_index",
-                    KeyConditionExpression=Key("src_name").eq(
-                        src_name.value
-                    )
+                    KeyConditionExpression=Key("src_name").eq(src_name.value),
                 )
             except ClientError as e:
                 raise DatabaseReadException(e)
@@ -528,17 +506,17 @@ class DynamoDbDatabase(AbstractDatabase):
             ) as batch:
                 for record in records:
                     try:
-                        batch.delete_item(Key={
-                            "label_and_type": record["label_and_type"],
-                            "concept_id": record["concept_id"]
-                        })
+                        batch.delete_item(
+                            Key={
+                                "label_and_type": record["label_and_type"],
+                                "concept_id": record["concept_id"],
+                            }
+                        )
                     except ClientError as e:
                         raise DatabaseWriteException(e)
 
         try:
-            self.metadata.delete_item(Key={
-                "src_name": src_name.value
-            })
+            self.metadata.delete_item(Key={"src_name": src_name.value})
         except ClientError as e:
             raise DatabaseWriteException(e)
 

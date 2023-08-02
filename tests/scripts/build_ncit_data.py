@@ -1,14 +1,14 @@
 """Construct test data for NCIt source."""
+import xml.etree.ElementTree as Xet
 from pathlib import Path
 from typing import Generator
-import xml.etree.ElementTree as XET
 
+import lxml.etree as et
 import owlready2 as owl
-import lxml.etree as ET
 import xmlformatter
 
-from disease.etl import NCIt
 from disease.database import create_db
+from disease.etl import NCIt
 
 # define captured ids in `test_classes` variable
 
@@ -36,7 +36,7 @@ outfile_path.parent.mkdir(exist_ok=True)
 def ncit_parser() -> Generator:
     """Get unique XML elements."""
     context = iter(
-        ET.iterparse(ncit._data_file, events=("start", "end"), huge_tree=True)
+        et.iterparse(ncit._data_file, events=("start", "end"), huge_tree=True)
     )
     for event, elem in context:
         if event == "start":
@@ -48,7 +48,7 @@ parser = ncit_parser()
 # make root element
 root = next(parser)
 nsmap = root.nsmap
-new_root = ET.Element(f"{RDF_PREFIX}RDF", nsmap=nsmap)
+new_root = et.Element(f"{RDF_PREFIX}RDF", nsmap=nsmap)
 new_root.set(
     "{http://www.w3.org/XML/1998/namespace}base",
     "http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl",
@@ -151,12 +151,12 @@ while not EOF:
         if element.tag == DESCRIPTION_TAG:
             break
 
-ET.ElementTree(new_root).write(outfile_path, pretty_print=True)
+et.ElementTree(new_root).write(outfile_path, pretty_print=True)
 
-pi = XET.ProcessingInstruction(  # TODO get encoding attrib out
+pi = Xet.ProcessingInstruction(  # TODO get encoding attrib out
     target='xml version="1.0"'
 )
-pi_string = XET.tostring(pi).decode("ASCII")
+pi_string = Xet.tostring(pi).decode("ASCII")
 with open(outfile_path, "r+") as f:
     content = f.read()
     f.seek(0, 0)

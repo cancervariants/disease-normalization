@@ -2,18 +2,17 @@
 from itertools import groupby
 from typing import Dict, List, Optional
 
-import requests
 import owlready2 as owl
+import requests
 from owlready2.rdflib_store import TripleLiteRDFlibGraph as RDFGraph
 
-from .base import OWLBase
 from disease import PREFIX_LOOKUP, logger
-from disease.schemas import SourceMeta, NamespacePrefix
+from disease.schemas import NamespacePrefix, SourceMeta
 
+from .base import OWLBase
 
 MONDO_PREFIX_LOOKUP = {
     "http://purl.obolibrary.org/obo/MONDO": NamespacePrefix.MONDO.value,
-
     # xref
     "http://purl.obolibrary.org/obo/DOID": NamespacePrefix.DO.value,
     "DOID": NamespacePrefix.DO.value,
@@ -22,7 +21,6 @@ MONDO_PREFIX_LOOKUP = {
     "http://purl.obolibrary.org/obo/NCIT": NamespacePrefix.NCIT.value,
     "NCIT": NamespacePrefix.NCIT.value,
     "ONCOTREE": NamespacePrefix.ONCOTREE.value,
-
     # associated_with
     "SCDO": NamespacePrefix.SCDO.value,
     "Orphanet": NamespacePrefix.ORPHANET.value,
@@ -52,7 +50,7 @@ MONDO_PREFIX_LOOKUP = {
     "OBI": NamespacePrefix.OBI.value,
     "OGMS": NamespacePrefix.OGMS.value,
     "OMIMPS": NamespacePrefix.OMIMPS.value,
-    "Wikidata": NamespacePrefix.WIKIDATA.value
+    "Wikidata": NamespacePrefix.WIKIDATA.value,
 }
 
 
@@ -63,33 +61,39 @@ class Mondo(OWLBase):
         """Get most recent version of MONDO from GitHub API.
         :return: Most recent version, as a str
         """
-        response = requests.get("https://api.github.com/repos/monarch-initiative/mondo/releases/latest")  # noqa: E501
+        response = requests.get(
+            "https://api.github.com/repos/monarch-initiative/mondo/releases/latest"
+        )  # noqa: E501
         if response.status_code == 200:
             return response.json()["name"].replace("v", "")
         else:
-            raise requests.HTTPError(f"Unable to retrieve MONDO version from GitHub "
-                                     f"API. Status code: {response.status_code}")
+            raise requests.HTTPError(
+                f"Unable to retrieve MONDO version from GitHub "
+                f"API. Status code: {response.status_code}"
+            )
 
-    def _download_data(self):
+    def _download_data(self) -> None:
         """Download Mondo thesaurus source file for loading into normalizer."""
-        logger.info('Downloading Mondo data...')
+        logger.info("Downloading Mondo data...")
         url = f"http://purl.obolibrary.org/obo/mondo/releases/{self._version}/mondo.owl"
         output_file = self._src_dir / f"mondo_{self._version}.owl"
         self._http_download(url, output_file)
-        logger.info('Finished downloading Mondo Disease Ontology')
+        logger.info("Finished downloading Mondo Disease Ontology")
 
-    def _load_meta(self):
+    def _load_meta(self) -> None:
         """Load metadata"""
-        metadata = SourceMeta(data_license="CC BY 4.0",
-                              data_license_url="https://creativecommons.org/licenses/by/4.0/legalcode",  # noqa: E501
-                              version=self._version,
-                              data_url="https://mondo.monarchinitiative.org/pages/download/",  # noqa: E501
-                              rdp_url='http://reusabledata.org/monarch.html',
-                              data_license_attributes={
-                                  'non_commercial': False,
-                                  'share_alike': False,
-                                  'attribution': True
-                              })
+        metadata = SourceMeta(
+            data_license="CC BY 4.0",
+            data_license_url="https://creativecommons.org/licenses/by/4.0/legalcode",  # noqa: E501
+            version=self._version,
+            data_url="https://mondo.monarchinitiative.org/pages/download/",  # noqa: E501
+            rdp_url="http://reusabledata.org/monarch.html",
+            data_license_attributes={
+                "non_commercial": False,
+                "share_alike": False,
+                "attribution": True,
+            },
+        )
         self._database.add_source_metadata(self._src_name, metadata)
 
     def _get_concept_id(self, ref: str) -> Optional[str]:
@@ -113,8 +117,10 @@ class Mondo(OWLBase):
                 try:
                     prefix, id_no = ref.split(":")
                 except ValueError as e:
-                    logger.warning(f"{ref} raised a ValueError when trying to get "
-                                   f"prefix and ID: {e}")
+                    logger.warning(
+                        f"{ref} raised a ValueError when trying to get "
+                        f"prefix and ID: {e}"
+                    )
                     return None
         try:
             concept_id = f"{MONDO_PREFIX_LOOKUP[prefix]}:{id_no}"
@@ -149,7 +155,7 @@ class Mondo(OWLBase):
         }
         return keyed
 
-    def _transform_data(self):
+    def _transform_data(self) -> None:
         """Gather and transform disease entities."""
         mondo = owl.get_ontology(self._data_file.absolute().as_uri()).load()
         graph = owl.default_world.as_rdflib_graph()
@@ -165,8 +171,9 @@ class Mondo(OWLBase):
             try:
                 disease = mondo.search_one(iri=uri)
             except TypeError:
-                logger.error(f"Mondo.transform_data could not retrieve class "
-                             f"for URI {uri}")
+                logger.error(
+                    f"Mondo.transform_data could not retrieve class " f"for URI {uri}"
+                )
                 continue
             try:
                 label = disease.label[0]
@@ -177,11 +184,11 @@ class Mondo(OWLBase):
             concept_id = disease.id[0].lower()
             aliases = list({d for d in disease.hasExactSynonym if d != label})
             params = {
-                'concept_id': concept_id,
-                'label': label,
-                'aliases': aliases,
-                'xrefs': [],
-                'associated_with': [],
+                "concept_id": concept_id,
+                "label": label,
+                "aliases": aliases,
+                "xrefs": [],
+                "associated_with": [],
             }
             exact_matches = {self._get_concept_id(m) for m in disease.exactMatch}
             equiv_xrefs = equiv_rels.get(concept_id.split(":")[1], set())
@@ -189,11 +196,11 @@ class Mondo(OWLBase):
 
             for ref in xrefs:
                 if ref.split(":")[0].lower() in PREFIX_LOOKUP:
-                    params['xrefs'].append(ref)
+                    params["xrefs"].append(ref)
                 else:
-                    params['associated_with'].append(ref)
+                    params["associated_with"].append(ref)
 
             if disease.iri in peds_uris:
-                params['pediatric_disease'] = True
+                params["pediatric_disease"] = True
 
             self._load_disease(params)

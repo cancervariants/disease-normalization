@@ -1,11 +1,10 @@
-"""This module contains data models for representing VICC normalized
-disease records.
-"""
-from typing import Any, Dict, Type, List, Optional, Union
-from enum import Enum, IntEnum
-from pydantic import BaseModel, StrictBool
+"""Contains data models for representing VICC normalized disease records."""
 from datetime import datetime
+from enum import Enum, IntEnum
+from typing import Any, Dict, List, Optional, Type, Union
+
 from ga4gh.vrsatile.pydantic.vrsatile_models import ValueObjectDescriptor
+from pydantic import BaseModel, StrictBool
 
 
 class MatchType(IntEnum):
@@ -108,14 +107,13 @@ class Disease(BaseModel):
         """Configure model."""
 
         @staticmethod
-        def schema_extra(schema: Dict[str, Any],
-                         model: Type['Disease']) -> None:
+        def schema_extra(schema: Dict[str, Any], model: Type["Disease"]) -> None:
             """Configure OpenAPI schema."""
-            if 'title' in schema.keys():
-                schema.pop('title', None)
-            for prop in schema.get('properties', {}).values():
-                prop.pop('title', None)
-            schema['example'] = {
+            if "title" in schema.keys():
+                schema.pop("title", None)
+            for prop in schema.get("properties", {}).values():
+                prop.pop("title", None)
+            schema["example"] = {
                 "label": "Von Hippel-Lindau Syndrome",
                 "concept_id": "ncit:C3105",
                 "aliases": [
@@ -123,7 +121,7 @@ class Disease(BaseModel):
                     "Von Hippel-Lindau Disease",
                     "Cerebroretinal Angiomatosis",
                     "von Hippel-Lindau syndrome",
-                    "VHL syndrome"
+                    "VHL syndrome",
                 ],
                 "xrefs": [],
                 "associated_with": ["umls:C0019562"],
@@ -143,10 +141,10 @@ class RefType(str, Enum):
     """Reference item types."""
 
     # Must be in descending MatchType order.
-    LABEL = 'label'
-    ALIASES = 'alias'
-    XREFS = 'xref'
-    ASSOCIATED_WITH = 'associated_with'
+    LABEL = "label"
+    ALIASES = "alias"
+    XREFS = "xref"
+    ASSOCIATED_WITH = "associated_with"
 
 
 class SourceMeta(BaseModel):
@@ -163,14 +161,13 @@ class SourceMeta(BaseModel):
         """Enables orm_mode"""
 
         @staticmethod
-        def schema_extra(schema: Dict[str, Any],
-                         model: Type['SourceMeta']) -> None:
+        def schema_extra(schema: Dict[str, Any], model: Type["SourceMeta"]) -> None:
             """Configure OpenAPI schema"""
-            if 'title' in schema.keys():
-                schema.pop('title', None)
-            for prop in schema.get('properties', {}).values():
-                prop.pop('title', None)
-            schema['example'] = {
+            if "title" in schema.keys():
+                schema.pop("title", None)
+            for prop in schema.get("properties", {}).values():
+                prop.pop("title", None)
+            schema["example"] = {
                 "data_license": "CC BY 4.0",
                 "data_license_url": "https://creativecommons.org/licenses/by/4.0/legalcode",  # noqa: E501
                 "version": "21.01d",
@@ -179,8 +176,8 @@ class SourceMeta(BaseModel):
                 "data_license_attributes": {
                     "non_commercial": False,
                     "attribution": True,
-                    "share_alike": False
-                }
+                    "share_alike": False,
+                },
             }
 
 
@@ -197,29 +194,30 @@ class MatchesKeyed(BaseModel):
         """Enables orm_mode"""
 
         @staticmethod
-        def schema_extra(schema: Dict[str, Any],
-                         model: Type['MatchesKeyed']) -> None:
+        def schema_extra(schema: Dict[str, Any], model: Type["MatchesKeyed"]) -> None:
             """Configure OpenAPI schema"""
-            if 'title' in schema.keys():
-                schema.pop('title', None)
-            for prop in schema.get('properties', {}).values():
-                prop.pop('title', None)
-            schema['example'] = {
+            if "title" in schema.keys():
+                schema.pop("title", None)
+            for prop in schema.get("properties", {}).values():
+                prop.pop("title", None)
+            schema["example"] = {
                 "match_type": 80,
-                "records": [{
-                    "label": "Von Hippel-Lindau Syndrome",
-                    "concept_id": "ncit:C3105",
-                    "aliases": [
-                        "Von Hippel-Lindau Syndrome (VHL)",
-                        "Von Hippel-Lindau Disease",
-                        "Cerebroretinal Angiomatosis",
-                        "von Hippel-Lindau syndrome",
-                        "VHL syndrome"
-                    ],
-                    "xrefs": [],
-                    "associated_with": ["umls:C0019562"],
-                    "pediatric_disease": None,
-                }],
+                "records": [
+                    {
+                        "label": "Von Hippel-Lindau Syndrome",
+                        "concept_id": "ncit:C3105",
+                        "aliases": [
+                            "Von Hippel-Lindau Syndrome (VHL)",
+                            "Von Hippel-Lindau Disease",
+                            "Cerebroretinal Angiomatosis",
+                            "von Hippel-Lindau syndrome",
+                            "VHL syndrome",
+                        ],
+                        "xrefs": [],
+                        "associated_with": ["umls:C0019562"],
+                        "pediatric_disease": None,
+                    }
+                ],
                 "source_meta_": {
                     "data_license": "CC BY 4.0",
                     "data_license_url": "https://creativecommons.org/licenses/by/4.0/legalcode",  # noqa: E501
@@ -229,9 +227,9 @@ class MatchesKeyed(BaseModel):
                     "data_license_attributes": {
                         "non_commercial": False,
                         "attribution": True,
-                        "share_alike": False
-                    }
-                }
+                        "share_alike": False,
+                    },
+                },
             }
 
 
@@ -249,30 +247,31 @@ class MatchesListed(BaseModel):
         """Enables orm_mode"""
 
         @staticmethod
-        def schema_extra(schema: Dict[str, Any],
-                         model: Type['MatchesListed']) -> None:
+        def schema_extra(schema: Dict[str, Any], model: Type["MatchesListed"]) -> None:
             """Configure OpenAPI schema"""
-            if 'title' in schema.keys():
-                schema.pop('title', None)
-            for prop in schema.get('properties', {}).values():
-                prop.pop('title', None)
-            schema['example'] = {
+            if "title" in schema.keys():
+                schema.pop("title", None)
+            for prop in schema.get("properties", {}).values():
+                prop.pop("title", None)
+            schema["example"] = {
                 "source": "NCIt",
                 "match_type": 80,
-                "records": [{
-                    "label": "Von Hippel-Lindau Syndrome",
-                    "concept_id": "ncit:C3105",
-                    "aliases": [
-                        "Von Hippel-Lindau Syndrome (VHL)",
-                        "Von Hippel-Lindau Disease",
-                        "Cerebroretinal Angiomatosis",
-                        "von Hippel-Lindau syndrome",
-                        "VHL syndrome"
-                    ],
-                    "xrefs": [],
-                    "associated_with": ["umls:C0019562"],
-                    "pediatric_disease": None
-                }],
+                "records": [
+                    {
+                        "label": "Von Hippel-Lindau Syndrome",
+                        "concept_id": "ncit:C3105",
+                        "aliases": [
+                            "Von Hippel-Lindau Syndrome (VHL)",
+                            "Von Hippel-Lindau Disease",
+                            "Cerebroretinal Angiomatosis",
+                            "von Hippel-Lindau syndrome",
+                            "VHL syndrome",
+                        ],
+                        "xrefs": [],
+                        "associated_with": ["umls:C0019562"],
+                        "pediatric_disease": None,
+                    }
+                ],
                 "source_meta_": {
                     "data_license": "CC BY 4.0",
                     "data_license_url": "https://creativecommons.org/licenses/by/4.0/legalcode",  # noqa: E501
@@ -282,36 +281,35 @@ class MatchesListed(BaseModel):
                     "data_license_attributes": {
                         "non_commercial": False,
                         "attribution": True,
-                        "share_alike": False
-                    }
-                }
+                        "share_alike": False,
+                    },
+                },
             }
 
 
 class ServiceMeta(BaseModel):
     """Metadata regarding the disease-normalization service."""
 
-    name = 'disease-normalizer'
+    name = "disease-normalizer"
     version: str
     response_datetime: datetime
-    url = 'https://github.com/cancervariants/disease-normalization'
+    url = "https://github.com/cancervariants/disease-normalization"
 
     class Config:
         """Enables orm_mode"""
 
         @staticmethod
-        def schema_extra(schema: Dict[str, Any],
-                         model: Type['ServiceMeta']) -> None:
+        def schema_extra(schema: Dict[str, Any], model: Type["ServiceMeta"]) -> None:
             """Configure OpenAPI schema"""
-            if 'title' in schema.keys():
-                schema.pop('title', None)
-            for prop in schema.get('properties', {}).values():
-                prop.pop('title', None)
-            schema['example'] = {
-                'name': 'disease-normalizer',
-                'version': '0.1.0',
-                'response_datetime': '2021-04-05T16:44:15.367831',
-                'url': 'https://github.com/cancervariants/disease-normalization'  # noqa: E501
+            if "title" in schema.keys():
+                schema.pop("title", None)
+            for prop in schema.get("properties", {}).values():
+                prop.pop("title", None)
+            schema["example"] = {
+                "name": "disease-normalizer",
+                "version": "0.1.0",
+                "response_datetime": "2021-04-05T16:44:15.367831",
+                "url": "https://github.com/cancervariants/disease-normalization",  # noqa: E501
             }
 
 
@@ -329,14 +327,15 @@ class NormalizationService(BaseModel):
         """Configure model."""
 
         @staticmethod
-        def schema_extra(schema: Dict[str, Any],
-                         model: Type['NormalizationService']) -> None:
+        def schema_extra(
+            schema: Dict[str, Any], model: Type["NormalizationService"]
+        ) -> None:
             """Configure OpenAPI schema"""
-            if 'title' in schema.keys():
-                schema.pop('title', None)
-            for prop in schema.get('properties', {}).values():
-                prop.pop('title', None)
-            schema['example'] = {
+            if "title" in schema.keys():
+                schema.pop("title", None)
+            for prop in schema.get("properties", {}).values():
+                prop.pop("title", None)
+            schema["example"] = {
                 "query": "childhood leukemia",
                 "warnings": None,
                 "match_type": 80,
@@ -345,29 +344,26 @@ class NormalizationService(BaseModel):
                     "type": "DiseaseDescriptor",
                     "disease_id": "ncit:C4989",
                     "label": "Childhood Leukemia",
-                    "xrefs": [
-                        "mondo:0004355",
-                        "DOID:7757"
-                    ],
+                    "xrefs": ["mondo:0004355", "DOID:7757"],
                     "alternate_labels": [
                         "childhood leukemia (disease)",
                         "leukemia",
                         "pediatric leukemia (disease)",
                         "Leukemia",
-                        "leukemia (disease) of childhood"
+                        "leukemia (disease) of childhood",
                     ],
                     "extensions": [
                         {
                             "type": "Extension",
                             "name": "pediatric_disease",
-                            "value": True
+                            "value": True,
                         },
                         {
                             "type": "Extension",
                             "name": "associated_with",
-                            "value": ["umls:C1332977"]
-                        }
-                    ]
+                            "value": ["umls:C1332977"],
+                        },
+                    ],
                 },
                 "source_meta_": {
                     "NCIt": {
@@ -379,8 +375,8 @@ class NormalizationService(BaseModel):
                         "data_license_attributes": {
                             "non_commercial": False,
                             "attribution": True,
-                            "share_alike": False
-                        }
+                            "share_alike": False,
+                        },
                     },
                     "Mondo": {
                         "data_license": "CC BY 4.0",
@@ -391,8 +387,8 @@ class NormalizationService(BaseModel):
                         "data_license_attributes": {
                             "non_commercial": False,
                             "attribution": True,
-                            "share_alike": False
-                        }
+                            "share_alike": False,
+                        },
                     },
                     "DO": {
                         "data_license": "CC0 1.0",
@@ -403,16 +399,16 @@ class NormalizationService(BaseModel):
                         "data_license_attributes": {
                             "non_commercial": False,
                             "attribution": False,
-                            "share_alike": False
-                        }
-                    }
+                            "share_alike": False,
+                        },
+                    },
                 },
                 "service_meta_": {
-                    'name': 'disease-normalizer',
-                    'version': '0.1.0',
-                    'response_datetime': '2021-04-05T16:44:15.367831',
-                    'url': 'https://github.com/cancervariants/disease-normalization'  # noqa: E501
-                }
+                    "name": "disease-normalizer",
+                    "version": "0.1.0",
+                    "response_datetime": "2021-04-05T16:44:15.367831",
+                    "url": "https://github.com/cancervariants/disease-normalization",  # noqa: E501
+                },
             }
 
 
@@ -428,50 +424,53 @@ class SearchService(BaseModel):
         """Enables orm_mode"""
 
         @staticmethod
-        def schema_extra(schema: Dict[str, Any],
-                         model: Type['SearchService']) -> None:
+        def schema_extra(schema: Dict[str, Any], model: Type["SearchService"]) -> None:
             """Configure OpenAPI schema"""
-            if 'title' in schema.keys():
-                schema.pop('title', None)
-            for prop in schema.get('properties', {}).values():
-                prop.pop('title', None)
-            schema['example'] = {
+            if "title" in schema.keys():
+                schema.pop("title", None)
+            for prop in schema.get("properties", {}).values():
+                prop.pop("title", None)
+            schema["example"] = {
                 "query": "Von Hippel-Lindau Syndrome",
                 "warnings": None,
-                "source_matches": [{
-                    "source": "NCIt",
-                    "match_type": 80,
-                    "records": [{
-                        "label": "Von Hippel-Lindau Syndrome",
-                        "concept_id": "ncit:C3105",
-                        "aliases": [
-                            "Von Hippel-Lindau Syndrome (VHL)",
-                            "Von Hippel-Lindau Disease",
-                            "Cerebroretinal Angiomatosis",
-                            "von Hippel-Lindau syndrome",
-                            "VHL syndrome"
+                "source_matches": [
+                    {
+                        "source": "NCIt",
+                        "match_type": 80,
+                        "records": [
+                            {
+                                "label": "Von Hippel-Lindau Syndrome",
+                                "concept_id": "ncit:C3105",
+                                "aliases": [
+                                    "Von Hippel-Lindau Syndrome (VHL)",
+                                    "Von Hippel-Lindau Disease",
+                                    "Cerebroretinal Angiomatosis",
+                                    "von Hippel-Lindau syndrome",
+                                    "VHL syndrome",
+                                ],
+                                "xrefs": [],
+                                "associated_with": ["umls:C0019562"],
+                                "pediatric_disease": None,
+                            }
                         ],
-                        "xrefs": [],
-                        "associated_with": ["umls:C0019562"],
-                        "pediatric_disease": None,
-                    }],
-                    "source_meta_": {
-                        "data_license": "CC BY 4.0",
-                        "data_license_url": "https://creativecommons.org/licenses/by/4.0/legalcode",  # noqa: E501
-                        "version": "21.01d",
-                        "data_url": "https://evs.nci.nih.gov/ftp1/NCI_Thesaurus/archive/21.01d_Release/",  # noqa: E501
-                        "rdp_url": "http://reusabledata.org/ncit.html",
-                        "data_license_attributes": {
-                            "non_commercial": False,
-                            "attribution": True,
-                            "share_alike": False
-                        }
+                        "source_meta_": {
+                            "data_license": "CC BY 4.0",
+                            "data_license_url": "https://creativecommons.org/licenses/by/4.0/legalcode",  # noqa: E501
+                            "version": "21.01d",
+                            "data_url": "https://evs.nci.nih.gov/ftp1/NCI_Thesaurus/archive/21.01d_Release/",  # noqa: E501
+                            "rdp_url": "http://reusabledata.org/ncit.html",
+                            "data_license_attributes": {
+                                "non_commercial": False,
+                                "attribution": True,
+                                "share_alike": False,
+                            },
+                        },
                     }
-                }],
+                ],
                 "service_meta_": {
-                    'name': 'disease-normalizer',
-                    'version': '0.1.0',
-                    'response_datetime': '2021-04-05T16:44:15.367831',
-                    'url': 'https://github.com/cancervariants/disease-normalization'  # noqa: E501
-                }
+                    "name": "disease-normalizer",
+                    "version": "0.1.0",
+                    "response_datetime": "2021-04-05T16:44:15.367831",
+                    "url": "https://github.com/cancervariants/disease-normalization",  # noqa: E501
+                },
             }
