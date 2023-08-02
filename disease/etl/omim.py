@@ -13,7 +13,8 @@ class OMIM(Base):
         requirements.
 
         :param use_existing: technically non-functional, but included to match
-            sibling method signatures. If True, will print warning but otherwise proceed.
+            sibling method signatures. If True, will print warning but otherwise
+            proceed.
         """
         if not use_existing:
             logger.warning(
