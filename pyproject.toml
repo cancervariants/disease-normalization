@@ -10,6 +10,7 @@ line-length = 88
 # Pyflakes (F)
 # flake8-annotations (ANN)
 # flake8-quotes (Q)
+# pydocstyle (D)
 # pep8-naming (N)
 # isort (I)
 select = ["E", "W", "F", "ANN", "Q", "D", "N", "I"]
@@ -37,4 +38,4 @@ docstring-quotes = "double"
 "tests/*" = ["ANN001", "ANN2", "ANN102"]
 "setup.py" = ["F821"]
 "*__init__.py" = ["F401"]
-"disease/database/__init__.py" = ["F401"]
+"disease/schemas.py" = ["ANN201", "N805", "ANN001"]
