@@ -1,13 +1,13 @@
 """Module to load disease data from NCIt."""
-import requests
-from typing import Set
-import owlready2 as owl
 import re
+from typing import Set
+
+import owlready2 as owl
+import requests
 
 from disease import logger
-from disease.schemas import SourceMeta, SourceName, NamespacePrefix
-from disease.etl.base import OWLBase, DownloadException
-
+from disease.etl.base import DownloadException, OWLBase
+from disease.schemas import NamespacePrefix, SourceMeta, SourceName
 
 icdo_re = re.compile("[0-9]+/[0-9]+")
 
@@ -47,22 +47,27 @@ class NCIt(OWLBase):
             else:
                 src_url = archive_url
 
-        self._http_download(src_url, self._src_dir / f"ncit_{self._version}.owl",
-                            handler=self._zip_handler)
+        self._http_download(
+            src_url,
+            self._src_dir / f"ncit_{self._version}.owl",
+            handler=self._zip_handler,
+        )
         logger.info("Successfully retrieved source data for NCIt")
 
-    def _load_meta(self):
+    def _load_meta(self) -> None:
         """Load metadata"""
-        metadata = SourceMeta(data_license="CC BY 4.0",
-                              data_license_url="https://creativecommons.org/licenses/by/4.0/legalcode",  # noqa F401
-                              version=self._version,
-                              data_url="https://evs.nci.nih.gov/ftp1/NCI_Thesaurus/",
-                              rdp_url='http://reusabledata.org/ncit.html',
-                              data_license_attributes={
-                                  'non_commercial': False,
-                                  'share_alike': False,
-                                  'attribution': True
-                              })
+        metadata = SourceMeta(
+            data_license="CC BY 4.0",
+            data_license_url="https://creativecommons.org/licenses/by/4.0/legalcode",  # noqa F401
+            version=self._version,
+            data_url="https://evs.nci.nih.gov/ftp1/NCI_Thesaurus/",
+            rdp_url="http://reusabledata.org/ncit.html",
+            data_license_attributes={
+                "non_commercial": False,
+                "share_alike": False,
+                "attribution": True,
+            },
+        )
         self._database.add_source_metadata(self._src_name, metadata)
 
     def _get_disease_classes(self) -> Set[str]:
@@ -81,7 +86,7 @@ class NCIt(OWLBase):
         uris = neopl.union(dos) - retired
         return uris
 
-    def _transform_data(self):
+    def _transform_data(self) -> None:
         """Get data from file and construct object for loading."""
         ncit = owl.get_ontology(self._data_file.absolute().as_uri()).load()
         disease_uris = self._get_disease_classes()
@@ -97,24 +102,27 @@ class NCIt(OWLBase):
 
             associated_with = []
             if disease_class.P207:
-                associated_with.append(f"{NamespacePrefix.UMLS.value}:"
-                                       f"{disease_class.P207.first()}")
+                associated_with.append(
+                    f"{NamespacePrefix.UMLS.value}:" f"{disease_class.P207.first()}"
+                )
             maps_to = disease_class.P375
             if maps_to:
                 icdo_list = list(filter(lambda s: icdo_re.match(s), maps_to))
                 if len(icdo_list) == 1:
-                    associated_with.append(f"{NamespacePrefix.ICDO.value}:"
-                                           f"{icdo_list[0]}")
+                    associated_with.append(
+                        f"{NamespacePrefix.ICDO.value}:" f"{icdo_list[0]}"
+                    )
             imdrf = disease_class.hasDbXref
             if imdrf:
-                associated_with.append(f"{NamespacePrefix.IMDRF.value}:"
-                                       f"{imdrf[0].split(':')[1]}")
+                associated_with.append(
+                    f"{NamespacePrefix.IMDRF.value}:" f"{imdrf[0].split(':')[1]}"
+                )
 
             disease = {
-                'concept_id': concept_id,
-                'src_name': SourceName.NCIT.value,
-                'label': label,
-                'aliases': aliases,
-                'associated_with': associated_with
+                "concept_id": concept_id,
+                "src_name": SourceName.NCIT.value,
+                "label": label,
+                "aliases": aliases,
+                "associated_with": associated_with,
             }
             self._load_disease(disease)

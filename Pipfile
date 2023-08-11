@@ -11,16 +11,14 @@ owlready2 = "==0.40"
 rdflib = "*"
 pytest = "*"
 pytest-cov = "*"
-flake8 = "*"
-flake8-docstrings = "*"
 pre-commit = "*"
-coveralls = "*"
-coverage = "*"
 ipykernel = "*"
 matplotlib = "*"
 lxml = "*"
 xmlformatter = "*"
 psycopg = {version = "*", extras=["binary"]}
+black = "*"
+ruff = "*"
 
 [packages]
 pydantic = "*"

@@ -1,23 +1,28 @@
-"""This module provides a CLI util to make updates to normalizer database."""
+"""Provides a CLI util to make updates to normalizer database."""
+import os
 from pathlib import Path
 from timeit import default_timer as timer
-import os
-from typing import Collection, Optional, List, Set
+from typing import Collection, List, Optional, Set
 
 import click
 
 from disease import SOURCES_FOR_MERGE, SOURCES_LOWER_LOOKUP, logger
-from disease.database.database import AbstractDatabase, DatabaseException, \
-    DatabaseReadException, DatabaseWriteException, create_db
-from disease.schemas import SourceName
+from disease.database.database import (
+    AbstractDatabase,
+    DatabaseException,
+    DatabaseReadException,
+    DatabaseWriteException,
+    create_db,
+)
+from disease.etl import DO, OMIM, Mondo, NCIt, OncoTree  # noqa: F401
 from disease.etl.merge import Merge
-from disease.etl import Mondo, NCIt, DO, OncoTree, OMIM  # noqa: F401
-
+from disease.schemas import SourceName
 
 # Use to lookup class object from source name. Should be one key-value pair
 # for every functioning ETL class.
-SOURCES_CLASS_LOOKUP = {s.value.lower(): eval(s.value)
-                        for s in SourceName.__members__.values()}
+SOURCES_CLASS_LOOKUP = {
+    s.value.lower(): eval(s.value) for s in SourceName.__members__.values()
+}
 
 
 @click.command()
@@ -66,7 +71,9 @@ def update_from_remote(data_url: Optional[str], db_url: str) -> None:
     try:
         db.load_from_remote(data_url)
     except NotImplementedError:
-        click.echo(f"Error: Fetching remote data dump not supported for {db.__class__.__name__}")  # noqa: E501
+        click.echo(
+            f"Error: Fetching remote data dump not supported for {db.__class__.__name__}"
+        )  # noqa: E501
         click.get_current_context().exit(1)
     except DatabaseException as e:
         click.echo(f"Encountered exception during update: {str(e)}")
@@ -75,12 +82,13 @@ def update_from_remote(data_url: Optional[str], db_url: str) -> None:
 
 @click.command()
 @click.option(
-    "--output_directory", "-o",
+    "--output_directory",
+    "-o",
     help="Output location to write to",
-    type=click.Path(exists=True, path_type=Path)
+    type=click.Path(exists=True, path_type=Path),
 )
 @click.option("--db_url", help="URL endpoint for the application database.")
-def dump_database(output_directory: Path, db_url: str):
+def dump_database(output_directory: Path, db_url: str) -> None:
     """Dump data from database into file.
 
     \f
@@ -104,8 +112,10 @@ def dump_database(output_directory: Path, db_url: str):
 
 
 def _update_sources(
-    sources: Collection[SourceName], db: AbstractDatabase, update_merged: bool,
-    from_local: bool
+    sources: Collection[SourceName],
+    db: AbstractDatabase,
+    update_merged: bool,
+    from_local: bool,
 ) -> None:
     """Update selected normalizer sources.
 
@@ -145,8 +155,11 @@ def _delete_source(n: SourceName, db: AbstractDatabase) -> float:
 
 
 def _load_source(
-    n: SourceName, db: AbstractDatabase, delete_time: float, processed_ids: List[str],
-    from_local: bool
+    n: SourceName,
+    db: AbstractDatabase,
+    delete_time: float,
+    processed_ids: List[str],
+    from_local: bool,
 ) -> None:
     """Load individual source data.
 
@@ -162,7 +175,7 @@ def _load_source(
     start_load = timer()
 
     # used to get source class name from string
-    SourceClass = eval(n.value)
+    SourceClass = eval(n.value)  # noqa: N806
 
     source = SourceClass(database=db)
     processed_ids += source.perform_etl(use_existing=from_local)
@@ -209,43 +222,34 @@ def _load_merge(db: AbstractDatabase, processed_ids: Set[str]) -> None:
     click.echo("Constructing normalized records...")
     merge.create_merged_concepts(processed_ids)
     end = timer()
-    click.echo(f"Merged concept generation completed in "
-               f"{(end - start):.5f} seconds")
+    click.echo(
+        f"Merged concept generation completed in " f"{(end - start):.5f} seconds"
+    )
 
 
 @click.command()
+@click.option("--sources", help="The source(s) you wish to update separated by spaces.")
+@click.option("--aws_instance", is_flag=True, help="Using AWS DynamodDB instance.")
+@click.option("--db_url", help="URL endpoint for the application database.")
+@click.option("--update_all", is_flag=True, help="Update all normalizer sources.")
 @click.option(
-    '--sources',
-    help="The source(s) you wish to update separated by spaces."
-)
-@click.option(
-    '--aws_instance',
+    "--update_merged",
     is_flag=True,
-    help="Using AWS DynamodDB instance."
+    help="Update concepts for normalize endpoint from accepted sources.",
 )
 @click.option(
-    '--db_url',
-    help="URL endpoint for the application database."
-)
-@click.option(
-    '--update_all',
-    is_flag=True,
-    help='Update all normalizer sources.'
-)
-@click.option(
-    '--update_merged',
-    is_flag=True,
-    help='Update concepts for normalize endpoint from accepted sources.'
-)
-@click.option(
-    '--from_local',
+    "--from_local",
     is_flag=True,
     default=False,
-    help="Use most recent local source data instead of fetching latest versions."
+    help="Use most recent local source data instead of fetching latest versions.",
 )
 def update_db(
-    sources: str, aws_instance: bool, db_url: str, update_all: bool,
-    update_merged: bool, from_local: bool
+    sources: str,
+    aws_instance: bool,
+    db_url: str,
+    update_all: bool,
+    update_merged: bool,
+    from_local: bool,
 ) -> None:
     """Update selected normalizer source(s) in the disease database.
 
@@ -266,7 +270,9 @@ def update_db(
             _load_merge(db, set())
         else:
             ctx = click.get_current_context()
-            click.echo("Must either enter 1 or more sources, or use `--update_all` parameter")  # noqa: E501
+            click.echo(
+                "Must either enter 1 or more sources, or use `--update_all` parameter"
+            )  # noqa: E501
             click.echo(ctx.get_help())
             ctx.exit()
     else:
@@ -284,5 +290,5 @@ def update_db(
         _update_sources(sources_to_update, db, update_merged, from_local)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     update_db()

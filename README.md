@@ -128,16 +128,17 @@ pip install -e ".[pg,etl,dev,test]"
 
 ### Init coding style tests
 
-Code style is managed by [flake8](https://github.com/PyCQA/flake8) and checked prior to commit.
+Code style is managed by [Ruff](https://github.com/astral-sh/ruff) and [Black](https://github.com/psf/black) and checked prior to commit.
 
 We use [pre-commit](https://pre-commit.com/#usage) to run conformance tests.
 
-This ensures:
+This performs checks for:
 
-* Check code style
-* Check for added large files
-* Detect AWS Credentials
-* Detect Private Key
+* Code style
+* File endings
+* Added large files
+* AWS credentials
+* Private keys
 
 Before first commit run:
 

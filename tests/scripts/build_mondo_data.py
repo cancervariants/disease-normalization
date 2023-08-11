@@ -5,17 +5,16 @@ directory, because the OWL output is still too large to commit to the repo. Meth
 using it should a) make sure to check for files with the `fixture_` prefix, and b)
 remember to decompress it.
 """
-from http import HTTPStatus
 import os
-import tarfile
 import subprocess
+import tarfile
+from http import HTTPStatus
 from pathlib import Path
 
 import requests
 
-from disease.etl import Mondo
 from disease.database import create_db
-
+from disease.etl import Mondo
 
 mondo = Mondo(create_db())
 mondo._extract_data()
@@ -27,7 +26,9 @@ test_data_dir = scripts_dir.parent / "data" / "mondo"
 
 robot_file = scripts_dir / "robot"
 if not robot_file.exists():
-    response = requests.get("https://raw.githubusercontent.com/ontodev/robot/master/bin/robot")  # noqa: E501
+    response = requests.get(
+        "https://raw.githubusercontent.com/ontodev/robot/master/bin/robot"
+    )  # noqa: E501
     if response.status_code != HTTPStatus.OK:
         raise requests.HTTPError("Couldn't acquire robot script")
     with open(robot_file, "wb") as f:
@@ -37,11 +38,15 @@ if not robot_file.exists():
     except PermissionError:
         pass  # handle below
 if not os.access(robot_file, os.X_OK):
-    raise PermissionError("robot file isn't executable by the user -- see 'getting started': http://robot.obolibrary.org/")  # noqa: E501
+    raise PermissionError(
+        "robot file isn't executable by the user -- see 'getting started': http://robot.obolibrary.org/"
+    )  # noqa: E501
 
 robot_jar = scripts_dir / "robot.jar"
 if not robot_jar.exists():
-    response = requests.get("https://api.github.com/repos/ontodev/robot/releases/latest")  # noqa: E501
+    response = requests.get(
+        "https://api.github.com/repos/ontodev/robot/releases/latest"
+    )  # noqa: E501
     if response.status_code != HTTPStatus.OK:
         raise requests.HTTPError("Couldn't get ROBOT release info from GitHub")
     json = response.json()
