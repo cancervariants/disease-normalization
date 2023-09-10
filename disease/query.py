@@ -291,7 +291,7 @@ class QueryHandler:
         response["service_meta_"] = ServiceMeta(
             version=__version__,
             response_datetime=datetime.now(),
-        ).dict()
+        ).model_dump()
         return SearchService(**response)
 
     def _add_merged_meta(self, response: Dict) -> Dict:

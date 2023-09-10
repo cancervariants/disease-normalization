@@ -3,10 +3,18 @@ disease records.
 """
 from datetime import datetime
 from enum import Enum, IntEnum
-from typing import Any, Dict, List, Optional, Type, Union
+from typing import Any, Dict, List, Literal, Optional, Union
 
-from ga4gh.vrsatile.pydantic.vrsatile_models import DiseaseDescriptor
-from pydantic import BaseModel, StrictBool
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    StrictBool,
+    StrictStr,
+    constr,
+    field_validator,
+)
+
+from disease.version import __version__
 
 
 class MatchType(IntEnum):
@@ -98,24 +106,16 @@ class SourcePriority(IntEnum):
 class Disease(BaseModel):
     """Define disease record."""
 
-    label: str
-    concept_id: str
-    aliases: Optional[List[str]] = []
-    xrefs: Optional[List[str]] = []
-    associated_with: Optional[List[str]] = []
-    pediatric_disease: Optional[bool]
+    label: StrictStr
+    concept_id: StrictStr
+    aliases: List[StrictStr] = []
+    xrefs: List[StrictStr] = []
+    associated_with: List[StrictStr] = []
+    pediatric_disease: Optional[bool] = None
 
-    class Config:
-        """Configure model."""
-
-        @staticmethod
-        def schema_extra(schema: Dict[str, Any], model: Type["Disease"]) -> None:
-            """Configure OpenAPI schema."""
-            if "title" in schema.keys():
-                schema.pop("title", None)
-            for prop in schema.get("properties", {}).values():
-                prop.pop("title", None)
-            schema["example"] = {
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
                 "label": "Von Hippel-Lindau Syndrome",
                 "concept_id": "ncit:C3105",
                 "aliases": [
@@ -129,6 +129,8 @@ class Disease(BaseModel):
                 "associated_with": ["umls:C0019562"],
                 "pediatric_disease": None,
             }
+        }
+    )
 
 
 class DataLicenseAttributes(BaseModel):
@@ -152,24 +154,16 @@ class RefType(str, Enum):
 class SourceMeta(BaseModel):
     """Metadata for a given source to return in response object."""
 
-    data_license: str
-    data_license_url: str
-    version: str
-    data_url: Optional[str]
-    rdp_url: Optional[str]
-    data_license_attributes: Dict[str, StrictBool]
+    data_license: StrictStr
+    data_license_url: StrictStr
+    version: StrictStr
+    data_url: Optional[StrictStr] = None
+    rdp_url: Optional[StrictStr] = None
+    data_license_attributes: Dict[StrictStr, StrictBool]
 
-    class Config:
-        """Enables orm_mode"""
-
-        @staticmethod
-        def schema_extra(schema: Dict[str, Any], model: Type["SourceMeta"]) -> None:
-            """Configure OpenAPI schema"""
-            if "title" in schema.keys():
-                schema.pop("title", None)
-            for prop in schema.get("properties", {}).values():
-                prop.pop("title", None)
-            schema["example"] = {
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
                 "data_license": "CC BY 4.0",
                 "data_license_url": "https://creativecommons.org/licenses/by/4.0/legalcode",  # noqa: E501
                 "version": "21.01d",
@@ -181,6 +175,8 @@ class SourceMeta(BaseModel):
                     "share_alike": False,
                 },
             }
+        }
+    )
 
 
 class MatchesKeyed(BaseModel):
@@ -189,20 +185,12 @@ class MatchesKeyed(BaseModel):
     """
 
     match_type: MatchType
-    records: List[Disease]
+    records: List[Disease] = []
     source_meta_: SourceMeta
 
-    class Config:
-        """Enables orm_mode"""
-
-        @staticmethod
-        def schema_extra(schema: Dict[str, Any], model: Type["MatchesKeyed"]) -> None:
-            """Configure OpenAPI schema"""
-            if "title" in schema.keys():
-                schema.pop("title", None)
-            for prop in schema.get("properties", {}).values():
-                prop.pop("title", None)
-            schema["example"] = {
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
                 "match_type": 80,
                 "records": [
                     {
@@ -233,6 +221,8 @@ class MatchesKeyed(BaseModel):
                     },
                 },
             }
+        }
+    )
 
 
 class MatchesListed(BaseModel):
@@ -242,20 +232,12 @@ class MatchesListed(BaseModel):
 
     source: SourceName
     match_type: MatchType
-    records: List[Disease]
+    records: List[Disease] = []
     source_meta_: SourceMeta
 
-    class Config:
-        """Enables orm_mode"""
-
-        @staticmethod
-        def schema_extra(schema: Dict[str, Any], model: Type["MatchesListed"]) -> None:
-            """Configure OpenAPI schema"""
-            if "title" in schema.keys():
-                schema.pop("title", None)
-            for prop in schema.get("properties", {}).values():
-                prop.pop("title", None)
-            schema["example"] = {
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
                 "source": "NCIt",
                 "match_type": 80,
                 "records": [
@@ -287,57 +269,90 @@ class MatchesListed(BaseModel):
                     },
                 },
             }
+        }
+    )
 
 
 class ServiceMeta(BaseModel):
     """Metadata regarding the disease-normalization service."""
 
-    name = "disease-normalizer"
-    version: str
+    name: Literal["disease-normalizer"] = "disease-normalizer"
+    version: StrictStr
     response_datetime: datetime
-    url = "https://github.com/cancervariants/disease-normalization"
+    url: Literal[
+        "https://github.com/cancervariants/disease-normalization"
+    ] = "https://github.com/cancervariants/disease-normalization"
 
-    class Config:
-        """Enables orm_mode"""
-
-        @staticmethod
-        def schema_extra(schema: Dict[str, Any], model: Type["ServiceMeta"]) -> None:
-            """Configure OpenAPI schema"""
-            if "title" in schema.keys():
-                schema.pop("title", None)
-            for prop in schema.get("properties", {}).values():
-                prop.pop("title", None)
-            schema["example"] = {
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
                 "name": "disease-normalizer",
-                "version": "0.1.0",
+                "version": __version__,
                 "response_datetime": "2021-04-05T16:44:15.367831",
                 "url": "https://github.com/cancervariants/disease-normalization",
             }
+        }
+    )
+
+
+CURIE = constr(pattern=r"^\w[^:]*:.+$")
+
+
+class Extension(BaseModel):
+    """The Extension class provides VODs with a means to extend descriptions with other
+    attributes unique to a content provider.
+    """
+
+    type: Literal["Extension"] = "Extension"
+    name: StrictStr
+    value: Optional[Any] = None
+
+
+class DiseaseValueObject(BaseModel, extra="forbid"):
+    """A reference to a Disease as defined by an authority. For human diseases, the
+    use of `MONDO <https://registry.identifiers.org/registry/mondo>` as the disease
+    authority is RECOMMENDED.
+    """
+
+    id: CURIE
+    type: Literal["Disease"] = "Disease"
+
+
+class DiseaseDescriptor(BaseModel, extra="forbid"):
+    """This descriptor class is used for describing Disease domain entities."""
+
+    id: Optional[StrictStr] = None
+    type: Literal["DiseaseDescriptor"] = "DiseaseDescriptor"
+    disease: Union[CURIE, DiseaseValueObject]
+    label: Optional[StrictStr] = None
+    description: Optional[StrictStr] = None
+    xrefs: List[CURIE] = []
+    alternate_labels: List[StrictStr] = []
+    extensions: List[Extension] = []
+
+    @field_validator("xrefs")
+    def check_count_value(cls, v):
+        """Check xrefs value"""
+        if v:
+            assert len(v) == len(
+                {xref for xref in v}
+            ), "xrefs must contain unique items"
+        return v
 
 
 class NormalizationService(BaseModel):
     """Response containing one or more merged records and source data."""
 
-    query: str
-    warnings: Optional[Dict]
+    query: StrictStr
+    warnings: Optional[Dict] = None
     match_type: MatchType
-    disease_descriptor: Optional[DiseaseDescriptor]
-    source_meta_: Optional[Dict[SourceName, SourceMeta]]
+    disease_descriptor: Optional[DiseaseDescriptor] = None
+    source_meta_: Optional[Dict[SourceName, SourceMeta]] = None
     service_meta_: ServiceMeta
 
-    class Config:
-        """Configure model."""
-
-        @staticmethod
-        def schema_extra(
-            schema: Dict[str, Any], model: Type["NormalizationService"]
-        ) -> None:
-            """Configure OpenAPI schema"""
-            if "title" in schema.keys():
-                schema.pop("title", None)
-            for prop in schema.get("properties", {}).values():
-                prop.pop("title", None)
-            schema["example"] = {
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
                 "query": "childhood leukemia",
                 "warnings": None,
                 "match_type": 80,
@@ -407,32 +422,26 @@ class NormalizationService(BaseModel):
                 },
                 "service_meta_": {
                     "name": "disease-normalizer",
-                    "version": "0.1.0",
+                    "version": __version__,
                     "response_datetime": "2021-04-05T16:44:15.367831",
                     "url": "https://github.com/cancervariants/disease-normalization",
                 },
             }
+        }
+    )
 
 
 class SearchService(BaseModel):
     """Core response schema containing matches for each source"""
 
-    query: str
-    warnings: Optional[Dict]
+    query: StrictStr
+    warnings: Optional[Dict] = None
     source_matches: Union[Dict[SourceName, MatchesKeyed], List[MatchesListed]]
     service_meta_: ServiceMeta
 
-    class Config:
-        """Enables orm_mode"""
-
-        @staticmethod
-        def schema_extra(schema: Dict[str, Any], model: Type["SearchService"]) -> None:
-            """Configure OpenAPI schema"""
-            if "title" in schema.keys():
-                schema.pop("title", None)
-            for prop in schema.get("properties", {}).values():
-                prop.pop("title", None)
-            schema["example"] = {
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
                 "query": "Von Hippel-Lindau Syndrome",
                 "warnings": None,
                 "source_matches": [
@@ -471,8 +480,10 @@ class SearchService(BaseModel):
                 ],
                 "service_meta_": {
                     "name": "disease-normalizer",
-                    "version": "0.1.0",
+                    "version": __version__,
                     "response_datetime": "2021-04-05T16:44:15.367831",
                     "url": "https://github.com/cancervariants/disease-normalization",  # noqa: E501
                 },
             }
+        }
+    )

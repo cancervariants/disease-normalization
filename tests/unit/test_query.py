@@ -2,10 +2,9 @@
 from datetime import datetime
 
 import pytest
-from ga4gh.vrsatile.pydantic.vrsatile_models import DiseaseDescriptor
 
 from disease.query import InvalidParameterException, QueryHandler
-from disease.schemas import MatchType, SourceName
+from disease.schemas import DiseaseDescriptor, MatchType, SourceName
 
 
 @pytest.fixture(scope="module")
