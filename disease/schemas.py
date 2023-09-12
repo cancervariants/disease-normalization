@@ -3,16 +3,10 @@ disease records.
 """
 from datetime import datetime
 from enum import Enum, IntEnum
-from typing import Any, Dict, List, Literal, Optional, Union
+from typing import Dict, List, Literal, Optional, Union
 
-from pydantic import (
-    BaseModel,
-    ConfigDict,
-    StrictBool,
-    StrictStr,
-    constr,
-    field_validator,
-)
+from ga4gh.core import core_models
+from pydantic import BaseModel, ConfigDict, StrictBool, StrictStr
 
 from disease.version import __version__
 
@@ -295,58 +289,13 @@ class ServiceMeta(BaseModel):
     )
 
 
-CURIE = constr(pattern=r"^\w[^:]*:.+$")
-
-
-class Extension(BaseModel):
-    """The Extension class provides VODs with a means to extend descriptions with other
-    attributes unique to a content provider.
-    """
-
-    type: Literal["Extension"] = "Extension"
-    name: StrictStr
-    value: Optional[Any] = None
-
-
-class DiseaseValueObject(BaseModel, extra="forbid"):
-    """A reference to a Disease as defined by an authority. For human diseases, the
-    use of `MONDO <https://registry.identifiers.org/registry/mondo>` as the disease
-    authority is RECOMMENDED.
-    """
-
-    id: CURIE
-    type: Literal["Disease"] = "Disease"
-
-
-class DiseaseDescriptor(BaseModel, extra="forbid"):
-    """This descriptor class is used for describing Disease domain entities."""
-
-    id: Optional[StrictStr] = None
-    type: Literal["DiseaseDescriptor"] = "DiseaseDescriptor"
-    disease: Union[CURIE, DiseaseValueObject]
-    label: Optional[StrictStr] = None
-    description: Optional[StrictStr] = None
-    xrefs: List[CURIE] = []
-    alternate_labels: List[StrictStr] = []
-    extensions: List[Extension] = []
-
-    @field_validator("xrefs")
-    def check_count_value(cls, v):
-        """Check xrefs value"""
-        if v:
-            assert len(v) == len(
-                {xref for xref in v}
-            ), "xrefs must contain unique items"
-        return v
-
-
 class NormalizationService(BaseModel):
     """Response containing one or more merged records and source data."""
 
     query: StrictStr
     warnings: Optional[Dict] = None
     match_type: MatchType
-    disease_descriptor: Optional[DiseaseDescriptor] = None
+    disease: Optional[core_models.Disease] = None
     source_meta_: Optional[Dict[SourceName, SourceMeta]] = None
     service_meta_: ServiceMeta
 
@@ -356,29 +305,36 @@ class NormalizationService(BaseModel):
                 "query": "childhood leukemia",
                 "warnings": None,
                 "match_type": 80,
-                "disease_descriptor": {
-                    "id": "normalize:childhood%20leukemia",
-                    "type": "DiseaseDescriptor",
-                    "disease": "ncit:C4989",
+                "disease": {
+                    "id": "ncit:C4989",
+                    "type": "Disease",
                     "label": "Childhood Leukemia",
-                    "xrefs": ["mondo:0004355", "DOID:7757"],
-                    "alternate_labels": [
+                    "aliases": [
                         "childhood leukemia (disease)",
                         "leukemia",
                         "pediatric leukemia (disease)",
                         "Leukemia",
                         "leukemia (disease) of childhood",
                     ],
+                    "mappings": [
+                        {
+                            "coding": {"code": "0004355", "system": "mondo"},
+                            "relation": "relatedMatch",
+                        },
+                        {
+                            "coding": {"code": "7757", "system": "doid"},
+                            "relation": "relatedMatch",
+                        },
+                        {
+                            "coding": {"code": "C1332977", "system": "umls"},
+                            "relation": "relatedMatch",
+                        },
+                    ],
                     "extensions": [
                         {
                             "type": "Extension",
                             "name": "pediatric_disease",
                             "value": True,
-                        },
-                        {
-                            "type": "Extension",
-                            "name": "associated_with",
-                            "value": ["umls:C1332977"],
                         },
                     ],
                 },
