@@ -318,15 +318,14 @@ class QueryHandler:
         response["source_meta_"] = sources_meta
         return response
 
-    def _add_vod(
-        self, response: Dict, record: Dict, query: str, match_type: MatchType
+    def _add_disease(
+        self, response: Dict, record: Dict, match_type: MatchType
     ) -> NormalizationService:
-        """Format received DB record as VOD and update response object.
+        """Format received DB record as core Disease object and update response object.
 
-        :param Dict response: in-progress response object
-        :param Dict record: record as stored in DB
-        :param str query: query string from user request
-        :param MatchType match_type: type of match achieved
+        :param response: in-progress response object
+        :param record: record as stored in DB
+        :param match_type: type of match achieved
         :return: completed normalized response object ready to return to user
         """
         disease_obj = core_models.Disease(
@@ -415,7 +414,7 @@ class QueryHandler:
         # check merged concept ID match
         record = self.db.get_record_by_id(query_str, case_sensitive=False, merge=True)
         if record:
-            return self._add_vod(response, record, query, MatchType.CONCEPT_ID)
+            return self._add_disease(response, record, MatchType.CONCEPT_ID)
 
         non_merged_match = None
 
@@ -429,7 +428,7 @@ class QueryHandler:
                 if merge is None:
                     return self._handle_failed_merge_ref(record, response, query_str)
                 else:
-                    return self._add_vod(response, merge, query, MatchType.CONCEPT_ID)
+                    return self._add_disease(response, merge, MatchType.CONCEPT_ID)
             else:
                 non_merged_match = (record, "concept_id")
 
@@ -457,8 +456,8 @@ class QueryHandler:
                                 record, response, query_str
                             )
                         else:
-                            return self._add_vod(
-                                response, merge, query, MatchType[match_type.upper()]
+                            return self._add_disease(
+                                response, merge, MatchType[match_type.upper()]
                             )
                     else:
                         if not non_merged_match:
@@ -467,6 +466,6 @@ class QueryHandler:
         # if no successful match, try available non-merged match
         if non_merged_match:
             match_type = MatchType[non_merged_match[1].upper()]
-            return self._add_vod(response, non_merged_match[0], query, match_type)
+            return self._add_disease(response, non_merged_match[0], match_type)
 
         return NormalizationService(**response)

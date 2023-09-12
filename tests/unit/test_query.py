@@ -136,7 +136,7 @@ def mafd2():
     )
 
 
-def compare_vod(actual, fixture):
+def compare_disease(actual, fixture):
     """Verify correctness of returned Disease core object against test fixture."""
     actual = actual.disease
     actual_keys = actual.model_dump(exclude_none=True).keys()
@@ -253,7 +253,7 @@ def test_normalize_query(query_handler, neuroblastoma, mafd2):
     response = query_handler.normalize("Neuroblastoma")
     assert response.match_type == MatchType.LABEL
     assert response.warnings is None
-    compare_vod(response, neuroblastoma)
+    compare_disease(response, neuroblastoma)
     assert len(response.source_meta_) == 4
     assert SourceName.NCIT in response.source_meta_
     assert SourceName.DO in response.source_meta_
@@ -263,7 +263,7 @@ def test_normalize_query(query_handler, neuroblastoma, mafd2):
     response = query_handler.normalize("MAFD2")
     assert response.match_type == MatchType.ALIAS
     assert response.warnings is None
-    compare_vod(response, mafd2)
+    compare_disease(response, mafd2)
     assert len(response.source_meta_) == 2
     assert SourceName.MONDO in response.source_meta_
 
@@ -273,19 +273,19 @@ def test_normalize_non_mondo(query_handler, skin_myo, neuroblastoma):
     response = query_handler.normalize("Skin Myoepithelioma")
     assert response.match_type == MatchType.LABEL
     assert len(response.source_meta_) == 1
-    compare_vod(response, skin_myo)
+    compare_disease(response, skin_myo)
     assert SourceName.NCIT in response.source_meta_
 
     response = query_handler.normalize("Cutaneous Myoepithelioma")
     assert response.match_type == MatchType.ALIAS
     assert len(response.source_meta_) == 1
-    compare_vod(response, skin_myo)
+    compare_disease(response, skin_myo)
     assert SourceName.NCIT in response.source_meta_
 
     response = query_handler.normalize("orphanet:635")
     assert response.match_type == MatchType.XREF
     assert len(response.source_meta_) == 4
-    compare_vod(response, neuroblastoma)
+    compare_disease(response, neuroblastoma)
     assert SourceName.NCIT in response.source_meta_
     assert SourceName.DO in response.source_meta_
     assert SourceName.MONDO in response.source_meta_
