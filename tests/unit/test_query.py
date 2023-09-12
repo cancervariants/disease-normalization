@@ -32,7 +32,7 @@ def neuroblastoma():
                     "relation": "relatedMatch",
                 },
                 {
-                    "coding": {"code": "769", "system": "DOID"},
+                    "coding": {"code": "769", "system": "doid"},
                     "relation": "relatedMatch",
                 },
                 {

@@ -308,7 +308,7 @@ class QueryHandler:
 
         for src in sources:
             try:
-                src_name = PREFIX_LOOKUP[src.lower()]
+                src_name = PREFIX_LOOKUP[src]
             except KeyError:
                 # not an imported source
                 continue
@@ -339,7 +339,7 @@ class QueryHandler:
             mappings.append(
                 core_models.Mapping(
                     coding=core_models.Coding(
-                        code=core_models.Code(code), system=system
+                        code=core_models.Code(code), system=system.lower()
                     ),
                     relation=core_models.Relation.RELATED_MATCH,
                 )
