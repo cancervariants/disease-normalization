@@ -302,7 +302,7 @@ class QueryHandler:
         """
         sources_meta = {}
         disease = response["disease"]
-        sources = [disease.id.split(":")[0]]
+        sources = [response["normalized_id"].split(":")[0]]
         if disease.mappings:
             sources += [m.coding.system for m in disease.mappings]
 
