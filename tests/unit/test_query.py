@@ -20,7 +20,7 @@ def neuroblastoma():
     return core_models.Disease(
         **{
             "type": "Disease",
-            "id": "ncit:C3270",
+            "id": "normalize.disease.ncit:C3270",
             "label": "Neuroblastoma",
             "mappings": [
                 {
@@ -94,7 +94,7 @@ def skin_myo():
     return core_models.Disease(
         **{
             "type": "Disease",
-            "id": "ncit:C167370",
+            "id": "normalize.disease.ncit:C167370",
             "label": "Skin Myoepithelioma",
             "aliases": ["Cutaneous Myoepithelioma"],
         }
@@ -109,7 +109,7 @@ def mafd2():
     return core_models.Disease(
         **{
             "type": "Disease",
-            "id": "mondo:0010648",
+            "id": "normalize.disease.mondo:0010648",
             "label": "major affective disorder 2",
             "aliases": [
                 "MAFD2",
@@ -138,6 +138,7 @@ def mafd2():
 
 def compare_disease(actual, fixture):
     """Verify correctness of returned Disease core object against test fixture."""
+    assert actual.normalized_id == fixture.id.split("normalize.disease.")[-1]
     actual = actual.disease
     actual_keys = actual.model_dump(exclude_none=True).keys()
     fixture_keys = fixture.model_dump(exclude_none=True).keys()

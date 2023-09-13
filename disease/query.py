@@ -329,7 +329,7 @@ class QueryHandler:
         :return: completed normalized response object ready to return to user
         """
         disease_obj = core_models.Disease(
-            id=record["concept_id"], label=record["label"]
+            id=f"normalize.disease.{record['concept_id']}", label=record["label"]
         )
 
         source_ids = record.get("xrefs", []) + record.get("associated_with", [])
@@ -360,6 +360,7 @@ class QueryHandler:
 
         response["match_type"] = match_type
         response["disease"] = disease_obj
+        response["normalized_id"] = record["concept_id"]
         response = self._add_merged_meta(response)
         return NormalizationService(**response)
 

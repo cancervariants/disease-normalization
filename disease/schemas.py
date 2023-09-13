@@ -295,6 +295,7 @@ class NormalizationService(BaseModel):
     query: StrictStr
     warnings: Optional[Dict] = None
     match_type: MatchType
+    normalized_id: Optional[str] = None
     disease: Optional[core_models.Disease] = None
     source_meta_: Optional[Dict[SourceName, SourceMeta]] = None
     service_meta_: ServiceMeta
@@ -305,8 +306,9 @@ class NormalizationService(BaseModel):
                 "query": "childhood leukemia",
                 "warnings": None,
                 "match_type": 80,
+                "normalized_id": "ncit:C4989",
                 "disease": {
-                    "id": "ncit:C4989",
+                    "id": "normalize.disease.ncit:C4989",
                     "type": "Disease",
                     "label": "Childhood Leukemia",
                     "aliases": [
