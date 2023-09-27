@@ -1,4 +1,4 @@
-"""This module provides methods for handling queries."""
+"""Provides methods for handling queries."""
 import re
 from datetime import datetime
 from typing import Dict, Optional, Set, Tuple
@@ -21,14 +21,8 @@ from disease.schemas import (
 from .version import __version__
 
 
-class InvalidParameterException(Exception):
+class InvalidParameterException(Exception):  # noqa: N818
     """Exception for invalid parameter args provided by the user."""
-
-    def __init__(self, message):
-        """Create new instance
-        :param str message: string describing the nature of the error
-        """
-        super().__init__(message)
 
 
 class QueryHandler:
@@ -36,14 +30,14 @@ class QueryHandler:
     and normalizes query input.
     """
 
-    def __init__(self, database: AbstractDatabase):
+    def __init__(self, database: AbstractDatabase) -> None:
         """Initialize Normalizer instance.
 
         :param database: storage backend to query against
         """
         self.db = database
 
-    def _emit_warnings(self, query_str) -> Optional[Dict]:
+    def _emit_warnings(self, query_str: str) -> Optional[Dict]:
         """Emit warnings if query contains non breaking space characters.
         :param str query_str: query string
         :return: dict keying warning type to warning description
@@ -231,7 +225,9 @@ class QueryHandler:
 
         return response_dict
 
-    def search(self, query_str, keyed=False, incl="", excl="") -> SearchService:
+    def search(
+        self, query_str: str, keyed: bool = False, incl: str = "", excl: str = ""
+    ) -> SearchService:
         """Fetch normalized disease objects.
         :param str query_str: query, a string, to search for
         :param bool keyed: if true, return response as dict keying source names
@@ -386,7 +382,9 @@ class QueryHandler:
             source_rank = 4
         return source_rank, record["concept_id"]
 
-    def _handle_failed_merge_ref(self, record, response, query) -> NormalizationService:
+    def _handle_failed_merge_ref(
+        self, record: Dict, response: Dict, query: str
+    ) -> NormalizationService:
         """Log + fill out response for a failed merge reference lookup.
 
         :param Dict record: record containing failed merge_ref

@@ -32,7 +32,7 @@ _logger.setLevel(logging.DEBUG)
 class DynamoDbDatabase(AbstractDatabase):
     """Database class employing DynamoDB."""
 
-    def __init__(self, db_url: Optional[str] = None, **db_args):
+    def __init__(self, db_url: Optional[str] = None, **db_args) -> None:
         """Initialize Database class.
 
         :param str db_url: URL endpoint for DynamoDB source
@@ -114,7 +114,7 @@ class DynamoDbDatabase(AbstractDatabase):
         for table_name in existing_tables:
             self.dynamodb.Table(table_name).delete()
 
-    def _create_diseases_table(self):
+    def _create_diseases_table(self) -> None:
         """Create Diseases table."""
         self.dynamodb.create_table(
             TableName="disease_concepts",
@@ -413,7 +413,7 @@ class DynamoDbDatabase(AbstractDatabase):
                 f"{e.response['Error']['Message']}"
             )
 
-    def update_merge_ref(self, concept_id: str, merge_ref: Any) -> None:
+    def update_merge_ref(self, concept_id: str, merge_ref: Any) -> None:  # noqa: ANN401
         """Update the merged record reference of an individual record to a new value.
 
         :param concept_id: record to update
@@ -521,7 +521,7 @@ class DynamoDbDatabase(AbstractDatabase):
         """Perform any manual connection closure procedures if necessary."""
         self.batch.__exit__(*sys.exc_info())
 
-    def load_from_remote(self, url: Optional[str] = None) -> None:
+    def load_from_remote(self, url: Optional[str] = None) -> None:  # noqa: ANN401
         """Load DB from remote dump. Not available for DynamoDB database backend.
 
         :param url: remote location to retrieve gzipped dump file from
