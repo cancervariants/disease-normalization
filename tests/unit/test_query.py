@@ -2,7 +2,7 @@
 from datetime import datetime
 
 import pytest
-from ga4gh.vrsatile.pydantic.vrsatile_models import DiseaseDescriptor
+from ga4gh.core import core_models
 
 from disease.query import InvalidParameterException, QueryHandler
 from disease.schemas import MatchType, SourceName
@@ -17,14 +17,62 @@ def query_handler(database):
 @pytest.fixture(scope="module")
 def neuroblastoma():
     """Create neuroblastoma fixture."""
-    return DiseaseDescriptor(
+    return core_models.Disease(
         **{
-            "id": "normalize.disease:Neuroblastoma",
-            "type": "DiseaseDescriptor",
-            "disease": "ncit:C3270",
+            "type": "Disease",
+            "id": "normalize.disease.ncit:C3270",
             "label": "Neuroblastoma",
-            "xrefs": ["mondo:0005072", "oncotree:NBL", "DOID:769"],
-            "alternate_labels": [
+            "mappings": [
+                {
+                    "coding": {"code": "0005072", "system": "mondo"},
+                    "relation": "relatedMatch",
+                },
+                {
+                    "coding": {"code": "NBL", "system": "oncotree"},
+                    "relation": "relatedMatch",
+                },
+                {
+                    "coding": {"code": "769", "system": "doid"},
+                    "relation": "relatedMatch",
+                },
+                {
+                    "coding": {"code": "C0027819", "system": "umls"},
+                    "relation": "relatedMatch",
+                },
+                {
+                    "coding": {"code": "9500/3", "system": "icdo"},
+                    "relation": "relatedMatch",
+                },
+                {
+                    "coding": {"code": "0000621", "system": "efo"},
+                    "relation": "relatedMatch",
+                },
+                {
+                    "coding": {"code": "7185", "system": "gard"},
+                    "relation": "relatedMatch",
+                },
+                {
+                    "coding": {"code": "0007185", "system": "gard"},
+                    "relation": "relatedMatch",
+                },
+                {
+                    "coding": {"code": "D009447", "system": "mesh"},
+                    "relation": "relatedMatch",
+                },
+                {
+                    "coding": {"code": "635", "system": "orphanet"},
+                    "relation": "relatedMatch",
+                },
+                {
+                    "coding": {"code": "C2751421", "system": "umls"},
+                    "relation": "relatedMatch",
+                },
+                {
+                    "coding": {"code": "CN205405", "system": "umls"},
+                    "relation": "relatedMatch",
+                },
+            ],
+            "aliases": [
                 "neuroblastoma",
                 "Neural Crest Tumor, Malignant",
                 "Neuroblastoma (Schwannian Stroma-poor)",
@@ -36,24 +84,6 @@ def neuroblastoma():
                 "neural Crest tumor, malignant",
                 "neuroblastoma, malignant",
             ],
-            "extensions": [
-                {
-                    "type": "Extension",
-                    "name": "associated_with",
-                    "value": [
-                        "umls:C0027819",
-                        "icdo:9500/3",
-                        "efo:0000621",
-                        "gard:7185",
-                        "gard:0007185",
-                        "icdo:9500/3",
-                        "mesh:D009447",
-                        "orphanet:635",
-                        "umls:CN205405",
-                        "umls:C2751421",
-                    ],
-                }
-            ],
         }
     )
 
@@ -61,13 +91,12 @@ def neuroblastoma():
 @pytest.fixture(scope="module")
 def skin_myo():
     """Create a test fixture for skin myopithelioma"""
-    return DiseaseDescriptor(
+    return core_models.Disease(
         **{
-            "id": "normalize.disease:Skin Myoepithelioma",
-            "type": "DiseaseDescriptor",
-            "disease": "ncit:C167370",
+            "type": "Disease",
+            "id": "normalize.disease.ncit:C167370",
             "label": "Skin Myoepithelioma",
-            "alternate_labels": ["Cutaneous Myoepithelioma"],
+            "aliases": ["Cutaneous Myoepithelioma"],
         }
     )
 
@@ -77,13 +106,12 @@ def mafd2():
     """Create a test fixture for major affective disorder 2. Query should not
     include a "pediatric_disease" Extension object.
     """
-    return DiseaseDescriptor(
+    return core_models.Disease(
         **{
-            "id": "normalize.disease:MAFD2",
-            "type": "DiseaseDescriptor",
-            "disease": "mondo:0010648",
+            "type": "Disease",
+            "id": "normalize.disease.mondo:0010648",
             "label": "major affective disorder 2",
-            "alternate_labels": [
+            "aliases": [
                 "MAFD2",
                 "MDI",
                 "MDX",
@@ -94,35 +122,48 @@ def mafd2():
                 "MANIC-DEPRESSIVE PSYCHOSIS, X-LINKED",
                 "major affective disorder 2, X-linked dominant",
             ],
-            "xrefs": ["omim:309200"],
-            "extensions": [
+            "mappings": [
                 {
-                    "type": "Extension",
-                    "name": "associated_with",
-                    "value": ["mesh:C564108"],
-                }
+                    "coding": {"code": "309200", "system": "omim"},
+                    "relation": "relatedMatch",
+                },
+                {
+                    "coding": {"code": "C564108", "system": "mesh"},
+                    "relation": "relatedMatch",
+                },
             ],
         }
     )
 
 
-def compare_vod(actual, fixture):
-    """Verify correctness of returned VOD object against test fixture."""
-    actual = actual.disease_descriptor
+def compare_disease(actual, fixture):
+    """Verify correctness of returned Disease core object against test fixture."""
+    assert actual.normalized_id == fixture.id.split("normalize.disease.")[-1]
+    actual = actual.disease
+    actual_keys = actual.model_dump(exclude_none=True).keys()
+    fixture_keys = fixture.model_dump(exclude_none=True).keys()
+    assert actual_keys == fixture_keys
     assert actual.id == fixture.id
     assert actual.type == fixture.type
-    assert actual.disease == fixture.disease
     assert actual.label == fixture.label
 
-    assert (actual.xrefs is not None) == (fixture.xrefs is not None)
-    if actual.xrefs is not None and fixture.xrefs is not None:
-        assert set(actual.xrefs) == set(fixture.xrefs)
+    assert bool(actual.mappings) == bool(fixture.mappings)
+    if actual.mappings:
+        no_matches = []
+        for actual_mapping in actual.mappings:
+            match = None
+            for fixture_mapping in fixture.mappings:
+                if actual_mapping == fixture_mapping:
+                    match = actual_mapping
+                    break
+            if not match:
+                no_matches.append(actual_mapping)
+        assert no_matches == [], no_matches
+        assert len(actual.mappings) == len(fixture.mappings)
 
-    assert (actual.alternate_labels is not None) == (
-        fixture.alternate_labels is not None
-    )
-    if (actual.alternate_labels is not None) and (fixture.alternate_labels is not None):
-        assert set(actual.alternate_labels) == set(fixture.alternate_labels)
+    assert bool(actual.aliases) == bool(fixture.aliases)
+    if actual.aliases:
+        assert set(actual.aliases) == set(fixture.aliases)
 
     def get_extension(extensions, name):
         matches = [e for e in extensions if e.name == name]
@@ -133,17 +174,10 @@ def compare_vod(actual, fixture):
         else:
             return None
 
-    assert (actual.extensions is not None) == (fixture.extensions is not None)
-    if actual.extensions is not None and fixture.extensions is not None:
+    assert bool(actual.extensions) == bool(fixture.extensions)
+    if actual.extensions:
         ext_actual = actual.extensions
         ext_fixture = fixture.extensions
-
-        assoc_actual = get_extension(ext_actual, "associated_with")
-        assoc_fixture = get_extension(ext_fixture, "associated_with")
-        assert (assoc_actual is None) == (assoc_fixture is None)
-        if assoc_actual and assoc_fixture:
-            assert set(assoc_actual.value) == set(assoc_fixture.value)
-            assert assoc_actual.value
 
         ped_actual = get_extension(ext_actual, "pediatric_disease")
         ped_fixture = get_extension(ext_fixture, "pediatric_disease")
@@ -220,7 +254,7 @@ def test_normalize_query(query_handler, neuroblastoma, mafd2):
     response = query_handler.normalize("Neuroblastoma")
     assert response.match_type == MatchType.LABEL
     assert response.warnings is None
-    compare_vod(response, neuroblastoma)
+    compare_disease(response, neuroblastoma)
     assert len(response.source_meta_) == 4
     assert SourceName.NCIT in response.source_meta_
     assert SourceName.DO in response.source_meta_
@@ -230,7 +264,7 @@ def test_normalize_query(query_handler, neuroblastoma, mafd2):
     response = query_handler.normalize("MAFD2")
     assert response.match_type == MatchType.ALIAS
     assert response.warnings is None
-    compare_vod(response, mafd2)
+    compare_disease(response, mafd2)
     assert len(response.source_meta_) == 2
     assert SourceName.MONDO in response.source_meta_
 
@@ -240,25 +274,19 @@ def test_normalize_non_mondo(query_handler, skin_myo, neuroblastoma):
     response = query_handler.normalize("Skin Myoepithelioma")
     assert response.match_type == MatchType.LABEL
     assert len(response.source_meta_) == 1
-    skin_myo_alias = skin_myo.copy()
-    skin_myo_alias.id = "normalize.disease:Skin%20Myoepithelioma"
-    compare_vod(response, skin_myo_alias)
+    compare_disease(response, skin_myo)
     assert SourceName.NCIT in response.source_meta_
 
     response = query_handler.normalize("Cutaneous Myoepithelioma")
     assert response.match_type == MatchType.ALIAS
     assert len(response.source_meta_) == 1
-    skin_myo_alias = skin_myo.copy()
-    skin_myo_alias.id = "normalize.disease:Cutaneous%20Myoepithelioma"
-    compare_vod(response, skin_myo_alias)
+    compare_disease(response, skin_myo)
     assert SourceName.NCIT in response.source_meta_
 
     response = query_handler.normalize("orphanet:635")
     assert response.match_type == MatchType.XREF
     assert len(response.source_meta_) == 4
-    neuroblastoma_alias = neuroblastoma.copy()
-    neuroblastoma_alias.id = "normalize.disease:orphanet%3A635"
-    compare_vod(response, neuroblastoma_alias)
+    compare_disease(response, neuroblastoma)
     assert SourceName.NCIT in response.source_meta_
     assert SourceName.DO in response.source_meta_
     assert SourceName.MONDO in response.source_meta_

@@ -2,9 +2,9 @@
 import re
 from datetime import datetime
 from typing import Dict, Optional, Set, Tuple
-from urllib.parse import quote
 
 from botocore.exceptions import ClientError
+from ga4gh.core import core_models
 
 from disease import NAMESPACE_LOOKUP, PREFIX_LOOKUP, SOURCES_LOWER_LOOKUP, logger
 from disease.database.database import AbstractDatabase
@@ -291,7 +291,7 @@ class QueryHandler:
         response["service_meta_"] = ServiceMeta(
             version=__version__,
             response_datetime=datetime.now(),
-        ).dict()
+        ).model_dump()
         return SearchService(**response)
 
     def _add_merged_meta(self, response: Dict) -> Dict:
@@ -301,58 +301,66 @@ class QueryHandler:
         :return: completed response object.
         """
         sources_meta = {}
-        vod = response["disease_descriptor"]
-        ids = [vod["disease"]] + vod.get("xrefs", [])
-        for concept_id in ids:
-            prefix = concept_id.split(":")[0]
-            src_name = PREFIX_LOOKUP[prefix.lower()]
-            if src_name not in sources_meta:
-                sources_meta[src_name] = self.db.get_source_metadata(src_name)
+        disease = response["disease"]
+        sources = [response["normalized_id"].split(":")[0]]
+        if disease.mappings:
+            sources += [m.coding.system for m in disease.mappings]
+
+        for src in sources:
+            try:
+                src_name = PREFIX_LOOKUP[src]
+            except KeyError:
+                # not an imported source
+                continue
+            else:
+                if src_name not in sources_meta:
+                    sources_meta[src_name] = self.db.get_source_metadata(src_name)
         response["source_meta_"] = sources_meta
         return response
 
-    def _add_vod(
-        self, response: Dict, record: Dict, query: str, match_type: MatchType
+    def _add_disease(
+        self, response: Dict, record: Dict, match_type: MatchType
     ) -> NormalizationService:
-        """Format received DB record as VOD and update response object.
+        """Format received DB record as core Disease object and update response object.
 
-        :param Dict response: in-progress response object
-        :param Dict record: record as stored in DB
-        :param str query: query string from user request
-        :param MatchType match_type: type of match achieved
+        :param response: in-progress response object
+        :param record: record as stored in DB
+        :param match_type: type of match achieved
         :return: completed normalized response object ready to return to user
         """
-        vod = {
-            "id": f"normalize.disease:{quote(query)}",
-            "type": "DiseaseDescriptor",
-            "disease": record["concept_id"],
-            "label": record["label"],
-            "extensions": [],
-        }
-        if "xrefs" in record:
-            vod["xrefs"] = record["xrefs"]
+        disease_obj = core_models.Disease(
+            id=f"normalize.disease.{record['concept_id']}", label=record["label"]
+        )
+
+        source_ids = record.get("xrefs", []) + record.get("associated_with", [])
+        mappings = []
+        for source_id in source_ids:
+            system, code = source_id.split(":")
+            mappings.append(
+                core_models.Mapping(
+                    coding=core_models.Coding(
+                        code=core_models.Code(code), system=system.lower()
+                    ),
+                    relation=core_models.Relation.RELATED_MATCH,
+                )
+            )
+        if mappings:
+            disease_obj.mappings = mappings
+
         if "aliases" in record:
-            vod["alternate_labels"] = record["aliases"]
+            disease_obj.aliases = record["aliases"]
+
         if "pediatric_disease" in record and record["pediatric_disease"] is not None:
-            vod["extensions"].append(
-                {
-                    "type": "Extension",
-                    "name": "pediatric_disease",
-                    "value": record["pediatric_disease"],
-                }
-            )
-        if "associated_with" in record and record["associated_with"]:
-            vod["extensions"].append(
-                {
-                    "type": "Extension",
-                    "name": "associated_with",
-                    "value": record["associated_with"],
-                }
-            )
-        if not vod["extensions"]:
-            del vod["extensions"]
+            disease_obj.extensions = [
+                core_models.Extension(
+                    name="pediatric_disease",
+                    value=record["pediatric_disease"],
+                )
+            ]
+
         response["match_type"] = match_type
-        response["disease_descriptor"] = vod
+        response["disease"] = disease_obj
+        response["normalized_id"] = record["concept_id"]
         response = self._add_merged_meta(response)
         return NormalizationService(**response)
 
@@ -415,7 +423,7 @@ class QueryHandler:
         # check merged concept ID match
         record = self.db.get_record_by_id(query_str, case_sensitive=False, merge=True)
         if record:
-            return self._add_vod(response, record, query, MatchType.CONCEPT_ID)
+            return self._add_disease(response, record, MatchType.CONCEPT_ID)
 
         non_merged_match = None
 
@@ -429,7 +437,7 @@ class QueryHandler:
                 if merge is None:
                     return self._handle_failed_merge_ref(record, response, query_str)
                 else:
-                    return self._add_vod(response, merge, query, MatchType.CONCEPT_ID)
+                    return self._add_disease(response, merge, MatchType.CONCEPT_ID)
             else:
                 non_merged_match = (record, "concept_id")
 
@@ -457,8 +465,8 @@ class QueryHandler:
                                 record, response, query_str
                             )
                         else:
-                            return self._add_vod(
-                                response, merge, query, MatchType[match_type.upper()]
+                            return self._add_disease(
+                                response, merge, MatchType[match_type.upper()]
                             )
                     else:
                         if not non_merged_match:
@@ -467,6 +475,6 @@ class QueryHandler:
         # if no successful match, try available non-merged match
         if non_merged_match:
             match_type = MatchType[non_merged_match[1].upper()]
-            return self._add_vod(response, non_merged_match[0], query, match_type)
+            return self._add_disease(response, non_merged_match[0], match_type)
 
         return NormalizationService(**response)
