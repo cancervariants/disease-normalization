@@ -20,7 +20,7 @@ def pytest_collection_modifyitems(items):
     """Modify test items in place to ensure test modules run in a given order.
     When creating new test modules, be sure to add them here.
     """
-    MODULE_ORDER = [
+    MODULE_ORDER = [  # noqa: N806
         "test_mondo",
         "test_do",
         "test_ncit",
@@ -103,7 +103,7 @@ def test_source(database: AbstractDatabase, is_test_env: bool):
     endpoint.
     """
 
-    def test_source_factory(EtlClass: Base):
+    def test_source_factory(EtlClass: Base):  # noqa: N803
         if IS_TEST_ENV:
             _logger.debug(f"Reloading DB with data from {TEST_DATA_DIRECTORY}")
             test_class = EtlClass(database, TEST_DATA_DIRECTORY)  # type: ignore

@@ -26,7 +26,7 @@ def merge_instance(test_source: Callable, is_test_env: bool):
                 f"forbidden -- either unset {AWS_ENV_VAR_NAME} or unset DISEASE_TEST"
             )
         else:
-            for SourceClass in (Mondo, DO, NCIt, OncoTree, OMIM):
+            for SourceClass in (Mondo, DO, NCIt, OncoTree, OMIM):  # noqa: N806
                 if not database.get_source_metadata(SourceName(SourceClass.__name__)):
                     test_source(SourceClass)
 

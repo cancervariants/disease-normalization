@@ -1,9 +1,9 @@
 """Construct test data for NCIt source."""
-import xml.etree.ElementTree as XET
+import xml.etree.ElementTree as XET  # noqa: N814
 from pathlib import Path
 from typing import Generator
 
-import lxml.etree as ET
+import lxml.etree as ET  # noqa: N812
 import owlready2 as owl
 import xmlformatter
 
