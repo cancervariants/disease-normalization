@@ -419,7 +419,7 @@ class QueryHandler:
                 self.db.get_record_by_id(ref, False) for ref in matching_refs
             ]
             matching_records.sort(
-                key=lambda i: SourcePriority[i["src_name"]]  # type: ignore
+                key=lambda i: SourcePriority[i["src_name"].upper()]  # type: ignore
             )
 
             # attempt merge ref resolution until successful
