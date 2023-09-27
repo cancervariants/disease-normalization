@@ -328,7 +328,7 @@ class DynamoDbDatabase(AbstractDatabase):
         :param data: known source attributes
         :raise DatabaseWriteException: if write fails
         """
-        metadata_item = metadata.dict()
+        metadata_item = metadata.model_dump()
         metadata_item["src_name"] = src_name.value
         try:
             self.metadata.put_item(Item=metadata_item)

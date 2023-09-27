@@ -79,6 +79,7 @@ normalize_description = (
     operation_id="getQueryResponse",
     response_description=response_descr,
     response_model=SearchService,
+    response_model_exclude_none=True,
 )
 def search(
     q: str = Query(..., description=q_descr),
@@ -110,6 +111,7 @@ merged_q_descr = "Disease to normalize."
     response_description=merged_response_descr,
     response_model=NormalizationService,
     description=normalize_description,
+    response_model_exclude_none=True,
 )
 def normalize(q: str = Query(..., description=merged_q_descr)):
     """Return strongest-match normalized concept for query string provided by
