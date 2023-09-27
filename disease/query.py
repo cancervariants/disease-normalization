@@ -15,7 +15,7 @@ from disease.schemas import (
     RefType,
     SearchService,
     ServiceMeta,
-    SourcePriority,
+    SourceName,
 )
 
 from .version import __version__
@@ -371,11 +371,19 @@ class QueryHandler:
         :return: tuple with rank value and concept ID
         """
         src = record["src_name"]
-        try:
-            source_rank = SourcePriority[src].value
-        except KeyError:
+        if src == SourceName.NCIT.value:
+            source_rank = 1
+        elif src == SourceName.MONDO.value:
+            source_rank = 2
+        elif src == SourceName.ONCOTREE.value:
+            source_rank = 3
+        elif src == SourceName.OMIM.value:
+            source_rank = 4
+        elif src == SourceName.DO.value:
+            source_rank = 5
+        else:
             logger.warning(f"query.record_order: Invalid source name for " f"{record}")
-            source_rank = len(SourcePriority) + 1
+            source_rank = 4
         return source_rank, record["concept_id"]
 
     def _handle_failed_merge_ref(self, record, response, query) -> NormalizationService:
