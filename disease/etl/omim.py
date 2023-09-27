@@ -7,7 +7,7 @@ from disease.schemas import NamespacePrefix, SourceMeta
 class OMIM(Base):
     """Gather and load data from OMIM."""
 
-    def _extract_data(self, use_existing: bool = False):
+    def _extract_data(self, use_existing: bool = False) -> None:
         """Override parent extract method to enforce OMIM-specific data file
         requirements.
         :param use_existing: technically non-functional, but included to match
@@ -28,11 +28,11 @@ class OMIM(Base):
                 f"{self._src_dir.absolute().as_uri()}"
             )
 
-    def _download_data(self):
+    def _download_data(self) -> None:
         """Download OMIM source data for loading into normalizer."""
         raise DownloadException("OMIM data not available for public download")
 
-    def _load_meta(self):
+    def _load_meta(self) -> None:
         """Load source metadata."""
         metadata = SourceMeta(
             data_license="custom",
@@ -48,7 +48,7 @@ class OMIM(Base):
         )
         self._database.add_source_metadata(self._src_name, metadata)
 
-    def _transform_data(self):
+    def _transform_data(self) -> None:
         """Modulate data and prepare for loading."""
         with open(self._data_file, "r") as f:
             rows = f.readlines()

@@ -72,7 +72,7 @@ class Mondo(OWLBase):
                 f"API. Status code: {response.status_code}"
             )
 
-    def _download_data(self):
+    def _download_data(self) -> None:
         """Download Mondo thesaurus source file for loading into normalizer."""
         logger.info("Downloading Mondo data...")
         url = f"http://purl.obolibrary.org/obo/mondo/releases/{self._version}/mondo.owl"
@@ -80,7 +80,7 @@ class Mondo(OWLBase):
         self._http_download(url, output_file)
         logger.info("Finished downloading Mondo Disease Ontology")
 
-    def _load_meta(self):
+    def _load_meta(self) -> None:
         """Load metadata"""
         metadata = SourceMeta(
             data_license="CC BY 4.0",
@@ -155,7 +155,7 @@ class Mondo(OWLBase):
         }
         return keyed
 
-    def _transform_data(self):
+    def _transform_data(self) -> None:
         """Gather and transform disease entities."""
         mondo = owl.get_ontology(self._data_file.absolute().as_uri()).load()
         graph = owl.default_world.as_rdflib_graph()

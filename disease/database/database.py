@@ -11,7 +11,7 @@ import click
 from disease.schemas import RefType, SourceMeta, SourceName
 
 
-class DatabaseException(Exception):
+class DatabaseException(Exception):  # noqa: N818
     """Create custom class for handling database exceptions"""
 
 
@@ -31,7 +31,7 @@ class AbstractDatabase(abc.ABC):
     """Define a database interface."""
 
     @abc.abstractmethod
-    def __init__(self, db_url: Optional[str] = None, **db_args):
+    def __init__(self, db_url: Optional[str] = None, **db_args) -> None:
         """Initialize database instance.
 
         Generally, implementing classes should be able to construct a connection by
@@ -167,7 +167,7 @@ class AbstractDatabase(abc.ABC):
         """
 
     @abc.abstractmethod
-    def update_merge_ref(self, concept_id: str, merge_ref: Any) -> None:
+    def update_merge_ref(self, concept_id: str, merge_ref: Any) -> None:  # noqa: ANN401
         """Update the merged record reference of an individual record to a new value.
 
         :param concept_id: record to update

@@ -10,7 +10,7 @@ from disease.schemas import SourcePriority
 class Merge:
     """Handles record merging."""
 
-    def __init__(self, database: AbstractDatabase):
+    def __init__(self, database: AbstractDatabase) -> None:
         """Initialize Merge instance.
 
         :param Database database: db instance to use for record retrieval and creation.
@@ -18,7 +18,7 @@ class Merge:
         self._database = database
         self._groups = []  # list of tuples: (mondo_concept_id, set_of_ids)
 
-    def create_merged_concepts(self, record_ids: Collection[str]):
+    def create_merged_concepts(self, record_ids: Collection[str]) -> None:
         """Create concept groups, generate merged concept records, and update database.
         Our normalization protocols only generate record ID sets that include Mondo
         terms, meaning only Mondo IDs should be submitted to this method.
@@ -97,7 +97,7 @@ class Merge:
                     f"record for {record_id} in {record_id_set}"
                 )
 
-        def record_order(record):
+        def record_order(record: Dict) -> Tuple:
             """Provide priority values of concepts for sort function."""
             src = record["src_name"].upper()
             source_rank = SourcePriority[src].value

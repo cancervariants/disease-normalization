@@ -519,7 +519,7 @@ class PostgresDatabase(AbstractDatabase):
     WHERE concept_id = %(concept_id)s;
     """
 
-    def update_merge_ref(self, concept_id: str, merge_ref: Any) -> None:
+    def update_merge_ref(self, concept_id: str, merge_ref: Any) -> None:  # noqa: ANN401
         """Update the merged record reference of an individual record to a new value.
 
         :param concept_id: record to update

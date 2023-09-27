@@ -1,4 +1,4 @@
-"""This module provides a CLI util to make updates to normalizer database."""
+"""Provides a CLI util to make updates to normalizer database."""
 import os
 from pathlib import Path
 from timeit import default_timer as timer
@@ -89,7 +89,7 @@ def update_from_remote(data_url: Optional[str], db_url: str) -> None:
     type=click.Path(exists=True, path_type=Path),
 )
 @click.option("--db_url", help="URL endpoint for the application database.")
-def dump_database(output_directory: Path, db_url: str):
+def dump_database(output_directory: Path, db_url: str) -> None:
     """Dump data from database into file.
 
     \f
@@ -176,7 +176,7 @@ def _load_source(
     start_load = timer()
 
     # used to get source class name from string
-    SourceClass = eval(n.value)
+    SourceClass = eval(n.value)  # noqa: N806
 
     source = SourceClass(database=db)
     processed_ids += source.perform_etl(use_existing=from_local)
