@@ -39,8 +39,12 @@ class DynamoDbDatabase(AbstractDatabase):
         :Keyword Arguments:
             * region_name: AWS region (defaults to "us-east-2")
         """
-        disease_concepts_table = "disease_concepts"  # default
-        disease_metadata_table = "disease_metadata"  # default
+        self.disease_concepts_table = environ.get(
+            "DISEASE_DYNAMO_CONCEPTS_TABLE", "disease_concepts"
+        )
+        self.disease_metadata_table = environ.get(
+            "DISEASE_DYNAMO_META_TABLE", "disease_metadata"
+        )
 
         region_name = db_args.get("region_name", "us-east-2")
 
@@ -65,8 +69,12 @@ class DynamoDbDatabase(AbstractDatabase):
             boto_params = {"region_name": region_name}
 
             if aws_env == AwsEnvName.DEVELOPMENT:
-                disease_concepts_table = "disease_concepts_nonprod"
-                disease_metadata_table = "disease_metadata_nonprod"
+                self.disease_concepts_table = environ.get(
+                    "DISEASE_DYNAMO_CONCEPTS_TABLE", "disease_concepts_nonprod"
+                )
+                self.disease_metadata_table = environ.get(
+                    "DISEASE_DYNAMO_META_TABLE", "disease_metadata_nonprod"
+                )
         else:
             if db_url:
                 endpoint_url = db_url
@@ -85,8 +93,8 @@ class DynamoDbDatabase(AbstractDatabase):
         if not set(envs_do_not_create_tables) & set(environ):
             self.initialize_db()
 
-        self.diseases = self.dynamodb.Table(disease_concepts_table)
-        self.metadata = self.dynamodb.Table(disease_metadata_table)
+        self.diseases = self.dynamodb.Table(self.disease_concepts_table)
+        self.metadata = self.dynamodb.Table(self.disease_metadata_table)
         self.batch = self.diseases.batch_writer()
         self._cached_sources = {}
         atexit.register(self.close_connection)
@@ -117,7 +125,7 @@ class DynamoDbDatabase(AbstractDatabase):
     def _create_diseases_table(self) -> None:
         """Create Diseases table."""
         self.dynamodb.create_table(
-            TableName="disease_concepts",
+            TableName=self.disease_concepts_table,
             KeySchema=[
                 {"AttributeName": "label_and_type", "KeyType": "HASH"},  # Partition key
                 {"AttributeName": "concept_id", "KeyType": "RANGE"},  # Sort key
@@ -154,7 +162,7 @@ class DynamoDbDatabase(AbstractDatabase):
     def _create_meta_data_table(self) -> None:
         """Create MetaData table."""
         self.dynamodb.create_table(
-            TableName="disease_metadata",
+            TableName=self.disease_metadata_table,
             KeySchema=[
                 {"AttributeName": "src_name", "KeyType": "HASH"}  # Partition key
             ],
@@ -171,8 +179,8 @@ class DynamoDbDatabase(AbstractDatabase):
         """
         existing_tables = self.list_tables()
         exists = (
-            "disease_concepts" in existing_tables
-            and "disease_metadata" in existing_tables
+            self.disease_concepts_table in existing_tables
+            and self.disease_metadata_table in existing_tables
         )
         if not exists:
             _logger.info("Disease tables are missing or unavailable.")
