@@ -1,5 +1,6 @@
 """Module to load disease data from OncoTree."""
 import json
+from typing import Dict
 
 from disease import logger
 from disease.etl.base import Base
@@ -9,7 +10,7 @@ from disease.schemas import Disease, NamespacePrefix, SourceMeta
 class OncoTree(Base):
     """Gather and load data from OncoTree."""
 
-    def _download_data(self):
+    def _download_data(self) -> None:
         """Download Oncotree source data for loading into normalizer."""
         logger.info("Retrieving source data for OncoTree")
         url_version = self._version.replace("-", "_")
@@ -18,7 +19,7 @@ class OncoTree(Base):
         self._http_download(url, output_file)
         logger.info("Successfully retrieved source data for OncoTree")
 
-    def _load_meta(self):
+    def _load_meta(self) -> None:
         """Load metadata"""
         metadata = SourceMeta(
             data_license="CC BY 4.0",
@@ -34,7 +35,7 @@ class OncoTree(Base):
         )
         self._database.add_source_metadata(self._src_name, metadata)
 
-    def _traverse_tree(self, disease_node):
+    def _traverse_tree(self, disease_node: Dict) -> None:
         """Traverse JSON tree and load diseases where possible.
 
         :param Dict disease_node: node in tree containing info for individual
@@ -68,7 +69,7 @@ class OncoTree(Base):
             for child in disease_node["children"].values():
                 self._traverse_tree(child)
 
-    def _transform_data(self):
+    def _transform_data(self) -> None:
         """Initiate OncoTree data transformation."""
         with open(self._data_file, "r") as f:
             oncotree = json.load(f)

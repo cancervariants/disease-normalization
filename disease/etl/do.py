@@ -32,7 +32,7 @@ class DO(OWLBase):
         """
         return bioversions.get_version("disease ontology")
 
-    def _download_data(self):
+    def _download_data(self) -> None:
         """Download DO source file for loading into normalizer."""
         logger.info("Retrieving source data for Disease Ontology")
         output_file = self._src_dir / f"do_{self._version}.owl"
@@ -41,7 +41,7 @@ class DO(OWLBase):
         )
         logger.info("Successfully retrieved source data for Disease Ontology")
 
-    def _load_meta(self):
+    def _load_meta(self) -> None:
         """Load metadata"""
         metadata = SourceMeta(
             data_license="CC0 1.0",
@@ -57,7 +57,7 @@ class DO(OWLBase):
         )
         self._database.add_source_metadata(self._src_name, metadata)
 
-    def _transform_data(self):
+    def _transform_data(self) -> None:
         """Transform source data and send to loading method."""
         do = owl.get_ontology(self._data_file.absolute().as_uri()).load()
         disease_uri = "http://purl.obolibrary.org/obo/DOID_4"

@@ -22,7 +22,9 @@ DEFAULT_DATA_PATH = APP_ROOT / "data"
 class Base(ABC):
     """The ETL base class."""
 
-    def __init__(self, database: AbstractDatabase, data_path: Path = DEFAULT_DATA_PATH):
+    def __init__(
+        self, database: AbstractDatabase, data_path: Path = DEFAULT_DATA_PATH
+    ) -> None:
         """Extract from sources.
         :param database: database client
         :param data_path: location of data directory
@@ -57,7 +59,7 @@ class Base(ABC):
         return bioversions.get_version(self._src_name)
 
     @abstractmethod
-    def _download_data(self):
+    def _download_data(self) -> None:
         """Download source data."""
         raise NotImplementedError
 
@@ -183,14 +185,14 @@ class Base(ABC):
             self._data_file = self._get_latest_data_file()
 
     @abstractmethod
-    def _transform_data(self, *args, **kwargs):
+    def _transform_data(self, *args, **kwargs) -> None:  # noqa: ANN002
         raise NotImplementedError
 
     @abstractmethod
-    def _load_meta(self, *args, **kwargs):
+    def _load_meta(self, *args, **kwargs) -> None:  # noqa: ANN002
         raise NotImplementedError
 
-    def _load_disease(self, disease: Dict):
+    def _load_disease(self, disease: Dict) -> None:
         """Load individual disease record."""
         assert Disease(**disease)
         concept_id = disease["concept_id"]
@@ -221,7 +223,7 @@ class Base(ABC):
             self._added_ids.append(concept_id)
 
 
-class DownloadException(Exception):
+class DownloadException(Exception):  # noqa: N818
     """Exception for failures relating to source file downloads."""
 
 

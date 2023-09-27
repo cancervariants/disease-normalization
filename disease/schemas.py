@@ -1,6 +1,4 @@
-"""This module contains data models for representing VICC normalized
-disease records.
-"""
+"""Contains data models for representing VICC normalized disease records."""
 from datetime import datetime
 from enum import Enum, IntEnum
 from typing import Dict, List, Literal, Optional, Union

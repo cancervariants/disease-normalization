@@ -54,7 +54,7 @@ class NCIt(OWLBase):
         )
         logger.info("Successfully retrieved source data for NCIt")
 
-    def _load_meta(self):
+    def _load_meta(self) -> None:
         """Load metadata"""
         metadata = SourceMeta(
             data_license="CC BY 4.0",
@@ -86,7 +86,7 @@ class NCIt(OWLBase):
         uris = neopl.union(dos) - retired
         return uris
 
-    def _transform_data(self):
+    def _transform_data(self) -> None:
         """Get data from file and construct object for loading."""
         ncit = owl.get_ontology(self._data_file.absolute().as_uri()).load()
         disease_uris = self._get_disease_classes()
