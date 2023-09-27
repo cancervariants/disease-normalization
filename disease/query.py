@@ -15,7 +15,7 @@ from disease.schemas import (
     RefType,
     SearchService,
     ServiceMeta,
-    SourceName,
+    SourcePriority,
 )
 
 from .version import __version__
@@ -360,28 +360,6 @@ class QueryHandler:
         response = self._add_merged_meta(response)
         return NormalizationService(**response)
 
-    def _record_order(self, record: Dict) -> Tuple[int, str]:
-        """Construct priority order for matching. Only called by sort().
-
-        :param Dict record: individual record item in iterable to sort
-        :return: tuple with rank value and concept ID
-        """
-        src = record["src_name"]
-        if src == SourceName.NCIT.value:
-            source_rank = 1
-        elif src == SourceName.MONDO.value:
-            source_rank = 2
-        elif src == SourceName.ONCOTREE.value:
-            source_rank = 3
-        elif src == SourceName.OMIM.value:
-            source_rank = 4
-        elif src == SourceName.DO.value:
-            source_rank = 5
-        else:
-            logger.warning(f"query.record_order: Invalid source name for " f"{record}")
-            source_rank = 4
-        return source_rank, record["concept_id"]
-
     def _handle_failed_merge_ref(
         self, record: Dict, response: Dict, query: str
     ) -> NormalizationService:
@@ -446,7 +424,7 @@ class QueryHandler:
             matching_records = [
                 self.db.get_record_by_id(ref, False) for ref in matching_refs
             ]
-            matching_records.sort(key=self._record_order)  # type: ignore
+            matching_records.sort(key=lambda i: SourcePriority[i["src_name"].upper()])  # type: ignore
 
             # attempt merge ref resolution until successful
             for match in matching_records:
