@@ -107,7 +107,6 @@ def lnscc():
             "mesh:D002289",
             "efo:0003060",
             "kegg.disease:05223",
-            "orphanet:488201",
         ],
         "item_type": "merger",
     }
