@@ -1,11 +1,83 @@
+[project]
+name = "disease-normalizer"
+authors = [
+    {name = "Alex Wagner"},
+    {name = "Kori Kuzma"},
+    {name = "James Stevenson"}
+]
+readme = "README.md"
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Framework :: FastAPI",
+    "Framework :: Pydantic",
+    "Framework :: Pydantic :: 2",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Developers",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+]
+requires-python = ">=3.8"
+description = "VICC normalization routines for diseases"
+license = {file = "LICENSE"}
+dependencies = [
+    "pydantic==2.*",
+    "fastapi",
+    "uvicorn",
+    "click",
+    "boto3",
+    "ga4gh.vrs~=2.0.0a1",
+]
+dynamic = ["version"]
+
+[project.optional-dependencies]
+pg = ["psycopg[binary]"]
+etl = ["owlready2==0.40", "rdflib", "requests", "typing-extensions", "bioversions"]
+test = ["pytest>=6.0", "pytest-cov"]
+dev = ["pre-commit", "black", "ruff", "lxml", "xmlformatter"]
+
+[project.urls]
+Homepage = "https://github.com/cancervariants/disease-normalization"
+Documentation = "https://github.com/cancervariants/disease-normalization"
+Changelog = "https://github.com/cancervariants/disease-normalization/releases"
+Source = "https://github.com/cancervariants/disease-normalization"
+"Bug Tracker" = "https://github.com/cancervariants/disease-normalization/issues"
+
+[project.scripts]
+disease_norm_update = "disease.cli:update_normalizer_db"
+disease_norm_update_remote = "disease.cli:update_from_remote"
+disease_norm_dump = "disease.cli:dump_database"
+disease_norm_check_db = "disease.cli:check_db"
+
 [build-system]
-requires = ["setuptools", "wheel"]
+requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
+
+[tool.setuptools.dynamic]
+version = {attr = "disease.version.__version__"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"disease.database.postgresql" = ["*.sql"]
+
+[tool.pytest.ini_options]
+addopts = "--cov=src --cov-report term-missing"
+testpaths = ["tests"]
+
+[tool.coverage.run]
+branch = true
 
 [tool.black]
 line-length = 88
 
 [tool.ruff]
+src = ["src"]
 # pycodestyle (E, W)
 # Pyflakes (F)
 # flake8-annotations (ANN)
