@@ -149,7 +149,7 @@ pytest.ini
 
 # ignore data dir
 data/*
-disease/data/*
+src/disease/data/*
 
 # IDE materials
 .idea/
