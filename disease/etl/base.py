@@ -58,11 +58,6 @@ class Base(ABC):
         """
         return bioversions.get_version(self._src_name)
 
-    @abstractmethod
-    def _download_data(self) -> None:
-        """Download source data."""
-        raise NotImplementedError
-
     def _zip_handler(self, dl_path: Path, outfile_path: Path) -> None:
         """Provide simple callback function to extract the largest file within a given
         zipfile and save it within the appropriate data directory.

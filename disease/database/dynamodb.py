@@ -4,7 +4,7 @@ import logging
 import sys
 from os import environ
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Set, Union
+from typing import Any, Dict, Generator, List, Optional, Set, Union
 
 import boto3
 import click
@@ -23,7 +23,7 @@ from disease.database.database import (
     DatabaseWriteException,
     confirm_aws_db_use,
 )
-from disease.schemas import RefType, SourceMeta, SourceName
+from disease.schemas import RecordType, RefType, SourceMeta, SourceName
 
 _logger = logging.getLogger()
 _logger.setLevel(logging.DEBUG)
@@ -201,7 +201,7 @@ class DynamoDbDatabase(AbstractDatabase):
 
         records = self.diseases.query(
             IndexName="item_type_index",
-            KeyConditionExpression=Key("item_type").eq("identity"),
+            KeyConditionExpression=Key("item_type").eq(RecordType.IDENTITY.value),
             Limit=1,
         )
         if len(records.get("Items", [])) < 1:
@@ -210,7 +210,7 @@ class DynamoDbDatabase(AbstractDatabase):
 
         normalized_records = self.diseases.query(
             IndexName="item_type_index",
-            KeyConditionExpression=Key("item_type").eq("merger"),
+            KeyConditionExpression=Key("item_type").eq(RecordType.MERGER.value),
             Limit=1,
         )
         if len(normalized_records.get("Items", [])) < 1:
@@ -254,9 +254,9 @@ class DynamoDbDatabase(AbstractDatabase):
         """
         try:
             if merge:
-                pk = f"{concept_id.lower()}##merger"
+                pk = f"{concept_id.lower()}##{RecordType.MERGER.value}"
             else:
-                pk = f"{concept_id.lower()}##identity"
+                pk = f"{concept_id.lower()}##{RecordType.IDENTITY.value}"
             if case_sensitive:
                 response = self.diseases.get_item(
                     Key={"label_and_type": pk, "concept_id": concept_id}
@@ -329,6 +329,47 @@ class DynamoDbDatabase(AbstractDatabase):
                 break
         return set(concept_ids)
 
+    def get_all_records(self, record_type: RecordType) -> Generator[Dict, None, None]:
+        """Retrieve all source or normalized records. Either return all source records,
+        or all records that qualify as "normalized" (i.e., merged groups + source
+        records that are otherwise ungrouped).
+        For example,
+
+        .. code-block::pycon
+
+           >>> from disease.database import create_db
+           >>> from disease.schemas import RecordType
+           >>> db = create_db()
+           >>> for record in db.get_all_records(RecordType.MERGER):
+           >>>     pass  # do something
+
+        :param record_type: type of result to return
+        :return: Generator that lazily provides records as they are retrieved
+        """
+        last_evaluated_key = None
+        while True:
+            if last_evaluated_key:
+                response = self.diseases.scan(
+                    ExclusiveStartKey=last_evaluated_key,
+                )
+            else:
+                response = self.diseases.scan()
+            records = response.get("Items", [])
+            for record in records:
+                incoming_record_type = record.get("item_type")
+                if record_type == RecordType.IDENTITY:
+                    if incoming_record_type == record_type:
+                        yield record
+                else:
+                    if (
+                        incoming_record_type == RecordType.IDENTITY
+                        and not record.get("merge_ref")
+                    ) or incoming_record_type == RecordType.MERGER:
+                        yield record
+            last_evaluated_key = response.get("LastEvaluatedKey")
+            if not last_evaluated_key:
+                break
+
     def add_source_metadata(self, src_name: SourceName, metadata: SourceMeta) -> None:
         """Add new source metadata entry.
 
@@ -383,9 +424,9 @@ class DynamoDbDatabase(AbstractDatabase):
         concept_id = record["concept_id"]
         id_prefix = concept_id.split(":")[0].lower()
         record["src_name"] = PREFIX_LOOKUP[id_prefix]
-        label_and_type = f"{concept_id.lower()}##merger"
+        label_and_type = f"{concept_id.lower()}##{RecordType.MERGER.value}"
         record["label_and_type"] = label_and_type
-        record["item_type"] = "merger"
+        record["item_type"] = RecordType.MERGER.value
         try:
             self.batch.put_item(Item=record)
         except ClientError as e:
@@ -467,7 +508,9 @@ class DynamoDbDatabase(AbstractDatabase):
                 try:
                     response = self.diseases.query(
                         IndexName="item_type_index",
-                        KeyConditionExpression=Key("item_type").eq("merger"),
+                        KeyConditionExpression=Key("item_type").eq(
+                            RecordType.MERGER.value
+                        ),
                     )
                 except ClientError as e:
                     raise DatabaseReadException(e)

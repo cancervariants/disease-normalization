@@ -133,6 +133,13 @@ class DataLicenseAttributes(BaseModel):
     attribution: StrictBool
 
 
+class RecordType(str, Enum):
+    """Record item types."""
+
+    IDENTITY = "identity"
+    MERGER = "merger"
+
+
 class RefType(str, Enum):
     """Reference item types."""
 

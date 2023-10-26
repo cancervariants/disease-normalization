@@ -4,11 +4,11 @@ import sys
 from enum import Enum
 from os import environ
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Set, Union
+from typing import Any, Dict, Generator, List, Optional, Set, Union
 
 import click
 
-from disease.schemas import RefType, SourceMeta, SourceName
+from disease.schemas import RecordType, RefType, SourceMeta, SourceName
 
 
 class DatabaseException(Exception):  # noqa: N818
@@ -140,6 +140,25 @@ class AbstractDatabase(abc.ABC):
 
         :param source: optionally, just get all IDs for a specific source
         :return: Set of concept IDs as strings.
+        """
+
+    @abc.abstractmethod
+    def get_all_records(self, record_type: RecordType) -> Generator[Dict, None, None]:
+        """Retrieve all source or normalized records. Either return all source records,
+        or all records that qualify as "normalized" (i.e., merged groups + source
+        records that are otherwise ungrouped).
+        For example,
+
+        .. code-block::pycon
+
+           >>> from disease.database import create_db
+           >>> from disease.schemas import RecordType
+           >>> db = create_db()
+           >>> for record in db.get_all_records(RecordType.MERGER):
+           >>>     pass  # do something
+
+        :param record_type: type of result to return
+        :return: Generator that lazily provides records as they are retrieved
         """
 
     @abc.abstractmethod
