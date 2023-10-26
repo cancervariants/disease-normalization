@@ -293,7 +293,7 @@ class PostgresDatabase(AbstractDatabase):
         """Restructure row from disease_concepts table as source record result object.
 
         :param source_row: result tuple from psycopg
-        :return: reformatted dictionary keying gene properties to row values
+        :return: reformatted dictionary keying disease properties to row values
         """
         disease_record = {
             "concept_id": source_row[0],
