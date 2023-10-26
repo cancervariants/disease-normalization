@@ -333,7 +333,7 @@ class PostgresDatabase(AbstractDatabase):
         """Restructure row from disease_merged table as normalized result object.
 
         :param merged_row: result tuple from psycopg
-        :return: reformatted dictionary keying normalized gene properties to row values
+        :return: reformatted dictionary keying normalized disease properties to row values
         """
         merged_record = {
             "concept_id": merged_row[0],
