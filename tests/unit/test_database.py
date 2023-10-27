@@ -23,8 +23,7 @@ def test_tables_created(database):
             "disease_sources",
         }
     else:
-        assert database.disease_concepts_table in existing_tables
-        assert database.disease_metadata_table in existing_tables
+        assert database.disease_table in existing_tables
 
 
 @pytest.mark.skipif(not IS_DDB, reason="only applies to DynamoDB in test env")
