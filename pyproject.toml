@@ -35,8 +35,8 @@ dependencies = [
 dynamic = ["version"]
 
 [project.optional-dependencies]
-pg = ["psycopg[binary]"]
-etl = ["owlready2==0.40", "rdflib", "requests", "typing-extensions", "bioversions"]
+pg = ["psycopg[binary]", "requests"]
+etl = ["owlready2==0.40", "rdflib", "typing-extensions", "wags-tails"]
 test = ["pytest>=6.0", "pytest-cov"]
 dev = ["pre-commit", "black", "ruff", "lxml", "xmlformatter"]
 

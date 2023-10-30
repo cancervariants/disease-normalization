@@ -1,8 +1,7 @@
 """Disease Ontology ETL module."""
-import bioversions
 import owlready2 as owl
 
-from disease import PREFIX_LOOKUP, logger
+from disease import PREFIX_LOOKUP
 from disease.etl.base import OWLBase
 from disease.schemas import NamespacePrefix, SourceMeta
 
@@ -24,22 +23,6 @@ DO_PREFIX_LOOKUP = {
 
 class DO(OWLBase):
     """Disease Ontology ETL class."""
-
-    def get_latest_version(self) -> str:
-        """Get most recent version of source data. Should be overriden by
-        sources not added to Bioversions yet, or other special-case sources.
-        :return: most recent version, as a str
-        """
-        return bioversions.get_version("disease ontology")
-
-    def _download_data(self) -> None:
-        """Download DO source file for loading into normalizer."""
-        logger.info("Retrieving source data for Disease Ontology")
-        output_file = self._src_dir / f"do_{self._version}.owl"
-        self._http_download(
-            "http://purl.obolibrary.org/obo/doid/doid-merged.owl", output_file
-        )
-        logger.info("Successfully retrieved source data for Disease Ontology")
 
     def _load_meta(self) -> None:
         """Load metadata"""

@@ -10,15 +10,6 @@ from disease.schemas import Disease, NamespacePrefix, SourceMeta
 class OncoTree(Base):
     """Gather and load data from OncoTree."""
 
-    def _download_data(self) -> None:
-        """Download Oncotree source data for loading into normalizer."""
-        logger.info("Retrieving source data for OncoTree")
-        url_version = self._version.replace("-", "_")
-        url = f"http://oncotree.mskcc.org/api/tumorTypes/tree?version=oncotree_{url_version}"  # noqa: E501
-        output_file = self._src_dir / f"oncotree_{self._version}.json"
-        self._http_download(url, output_file)
-        logger.info("Successfully retrieved source data for OncoTree")
-
     def _load_meta(self) -> None:
         """Load metadata"""
         metadata = SourceMeta(

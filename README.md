@@ -15,6 +15,8 @@ The [etl,pg] argument tells pip to install packages to fulfill the dependencies 
 
 ### External requirements
 
+# TODO update this
+
 The Disease Normalizer can retrieve most required data itself. The exception is disease terms from OMIM, for which a source file must be manually acquired and placed in the `disease/data/omim` folder within the library root. In order to access OMIM data, users must submit a request [here](https://www.omim.org/downloads). Once approved, the relevant OMIM file (`mimTitles.txt`) should be renamed according to the convention `omim_YYYYMMDD.tsv`, where `YYYYMMDD` indicates the date that the file was generated, and placed in the appropriate location.
 
 ### Database Initialization
