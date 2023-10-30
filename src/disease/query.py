@@ -7,7 +7,7 @@ from botocore.exceptions import ClientError
 from ga4gh.core import core_models
 
 from disease import NAMESPACE_LOOKUP, PREFIX_LOOKUP, SOURCES_LOWER_LOOKUP, logger
-from disease.database.database import AbstractDatabase
+from disease.database.database import AbstractDatabase, DatabaseReadException
 from disease.schemas import (
     Disease,
     MatchType,
@@ -243,8 +243,11 @@ class QueryHandler:
         """
         sources = dict()
         for k, v in SOURCES_LOWER_LOOKUP.items():
-            if self.db.get_source_metadata(v):
-                sources[k] = v
+            try:
+                if self.db.get_source_metadata(v):
+                    sources[k] = v
+            except DatabaseReadException:
+                continue
         if not incl and not excl:
             query_sources = set(sources.values())
         elif incl and excl:

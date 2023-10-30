@@ -148,19 +148,6 @@ class DynamoDbDatabase(AbstractDatabase):
             ProvisionedThroughput={"ReadCapacityUnits": 10, "WriteCapacityUnits": 10},
         )
 
-    def _create_meta_data_table(self) -> None:
-        """Create MetaData table."""
-        self.dynamodb.create_table(
-            TableName=self.disease_metadata_table,
-            KeySchema=[
-                {"AttributeName": "src_name", "KeyType": "HASH"}  # Partition key
-            ],
-            AttributeDefinitions=[
-                {"AttributeName": "src_name", "AttributeType": "S"},
-            ],
-            ProvisionedThroughput={"ReadCapacityUnits": 10, "WriteCapacityUnits": 10},
-        )
-
     def check_schema_initialized(self) -> bool:
         """Check if database schema is properly initialized.
 
@@ -230,9 +217,7 @@ class DynamoDbDatabase(AbstractDatabase):
                 Key={"label_and_type": pk, "concept_id": concept_id}
             ).get("Item")
             if not metadata:
-                raise DatabaseReadException(
-                    f"Unable to retrieve data for source {src_name}"
-                )
+                return None
             self._cached_sources[src_name] = metadata
             return metadata
 
