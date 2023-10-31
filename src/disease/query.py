@@ -172,9 +172,10 @@ class QueryHandler:
             sources = sources - matched_srcs
         return resp, sources
 
-    def _response_keyed(self, query: str, sources: Set[str]) -> Dict:
-        """Return response as dict where key is source name and value
-        is a list of records. Corresponds to `keyed=true` API parameter.
+    def _get_search_response(self, query: str, sources: Set[str]) -> Dict:
+        """Return response as dict where key is source name and value is a list of
+        records.
+
         :param str query: string to match against
         :param Set[str] sources: sources to match from
         :return: completed response object to return to client
@@ -204,34 +205,10 @@ class QueryHandler:
         # remaining sources get no match
         return self._fill_no_matches(response)
 
-    def _response_list(self, query: str, sources: Set[str]) -> Dict:
-        """Return response as list, where the first key-value in each item
-        is the source name. Corresponds to `keyed=false` API parameter.
-        :param str query: string to match against
-        :param Set[str] sources: sources to match from
-        :return: Completed response object to return to client
-        """
-        response_dict = self._response_keyed(query, sources)
-        source_list = []
-        for src_name in response_dict["source_matches"].keys():
-            src = {
-                "source": src_name,
-            }
-            to_merge = response_dict["source_matches"][src_name]
-            src.update(to_merge)
-
-            source_list.append(src)
-        response_dict["source_matches"] = source_list
-
-        return response_dict
-
-    def search(
-        self, query_str: str, keyed: bool = False, incl: str = "", excl: str = ""
-    ) -> SearchService:
+    def search(self, query_str: str, incl: str = "", excl: str = "") -> SearchService:
         """Fetch normalized disease objects.
+
         :param str query_str: query, a string, to search for
-        :param bool keyed: if true, return response as dict keying source names
-            to source objects; otherwise, return list of source objects
         :param str incl: str containing comma-separated names of sources to
             use. Will exclude all other sources. Case-insensitive.
         :param str excl: str containing comma-separated names of source to
@@ -279,10 +256,7 @@ class QueryHandler:
 
         query_str = query_str.strip()
 
-        if keyed:
-            response = self._response_keyed(query_str, query_sources)
-        else:
-            response = self._response_list(query_str, query_sources)
+        response = self._get_search_response(query_str, query_sources)
 
         response["service_meta_"] = ServiceMeta(
             version=__version__,

@@ -11,7 +11,7 @@ from disease.database import AWS_ENV_VAR_NAME, create_db
 from disease.database.database import AbstractDatabase
 from disease.etl.base import Base
 from disease.query import QueryHandler
-from disease.schemas import Disease, MatchesKeyed, MatchType, SourceName
+from disease.schemas import Disease, MatchType, SourceName, SourceSearchMatches
 
 _logger = logging.getLogger(__name__)
 
@@ -117,9 +117,7 @@ def test_source(database: AbstractDatabase, is_test_env: bool):
                 self._src_name = EtlClass.__name__  # type: ignore
 
             def search(self, query_str: str):
-                resp = self.query_handler.search(
-                    query_str, keyed=True, incl=self._src_name
-                )
+                resp = self.query_handler.search(query_str, incl=self._src_name)
                 return resp.source_matches[self._src_name]
 
         return QueryGetter()
@@ -156,7 +154,7 @@ def compare_records():
 
 
 def _compare_response(
-    response: MatchesKeyed,
+    response: SourceSearchMatches,
     match_type: MatchType,
     fixture: Optional[Disease] = None,
     fixture_list: Optional[List[Disease]] = None,

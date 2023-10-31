@@ -51,10 +51,6 @@ get_matches_summary = "Given query, provide highest matches from " "each source.
 search_descr = "Search for disease term."
 response_descr = "A response to a validly-formed query."
 q_descr = "Disease term to search for."
-keyed_descr = (
-    "If true, return response as key-value pairs of "
-    "sources to source matches. False by default"
-)
 incl_descr = (
     "Comma-separated list of source names to include in "
     "response. Will exclude all other sources. Will return HTTP "
@@ -83,17 +79,19 @@ normalize_description = (
 )
 def search(
     q: str = Query(..., description=q_descr),
-    keyed: Optional[bool] = Query(False, description=keyed_descr),
     incl: Optional[str] = Query("", description=incl_descr),
     excl: Optional[str] = Query("", description=excl_descr),
 ) -> SearchService:
     """For each source, return strongest-match concepts for query string
     provided by user.
+
+    :param q: disease search term
+    :param incl: sources to include
+    :param excl: sources to excl
+    :return: search results
     """
     try:
-        response = query_handler.search(
-            html.unescape(q), keyed=keyed, incl=incl, excl=excl
-        )
+        response = query_handler.search(html.unescape(q), incl=incl, excl=excl)
     except InvalidParameterException as e:
         raise HTTPException(status_code=422, detail=str(e))
     return response
