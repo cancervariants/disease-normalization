@@ -1,7 +1,7 @@
 """Contains data models for representing VICC normalized disease records."""
 from datetime import datetime
 from enum import Enum, IntEnum
-from typing import Dict, List, Literal, Optional, Union
+from typing import Dict, List, Literal, Optional
 
 from ga4gh.core import core_models
 from pydantic import BaseModel, ConfigDict, StrictBool, StrictStr
@@ -178,10 +178,8 @@ class SourceMeta(BaseModel):
     )
 
 
-class MatchesKeyed(BaseModel):
-    """Container for matching information from an individual source.
-    Used when matches are requested as an object, not an array.
-    """
+class SourceSearchMatches(BaseModel):
+    """Container for matching information from an individual source."""
 
     match_type: MatchType
     records: List[Disease] = []
@@ -193,74 +191,32 @@ class MatchesKeyed(BaseModel):
                 "match_type": 80,
                 "records": [
                     {
-                        "label": "Von Hippel-Lindau Syndrome",
-                        "concept_id": "ncit:C3105",
+                        "label": "non-small cell lung carcinoma",
+                        "concept_id": "mondo:0005233",
                         "aliases": [
-                            "Von Hippel-Lindau Syndrome (VHL)",
-                            "Von Hippel-Lindau Disease",
-                            "Cerebroretinal Angiomatosis",
-                            "von Hippel-Lindau syndrome",
-                            "VHL syndrome",
+                            "non-small cell lung carcinoma (disease)",
+                            "non-small cell carcinoma of lung",
+                            "non-small cell lung cancer",
+                            "non-small cell cancer of lung",
+                            "non-small cell carcinoma of the lung",
+                            "non-small cell cancer of the lung",
+                            "NSCLC",
+                            "NSCLC - non-small cell lung cancer",
                         ],
-                        "xrefs": [],
-                        "associated_with": ["umls:C0019562"],
-                        "pediatric_disease": None,
+                        "xrefs": ["DOID:3908", "ncit:C2926", "oncotree:NSCLC"],
+                        "associated_with": [
+                            "mesh:D002289",
+                            "efo:0003060",
+                            "umls:C0007131",
+                        ],
                     }
                 ],
                 "source_meta_": {
                     "data_license": "CC BY 4.0",
-                    "data_license_url": "https://creativecommons.org/licenses/by/4.0/legalcode",  # noqa: E501
-                    "version": "21.01d",
-                    "data_url": "https://evs.nci.nih.gov/ftp1/NCI_Thesaurus/archive/21.01d_Release/",  # noqa: E501
-                    "rdp_url": "http://reusabledata.org/ncit.html",
-                    "data_license_attributes": {
-                        "non_commercial": False,
-                        "attribution": True,
-                        "share_alike": False,
-                    },
-                },
-            }
-        }
-    )
-
-
-class MatchesListed(BaseModel):
-    """Container for matching information from an individual source.
-    Used when matches are requested as an array, not an object.
-    """
-
-    source: SourceName
-    match_type: MatchType
-    records: List[Disease] = []
-    source_meta_: SourceMeta
-
-    model_config = ConfigDict(
-        json_schema_extra={
-            "example": {
-                "source": "NCIt",
-                "match_type": 80,
-                "records": [
-                    {
-                        "label": "Von Hippel-Lindau Syndrome",
-                        "concept_id": "ncit:C3105",
-                        "aliases": [
-                            "Von Hippel-Lindau Syndrome (VHL)",
-                            "Von Hippel-Lindau Disease",
-                            "Cerebroretinal Angiomatosis",
-                            "von Hippel-Lindau syndrome",
-                            "VHL syndrome",
-                        ],
-                        "xrefs": [],
-                        "associated_with": ["umls:C0019562"],
-                        "pediatric_disease": None,
-                    }
-                ],
-                "source_meta_": {
-                    "data_license": "CC BY 4.0",
-                    "data_license_url": "https://creativecommons.org/licenses/by/4.0/legalcode",  # noqa: E501
-                    "version": "21.01d",
-                    "data_url": "https://evs.nci.nih.gov/ftp1/NCI_Thesaurus/archive/21.01d_Release/",  # noqa: E501
-                    "rdp_url": "http://reusabledata.org/ncit.html",
+                    "data_license_url": "https://creativecommons.org/licenses/by/4.0/legalcode",
+                    "version": "2023-07-03",
+                    "data_url": "https://mondo.monarchinitiative.org/pages/download/",
+                    "rdp_url": "http://reusabledata.org/monarch.html",
                     "data_license_attributes": {
                         "non_commercial": False,
                         "attribution": True,
@@ -399,54 +355,66 @@ class SearchService(BaseModel):
 
     query: StrictStr
     warnings: Optional[Dict] = None
-    source_matches: Union[Dict[SourceName, MatchesKeyed], List[MatchesListed]]
+    source_matches: Dict[SourceName, SourceSearchMatches]
     service_meta_: ServiceMeta
 
     model_config = ConfigDict(
         json_schema_extra={
-            "example": {
-                "query": "Von Hippel-Lindau Syndrome",
-                "warnings": None,
-                "source_matches": [
-                    {
-                        "source": "NCIt",
-                        "match_type": 80,
-                        "records": [
-                            {
-                                "label": "Von Hippel-Lindau Syndrome",
-                                "concept_id": "ncit:C3105",
-                                "aliases": [
-                                    "Von Hippel-Lindau Syndrome (VHL)",
-                                    "Von Hippel-Lindau Disease",
-                                    "Cerebroretinal Angiomatosis",
-                                    "von Hippel-Lindau syndrome",
-                                    "VHL syndrome",
-                                ],
-                                "xrefs": [],
-                                "associated_with": ["umls:C0019562"],
-                                "pediatric_disease": None,
-                            }
-                        ],
-                        "source_meta_": {
-                            "data_license": "CC BY 4.0",
-                            "data_license_url": "https://creativecommons.org/licenses/by/4.0/legalcode",  # noqa: E501
-                            "version": "21.01d",
-                            "data_url": "https://evs.nci.nih.gov/ftp1/NCI_Thesaurus/archive/21.01d_Release/",  # noqa: E501
-                            "rdp_url": "http://reusabledata.org/ncit.html",
-                            "data_license_attributes": {
-                                "non_commercial": False,
-                                "attribution": True,
-                                "share_alike": False,
-                            },
+            "query": "nsclc",
+            "source_matches": {
+                "OMIM": {
+                    "records": [],
+                    "source_meta_": {
+                        "data_license": "custom",
+                        "data_license_url": "https://omim.org/help/agreement",
+                        "version": "20231030",
+                        "data_url": "https://www.omim.org/downloads",
+                        "rdp_url": "http://reusabledata.org/omim.html",
+                        "data_license_attributes": {
+                            "non_commercial": False,
+                            "attribution": True,
+                            "share_alike": True,
                         },
-                    }
-                ],
-                "service_meta_": {
-                    "name": "disease-normalizer",
-                    "version": __version__,
-                    "response_datetime": "2021-04-05T16:44:15.367831",
-                    "url": "https://github.com/cancervariants/disease-normalization",  # noqa: E501
+                    },
                 },
-            }
+                "DO": {
+                    "records": [
+                        {
+                            "label": "lung non-small cell carcinoma",
+                            "concept_id": "DOID:3908",
+                            "aliases": [
+                                "Non-small cell lung cancer",
+                                "NSCLC",
+                                "non-small cell lung carcinoma",
+                            ],
+                            "xrefs": ["ncit:C2926"],
+                            "associated_with": [
+                                "mesh:D002289",
+                                "kegg.disease:05223",
+                                "efo:0003060",
+                                "umls:C0007131",
+                            ],
+                            "match_type": 60,
+                        }
+                    ],
+                    "source_meta_": {
+                        "data_license": "CC0 1.0",
+                        "data_license_url": "https://creativecommons.org/publicdomain/zero/1.0/legalcode",
+                        "version": "2023-07-24",
+                        "data_url": "http://www.obofoundry.org/ontology/doid.html",
+                        "data_license_attributes": {
+                            "non_commercial": False,
+                            "attribution": False,
+                            "share_alike": False,
+                        },
+                    },
+                },
+            },
+            "service_meta_": {
+                "name": "disease-normalizer",
+                "version": "0.4.0.dev1",
+                "response_datetime": "2023-10-31T10:53:30.890262",
+                "url": "https://github.com/cancervariants/disease-normalization",
+            },
         }
     )
