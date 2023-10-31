@@ -1,10 +1,10 @@
 """A base class for extraction, transformation, and loading of data."""
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import Dict, List, Optional, Set
+from typing import Dict, List, Optional, Set, Union
 
 from owlready2.rdflib_store import TripleLiteRDFlibGraph as RDFGraph
-from wags_tails import DataSource, DoData, MondoData, NcitData, OncoTreeData
+from wags_tails import CustomData, DataSource, DoData, MondoData, NcitData, OncoTreeData
 
 from disease import ITEM_TYPES, SOURCES_FOR_MERGE, logger
 from disease.database import AbstractDatabase
@@ -30,7 +30,7 @@ class Base(ABC):
         :param data_path: location of data directory
         """
         self._src_name = SourceName(self.__class__.__name__)
-        self._data_source = self._get_data_handler(data_path)
+        self._data_source: Union[NcitData, OncoTreeData, MondoData, DoData, CustomData] = self._get_data_handler(data_path)  # type: ignore
         self._database = database
         self._store_ids = self.__class__.__name__ in SOURCES_FOR_MERGE
         if self._store_ids:
