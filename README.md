@@ -47,6 +47,12 @@ export DISEASE_NORM_DB_URL="postgresql://postgres@localhost:5432/disease_normali
 
 Use the `disease_norm_update` command in a shell to update the database.
 
+If you encounter an error message like the following, refer to the installation instructions above:
+
+```shell
+"Encountered ModuleNotFoundError attempting to import Mondo. Are ETL dependencies installed?"
+```
+
 #### Update source(s)
 
 The Disease Normalizer currently uses data from the following sources:

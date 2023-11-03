@@ -14,8 +14,6 @@ from disease.database.database import (
     DatabaseWriteException,
     create_db,
 )
-from disease.etl import DO, OMIM, Mondo, NCIt, OncoTree  # noqa: F401
-from disease.etl.merge import Merge
 from disease.schemas import SourceName
 
 # Use to lookup class object from source name. Should be one key-value pair
@@ -176,6 +174,13 @@ def _load_source(
     start_load = timer()
 
     # used to get source class name from string
+    try:
+        from disease.etl import DO, OMIM, Mondo, NCIt, OncoTree  # noqa: F401
+    except ModuleNotFoundError as e:
+        click.echo(
+            f"Encountered ModuleNotFoundError attempting to import {e.name}. Are ETL dependencies installed?"
+        )
+        click.get_current_context().exit()
     SourceClass = eval(n.value)  # noqa: N806
 
     source = SourceClass(database=db)
@@ -219,6 +224,15 @@ def _load_merge(db: AbstractDatabase, processed_ids: Set[str]) -> None:
         processed_ids = set()
         for source in SOURCES_FOR_MERGE:
             processed_ids |= db.get_all_concept_ids(source)
+
+    try:
+        from disease.etl.merge import Merge
+    except ModuleNotFoundError as e:
+        click.echo(
+            f"Encountered ModuleNotFoundError attempting to import {e.name}. Are ETL dependencies installed?"
+        )
+        click.get_current_context().exit()
+
     merge = Merge(database=db)
     click.echo("Constructing normalized records...")
     merge.create_merged_concepts(processed_ids)
