@@ -16,12 +16,6 @@ from disease.database.database import (
 )
 from disease.schemas import SourceName
 
-# Use to lookup class object from source name. Should be one key-value pair
-# for every functioning ETL class.
-SOURCES_CLASS_LOOKUP = {
-    s.value.lower(): eval(s.value) for s in SourceName.__members__.values()
-}
-
 
 @click.command()
 @click.option("--db_url", help="URL endpoint for the application database.")
