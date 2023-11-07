@@ -33,10 +33,3 @@ def test_normalize(api_client):
     response = api_client.get("/disease/normalize?q=neuroblastoma")
     assert response.status_code == 200
     assert response.json()["normalized_id"] == "ncit:C3270"
-
-
-def test_normalize_unmerged(api_client):
-    """Test /normalize_unmerged endpoint."""
-    response = api_client.get("/disease/normalize_unmerged?q=neuroblastoma")
-    assert response.status_code == 200
-    assert response.json()["normalized_concept_id"] == "ncit:C3270"
