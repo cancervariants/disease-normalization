@@ -27,9 +27,15 @@ def test_search(api_client):
     response = api_client.get("/disease/search?q=neuroblastoma&incl=sdkl")
     assert response.status_code == 422
 
+    response = api_client.get("/disease/search")
+    assert response.status_code == 422
+
 
 def test_normalize(api_client):
     """Test /normalize endpoint."""
     response = api_client.get("/disease/normalize?q=neuroblastoma")
     assert response.status_code == 200
     assert response.json()["normalized_id"] == "ncit:C3270"
+
+    response = api_client.get("/disease/normalize")
+    assert response.status_code == 422
