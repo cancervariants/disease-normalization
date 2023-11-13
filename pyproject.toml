@@ -37,7 +37,7 @@ dynamic = ["version"]
 [project.optional-dependencies]
 pg = ["psycopg[binary]"]
 etl = ["owlready2==0.40", "rdflib", "requests", "typing-extensions", "bioversions"]
-test = ["pytest>=6.0", "pytest-cov"]
+test = ["pytest>=6.0", "pytest-cov", "httpx"]
 dev = ["pre-commit", "ruff>=0.1.2", "lxml", "xmlformatter"]
 
 [project.urls]

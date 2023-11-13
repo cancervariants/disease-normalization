@@ -29,6 +29,7 @@ def pytest_collection_modifyitems(items):
         "test_merge",
         "test_database",
         "test_query",
+        "test_endpoints",
         "test_emit_warnings",
     ]
     # remember to add new test modules to the order constant:
