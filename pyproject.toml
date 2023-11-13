@@ -38,7 +38,7 @@ dynamic = ["version"]
 pg = ["psycopg[binary]"]
 etl = ["owlready2==0.40", "rdflib", "requests", "typing-extensions", "bioversions"]
 test = ["pytest>=6.0", "pytest-cov"]
-dev = ["pre-commit", "ruff", "lxml", "xmlformatter"]
+dev = ["pre-commit", "ruff>=0.1.2", "lxml", "xmlformatter"]
 
 [project.urls]
 Homepage = "https://github.com/cancervariants/disease-normalization"
