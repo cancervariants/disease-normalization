@@ -382,10 +382,10 @@ class PostgresDatabase(AbstractDatabase):
             return self._get_record(concept_id, case_sensitive)
 
     _ref_types_query = {
-        RefType.LABEL: b"SELECT concept_id FROM disease_labels WHERE lower(label) = %s;",  # noqa: E501
-        RefType.ALIASES: b"SELECT concept_id FROM disease_aliases WHERE lower(alias) = %s;",  # noqa: E501
+        RefType.LABEL: b"SELECT concept_id FROM disease_labels WHERE lower(label) = %s;",
+        RefType.ALIASES: b"SELECT concept_id FROM disease_aliases WHERE lower(alias) = %s;",
         RefType.XREFS: "SELECT concept_id FROM disease_xrefs WHERE lower(xref) = %s;",
-        RefType.ASSOCIATED_WITH: "SELECT concept_id FROM disease_associations WHERE lower(associated_with) = %s;",  # noqa: E501
+        RefType.ASSOCIATED_WITH: "SELECT concept_id FROM disease_associations WHERE lower(associated_with) = %s;",
     }
 
     def get_refs_by_type(self, search_term: str, ref_type: RefType) -> List[str]:
@@ -435,7 +435,7 @@ class PostgresDatabase(AbstractDatabase):
 
     _get_all_normalized_records_query = b"SELECT * FROM disease_merged;"
     _get_all_unmerged_source_records_query = (
-        b"SELECT * FROM record_lookup_view WHERE merge_ref IS NULL;"  # noqa: E501
+        b"SELECT * FROM record_lookup_view WHERE merge_ref IS NULL;"
     )
     _get_all_source_records_query = b"SELECT * FROM record_lookup_view;"
 
@@ -525,13 +525,13 @@ class PostgresDatabase(AbstractDatabase):
         VALUES (%s, %s, %s);
     """
     _insert_label_query = (
-        b"INSERT INTO disease_labels (label, concept_id) VALUES (%s, %s)"  # noqa: E501
+        b"INSERT INTO disease_labels (label, concept_id) VALUES (%s, %s)"
     )
     _insert_alias_query = (
-        b"INSERT INTO disease_aliases (alias, concept_id) VALUES (%s, %s)"  # noqa: E501
+        b"INSERT INTO disease_aliases (alias, concept_id) VALUES (%s, %s)"
     )
     _insert_xref_query = b"INSERT INTO disease_xrefs (xref, concept_id) VALUES (%s, %s)"
-    _insert_assoc_query = b"INSERT INTO disease_associations (associated_with, concept_id) VALUES (%s, %s)"  # noqa: E501
+    _insert_assoc_query = b"INSERT INTO disease_associations (associated_with, concept_id) VALUES (%s, %s)"
 
     def add_record(self, record: Dict, src_name: SourceName) -> None:
         """Add new record to database.
@@ -715,7 +715,7 @@ class PostgresDatabase(AbstractDatabase):
             command fails
         """
         if not url:
-            url = "https://vicc-normalizers.s3.us-east-2.amazonaws.com/disease_normalization/postgresql/disease_norm_latest.sql.tar.gz"  # noqa: E501
+            url = "https://vicc-normalizers.s3.us-east-2.amazonaws.com/disease_normalization/postgresql/disease_norm_latest.sql.tar.gz"
         with tempfile.TemporaryDirectory() as tempdir:
             tempdir_path = Path(tempdir)
             temp_tarfile = tempdir_path / "disease_norm_latest.tar.gz"
@@ -743,7 +743,7 @@ class PostgresDatabase(AbstractDatabase):
                 pw_param = "-w"
 
             self.drop_db()
-            system_call = f"psql -d {self.conn.info.dbname} -U {self.conn.info.user} {pw_param} -f {dump_file.absolute()}"  # noqa: E501
+            system_call = f"psql -d {self.conn.info.dbname} -U {self.conn.info.user} {pw_param} -f {dump_file.absolute()}"
             result = os.system(system_call)
         if result != 0:
             raise DatabaseException(
@@ -762,7 +762,7 @@ class PostgresDatabase(AbstractDatabase):
         if not output_directory.is_dir() or not output_directory.exists():
             raise ValueError(
                 f"Output location {output_directory} isn't a directory or doesn't exist"
-            )  # noqa: E501
+            )
         now = datetime.now().strftime("%Y%m%d%H%M%S")
         output_location = output_directory / f"disease_norm_{now}.sql"
         user = self.conn.info.user
@@ -774,7 +774,7 @@ class PostgresDatabase(AbstractDatabase):
         else:
             pw_param = "-w"
 
-        system_call = f"pg_dump -E UTF8 -f {output_location} -U {user} {pw_param} -h {host} -p {port} {database_name}"  # noqa: E501
+        system_call = f"pg_dump -E UTF8 -f {output_location} -U {user} {pw_param} -h {host} -p {port} {database_name}"
         result = os.system(system_call)
         if result != 0:
             raise DatabaseException(

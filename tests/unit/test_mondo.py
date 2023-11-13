@@ -299,9 +299,7 @@ def test_meta(mondo):
         response.source_meta_.data_url
         == "https://mondo.monarchinitiative.org/pages/download/"
     )
-    assert (
-        response.source_meta_.rdp_url == "http://reusabledata.org/monarch.html"
-    )  # noqa: E501
+    assert response.source_meta_.rdp_url == "http://reusabledata.org/monarch.html"
     assert response.source_meta_.data_license_attributes == {
         "non_commercial": False,
         "share_alike": False,

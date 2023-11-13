@@ -164,9 +164,9 @@ class SourceMeta(BaseModel):
         json_schema_extra={
             "example": {
                 "data_license": "CC BY 4.0",
-                "data_license_url": "https://creativecommons.org/licenses/by/4.0/legalcode",  # noqa: E501
+                "data_license_url": "https://creativecommons.org/licenses/by/4.0/legalcode",
                 "version": "21.01d",
-                "data_url": "https://evs.nci.nih.gov/ftp1/NCI_Thesaurus/archive/21.01d_Release/",  # noqa: E501
+                "data_url": "https://evs.nci.nih.gov/ftp1/NCI_Thesaurus/archive/21.01d_Release/",
                 "rdp_url": "http://reusabledata.org/ncit.html",
                 "data_license_attributes": {
                     "non_commercial": False,
@@ -304,9 +304,9 @@ class NormalizationService(BaseModel):
                 "source_meta_": {
                     "NCIt": {
                         "data_license": "CC BY 4.0",
-                        "data_license_url": "https://creativecommons.org/licenses/by/4.0/legalcode",  # noqa: E501
+                        "data_license_url": "https://creativecommons.org/licenses/by/4.0/legalcode",
                         "version": "21.01d",
-                        "data_url": "https://evs.nci.nih.gov/ftp1/NCI_Thesaurus/archive/21.01d_Release/",  # noqa: E501
+                        "data_url": "https://evs.nci.nih.gov/ftp1/NCI_Thesaurus/archive/21.01d_Release/",
                         "rdp_url": "http://reusabledata.org/ncit.html",
                         "data_license_attributes": {
                             "non_commercial": False,
@@ -316,9 +316,9 @@ class NormalizationService(BaseModel):
                     },
                     "Mondo": {
                         "data_license": "CC BY 4.0",
-                        "data_license_url": "https://creativecommons.org/licenses/by/4.0/legalcode",  # noqa: E501
+                        "data_license_url": "https://creativecommons.org/licenses/by/4.0/legalcode",
                         "version": "20210129",
-                        "data_url": "https://mondo.monarchinitiative.org/pages/download/",  # noqa: E501
+                        "data_url": "https://mondo.monarchinitiative.org/pages/download/",
                         "rdp_url": "http://reusabledata.org/monarch.html",
                         "data_license_attributes": {
                             "non_commercial": False,
@@ -328,7 +328,7 @@ class NormalizationService(BaseModel):
                     },
                     "DO": {
                         "data_license": "CC0 1.0",
-                        "data_license_url": "https://creativecommons.org/publicdomain/zero/1.0/legalcode",  # noqa: E501
+                        "data_license_url": "https://creativecommons.org/publicdomain/zero/1.0/legalcode",
                         "version": "20210305",
                         "data_url": "http://www.obofoundry.org/ontology/doid.html",
                         "rdp_url": None,

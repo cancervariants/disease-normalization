@@ -14,7 +14,7 @@ class OncoTree(Base):
         """Download Oncotree source data for loading into normalizer."""
         logger.info("Retrieving source data for OncoTree")
         url_version = self._version.replace("-", "_")
-        url = f"http://oncotree.mskcc.org/api/tumorTypes/tree?version=oncotree_{url_version}"  # noqa: E501
+        url = f"http://oncotree.mskcc.org/api/tumorTypes/tree?version=oncotree_{url_version}"
         output_file = self._src_dir / f"oncotree_{self._version}.json"
         self._http_download(url, output_file)
         logger.info("Successfully retrieved source data for OncoTree")
@@ -25,7 +25,7 @@ class OncoTree(Base):
             data_license="CC BY 4.0",
             data_license_url="https://creativecommons.org/licenses/by/4.0/legalcode",  # noqa F401
             version=self._version,
-            data_url="http://oncotree.mskcc.org/#/home?tab=api",  # noqa: E501
+            data_url="http://oncotree.mskcc.org/#/home?tab=api",
             rdp_url=None,
             data_license_attributes={
                 "non_commercial": False,
@@ -43,7 +43,7 @@ class OncoTree(Base):
         """
         if disease_node.get("level", None) >= 2:
             disease = {
-                "concept_id": f"{NamespacePrefix.ONCOTREE.value}:{disease_node['code']}",  # noqa: E501
+                "concept_id": f"{NamespacePrefix.ONCOTREE.value}:{disease_node['code']}",
                 "label": disease_node["name"],
                 "xrefs": [],
                 "associated_with": [],
