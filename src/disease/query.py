@@ -425,7 +425,8 @@ class QueryHandler:
             # attempt merge ref resolution until successful
             for match in matching_records:
                 record = self.db.get_record_by_id(
-                    match["concept_id"], False  # type: ignore
+                    match["concept_id"],
+                    False,  # type: ignore
                 )
                 if record:
                     if "merge_ref" in record:

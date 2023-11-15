@@ -174,7 +174,7 @@ class Base(ABC):
                     f"Unable to parse version value from {src_name} source data file "
                     f"located at {self._data_file.absolute().as_uri()} -- "
                     "check filename against schema defined in README: "
-                    "https://github.com/cancervariants/disease-normalization#adding-and-refreshing-data"  # noqa: E501
+                    "https://github.com/cancervariants/disease-normalization#adding-and-refreshing-data"
                 )
         else:
             self._data_file = self._get_latest_data_file()
