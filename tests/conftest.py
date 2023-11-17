@@ -107,7 +107,9 @@ def test_source(database: AbstractDatabase, is_test_env: bool):
     def test_source_factory(EtlClass: Base):  # noqa: N803
         if IS_TEST_ENV:
             _logger.debug(f"Reloading DB with data from {TEST_DATA_DIRECTORY}")
-            test_class = EtlClass(database, TEST_DATA_DIRECTORY)  # type: ignore
+            test_class = EtlClass(
+                database, TEST_DATA_DIRECTORY / EtlClass.__name__.lower()
+            )  # type: ignore
             if EtlClass.__name__ == SourceName.MONDO:  # type: ignore
                 decompress_mondo_tar()
             test_class.perform_etl(use_existing=True)
