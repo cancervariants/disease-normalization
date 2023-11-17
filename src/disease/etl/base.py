@@ -3,6 +3,7 @@ from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Dict, List, Optional, Set, Union
 
+import click
 from owlready2.rdflib_store import TripleLiteRDFlibGraph as RDFGraph
 from wags_tails import CustomData, DataSource, DoData, MondoData, NcitData, OncoTreeData
 
@@ -33,23 +34,23 @@ class Base(ABC):
         :param data_path: location of data directory
         :param silent: if True, don't print ETL results to console
         """
+        self._silent = silent
         self._src_name = SourceName(self.__class__.__name__)
         self._data_source: Union[
             NcitData, OncoTreeData, MondoData, DoData, CustomData
-        ] = self._get_data_handler(data_path, silent)  # type: ignore
+        ] = self._get_data_handler(data_path)  # type: ignore
         self._database = database
         self._store_ids = self.__class__.__name__ in SOURCES_FOR_MERGE
         if self._store_ids:
             self._added_ids = []
 
-    def _get_data_handler(self, data_path: Optional[Path], silent: bool) -> DataSource:
+    def _get_data_handler(self, data_path: Optional[Path]) -> DataSource:
         """Construct data handler instance for source. Overwrite for edge-case sources.
 
         :param data_path: location of data storage
-        :param silent: if True, don't print data acquisition steps to console
         :return: instance of wags_tails.DataSource to manage source file(s)
         """
-        return DATA_DISPATCH[self._src_name](data_dir=data_path, silent=silent)
+        return DATA_DISPATCH[self._src_name](data_dir=data_path, silent=self._silent)
 
     def perform_etl(self, use_existing: bool = False) -> List:
         """Public-facing method to begin ETL procedures on given data.
@@ -59,6 +60,8 @@ class Base(ABC):
         """
         self._extract_data(use_existing)
         self._load_meta()
+        if not self._silent:
+            click.echo("Transforming and loading data to DB...")
         self._transform_data()
         self._database.complete_write_transaction()
         if self._store_ids:
