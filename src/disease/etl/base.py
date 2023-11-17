@@ -22,27 +22,36 @@ class Base(ABC):
     """The ETL base class."""
 
     def __init__(
-        self, database: AbstractDatabase, data_path: Optional[Path] = None
+        self,
+        database: AbstractDatabase,
+        data_path: Optional[Path] = None,
+        silent: bool = True,
     ) -> None:
         """Extract from sources.
 
         :param database: database client
         :param data_path: location of data directory
+        :param silent: if True, don't print ETL results to console
         """
         self._src_name = SourceName(self.__class__.__name__)
-        self._data_source: Union[NcitData, OncoTreeData, MondoData, DoData, CustomData] = self._get_data_handler(data_path)  # type: ignore
+        self._data_source: Union[
+            NcitData, OncoTreeData, MondoData, DoData, CustomData
+        ] = self._get_data_handler(
+            data_path, silent
+        )  # type: ignore
         self._database = database
         self._store_ids = self.__class__.__name__ in SOURCES_FOR_MERGE
         if self._store_ids:
             self._added_ids = []
 
-    def _get_data_handler(self, data_path: Optional[Path]) -> DataSource:
+    def _get_data_handler(self, data_path: Optional[Path], silent: bool) -> DataSource:
         """Construct data handler instance for source. Overwrite for edge-case sources.
 
         :param data_path: location of data storage
+        :param silent: if True, don't print data acquisition steps to console
         :return: instance of wags_tails.DataSource to manage source file(s)
         """
-        return DATA_DISPATCH[self._src_name](data_dir=data_path)
+        return DATA_DISPATCH[self._src_name](data_dir=data_path, silent=silent)
 
     def perform_etl(self, use_existing: bool = False) -> List:
         """Public-facing method to begin ETL procedures on given data.
