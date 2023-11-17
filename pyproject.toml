@@ -37,8 +37,8 @@ dynamic = ["version"]
 [project.optional-dependencies]
 pg = ["psycopg[binary]", "requests"]
 etl = ["owlready2==0.40", "rdflib", "typing-extensions", "wags-tails"]
-test = ["pytest>=6.0", "pytest-cov"]
-dev = ["pre-commit", "black", "ruff", "lxml", "xmlformatter"]
+test = ["pytest>=6.0", "pytest-cov", "httpx"]
+dev = ["pre-commit", "ruff>=0.1.2", "lxml", "xmlformatter"]
 
 [project.urls]
 Homepage = "https://github.com/cancervariants/disease-normalization"
@@ -48,7 +48,7 @@ Source = "https://github.com/cancervariants/disease-normalization"
 "Bug Tracker" = "https://github.com/cancervariants/disease-normalization/issues"
 
 [project.scripts]
-disease_norm_update = "disease.cli:update_normalizer_db"
+disease_norm_update = "disease.cli:update_db"
 disease_norm_update_remote = "disease.cli:update_from_remote"
 disease_norm_dump = "disease.cli:dump_database"
 disease_norm_check_db = "disease.cli:check_db"
@@ -81,23 +81,24 @@ src = ["src"]
 # pycodestyle (E, W)
 # Pyflakes (F)
 # flake8-annotations (ANN)
-# flake8-quotes (Q)
 # pydocstyle (D)
 # pep8-naming (N)
 # isort (I)
-select = ["E", "W", "F", "ANN", "Q", "D", "N", "I"]
-
+select = ["E", "W", "F", "ANN", "D", "N", "I"]
 fixable = ["I", "F401"]
 
 # D203 - one-blank-line-before-class
 # D205 - blank-line-after-summary
+# D206 - indent-with-spaces*
 # D213 - multi-line-summary-second-line
 # D400 - ends-in-period
 # D415 - ends-in-punctuation
 # ANN101 - missing-type-self
 # ANN003 - missing-type-kwargs
 # E501 - line-too-long
-ignore = ["D203", "D205", "D213", "D400", "D415", "ANN101", "ANN003", "E501"]
+# W191 - tab-indentation*
+# *ignored for compatibility with formatter
+ignore = ["D203", "D205", "D206", "D213", "D400", "D415", "ANN101", "ANN003", "E501", "Q", "W191"]
 
 [tool.ruff.flake8-quotes]
 docstring-quotes = "double"

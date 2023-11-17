@@ -16,7 +16,7 @@ class OncoTree(Base):
             data_license="CC BY 4.0",
             data_license_url="https://creativecommons.org/licenses/by/4.0/legalcode",  # noqa F401
             version=self._version,
-            data_url="http://oncotree.mskcc.org/#/home?tab=api",  # noqa: E501
+            data_url="http://oncotree.mskcc.org/#/home?tab=api",
             rdp_url=None,
             data_license_attributes={
                 "non_commercial": False,
@@ -34,7 +34,7 @@ class OncoTree(Base):
         """
         if disease_node.get("level", None) >= 2:
             disease = {
-                "concept_id": f"{NamespacePrefix.ONCOTREE.value}:{disease_node['code']}",  # noqa: E501
+                "concept_id": f"{NamespacePrefix.ONCOTREE.value}:{disease_node['code']}",
                 "label": disease_node["name"],
                 "xrefs": [],
                 "associated_with": [],

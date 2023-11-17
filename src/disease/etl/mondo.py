@@ -60,9 +60,9 @@ class Mondo(OWLBase):
         """Load metadata"""
         metadata = SourceMeta(
             data_license="CC BY 4.0",
-            data_license_url="https://creativecommons.org/licenses/by/4.0/legalcode",  # noqa: E501
+            data_license_url="https://creativecommons.org/licenses/by/4.0/legalcode",
             version=self._version,
-            data_url="https://mondo.monarchinitiative.org/pages/download/",  # noqa: E501
+            data_url="https://mondo.monarchinitiative.org/pages/download/",
             rdp_url="http://reusabledata.org/monarch.html",
             data_license_attributes={
                 "non_commercial": False,
@@ -123,7 +123,8 @@ class Mondo(OWLBase):
         """
         equiv_rels_result = graph.query(equiv_annotations_query)
         grouped = groupby(
-            equiv_rels_result, lambda i: i[0].split("_")[1]  # type: ignore
+            equiv_rels_result,
+            lambda i: i[0].split("_")[1],  # type: ignore
         )
         keyed = {
             str(key): [self._get_concept_id(g[1]) for g in group]  # type: ignore

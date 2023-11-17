@@ -14,15 +14,7 @@ from disease.database.database import (
     DatabaseWriteException,
     create_db,
 )
-from disease.etl import DO, OMIM, Mondo, NCIt, OncoTree  # noqa: F401
-from disease.etl.merge import Merge
 from disease.schemas import SourceName
-
-# Use to lookup class object from source name. Should be one key-value pair
-# for every functioning ETL class.
-SOURCES_CLASS_LOOKUP = {
-    s.value.lower(): eval(s.value) for s in SourceName.__members__.values()
-}
 
 
 @click.command()
@@ -176,6 +168,13 @@ def _load_source(
     start_load = timer()
 
     # used to get source class name from string
+    try:
+        from disease.etl import DO, OMIM, Mondo, NCIt, OncoTree  # noqa: F401
+    except ModuleNotFoundError as e:
+        click.echo(
+            f"Encountered ModuleNotFoundError attempting to import {e.name}. Are ETL dependencies installed?"
+        )
+        click.get_current_context().exit()
     SourceClass = eval(n.value)  # noqa: N806
 
     source = SourceClass(database=db)
@@ -219,6 +218,15 @@ def _load_merge(db: AbstractDatabase, processed_ids: Set[str]) -> None:
         processed_ids = set()
         for source in SOURCES_FOR_MERGE:
             processed_ids |= db.get_all_concept_ids(source)
+
+    try:
+        from disease.etl.merge import Merge
+    except ModuleNotFoundError as e:
+        click.echo(
+            f"Encountered ModuleNotFoundError attempting to import {e.name}. Are ETL dependencies installed?"
+        )
+        click.get_current_context().exit()
+
     merge = Merge(database=db)
     click.echo("Constructing normalized records...")
     merge.create_merged_concepts(processed_ids)
@@ -273,7 +281,7 @@ def update_db(
             ctx = click.get_current_context()
             click.echo(
                 "Must either enter 1 or more sources, or use `--update_all` parameter"
-            )  # noqa: E501
+            )
             click.echo(ctx.get_help())
             ctx.exit()
     else:

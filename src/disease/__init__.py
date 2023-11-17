@@ -16,7 +16,7 @@ logger.setLevel(logging.DEBUG)
 logger.handlers = []
 
 
-from disease.schemas import (  # noqa: E402 E501
+from disease.schemas import (  # noqa: E402
     NamespacePrefix,
     RefType,
     SourceIDAfterNamespace,

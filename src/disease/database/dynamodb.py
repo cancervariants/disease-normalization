@@ -47,18 +47,18 @@ class DynamoDbDatabase(AbstractDatabase):
             if "DISEASE_TEST" in environ:
                 raise DatabaseException(
                     f"Cannot have both DISEASE_TEST and {AWS_ENV_VAR_NAME} set."
-                )  # noqa: E501
+                )
 
             aws_env = environ[AWS_ENV_VAR_NAME]
             if aws_env not in VALID_AWS_ENV_NAMES:
                 raise DatabaseException(
                     f"{AWS_ENV_VAR_NAME} must be one of {VALID_AWS_ENV_NAMES}"
-                )  # noqa: E501
+                )
 
             skip_confirmation = environ.get(SKIP_AWS_DB_ENV_NAME)
             if (not skip_confirmation) or (
                 skip_confirmation and skip_confirmation != "true"
-            ):  # noqa: E501
+            ):
                 confirm_aws_db_use(environ[AWS_ENV_VAR_NAME])
 
             boto_params = {"region_name": region_name}

@@ -28,7 +28,7 @@ class DO(OWLBase):
         """Load metadata"""
         metadata = SourceMeta(
             data_license="CC0 1.0",
-            data_license_url="https://creativecommons.org/publicdomain/zero/1.0/legalcode",  # noqa: E501
+            data_license_url="https://creativecommons.org/publicdomain/zero/1.0/legalcode",
             version=self._version,
             data_url="http://www.obofoundry.org/ontology/doid.html",
             rdp_url=None,

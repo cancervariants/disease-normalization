@@ -1,7 +1,0 @@
-[run]
-source =
-   disease/
-   tests/
-omit =
-   setup.py
-   docs/*

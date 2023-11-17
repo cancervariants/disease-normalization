@@ -36,9 +36,7 @@ class Base(ABC):
         self._src_name = SourceName(self.__class__.__name__)
         self._data_source: Union[
             NcitData, OncoTreeData, MondoData, DoData, CustomData
-        ] = self._get_data_handler(
-            data_path, silent
-        )  # type: ignore
+        ] = self._get_data_handler(data_path, silent)  # type: ignore
         self._database = database
         self._store_ids = self.__class__.__name__ in SOURCES_FOR_MERGE
         if self._store_ids:

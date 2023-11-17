@@ -19,6 +19,7 @@ xmlformatter = "*"
 psycopg = {version = "*", extras=["binary"]}
 black = "*"
 ruff = "*"
+httpx = "*"
 
 [packages]
 pydantic = "*"
