@@ -11,7 +11,7 @@ from disease.schemas import NamespacePrefix, SourceMeta
 class OMIM(Base):
     """Gather and load data from OMIM."""
 
-    def _omim_access_warning(self) -> None:
+    def _raise_access_error(self) -> None:
         """Raise improper data access error and describe proper data access."""
         raise FileNotFoundError(
             "Could not locate OMIM data. Per README, OMIM "
@@ -30,7 +30,7 @@ class OMIM(Base):
             "omim",
             "tsv",
             latest_version_cb=lambda: "",
-            download_cb=lambda latest_file, latest_version: self._omim_access_warning(),
+            download_cb=lambda latest_file, latest_version: self._raise_access_error(),
             data_dir=data_path,
         )
 
