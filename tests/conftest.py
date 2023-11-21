@@ -37,6 +37,26 @@ def pytest_collection_modifyitems(items):
     items.sort(key=lambda i: MODULE_ORDER.index(i.module.__name__))
 
 
+def pytest_addoption(parser):
+    """Add custom commands to pytest invocation.
+    See https://docs.pytest.org/en/7.1.x/reference/reference.html#parser
+    """
+    parser.addoption(
+        "--verbose-logs",
+        action="store_true",
+        default=False,
+        help="show noisy module logs",
+    )
+
+
+def pytest_configure(config):
+    """Configure pytest setup."""
+    if not config.getoption("--verbose-logs"):
+        logging.getLogger("botocore").setLevel(logging.ERROR)
+        logging.getLogger("boto3").setLevel(logging.ERROR)
+        logging.getLogger("urllib3.connectionpool").setLevel(logging.ERROR)
+
+
 TEST_ROOT = Path(__file__).resolve().parents[1]
 TEST_DATA_DIRECTORY = TEST_ROOT / "tests" / "data"
 IS_TEST_ENV = os.environ.get("DISEASE_TEST", "").lower() == "true"
