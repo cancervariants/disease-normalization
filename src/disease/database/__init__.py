@@ -1,6 +1,6 @@
 """Provide database clients."""
 from .database import (
-    AWS_ENV_VAR_NAME,  # noqa: F401
+    AWS_ENV_VAR_NAME,
     AbstractDatabase,
     DatabaseException,
     DatabaseInitializationException,
@@ -8,3 +8,13 @@ from .database import (
     DatabaseWriteException,
     create_db,
 )
+
+__all__ = [
+    "AWS_ENV_VAR_NAME",
+    "AbstractDatabase",
+    "DatabaseException",
+    "DatabaseInitializationException",
+    "DatabaseReadException",
+    "DatabaseWriteException",
+    "create_db",
+]
