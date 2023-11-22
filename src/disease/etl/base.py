@@ -44,7 +44,7 @@ class Base(ABC):
         if self._store_ids:
             self._added_ids = []
 
-    def _get_data_handler(self, data_path: Optional[Path]) -> DataSource:
+    def _get_data_handler(self, data_path: Optional[Path] = None) -> DataSource:
         """Construct data handler instance for source. Overwrite for edge-case sources.
 
         :param data_path: location of data storage
