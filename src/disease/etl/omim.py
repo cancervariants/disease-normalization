@@ -19,7 +19,7 @@ class OMIM(Base):
             f"{self._data_source.data_dir.absolute().as_uri()}"
         )
 
-    def _get_data_handler(self, data_path: Optional[Path]) -> DataSource:
+    def _get_data_handler(self, data_path: Optional[Path] = None) -> DataSource:
         """Construct data handler instance for source. Overwrites base class method
         to use custom data handler instead.
 
