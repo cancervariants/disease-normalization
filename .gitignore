@@ -147,10 +147,6 @@ cython_debug/
 # allow pytest override with pytest.ini
 pytest.ini
 
-# ignore data dir
-data/*
-src/disease/data/*
-
 # IDE materials
 .idea/
 .vim/

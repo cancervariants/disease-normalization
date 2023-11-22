@@ -5,7 +5,7 @@ name = "pypi"
 
 [dev-packages]
 disease-normalizer = {editable = true, path = "."}
-bioversions = "*"
+wags-tails = "*"
 requests = "*"
 owlready2 = "*"
 rdflib = "*"

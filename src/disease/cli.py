@@ -177,7 +177,7 @@ def _load_source(
         click.get_current_context().exit()
     SourceClass = eval(n.value)  # noqa: N806
 
-    source = SourceClass(database=db)
+    source = SourceClass(database=db, silent=False)
     processed_ids += source.perform_etl(use_existing=from_local)
     end_load = timer()
     load_time = end_load - start_load
