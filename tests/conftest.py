@@ -20,7 +20,7 @@ def pytest_collection_modifyitems(items):
     """Modify test items in place to ensure test modules run in a given order.
     When creating new test modules, be sure to add them here.
     """
-    MODULE_ORDER = [  # noqa: N806
+    module_order = [
         "test_mondo",
         "test_do",
         "test_ncit",
@@ -33,8 +33,8 @@ def pytest_collection_modifyitems(items):
         "test_emit_warnings",
     ]
     # remember to add new test modules to the order constant:
-    assert len(MODULE_ORDER) == len(list(Path(__file__).parent.rglob("test_*.py")))
-    items.sort(key=lambda i: MODULE_ORDER.index(i.module.__name__))
+    assert len(module_order) == len(list(Path(__file__).parent.rglob("test_*.py")))
+    items.sort(key=lambda i: module_order.index(i.module.__name__))
 
 
 TEST_ROOT = Path(__file__).resolve().parents[1]
