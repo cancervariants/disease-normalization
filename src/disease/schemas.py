@@ -49,7 +49,8 @@ class NamespacePrefix(Enum):
     # built-in sources
     NCIT = "ncit"
     MONDO = "mondo"
-    DO = "DOID"
+    DOID = "DOID"
+    DO = DOID
     OMIM = "omim"
     ONCOTREE = "oncotree"
     # external sources
