@@ -1,0 +1,2522 @@
+format-version: 1.2
+data-version: releases/2023-09-12
+subsetdef: clingen "initial subset used by clingen"
+subsetdef: disease_grouping "disease_grouping"
+subsetdef: do_inheritance_inconsistent "classes where the corresponding DO term is both AR and AD https://github.com/monarch-initiative/monarch-disease-ontology/issues/406"
+subsetdef: gard_rare "GARD rare disease subset"
+subsetdef: harrisons_view "harrisons_view"
+subsetdef: historic_epidemic "classes representing a historic epidemic"
+subsetdef: implicit_genetic_in_ordo "in ORDO this is classified as genetic even though the class is used for non-genetic disorders"
+subsetdef: inferred_rare "inferred rare disease subset"
+subsetdef: merged_class "this class merges distinct concepts in other resources"
+subsetdef: metaclass "A grouping of disease classes. Should be excluded from analysis"
+subsetdef: mondo_rare "mondo rare"
+subsetdef: mostly_harmless "condition has no severe phenotypes and is harmless or mostly harmless"
+subsetdef: n_of_one "N of one"
+subsetdef: nord_rare "nord rare"
+subsetdef: not_a_disease "classes that do not represent diseases"
+subsetdef: obsoletion_candidate "obsoletion candidate"
+subsetdef: ordo_biological_anomaly "biological anomaly"
+subsetdef: ordo_clinical_situation "particular clinical situation in a disease or syndrome"
+subsetdef: ordo_clinical_subtype "clinical subtype"
+subsetdef: ordo_clinical_syndrome "clinical syndrome"
+subsetdef: ordo_disease "disease"
+subsetdef: ordo_disorder "disorder"
+subsetdef: ordo_etiological_subtype "etiological subtype"
+subsetdef: ordo_group_of_disorders "group of disorders"
+subsetdef: ordo_histopathological_subtype "histopathological subtype"
+subsetdef: ordo_inheritance_inconsistent "classes where the corresponding ordo term is both AR and AD https://github.com/monarch-initiative/monarch-disease-ontology/issues/406"
+subsetdef: ordo_malformation_syndrome "malformation syndrome"
+subsetdef: ordo_morphological_anomaly "morphological anomaly"
+subsetdef: ordo_subtype_of_a_disorder "subtype of a disorder"
+subsetdef: orphanet_rare "orphanet rare"
+subsetdef: other_hierarchy "A bin for classes that are likely not diseases and may be moved to a separate hierarchy"
+subsetdef: predisposition "Diseases that are pre-dispositions to other diseases"
+subsetdef: prototype_pattern "Conforms to the prototype design pattern where the classic/type1 form may be confused with the grouping type. See https://github.com/monarch-initiative/monarch-disease-ontology/issues/149"
+subsetdef: rare "rare"
+subsetdef: rare_grouping "rare grouping"
+subsetdef: speculative "A hypothesized disease whose existence is speculative"
+synonymtypedef: ABBREVIATION "abbreviation"
+synonymtypedef: AMBIGUOUS "ambiguous"
+synonymtypedef: DEPRECATED "A synonym that is historic and discouraged"
+synonymtypedef: DUBIOUS "dubious synonym"
+synonymtypedef: EXCLUDE "Synonym to be removed from public release but maintained in edit version as record of external usage"
+synonymtypedef: MISSPELLING "A synonym that is recorded for consistency with another source but is a misspelling"
+synonymtypedef: NON_HUMAN "A synonym that is used for non-human animal variants of a disease"
+synonymtypedef: OMO:0003005 "UK spelling synonym"
+remark: Includes Ontology(OntologyID(Anonymous-11)) [Axioms: 74703 Logical Axioms: 0]
+ontology: mondo
+property_value: http://purl.org/dc/elements/1.1/description "A semi-automatically constructed ontology that merges in multiple disease resources to yield a coherent merged ontology." xsd:string
+property_value: http://purl.org/dc/elements/1.1/title "Mondo Disease Ontology" xsd:string
+property_value: http://purl.org/dc/terms/license http://creativecommons.org/licenses/by/4.0/
+property_value: http://purl.org/dc/terms/source http://purl.obolibrary.org/obo/chebi.owl
+property_value: http://purl.org/dc/terms/source http://purl.obolibrary.org/obo/doid.owl
+property_value: http://purl.org/dc/terms/source http://purl.obolibrary.org/obo/envo.owl
+property_value: http://purl.org/dc/terms/source http://purl.obolibrary.org/obo/go.owl
+property_value: http://purl.org/dc/terms/source http://purl.obolibrary.org/obo/hp.owl
+property_value: http://purl.org/dc/terms/source http://purl.obolibrary.org/obo/mf.owl
+property_value: http://purl.org/dc/terms/source http://purl.obolibrary.org/obo/ncbitaxon.owl
+property_value: http://purl.org/dc/terms/source http://purl.obolibrary.org/obo/ncit.owl
+property_value: http://purl.org/dc/terms/source http://purl.obolibrary.org/obo/uberon.owl
+property_value: http://purl.org/dc/terms/source http://www.orpha.net/ontology/orphanet.owl
+property_value: http://purl.org/dc/terms/source https://id.nlm.nih.gov/mesh/
+property_value: http://purl.org/dc/terms/source https://rarediseases.info.nih.gov/
+property_value: http://xmlns.com/foaf/0.1/homepage "http://obofoundry.org/ontology/mondo.html" xsd:anyURI
+property_value: IAO:0000700 MONDO:0000001
+property_value: IAO:0000700 MONDO:0021125
+property_value: IAO:0000700 MONDO:0021178
+property_value: IAO:0000700 MONDO:0042489
+
+[Term]
+id: MONDO:0000001
+name: disease
+def: "A disease is a disposition to undergo pathological processes that exists in an organism because of one or more disorders in that organism." [OGMS:0000031]
+synonym: "condition" EXACT [NCIT:C2991]
+synonym: "disease" EXACT [NCIT:C2991]
+synonym: "disease or disorder" EXACT [NCIT:C2991]
+synonym: "disease or disorder, non-neoplastic" EXACT [NCIT:C2991]
+synonym: "diseases" EXACT [NCIT:C2991]
+synonym: "diseases and disorders" EXACT [NCIT:C2991]
+synonym: "disorder" EXACT [NCIT:C2991]
+synonym: "disorders" EXACT [NCIT:C2991]
+synonym: "medical condition" EXACT []
+synonym: "other disease" EXACT [NCIT:C2991]
+xref: DOID:4
+xref: EFO:0000408
+xref: ICD9:799.9
+xref: MESH:D004194
+xref: NCIT:C2991
+xref: OGMS:0000031
+xref: Orphanet:377788
+xref: SCTID:64572001
+xref: UMLS:C0012634
+property_value: exactMatch DOID:4
+property_value: exactMatch http://identifiers.org/mesh/D004194
+property_value: exactMatch http://identifiers.org/snomedct/64572001
+property_value: exactMatch http://linkedlifedata.com/resource/umls/id/C0012634
+property_value: exactMatch NCIT:C2991
+property_value: exactMatch Orphanet:377788
+
+[Term]
+id: MONDO:0000270
+name: lower respiratory tract disorder
+def: "A disease involving the lower respiratory tract." [https://orcid.org/0000-0002-6601-2165]
+synonym: "disease of lower respiratory tract" EXACT [MONDO:patterns/location_top]
+synonym: "disease or disorder of lower respiratory tract" EXACT []
+synonym: "disorder of lower respiratory tract" EXACT [MONDO:patterns/location_top]
+synonym: "lower respiratory tract disease" EXACT [MONDO:patterns/location]
+synonym: "lower respiratory tract disease or disorder" EXACT [MONDO:design_pattern, MONDO:patterns/location]
+xref: DOID:0050161
+xref: ICD9:478.1
+xref: ICD9:478.19
+xref: SCTID:128272009
+xref: UMLS:C1290325
+is_a: MONDO:0005087
+property_value: exactMatch DOID:0050161
+property_value: exactMatch http://identifiers.org/snomedct/128272009
+property_value: exactMatch http://linkedlifedata.com/resource/umls/id/C1290325
+
+[Term]
+id: MONDO:0000376
+name: respiratory system cancer
+def: "A malignant neoplasm involving the respiratory system" [https://orcid.org/0000-0002-6601-2165]
+synonym: "cancer of respiratory system" EXACT [MONDO:patterns/cancer]
+synonym: "malignant neoplasm of respiratory system" EXACT [MONDO:patterns/cancer]
+synonym: "malignant respiratory system neoplasm" EXACT [MONDO:patterns/cancer]
+synonym: "respiratory system cancer" EXACT [MONDO:patterns/location]
+xref: DOID:0050615
+xref: ICD9:165.8
+xref: ICD9:165.9
+xref: SCTID:449096009
+xref: UMLS:C3164456
+is_a: MONDO:0004992
+is_a: MONDO:0005087
+property_value: exactMatch DOID:0050615
+property_value: exactMatch http://identifiers.org/snomedct/449096009
+property_value: exactMatch http://linkedlifedata.com/resource/umls/id/C3164456
+
+[Term]
+id: MONDO:0000693
+name: bipolar II disorder
+def: "A bipolar disorder that is characterized by at least one hypomanic episode and at least one major depressive episode; with this disorder, depressive episodes are more frequent and more intense than manic episodes." [DOID:0060166, http://en.wikipedia.org/wiki/Bipolar_II]
+synonym: "bipolar 2 disorder" RELATED []
+synonym: "bipolar II disorder" EXACT []
+synonym: "bipolar ll disorder" RELATED [DOID:0060166]
+xref: DOID:0060166
+xref: ICD9:296.89
+xref: SCTID:83225003
+is_a: MONDO:0004985
+property_value: exactMatch DOID:0060166
+property_value: exactMatch http://identifiers.org/snomedct/83225003
+
+[Term]
+id: MONDO:0002025
+name: psychiatric disorder
+def: "A disorder characterized by behavioral and/or psychological abnormalities, often accompanied by physical symptoms. The symptoms may cause clinically significant distress or impairment in social and occupational areas of functioning. Representative examples include anxiety disorders, cognitive disorders, mood disorders and schizophrenia." [NCIT:C2893]
+subset: rare_grouping
+synonym: "disease of mental health" NARROW [DOID:150]
+synonym: "mental disorder" NARROW [NCIT:C2893]
+synonym: "mental dysfunction" NARROW [NCIT:C2893]
+synonym: "mental illness" NARROW [NCIT:C2893]
+synonym: "Psychiatric disease" EXACT [NCIT:C2893]
+synonym: "Psychiatric disorder" EXACT [NCIT:C2893]
+xref: DOID:150
+xref: MESH:D001523
+xref: MFOMD:0000004
+xref: NCIT:C2893
+xref: SCTID:74732009
+is_a: MONDO:0700096
+relationship: excluded_subClassOf MONDO:0005071
+property_value: exactMatch DOID:150
+property_value: exactMatch http://identifiers.org/mesh/D001523
+property_value: exactMatch NCIT:C2893
+
+[Term]
+id: MONDO:0002083
+name: Richter syndrome
+def: "Transformation of chronic lymphocytic leukemia into aggressive non-Hodgkin's lymphoma, usually diffuse large B-cell lymphoma (immunoblastic or centroblastic variant). Occasional cases of transformation to Hodgkin's lymphoma have also been described, particularly in patients treated with purine nucleotide analogs. Molecular genetic studies suggest that in approximately half of the cases, the lymphoma is clonally related to the underlying chronic lymphocytic leukemia, whereas in the remaining cases the lymphoma probably represents a secondary, unrelated neoplasm." [NCIT:P378]
+synonym: "Richter syndrome" EXACT [DOID:1703, NCIT:C35424]
+synonym: "Richter transformation" EXACT [NCIT:C35424]
+synonym: "Richter's syndrome" EXACT [doi:10.1093/jama/9780195176339.003.0016, MONDO:LexicalVariant, NCIT:C35424]
+synonym: "Richter's transformation" EXACT [NCIT:C35424]
+xref: DOID:1703
+xref: NCIT:C35424
+xref: SCTID:277550009
+xref: UMLS:C0349631
+is_a: MONDO:0021058
+is_a: MONDO:0024882
+relationship: disease_arises_from_feature MONDO:0004948
+relationship: excluded_subClassOf MONDO:0004948
+property_value: exactMatch DOID:1703
+property_value: exactMatch http://identifiers.org/snomedct/277550009
+property_value: exactMatch http://linkedlifedata.com/resource/umls/id/C0349631
+property_value: exactMatch NCIT:C35424
+
+[Term]
+id: MONDO:0002254
+name: syndromic disease
+def: "A group of signs, symptoms, and clinicopathological characteristics that may or may not have a genetic basis and collectively define an abnormal condition." [NCIT:C28193]
+subset: harrisons_view
+subset: rare_grouping
+synonym: "cluster, symptom" EXACT [MESH:D013577]
+synonym: "clusters, symptom" EXACT [MESH:D013577]
+synonym: "symptom cluster" EXACT [MESH:D013577]
+synonym: "symptom clusters" EXACT [MESH:D013577]
+synonym: "syndrome" EXACT [NCIT:C28193, OGMS:0000086]
+synonym: "syndrome associated with disease or disorder" EXACT [MONDO:patterns/syndromic]
+synonym: "syndromes" EXACT [MESH:D013577]
+synonym: "syndromic disease" EXACT [MONDO:patterns/syndromic]
+synonym: "syndromic disease or disorder" EXACT [MONDO:patterns/syndromic]
+xref: DOID:225
+xref: MESH:D013577
+xref: NCIT:C28193
+xref: OGMS:0000086
+xref: UMLS:C0039082
+is_a: MONDO:0700096
+intersection_of: MONDO:0700096
+intersection_of: has_characteristic MONDO:0021127
+disjoint_from: MONDO:0011348
+disjoint_from: MONDO:0019530
+relationship: has_characteristic MONDO:0021127
+property_value: exactMatch DOID:225
+property_value: exactMatch http://identifiers.org/mesh/D013577
+property_value: exactMatch http://linkedlifedata.com/resource/umls/id/C0039082
+property_value: exactMatch NCIT:C28193
+
+[Term]
+id: MONDO:0002334
+name: hematopoietic and lymphoid system neoplasm
+def: "Neoplasms of the hematopoietic system, including hematopoietic cell neoplasms (e.g. leukemias, lymphomas) and non-hematopoietic cell neoplasms that can affect the hematopoietic system (e.g. lymph node and splenic sarcomas). --2003" [NCIT:C35813]
+synonym: "blood cancer" NARROW [DOID:2531]
+synonym: "blood neoplasm (disease)" EXACT [MONDO:patterns/location]
+synonym: "blood tumor" EXACT [MONDO:patterns/neoplasm]
+synonym: "blood tumour" EXACT OMO:0003005 []
+synonym: "haematological tumours" EXACT OMO:0003005 []
+synonym: "haematopoietic and lymphoid system tumour" EXACT OMO:0003005 []
+synonym: "haematopoietic cancer" NARROW OMO:0003005 []
+synonym: "haematopoietic neoplasm" BROAD OMO:0003005 []
+synonym: "haematopoietic neoplasm (morphologic abnormality)" BROAD OMO:0003005 []
+synonym: "haematopoietic system neoplasm" EXACT OMO:0003005 []
+synonym: "haematopoietic system tumour" EXACT OMO:0003005 []
+synonym: "haematopoietic tumours" EXACT OMO:0003005 []
+synonym: "hematologic cancer" RELATED [DOID:2531]
+synonym: "hematologic malignancy" NARROW [DOID:2531]
+synonym: "hematologic neoplasm" BROAD [DOID:2531]
+synonym: "hematological tumors" EXACT [DOID:2531, NCIT:C27134]
+synonym: "hematopoietic and lymphoid system neoplasm" EXACT [NCIT:C35813]
+synonym: "hematopoietic and lymphoid system tumor" EXACT [DOID:2531, NCIT:C35813]
+synonym: "hematopoietic cancer" NARROW [DOID:2531]
+synonym: "hematopoietic neoplasm" BROAD [DOID:2531]
+synonym: "hematopoietic neoplasm (morphologic abnormality)" BROAD [DOID:2531]
+synonym: "hematopoietic system neoplasm" EXACT []
+synonym: "hematopoietic system tumor" EXACT [MONDO:patterns/neoplasm]
+synonym: "hematopoietic tumors" EXACT [DOID:2531, NCIT:C27134]
+synonym: "malignant haematopoietic neoplasm" RELATED OMO:0003005 []
+synonym: "malignant haematopoietic neoplasm (morphologic abnormality)" NARROW OMO:0003005 []
+synonym: "malignant hematopoietic neoplasm (morphologic abnormality)" NARROW [DOID:2531]
+synonym: "neoplasm of blood" EXACT [MONDO:patterns/neoplasm]
+synonym: "neoplasm of haematopoietic system" EXACT OMO:0003005 []
+synonym: "neoplasm of hematopoietic system" EXACT [MONDO:patterns/neoplasm]
+synonym: "tumor of blood" EXACT [MONDO:patterns/neoplasm]
+synonym: "tumor of hematopoietic system" EXACT [MONDO:patterns/neoplasm]
+synonym: "tumour of blood" EXACT OMO:0003005 []
+synonym: "tumour of haematopoietic system" EXACT OMO:0003005 []
+xref: DOID:2531
+xref: MESH:D019337
+xref: NCIT:C35813
+xref: SCTID:129154003
+xref: UMLS:C0376544
+xref: UMLS:C0376545
+xref: UMLS:C1512393
+is_a: MONDO:0005070
+is_a: MONDO:0005570
+property_value: exactMatch DOID:2531
+property_value: exactMatch http://identifiers.org/mesh/D019337
+property_value: exactMatch http://identifiers.org/snomedct/129154003
+property_value: exactMatch http://linkedlifedata.com/resource/umls/id/C0376544
+property_value: exactMatch http://linkedlifedata.com/resource/umls/id/C0376545
+property_value: exactMatch http://linkedlifedata.com/resource/umls/id/C1512393
+property_value: exactMatch NCIT:C35813
+
+[Term]
+id: MONDO:0002379
+name: cystic teratoma
+synonym: "cystic teratoma" EXACT [NCIT:C9014]
+xref: DOID:2660
+xref: NCIT:C9014
+xref: UMLS:C1368903
+is_a: MONDO:0002601
+property_value: exactMatch DOID:2660
+property_value: exactMatch http://linkedlifedata.com/resource/umls/id/C1368903
+property_value: exactMatch NCIT:C9014
+
+[Term]
+id: MONDO:0002601
+name: teratoma
+def: "A non-seminomatous germ cell tumor characterized by the presence of various tissues which correspond to the different germinal layers (endoderm, mesoderm, and ectoderm). It occurs in the testis, ovary, and extragonadal sites including central nervous system, mediastinum, lung, and stomach. According to the level of differentiation of the tissues which comprise the tumor, teratomas are classified as mature or immature. Mature teratomas are composed of well differentiated, adult-type tissues. Immature teratomas are composed of immature, fetal-type tissues. Testicular teratomas in children follow a benign clinical course. Mature ovarian teratomas without a fetal-type component have an excellent outcome. The prognosis of immature ovarian teratomas is related to the grade and stage of the tumor." [NCIT:C3403]
+synonym: "teratoma" EXACT [NCIT:C3403]
+xref: DOID:3307
+xref: ICDO:9080/1
+xref: MESH:D013724
+xref: NCIT:C3403
+xref: ONCOTREE:TT
+xref: SCTID:36591000119102
+is_a: MONDO:0021656
+relationship: excluded_subClassOf MONDO:0002510
+relationship: has_characteristic MONDO:0021136
+property_value: exactMatch DOID:3307
+property_value: exactMatch http://identifiers.org/mesh/D013724
+property_value: exactMatch http://identifiers.org/snomedct/36591000119102
+property_value: exactMatch NCIT:C3403
+
+[Term]
+id: MONDO:0002602
+name: central nervous system disorder
+def: "A disease involving the central nervous system." [https://orcid.org/0000-0002-6601-2165]
+subset: rare_grouping
+synonym: "central nervous disease" EXACT [DOID:331]
+synonym: "central nervous system disease" EXACT [MONDO:patterns/location, NCIT:C2934]
+synonym: "central nervous system disease or disorder" EXACT [MONDO:design_pattern, MONDO:patterns/location]
+synonym: "central nervous system disorder" EXACT [NCIT:C2934]
+synonym: "CNS disorder" EXACT [https://orcid.org/0000-0001-5208-3432]
+synonym: "disease of central nervous system" EXACT [MONDO:patterns/location_top]
+synonym: "disease of the central nervous system" EXACT [ISBN-13:978-1-259-64403-0]
+synonym: "disease or disorder of central nervous system" EXACT []
+synonym: "disorder of central nervous system" EXACT [MONDO:patterns/location_top, NCIT:C2934]
+xref: DOID:331
+xref: MESH:D002493
+xref: NCIT:C2934
+xref: SCTID:23853001
+xref: UMLS:C0007682
+is_a: MONDO:0005071
+property_value: exactMatch DOID:331
+property_value: exactMatch http://identifiers.org/mesh/D002493
+property_value: exactMatch http://identifiers.org/snomedct/23853001
+property_value: exactMatch http://linkedlifedata.com/resource/umls/id/C0007682
+property_value: exactMatch NCIT:C2934
+
+[Term]
+id: MONDO:0002616
+name: mesenchymal cell neoplasm
+def: "A benign, intermediate, or malignant neoplasm that arises from the mesenchyma-derived cells of the soft tissue or bone. Representative examples include lipoma, leiomyoma, leiomyosarcoma and osteosarcoma." [NCIT:C7059]
+synonym: "benign miscellaneous mesenchymal tumor" EXACT [DOID:3350]
+synonym: "benign miscellaneous mesenchymal tumour" EXACT OMO:0003005 []
+synonym: "mesenchymal cell neoplasm" EXACT [NCIT:C7059]
+synonym: "mesenchymal cell tumor" EXACT [NCIT:C7059]
+synonym: "mesenchymal cell tumour" EXACT OMO:0003005 []
+synonym: "mesenchymal neoplasm" EXACT [NCIT:C7059]
+synonym: "mesenchymal tumor" EXACT [DOID:3350, NCIT:C7059]
+synonym: "mesenchymal tumour" EXACT OMO:0003005 []
+xref: DOID:3350
+xref: NCIT:C7059
+xref: UMLS:C1334699
+is_a: MONDO:0005070
+property_value: exactMatch DOID:3350
+property_value: exactMatch http://linkedlifedata.com/resource/umls/id/C1334699
+property_value: exactMatch NCIT:C7059
+
+[Term]
+id: MONDO:0002813
+name: lipomatous cancer
+def: "A malignant mesenchymal neoplasm arising from adipocytes." [NCIT:C4501]
+synonym: "adipose tissue cancer" EXACT [MONDO:patterns/location]
+synonym: "cancer of adipose tissue" EXACT [MONDO:patterns/cancer]
+synonym: "malignant adipose tissue neoplasm" EXACT [MONDO:patterns/cancer, NCIT:C4501]
+synonym: "malignant adipose tissue tumor" EXACT [NCIT:C4501]
+synonym: "malignant adipose tissue tumour" EXACT OMO:0003005 []
+synonym: "malignant lipomatous neoplasm" EXACT [NCIT:C4501]
+synonym: "malignant lipomatous tumor" EXACT [NCIT:C4501]
+synonym: "malignant lipomatous tumour" EXACT OMO:0003005 []
+synonym: "malignant neoplasm of adipose tissue" EXACT [MONDO:patterns/cancer, NCIT:C4501]
+synonym: "malignant neoplasm of the adipose tissue" EXACT [NCIT:C4501]
+synonym: "malignant tumor of adipose tissue" EXACT [DOID:3939, NCIT:C4501]
+synonym: "malignant tumor of the adipose tissue" EXACT [NCIT:C4501]
+synonym: "malignant tumour of adipose tissue" EXACT OMO:0003005 []
+synonym: "malignant tumour of the adipose tissue" EXACT OMO:0003005 []
+xref: DOID:3939
+xref: ICD9:171.9
+xref: NCIT:C4501
+xref: SCTID:254828009
+xref: UMLS:C0346117
+is_a: MONDO:0004992
+is_a: MONDO:0021354
+property_value: exactMatch http://identifiers.org/snomedct/254828009
+property_value: exactMatch http://linkedlifedata.com/resource/umls/id/C0346117
+
+[Term]
+id: MONDO:0003274
+name: thoracic cancer
+def: "A primary or metastatic malignant neoplasm affecting the tissues of the thorax." [NCIT:C3576]
+synonym: "cancer of thoracic segment of trunk" EXACT [MONDO:patterns/cancer]
+synonym: "malignant neoplasm of the thorax" EXACT [NCIT:C3576]
+synonym: "malignant neoplasm of thoracic segment of trunk" EXACT [MONDO:patterns/cancer]
+synonym: "malignant neoplasm of thorax" EXACT [NCIT:C3576]
+synonym: "malignant thoracic neoplasm" EXACT [NCIT:C3576]
+synonym: "malignant thoracic segment of trunk neoplasm" EXACT [MONDO:patterns/cancer]
+synonym: "malignant thoracic tumor" EXACT [NCIT:C3576]
+synonym: "malignant thoracic tumour" EXACT OMO:0003005 []
+synonym: "malignant tumor of the thorax" EXACT [NCIT:C3576]
+synonym: "malignant tumor of thorax" EXACT [NCIT:C3576]
+synonym: "malignant tumour of the thorax" EXACT OMO:0003005 []
+synonym: "malignant tumour of thorax" EXACT OMO:0003005 []
+synonym: "thoracic segment of trunk cancer" EXACT [MONDO:patterns/location]
+synonym: "thoracic tumor" BROAD [DOID:5093, NCIT:C3406]
+synonym: "thoracic tumour" BROAD OMO:0003005 []
+synonym: "thorax cancer" EXACT [DOID:5093]
+synonym: "thorax neoplasm" BROAD [DOID:5093]
+synonym: "tumor of thorax" BROAD [DOID:5093]
+synonym: "tumour of thorax" BROAD OMO:0003005 []
+xref: DOID:5093
+xref: ICD9:195.1
+xref: NCIT:C3576
+xref: SCTID:188361007
+xref: UMLS:C0153661
+is_a: MONDO:0004992
+is_a: MONDO:0021350
+property_value: exactMatch DOID:5093
+property_value: exactMatch http://identifiers.org/snomedct/188361007
+property_value: exactMatch http://linkedlifedata.com/resource/umls/id/C0153661
+property_value: exactMatch NCIT:C3576
+
+[Term]
+id: MONDO:0003516
+name: adult teratoma
+def: "A teratoma that occurs in an adult." [MONDO:design_pattern]
+synonym: "adult teratoma" EXACT [NCIT:C9013]
+synonym: "teratoma" BROAD [NCIT:C9013]
+synonym: "teratoma of adults" EXACT [MONDO:design_pattern, MONDO:patterns/adult]
+xref: DOID:5565
+xref: NCIT:C9013
+xref: UMLS:C1368898
+is_a: MONDO:0002601
+is_a: MONDO:0044878
+property_value: exactMatch DOID:5565
+property_value: exactMatch http://linkedlifedata.com/resource/umls/id/C1368898
+property_value: exactMatch NCIT:C9013
+
+[Term]
+id: MONDO:0003538
+name: precursor lymphoblastic lymphoma/leukemia
+def: "A neoplasm of immature malignant lymphocytes (lymphoblasts) committed to the B-cell or T-cell lineage. Neoplasms involving the bone marrow and the peripheral blood are called precursor lymphoblastic leukemias or acute lymphoblastic leukemias. Neoplasms involving primarily lymph nodes or extranodal sites are called lymphoblastic lymphomas. -- 2003" [NCIT:P378]
+synonym: "precursor lymphoblastic leukemia/lymphoma" EXACT [NCIT:C7055]
+synonym: "precursor lymphoblastic lymphoma/leukemia" EXACT [NCIT:C7055]
+synonym: "precursor lymphoid neoplasm" EXACT [NCIT:C7055]
+xref: DOID:5600
+xref: EFO:0009119
+xref: NCIT:C7055
+xref: UMLS:C1335469
+is_a: MONDO:0005157
+property_value: exactMatch http://linkedlifedata.com/resource/umls/id/C1335469
+property_value: exactMatch NCIT:C7055
+
+[Term]
+id: MONDO:0003587
+name: pediatric liposarcoma
+def: "A rare malignant neoplasm arising from adipocytes, that occurs in children. The tumor maybe one of several histologic types including well-differentiated, dedifferentiated, myxoid/round cell, and pleomorphic liposarcoma." [NCIT:P378]
+synonym: "childhood liposarcoma" EXACT [NCIT:C8091]
+synonym: "liposarcoma" BROAD [NCIT:C8091]
+synonym: "pediatric liposarcoma" EXACT [NCIT:C8091]
+xref: DOID:5695
+xref: NCIT:C8091
+xref: UMLS:C0279984
+is_a: MONDO:0005060
+is_a: MONDO:0006517
+property_value: exactMatch DOID:5695
+property_value: exactMatch http://linkedlifedata.com/resource/umls/id/C0279984
+property_value: exactMatch NCIT:C8091
+
+[Term]
+id: MONDO:0003847
+name: hereditary disease
+def: "A disease that is caused by genetic modifications where those modifications are inherited from a parent's genome." [MONDO:cjm]
+comment: Usage note: this is intended only for diseases with an inherited genetic etiology. Somatic genetic mutations are excluded. Some ontologies use the term 'genetic disease' in the sense of inherited disorders only, we are here careful to distinguish.
+subset: harrisons_view
+subset: rare_grouping
+synonym: "familial disorder" RELATED []
+synonym: "genetic condition" BROAD [NCIT:C3101]
+synonym: "genetic disease" BROAD []
+synonym: "genetic disorder" BROAD [NCIT:C3101]
+synonym: "hereditary disease" EXACT [MONDO:patterns/hereditary, NCIT:C3101]
+synonym: "hereditary disease or disorder" EXACT [MONDO:patterns/hereditary]
+synonym: "hereditary diseases" EXACT [NCIT:C3101]
+synonym: "inborn disorder" RELATED []
+synonym: "inherited disease" EXACT [NCIT:C3101]
+synonym: "inherited genetic disease" EXACT [https://github.com/monarch-initiative/mondo/issues/1758]
+synonym: "Mendelian disease" NARROW [DOID:0050177]
+synonym: "molecular disease" EXACT [NCIT:C3101]
+xref: DOID:630
+xref: EFO:0000508
+xref: ICD9:799.89
+xref: MESH:D030342
+xref: NCIT:C3101
+xref: SCTID:32895009
+xref: UMLS:C0019247
+is_a: MONDO:0700096
+intersection_of: MONDO:0700096
+intersection_of: has_characteristic MONDO:0021152
+disjoint_from: MONDO:0016592
+relationship: has_characteristic MONDO:0021152
+property_value: exactMatch DOID:630
+property_value: exactMatch http://identifiers.org/mesh/D030342
+property_value: exactMatch http://identifiers.org/snomedct/32895009
+property_value: exactMatch http://linkedlifedata.com/resource/umls/id/C0019247
+property_value: exactMatch NCIT:C3101
+
+[Term]
+id: MONDO:0003900
+name: connective tissue disorder
+def: "A disease involving the connective tissue." [https://orcid.org/0000-0002-6601-2165]
+comment: Following clinical usage of the term 'connective tissue disorder' this grouping excludes some diseases affecting tissues classically considered to be connective tissue, such as bone.
+subset: rare_grouping
+synonym: "connective tissue disease" EXACT [MONDO:patterns/location]
+synonym: "connective tissue disease or disorder" EXACT [MONDO:patterns/location]
+synonym: "connective tissue diseases" EXACT [NCIT:C26729]
+synonym: "connective tissue disorder" EXACT [DOID:65]
+synonym: "connective tissue disorders" EXACT [NCIT:C26729]
+synonym: "disease of connective tissue" EXACT [MONDO:patterns/location_top]
+synonym: "disease or disorder of connective tissue" EXACT []
+synonym: "disease, connective tissue" EXACT [NCIT:C26729]
+synonym: "disorder of connective tissue" EXACT [DOID:65, MONDO:patterns/location_top]
+synonym: "primary disorder of connective tissue" EXACT [NCIT:C26729]
+synonym: "tissue disease, connective" EXACT [NCIT:C26729]
+xref: DOID:65
+xref: MESH:D003240
+xref: NCIT:C26729
+xref: SCTID:105969002
+xref: UMLS:C0009782
+is_a: MONDO:0700096
+relationship: excluded_subClassOf MONDO:0002081
+property_value: exactMatch DOID:65
+property_value: exactMatch http://identifiers.org/mesh/D003240
+property_value: exactMatch http://identifiers.org/snomedct/105969002
+property_value: exactMatch http://linkedlifedata.com/resource/umls/id/C0009782
+property_value: exactMatch NCIT:C26729
+property_value: IAO:0000233 "https://github.com/monarch-initiative/mondo/issues/3570" xsd:anyURI
+
+[Term]
+id: MONDO:0004099
+name: adult cystic teratoma
+def: "A cystic teratoma that occurs in an adult." [MONDO:design_pattern]
+synonym: "adult cystic teratoma" EXACT [NCIT:C9012]
+synonym: "cystic teratoma of adults" EXACT [MONDO:design_pattern, MONDO:patterns/adult]
+xref: DOID:7079
+xref: NCIT:C9012
+xref: UMLS:C1368888
+is_a: MONDO:0002379
+is_a: MONDO:0003516
+property_value: exactMatch DOID:7079
+property_value: exactMatch http://linkedlifedata.com/resource/umls/id/C1368888
+property_value: exactMatch NCIT:C9012
+
+[Term]
+id: MONDO:0004335
+name: digestive system disorder
+def: "A disease or disorder that involves the digestive system." [MONDO:design_pattern]
+subset: rare_grouping
+synonym: "alimentary system disease" EXACT [DOID:77]
+synonym: "digestive disease" EXACT [NCIT:C2990]
+synonym: "digestive system disease" EXACT [NCIT:C2990]
+synonym: "digestive system disease or disorder" EXACT [MONDO:design_pattern, MONDO:patterns/location]
+synonym: "digestive system disorder" EXACT [DOID:77, NCIT:C2990]
+synonym: "disease of digestive system" EXACT [MONDO:design_pattern, MONDO:patterns/location_top]
+synonym: "disease or disorder of digestive system" EXACT []
+synonym: "disorder of digestive system" EXACT [MONDO:patterns/location_top, NCIT:C2990]
+synonym: "gastroenterological system disease" EXACT [MONDO:cjm]
+synonym: "gastroenterological system disorder" EXACT [MONDO:cjm]
+synonym: "gastroenteropathy" EXACT [DOID:77]
+synonym: "gastrointestinal disease" EXACT [DOID:77]
+synonym: "gastrointestinal disorder" EXACT [DOID:77, NCIT:C2990]
+synonym: "gastrointestinal system disease" EXACT [NCIT:C2990]
+synonym: "gastrointestinal system disorder" EXACT [NCIT:C2990]
+synonym: "git disease" EXACT [DOID:77]
+synonym: "stomach or intestinal disorder" EXACT [NCIT:C2990]
+xref: DOID:77
+xref: EFO:0000405
+xref: ICD10CM:K00-K95
+xref: ICD9:520-579.99
+xref: ICD9:V47.3
+xref: MESH:D005767
+xref: NCIT:C2990
+xref: SCTID:53619000
+is_a: MONDO:0700096
+property_value: exactMatch DOID:77
+property_value: exactMatch http://identifiers.org/mesh/D005767
+property_value: exactMatch http://identifiers.org/snomedct/53619000
+property_value: exactMatch http://purl.bioontology.org/ontology/ICD10CM/K00-K95
+property_value: exactMatch NCIT:C2990
+
+[Term]
+id: MONDO:0004967
+name: acute lymphoblastic leukemia
+def: "Leukemia with an acute onset, characterized by the presence of lymphoblasts in the bone marrow and the peripheral blood. It includes the acute B lymphoblastic leukemia and acute T lymphoblastic leukemia." [NCIT:C3167]
+subset: disease_grouping
+subset: gard_rare
+subset: ordo_group_of_disorders
+synonym: "acute lymphoblastic leukaemia (ALL)" EXACT OMO:0003005 []
+synonym: "acute lymphoblastic leukaemia (disease)" EXACT OMO:0003005 []
+synonym: "acute lymphoblastic leukemia" EXACT [DOID:9952, MONDO:ambiguous, NCIT:C3167]
+synonym: "acute lymphoblastic leukemia (ALL)" EXACT [NCIT:C3167]
+synonym: "acute lymphoblastic leukemia (disease)" EXACT [https://orcid.org/0000-0002-6601-2165]
+synonym: "acute lymphoblastic leukemia/lymphoma" EXACT [Orphanet:513]
+synonym: "acute lymphocytic leukaemia" EXACT OMO:0003005 []
+synonym: "acute lymphocytic leukemia" EXACT [GARD:0000522, NCIT:C3167, Orphanet:513]
+synonym: "acute lymphocytic leukemias" EXACT [NCIT:C3167]
+synonym: "acute lymphogenous leukaemia" EXACT OMO:0003005 []
+synonym: "acute lymphogenous leukemia" EXACT [NCIT:C3167]
+synonym: "acute lymphoid leukaemia" EXACT OMO:0003005 []
+synonym: "acute lymphoid leukemia" EXACT [NCIT:C3167]
+synonym: "ALL" EXACT ABBREVIATION [GARD:0000522, NCIT:C3167, Orphanet:513]
+synonym: "ALL - acute lymphocytic leukaemia" EXACT OMO:0003005 []
+synonym: "ALL - acute lymphocytic leukemia" EXACT [NCIT:C3167]
+synonym: "leukemia, lymphoblastic, malignant" EXACT [NCIT:C3167]
+synonym: "lymphoblastic leukaemia" BROAD OMO:0003005 []
+synonym: "lymphoblastic leukemia" BROAD [NCIT:C3167]
+synonym: "lymphoblastic leukemia, acute" EXACT [MONDO:patterns/acute]
+synonym: "precursor cell lymphoblastic leukaemia" EXACT OMO:0003005 []
+synonym: "precursor cell lymphoblastic leukemia" EXACT [NCIT:C3167]
+synonym: "precursor Lymphoblasic leukaemia" EXACT OMO:0003005 []
+synonym: "precursor Lymphoblasic leukemia" EXACT [NCIT:C3167]
+synonym: "precursor lymphoblastic leukaemia" EXACT OMO:0003005 []
+synonym: "precursor lymphoblastic leukemia" EXACT [NCIT:C3167]
+xref: DOID:9952
+xref: EFO:0000220
+xref: HP:0006721
+xref: ICD9:204
+xref: ICD9:204.0
+xref: ICD9:204.00
+xref: ICD9:204.9
+xref: ICDO:9835/3
+xref: NCIT:C3167
+xref: Orphanet:513
+xref: SCTID:91857003
+is_a: MONDO:0003538
+is_a: MONDO:0005168
+is_a: MONDO:0005402
+is_a: MONDO:0010643
+is_a: MONDO:0018908
+property_value: exactMatch DOID:9952
+property_value: exactMatch http://identifiers.org/snomedct/91857003
+property_value: exactMatch NCIT:C3167
+property_value: exactMatch Orphanet:513
+property_value: IAO:0000589 "acute lymphoblastic leukemia (disease)" xsd:string
+
+[Term]
+id: MONDO:0004985
+name: bipolar disorder
+def: "A disorder of the brain that causes unusual shifts in mood, energy, activity levels and the ability to carry out day-to-day tasks. Often these moods range and shift from periods of elation and energized behavior to those of hopelessness and depression." [NCIT:C34423]
+synonym: "bipolar affective disorder" RELATED []
+synonym: "bipolar depression" NARROW [DOID:3312]
+synonym: "bipolar disorder" EXACT [NCIT:C34423]
+synonym: "bipolar disorder manic phase" NARROW [DOID:3312]
+synonym: "depressive-manic psych." RELATED [DOID:3312]
+synonym: "MAFD" RELATED ABBREVIATION []
+synonym: "major affective disorder" EXACT [MONDO:0000055]
+synonym: "major bipolar affective disorder" RELATED []
+synonym: "manic bipolar affective disorder" NARROW [DOID:3312, NCIT:C34805]
+synonym: "manic bipolar I disorder" NARROW [DOID:3312]
+synonym: "manic depression" NARROW [DOID:3312]
+synonym: "manic depressive disorder" NARROW [DOID:3312, NCIT:C34423]
+synonym: "manic disorder" NARROW [DOID:3312]
+synonym: "manic-depression" EXACT [NCIT:C34423]
+synonym: "manic-depressive illness" RELATED []
+synonym: "manic-depressive psychosis" RELATED []
+synonym: "mixed bipolar disorder" NARROW [DOID:3312]
+xref: DOID:3312
+xref: EFO:0000289
+xref: ICD10CM:F31
+xref: ICD10WHO:F31
+xref: ICD9:296.40
+xref: ICD9:296.60
+xref: ICD9:296.80
+xref: ICD9:296.89
+xref: MESH:D001714
+xref: NCIT:C34423
+xref: NIFSTD:birnlex_12754
+xref: SCTID:13746004
+xref: UMLS:C0005586
+is_a: MONDO:0005371
+relationship: disease_has_feature MONDO:0004617
+property_value: exactMatch DOID:3312
+property_value: exactMatch http://identifiers.org/mesh/D001714
+property_value: exactMatch http://identifiers.org/snomedct/13746004
+property_value: exactMatch http://linkedlifedata.com/resource/umls/id/C0005586
+property_value: exactMatch http://purl.bioontology.org/ontology/ICD10CM/F31
+property_value: exactMatch https://icd.who.int/browse10/2019/en#/F31
+property_value: exactMatch NCIT:C34423
+
+[Term]
+id: MONDO:0004992
+name: cancer
+def: "A tumor composed of atypical neoplastic, often pleomorphic cells that invade other tissues. Malignant neoplasms often metastasize to distant anatomic sites and may recur after excision. The most common malignant neoplasms are carcinomas (adenocarcinomas or squamous cell carcinomas), Hodgkin and non-Hodgkin lymphomas, leukemias, melanomas, and sarcomas." [NCIT:C9305]
+synonym: "CA" EXACT ABBREVIATION [NCIT:C9305]
+synonym: "cancer" EXACT [NCIT:C9305]
+synonym: "cell type cancer" EXACT [MONDO:0000404]
+synonym: "malignancy" EXACT [NCIT:C9305]
+synonym: "malignant Growth" EXACT [NCIT:C9305]
+synonym: "malignant neoplasm" EXACT [DOID:162, NCIT:C9305]
+synonym: "malignant neoplasm (disease)" EXACT []
+synonym: "malignant neoplastic disease" EXACT [NCIT:C9305]
+synonym: "malignant tumor" EXACT [DOID:162, NCIT:C9305]
+synonym: "malignant tumour" EXACT OMO:0003005 []
+synonym: "MT" RELATED ABBREVIATION [ONCOTREE:MT]
+synonym: "neoplasm (disease), malignant" EXACT [MONDO:patterns/malignant]
+synonym: "neoplasm, malignant" EXACT [NCIT:C9305]
+synonym: "organ system cancer" EXACT [MONDO:0000403]
+synonym: "primary cancer" EXACT [DOID:162]
+xref: DOID:0050686
+xref: DOID:0050687
+xref: DOID:162
+xref: EFO:0000311
+xref: ICD9:195.8
+xref: ICD9:199
+xref: ICD9:199.1
+xref: ICDO:8000/3
+xref: NCIT:C9305
+xref: NIFSTD:birnlex_406
+xref: ONCOTREE:MT
+xref: SCTID:363346000
+xref: UMLS:C0006826
+is_a: MONDO:0005070
+disjoint_from: MONDO:0005165
+property_value: exactMatch DOID:0050686
+property_value: exactMatch DOID:0050687
+property_value: exactMatch DOID:162
+property_value: exactMatch http://identifiers.org/snomedct/363346000
+property_value: exactMatch http://linkedlifedata.com/resource/umls/id/C0006826
+property_value: exactMatch NCIT:C9305
+
+[Term]
+id: MONDO:0004993
+name: carcinoma
+def: "A malignant tumor arising from epithelial cells. Carcinomas that arise from glandular epithelium are called adenocarcinomas, those that arise from squamous epithelium are called squamous cell carcinomas, and those that arise from transitional epithelium are called transitional cell carcinomas. Morphologically, the malignant epithelial cells may display abnormal mitotic figures, anaplasia, and necrosis. Carcinomas are graded by the degree of cellular differentiation as well, moderately, or poorly differentiated. Carcinomas invade the surrounding tissues and tend to metastasize to other anatomic sites. Lung carcinoma, skin carcinoma, breast carcinoma, colon carcinoma, and prostate carcinoma are the most frequently seen carcinomas." [NCIT:C2916]
+synonym: "carcinoma" EXACT [NCIT:C2916]
+synonym: "carcinoma, malignant" EXACT [NCIT:C2916]
+synonym: "epithelial carcinoma" EXACT [NCIT:C2916]
+synonym: "epithelioma" BROAD [DOID:305]
+synonym: "epithelioma malignant" EXACT [NCIT:C2916]
+synonym: "malignant epithelial neoplasm" EXACT [NCIT:C2916]
+synonym: "malignant epithelial tumor" EXACT [NCIT:C2916]
+synonym: "malignant epithelial tumour" EXACT OMO:0003005 []
+synonym: "malignant epithelioma" EXACT [DOID:305, NCIT:C2916, NCIT:C6927]
+synonym: "Other carcinoma" EXACT [NCIT:C2916]
+xref: CSP:2000-1867
+xref: DOID:305
+xref: EFO:0000313
+xref: ICDO:8010/3
+xref: ICDO:8011/3
+xref: MESH:D002277
+xref: NCIT:C2916
+xref: SCTID:722688002
+xref: UMLS:C0007097
+is_a: MONDO:0004992
+is_a: MONDO:0005626
+property_value: exactMatch DOID:305
+property_value: exactMatch http://identifiers.org/mesh/D002277
+property_value: exactMatch http://identifiers.org/snomedct/722688002
+property_value: exactMatch http://linkedlifedata.com/resource/umls/id/C0007097
+property_value: exactMatch NCIT:C2916
+
+[Term]
+id: MONDO:0005020
+name: intestinal disorder
+def: "A non-neoplastic or neoplastic disorder that affects the small or large intestine." [NCIT:C26801]
+subset: rare_grouping
+synonym: "disease of intestine" EXACT [MONDO:patterns/location_top]
+synonym: "disease or disorder of intestine" EXACT []
+synonym: "disease, intestinal" RELATED [MESH:D007410]
+synonym: "diseases, intestinal" RELATED [MESH:D007410]
+synonym: "disorder of intestine" EXACT [MONDO:patterns/location_top]
+synonym: "intestinal disease" EXACT [MESH:D007410]
+synonym: "intestinal disorder" EXACT [NCIT:C26801]
+synonym: "intestine disease" EXACT [MONDO:patterns/location]
+synonym: "intestine disease or disorder" EXACT [MONDO:design_pattern, MONDO:patterns/location]
+xref: DOID:5295
+xref: ICD9:520-579.99
+xref: ICD9:560-569.99
+xref: ICD9:564
+xref: ICD9:564.4
+xref: ICD9:569
+xref: ICD9:569.4
+xref: ICD9:569.49
+xref: ICD9:569.89
+xref: ICD9:569.9
+xref: ICD9:570-579.99
+xref: ICD9:575
+xref: MESH:D007410
+xref: NCIT:C26801
+xref: SCTID:85919009
+is_a: MONDO:0004335
+property_value: exactMatch DOID:5295
+property_value: exactMatch http://identifiers.org/mesh/D007410
+property_value: exactMatch http://identifiers.org/snomedct/85919009
+property_value: exactMatch NCIT:C26801
+
+[Term]
+id: MONDO:0005040
+name: germ cell tumor
+def: "A benign or malignant, gonadal or extragonadal neoplasm that originates from germ cells. Representative examples include teratoma, seminoma, embryonal carcinoma, and yolk sac tumor." [NCIT:C3708]
+subset: gard_rare
+synonym: "germ cell cancer" RELATED [DOID:2994]
+synonym: "germ cell neoplasm" EXACT [DOID:2994, NCIT:C3708]
+synonym: "germ cell tumor" EXACT [DOID:2994, NCIT:C3708]
+synonym: "germ cells tumors" RELATED [GARD:0013022]
+synonym: "germ cells tumours" RELATED OMO:0003005 []
+synonym: "malignant tumour of the germ cell" RELATED OMO:0003005 []
+synonym: "neoplasm of germ cell" EXACT [NCIT:C3708]
+synonym: "neoplasm of the germ cell" EXACT [NCIT:C3708]
+synonym: "tumor of germ cell" EXACT [NCIT:C3708]
+synonym: "tumor of the germ cell" EXACT [NCIT:C3708]
+synonym: "tumour of germ cell" EXACT OMO:0003005 []
+synonym: "tumour of the germ cell" EXACT OMO:0003005 []
+xref: DOID:2994
+xref: DOID:688
+xref: EFO:0000514
+xref: NCIT:C3708
+xref: UMLS:C0205851
+is_a: MONDO:0005070
+property_value: exactMatch DOID:2994
+property_value: exactMatch http://linkedlifedata.com/resource/umls/id/C0205851
+property_value: exactMatch NCIT:C3708
+
+[Term]
+id: MONDO:0005059
+name: leukemia
+def: "A malignant (clonal) hematologic disorder, involving hematopoietic stem cells and characterized by the presence of primitive or atypical myeloid or lymphoid cells in the bone marrow and the blood. Leukemias are classified as acute or chronic based on the degree of cellular differentiation and the predominant cell type present. Leukemia is usually associated with anemia, fever, hemorrhagic episodes, and splenomegaly. Common leukemias include acute myeloid leukemia, chronic myelogenous leukemia, acute lymphoblastic or precursor lymphoblastic leukemia, and chronic lymphocytic leukemia. Treatment is vital to patient survival; untreated, the natural course of acute leukemias is normally measured in weeks or months, while that of chronic leukemias is more often measured in months or years." [NCIT:C3161]
+synonym: "blood (leukemia)" EXACT [NCIT:C3161]
+synonym: "leukaemia (disease)" EXACT OMO:0003005 []
+synonym: "leukaemia NOS" RELATED OMO:0003005 []
+synonym: "leukemia" EXACT [MONDO:ambiguous, NCIT:C3161]
+synonym: "leukemia (disease)" EXACT [https://orcid.org/0000-0002-6601-2165]
+synonym: "leukemia, disease" EXACT [NCIT:C3161]
+synonym: "leukemia, malignant" EXACT [NCIT:C3161]
+synonym: "leukemias" EXACT [NCIT:C3161]
+synonym: "leukemias, general" EXACT [NCIT:C3161]
+xref: DOID:1240
+xref: EFO:0000565
+xref: HP:0001909
+xref: ICD9:207
+xref: ICD9:207.8
+xref: ICD9:207.80
+xref: ICD9:208
+xref: ICD9:208.8
+xref: ICD9:208.80
+xref: ICD9:208.9
+xref: ICD9:208.90
+xref: ICDO:9800/3
+xref: MESH:D007938
+xref: NCIT:C3161
+xref: SCTID:93143009
+xref: UMLS:C0023418
+is_a: MONDO:0044881
+relationship: excluded_subClassOf MONDO:0005157
+property_value: exactMatch DOID:1240
+property_value: exactMatch http://identifiers.org/mesh/D007938
+property_value: exactMatch http://identifiers.org/snomedct/93143009
+property_value: exactMatch http://linkedlifedata.com/resource/umls/id/C0023418
+property_value: exactMatch NCIT:C3161
+property_value: IAO:0000589 "leukemia (disease)" xsd:string
+
+[Term]
+id: MONDO:0005060
+name: liposarcoma
+def: "A usually painless malignant tumor that arises from adipose tissue. Microscopically, it may contain a spectrum of neoplastic adipocytes ranging from lipoblasts to pleomorphic malignant adipocytes. Morphologic variants include: well differentiated, dedifferentiated, pleomorphic, and myxoid liposarcoma. The metastatic potential is higher in less differentiated tumors." [NCIT:C3194]
+subset: gard_rare
+subset: ordo_disease
+synonym: "lip sarcoma" EXACT [MONDO:patterns/location]
+synonym: "liposarcoma" EXACT [NCIT:C3194]
+synonym: "liposarcoma, malignant" EXACT [NCIT:C3194]
+synonym: "sarcoma of lip" EXACT [MONDO:patterns/sarcoma]
+xref: DOID:3382
+xref: EFO:0000569
+xref: ICD9:171.9
+xref: ICDO:8850/3
+xref: MedDRA:10024627
+xref: MESH:D008080
+xref: NCIT:C3194
+xref: ONCOTREE:LIPO
+xref: Orphanet:69078
+xref: SCTID:254829001
+xref: UMLS:C0023827
+is_a: MONDO:0002813
+is_a: MONDO:0018078
+property_value: closeMatch http://identifiers.org/meddra/10024627
+property_value: exactMatch DOID:3382
+property_value: exactMatch http://identifiers.org/mesh/D008080
+property_value: exactMatch http://identifiers.org/snomedct/254829001
+property_value: exactMatch http://linkedlifedata.com/resource/umls/id/C0023827
+property_value: exactMatch NCIT:C3194
+property_value: exactMatch Orphanet:69078
+property_value: seeAlso "https://rarediseases.info.nih.gov/diseases/6913/liposarcoma" xsd:anyURI
+
+[Term]
+id: MONDO:0005062
+name: lymphoma
+def: "A malignant (clonal) proliferation of B- lymphocytes or T- lymphocytes which involves the lymph nodes, bone marrow and/or extranodal sites. This category includes Non-Hodgkin lymphomas and Hodgkin lymphomas." [NCIT:C3208]
+comment: This is potentially too broad as well as overlaps with leukemia and should be obsoleted.
+subset: disease_grouping
+subset: ordo_group_of_disorders
+synonym: "lymphoid cancer" EXACT [DOID:0060058]
+synonym: "lymphoma" EXACT [MONDO:0016389, NCIT:C3208]
+synonym: "lymphoma (Hodgkin and non-Hodgkin)" EXACT [NCIT:C3208]
+synonym: "lymphoma (Hodgkin's and non-Hodgkin's)" EXACT [NCIT:C3208]
+synonym: "lymphoma, malignant" EXACT [NCIT:C3208]
+synonym: "lymphomatous" EXACT [NCIT:C3208]
+synonym: "malignant lymphoma" EXACT [MONDO:cjm, NCIT:C3208]
+synonym: "MLYM" RELATED ABBREVIATION [ONCOTREE:MLYM]
+xref: DOID:0060058
+xref: EFO:0000574
+xref: ICD9:200.0
+xref: ICD9:200.1
+xref: ICD9:202.80
+xref: ICDO:9590/3
+xref: MedDRA:10025310
+xref: MESH:D008223
+xref: NCIT:C3208
+xref: ONCOTREE:MLYM
+xref: Orphanet:223735
+xref: SCTID:118600007
+xref: SCTID:373168002
+xref: UMLS:C0024299
+is_a: MONDO:0005157
+is_a: MONDO:0015757
+property_value: closeMatch http://identifiers.org/meddra/10025310
+property_value: exactMatch DOID:0060058
+property_value: exactMatch http://identifiers.org/mesh/D008223
+property_value: exactMatch http://identifiers.org/snomedct/118600007
+property_value: exactMatch http://linkedlifedata.com/resource/umls/id/C0024299
+property_value: exactMatch NCIT:C3208
+property_value: exactMatch Orphanet:223735
+
+[Term]
+id: MONDO:0005070
+name: neoplasm
+def: "A benign or malignant tissue growth resulting from uncontrolled cell proliferation. Benign neoplastic cells resemble normal cells without exhibiting significant cytologic atypia, while malignant cells exhibit overt signs such as dysplastic features, atypical mitotic figures, necrosis, nuclear pleomorphism, and anaplasia. Representative examples of benign neoplasms include papillomas, cystadenomas, and lipomas; malignant neoplasms include carcinomas, sarcomas, lymphomas, and leukemias." [NCIT:C3262]
+synonym: "cell process disease" BROAD DUBIOUS [DOID:14566]
+synonym: "disease of cellular proliferation" EXACT [MONDO:0002001]
+synonym: "neoplasia" EXACT [NCIT:C3262]
+synonym: "neoplasm" EXACT [DOID:14566, MONDO:ambiguous, NCIT:C3262]
+synonym: "neoplasm (disease)" EXACT [https://orcid.org/0000-0002-6601-2165]
+synonym: "neoplastic disease" EXACT [NCIT:C3262]
+synonym: "neoplastic growth" EXACT [NCIT:C3262]
+synonym: "other neoplasm" NARROW [NCIT:C3262]
+synonym: "tumor" EXACT [NCIT:C3262]
+synonym: "tumor disease" EXACT []
+synonym: "tumour" EXACT OMO:0003005 []
+synonym: "tumour disease" EXACT OMO:0003005 []
+xref: DOID:14566
+xref: EFO:0000616
+xref: HP:0002664
+xref: ICD10CM:C00-D49
+xref: ICD10CM:C7A-C7A
+xref: ICD10CM:C7B-C7B
+xref: ICD9:140-239.99
+xref: ICD9:239.8
+xref: ICD9:239.9
+xref: MESH:D009369
+xref: NCIT:C3262
+xref: ONCOTREE:OTHER
+xref: SCTID:55342001
+xref: UMLS:CN236628
+is_a: MONDO:0023370
+disjoint_from: MONDO:0024291
+property_value: exactMatch DOID:14566
+property_value: exactMatch http://identifiers.org/mesh/D009369
+property_value: exactMatch http://identifiers.org/snomedct/55342001
+property_value: exactMatch http://linkedlifedata.com/resource/umls/id/CN236628
+property_value: exactMatch http://purl.bioontology.org/ontology/ICD10CM/C00-D49
+property_value: exactMatch NCIT:C3262
+property_value: IAO:0000589 "neoplasm (disease)" xsd:string
+property_value: narrowMatch http://purl.bioontology.org/ontology/ICD10CM/C7A-C7A
+property_value: narrowMatch http://purl.bioontology.org/ontology/ICD10CM/C7B-C7B
+
+[Term]
+id: MONDO:0005071
+name: nervous system disorder
+def: "A non-neoplastic or neoplastic disorder that affects the brain, spinal cord, or peripheral nerves." [NCIT:C26835]
+comment: 'psychiatric disorder' is not classified as a 'nervous system disorder' in Mondo (though it is often as such): the hallmarks of psychiatric disorders are based in behavior and emotional state, and the relation with nervous system malfunction or damage is not always clearly determined.
+subset: rare_grouping
+synonym: "disease of nervous system" EXACT [MONDO:patterns/location_top]
+synonym: "disease or disorder of nervous system" EXACT []
+synonym: "disorder of nervous system" EXACT [MONDO:patterns/location_top, NCIT:C26835]
+synonym: "nervous system disease" EXACT [MONDO:patterns/location]
+synonym: "nervous system disease or disorder" EXACT [MONDO:design_pattern, MONDO:patterns/location]
+synonym: "nervous system disorder" EXACT [NCIT:C26835]
+synonym: "neurologic disease" EXACT [DOID:863]
+synonym: "neurologic disorder" EXACT [DOID:863, ISBN-13:978-1-259-64403-0, NCIT:C26835]
+synonym: "neurological disease" EXACT [DOID:863]
+synonym: "neurological disorder" EXACT [DOID:863]
+xref: DOID:863
+xref: EFO:0000618
+xref: ICD10CM:G00-G99
+xref: ICD9:349.89
+xref: ICD9:349.9
+xref: MESH:D009422
+xref: NCIT:C26835
+xref: SCTID:118940003
+xref: UMLS:C0027765
+xref: Wikipedia:Nervous_system_disease
+is_a: MONDO:0700096
+property_value: exactMatch DOID:863
+property_value: exactMatch http://identifiers.org/mesh/D009422
+property_value: exactMatch http://identifiers.org/snomedct/118940003
+property_value: exactMatch http://linkedlifedata.com/resource/umls/id/C0027765
+property_value: exactMatch http://purl.bioontology.org/ontology/ICD10CM/G00-G99
+property_value: exactMatch NCIT:C26835
+
+[Term]
+id: MONDO:0005072
+name: neuroblastoma
+def: "Neuroblastoma (NB) is the most common solid, extracranial childhood tumor. It is an aggressive pediatric cancer that originates from neural crest tissues of the sympathetic nervous system." [PMID:32903387]
+comment: NB is a disease of the sympaticoadrenal lineage of the neural crest, with tumors forming anywhere in the sympathetic nervous system. The tumors most commonly arise in the abdomen (65%), however, they also occur in the neck, chest, and pelvis. Approximately 50% of patients present with evidence of metastasis. Frequent metastasis sites include cortical bone, bone marrow, liver, and lymph nodes. The most common genetic change is MYCN amplification, which occurs in approximately 20% of patients, and is strongly correlated with advanced stage NB. Additionally, deletions of the short arm of chromosome 1 (1p) are found in 25–35% of patients and can be correlated with MYCN amplification. Outside of MYC linked changes, allelic loss of 11q is present in 35–45% of patients and is also associated with high-risk disease features.
+subset: gard_rare
+subset: ordo_disease
+synonym: "NB" RELATED ABBREVIATION [GARD:0007185]
+synonym: "neural Crest tumor, malignant" EXACT [NCIT:C3270]
+synonym: "neuroblastoma" EXACT [NCIT:C3270]
+synonym: "neuroblastoma (Schwannian Stroma-poor)" EXACT [DOID:769, NCIT:C3270]
+synonym: "neuroblastoma, malignant" EXACT [NCIT:C3270]
+xref: DOID:769
+xref: EFO:0000621
+xref: ICDO:9500/3
+xref: MedDRA:10029260
+xref: MESH:D009447
+xref: NCIT:C3270
+xref: NIFSTD:birnlex_12631
+xref: ONCOTREE:NBL
+xref: Orphanet:635
+xref: SCTID:432328008
+xref: UMLS:C0027819
+xref: UMLS:CN205405
+is_a: MONDO:0006316
+is_a: MONDO:0021635
+relationship: excluded_subClassOf MONDO:0002366
+relationship: excluded_subClassOf MONDO:0016713
+property_value: closeMatch http://identifiers.org/meddra/10029260
+property_value: exactMatch DOID:769
+property_value: exactMatch http://identifiers.org/mesh/D009447
+property_value: exactMatch http://identifiers.org/snomedct/432328008
+property_value: exactMatch http://linkedlifedata.com/resource/umls/id/C0027819
+property_value: exactMatch http://linkedlifedata.com/resource/umls/id/CN205405
+property_value: exactMatch NCIT:C3270
+property_value: exactMatch Orphanet:635
+property_value: seeAlso "https://rarediseases.info.nih.gov/diseases/7185/neuroblastoma" xsd:anyURI
+
+[Term]
+id: MONDO:0005084
+name: mental disorder
+def: "A disease that has its basis in the disruption of mental process." [MONDO:patterns/basis_in_disruption_of_process]
+synonym: "disorder of mental process" EXACT [MONDO:patterns/basis_in_disruption_of_process]
+synonym: "mental or behavioral disorder" EXACT [DOID:2468]
+synonym: "mental or behavioural disorder" EXACT OMO:0003005 []
+synonym: "mental process disease" EXACT [MONDO:design_pattern]
+xref: DOID:150
+xref: EFO:0000677
+xref: ICD9:290-299.99
+xref: ICD9:298.8
+xref: ICD9:V11.9
+xref: MESH:D001523
+xref: NCIT:C2893
+xref: NIFSTD:birnlex_12669
+xref: SCTID:74732009
+xref: UMLS:CN240636
+is_a: MONDO:0002025
+is_a: MONDO:0005560
+disjoint_from: MONDO:0005404
+property_value: exactMatch http://identifiers.org/snomedct/74732009
+property_value: exactMatch http://linkedlifedata.com/resource/umls/id/CN240636
+
+[Term]
+id: MONDO:0005087
+name: respiratory system disorder
+def: "A non-neoplastic or neoplastic disorder that affects the respiratory system. Representative examples include pneumonia, chronic obstructive pulmonary disease, pulmonary failure, lung adenoma, lung carcinoma, and tracheal carcinoma." [NCIT:C26871]
+subset: rare_grouping
+synonym: "disease of respiratory system" EXACT [MONDO:patterns/location_top]
+synonym: "disease or disorder of respiratory system" EXACT []
+synonym: "disorder of respiratory system" EXACT [MONDO:patterns/location_top, NCIT:C26871]
+synonym: "respiratory disease" EXACT [DOID:1579]
+synonym: "respiratory disorder" EXACT [NCIT:C26871]
+synonym: "respiratory system disease" EXACT [MONDO:patterns/location]
+synonym: "respiratory system disease or disorder" EXACT [MONDO:design_pattern, MONDO:patterns/location]
+synonym: "respiratory system disorder" EXACT [NCIT:C26871]
+xref: DOID:1579
+xref: EFO:0000684
+xref: ICD10CM:J00-J99
+xref: ICD9:460-519.99
+xref: ICD9:500-508.99
+xref: ICD9:503
+xref: ICD9:508
+xref: ICD9:508.1
+xref: ICD9:508.8
+xref: ICD9:508.9
+xref: ICD9:510-519.99
+xref: ICD9:516
+xref: ICD9:516.8
+xref: ICD9:516.9
+xref: ICD9:517
+xref: ICD9:517.8
+xref: ICD9:519
+xref: ICD9:519.1
+xref: ICD9:519.3
+xref: ICD9:519.8
+xref: ICD9:519.9
+xref: ICD9:V12.60
+xref: ICD9:V47.2
+xref: MESH:D012140
+xref: NCIT:C26871
+xref: SCTID:50043002
+is_a: MONDO:0700096
+property_value: exactMatch DOID:1579
+property_value: exactMatch http://identifiers.org/mesh/D012140
+property_value: exactMatch http://identifiers.org/snomedct/50043002
+property_value: exactMatch http://purl.bioontology.org/ontology/ICD10CM/J00-J99
+property_value: exactMatch NCIT:C26871
+
+[Term]
+id: MONDO:0005089
+name: sarcoma
+def: "A usually aggressive malignant neoplasm of the soft tissue or bone. It arises from muscle, fat, fibrous tissue, bone, cartilage, and blood vessels. Sarcomas occur in both children and adults. The prognosis depends largely on the degree of differentiation (grade) of the neoplasm. Representative subtypes are liposarcoma, leiomyosarcoma, osteosarcoma, and chondrosarcoma." [NCIT:C9118]
+synonym: "mesenchymal tumor, malignant" EXACT [NCIT:C9118]
+synonym: "sarcoma" EXACT [NCIT:C9118]
+synonym: "sarcoma of soft tissue and bone" EXACT [NCIT:C9118]
+synonym: "sarcoma of the soft tissue and bone" EXACT [NCIT:C9118]
+synonym: "sarcoma, malignant" EXACT [NCIT:C9118]
+synonym: "tumor of soft tissue and skeleton" RELATED [DOID:1115, NCIT:C3810]
+synonym: "tumour of soft tissue and skeleton" RELATED OMO:0003005 []
+xref: DOID:1115
+xref: EFO:0000691
+xref: ICD9:171
+xref: ICD9:171.0
+xref: ICD9:171.2
+xref: ICD9:171.3
+xref: ICD9:171.4
+xref: ICD9:171.5
+xref: ICD9:171.6
+xref: ICD9:171.7
+xref: ICD9:171.8
+xref: ICD9:171.9
+xref: ICDO:8800/3
+xref: MESH:D012509
+xref: NCIT:C9118
+xref: SCTID:424413001
+is_a: MONDO:0004992
+property_value: exactMatch DOID:1115
+property_value: exactMatch http://identifiers.org/mesh/D012509
+property_value: exactMatch http://identifiers.org/snomedct/424413001
+property_value: exactMatch NCIT:C9118
+
+[Term]
+id: MONDO:0005138
+name: lung carcinoma
+def: "A carcinoma that arises from epithelial cells of the lung" [https://orcid.org/0000-0002-6601-2165]
+synonym: "cancer of lung" BROAD [DOID:3905, NCIT:C4878]
+synonym: "cancer of the lung" BROAD [NCIT:C4878]
+synonym: "carcinoma of lung" EXACT [DOID:3905, MONDO:patterns/carcinoma, NCIT:C4878]
+synonym: "carcinoma of the lung" EXACT [NCIT:C4878]
+synonym: "lung cancer" BROAD [NCIT:C4878]
+synonym: "lung cancer, NOS" BROAD [NCIT:C4878]
+synonym: "lung carcinoma" EXACT [MONDO:patterns/location, NCIT:C4878]
+xref: DOID:3905
+xref: EFO:0001071
+xref: NCIT:C4878
+xref: UMLS:C0684249
+is_a: MONDO:0004993
+is_a: MONDO:0008903
+property_value: exactMatch DOID:3905
+property_value: exactMatch http://linkedlifedata.com/resource/umls/id/C0684249
+property_value: exactMatch NCIT:C4878
+
+[Term]
+id: MONDO:0005157
+name: lymphoid neoplasm
+def: "A neoplasm composed of a lymphocytic cell population which is usually malignant (clonal) by molecular genetic and/or immunophenotypic analysis. Lymphocytic neoplasms include Hodgkin and non-Hodgkin lymphomas, acute and chronic lymphocytic leukemias, and plasma cell neoplasms." [NCIT:C7065]
+synonym: "lymphocytic and plasma cell neoplasm" EXACT [NCIT:C7065]
+synonym: "lymphocytic and plasma cell tumor" EXACT [NCIT:C7065]
+synonym: "lymphocytic and plasma cell tumour" EXACT OMO:0003005 []
+synonym: "lymphocytic and plasmacytic neoplasm" EXACT [NCIT:C7065]
+synonym: "lymphocytic neoplasm" EXACT [NCIT:C7065]
+synonym: "lymphocytic tumor" EXACT [NCIT:C7065]
+synonym: "lymphocytic tumour" EXACT OMO:0003005 []
+synonym: "lymphoid and plasma cell tumor" EXACT [NCIT:C7065]
+synonym: "lymphoid and plasma cell tumour" EXACT OMO:0003005 []
+synonym: "lymphoid and plasmacytic neoplasm" EXACT [NCIT:C7065]
+synonym: "lymphoid and plasmacytic tumor" EXACT [NCIT:C7065]
+synonym: "lymphoid and plasmacytic tumour" EXACT OMO:0003005 []
+synonym: "lymphoid neoplasm" EXACT [NCIT:C7065]
+synonym: "lymphoid tumor" EXACT [NCIT:C7065]
+synonym: "lymphoid tumour" EXACT OMO:0003005 []
+xref: EFO:0001642
+xref: ICD9:200.7
+xref: NCIT:C7065
+xref: ONCOTREE:LYMPH
+xref: UMLS:C0598798
+is_a: MONDO:0044881
+property_value: exactMatch http://linkedlifedata.com/resource/umls/id/C0598798
+property_value: exactMatch NCIT:C7065
+
+[Term]
+id: MONDO:0005168
+name: neoplasm of immature B and T cells
+def: "A neoplasm arising from immature B and T cells" [EFO:0002425]
+xref: EFO:0002425
+is_a: MONDO:0005157
+
+[Term]
+id: MONDO:0005233
+name: non-small cell lung carcinoma
+def: "A group of at least three distinct histological types of lung cancer, including non-small cell squamous cell carcinoma, adenocarcinoma, and large cell carcinoma. Non-small cell lung carcinomas have a poor response to conventional chemotherapy." [NCIT:P378]
+synonym: "non-small cell cancer of lung" EXACT [NCIT:C2926]
+synonym: "non-small cell cancer of the lung" EXACT [NCIT:C2926]
+synonym: "non-small cell carcinoma of lung" EXACT [NCIT:C2926]
+synonym: "non-small cell carcinoma of the lung" EXACT [NCIT:C2926]
+synonym: "non-small cell lung cancer" EXACT [DOID:3908, NCIT:C2926]
+synonym: "non-small cell lung carcinoma" EXACT [MONDO:ambiguous, NCIT:C2926]
+synonym: "non-small cell lung carcinoma (disease)" EXACT [https://orcid.org/0000-0002-6601-2165]
+synonym: "NSCLC" EXACT ABBREVIATION [DOID:3908, NCIT:C2926, Orphanet:488201]
+synonym: "NSCLC - non-small cell lung cancer" EXACT [NCIT:C2926]
+xref: DOID:3908
+xref: EFO:0003060
+xref: HP:0030358
+xref: MESH:D002289
+xref: NCIT:C2926
+xref: ONCOTREE:NSCLC
+xref: Orphanet:488201
+xref: SCTID:254637007
+xref: UMLS:C0007131
+is_a: MONDO:0005138
+property_value: exactMatch DOID:3908
+property_value: exactMatch http://identifiers.org/mesh/D002289
+property_value: exactMatch http://identifiers.org/snomedct/254637007
+property_value: exactMatch http://linkedlifedata.com/resource/umls/id/C0007131
+property_value: exactMatch NCIT:C2926
+property_value: IAO:0000589 "non-small cell lung carcinoma (disease)" xsd:string
+
+[Term]
+id: MONDO:0005275
+name: lung disorder
+def: "A disease involving the lung." [https://orcid.org/0000-0002-6601-2165]
+synonym: "disease of lung" EXACT [MONDO:patterns/location_top]
+synonym: "disease or disorder of lung" EXACT []
+synonym: "disorder of lung" EXACT [MONDO:patterns/location_top]
+synonym: "lung disease" EXACT [MONDO:patterns/location]
+synonym: "lung disease or disorder" EXACT [MONDO:design_pattern, MONDO:patterns/location]
+synonym: "lung disorder" EXACT []
+synonym: "lung disorders" EXACT [NCIT:C3198]
+synonym: "pulmonary disease" EXACT []
+synonym: "pulmonary diseases" EXACT [NCIT:C3198]
+synonym: "pulmonary disorder" EXACT [NCIT:C3198]
+synonym: "pulmonary disorders" EXACT [NCIT:C3198]
+xref: DOID:850
+xref: EFO:0003818
+xref: ICD9:518.89
+xref: MESH:D008171
+xref: NCIT:C3198
+xref: SCTID:19829001
+is_a: MONDO:0000270
+property_value: exactMatch DOID:850
+property_value: exactMatch http://identifiers.org/mesh/D008171
+property_value: exactMatch http://identifiers.org/snomedct/19829001
+property_value: exactMatch NCIT:C3198
+
+[Term]
+id: MONDO:0005371
+name: mood disorder
+def: "A cognitive disorder a disturbance in which the person's mood is hypothesized to be the main underlying feature." [Wikipedia:Mood_disorder]
+synonym: "episodic mood disorder" NARROW []
+xref: DOID:3324
+xref: EFO:0004247
+xref: ICD10CM:F30-F39
+xref: ICD9:296.99
+xref: MESH:D019964
+xref: NCIT:C92200
+xref: SCTID:46206005
+xref: UMLS:CN236678
+is_a: MONDO:0005084
+property_value: exactMatch DOID:3324
+property_value: exactMatch http://identifiers.org/mesh/D019964
+property_value: exactMatch http://identifiers.org/snomedct/46206005
+property_value: exactMatch http://linkedlifedata.com/resource/umls/id/CN236678
+property_value: exactMatch http://purl.bioontology.org/ontology/ICD10CM/F30-F39
+property_value: exactMatch NCIT:C92200
+
+[Term]
+id: MONDO:0005402
+name: lymphoid leukemia
+def: "A malignant lymphocytic neoplasm of B-cell or T-cell lineage involving primarily the bone marrow and the peripheral blood. This category includes precursor or acute lymphoblastic leukemias and chronic leukemias." [NCIT:C7539]
+synonym: "leukemia, LYMPHOCYTIC, malignant" EXACT [NCIT:C7539]
+synonym: "lymphocytic leukaemia" EXACT OMO:0003005 []
+synonym: "lymphocytic leukemia" EXACT [NCIT:C7539]
+synonym: "lymphogenous leukaemia" EXACT OMO:0003005 []
+synonym: "lymphogenous leukemia" EXACT [NCIT:C7539]
+synonym: "lymphoid leukaemia (disease)" EXACT OMO:0003005 []
+synonym: "lymphoid leukemia" EXACT [MONDO:ambiguous, NCIT:C7539]
+synonym: "lymphoid leukemia (disease)" EXACT [https://orcid.org/0000-0002-6601-2165]
+synonym: "subacute lymphoid leukaemia" EXACT OMO:0003005 []
+synonym: "subacute lymphoid leukemia" EXACT [DOID:10747]
+xref: DOID:1037
+xref: DOID:10747
+xref: EFO:0004289
+xref: HP:0005526
+xref: ICD9:204
+xref: ICD9:204.2
+xref: ICD9:204.20
+xref: ICDO:981-983
+xref: ICDO:9820/3
+xref: MESH:D007945
+xref: NCIT:C7539
+xref: SCTID:188726003
+xref: UMLS:C0023448
+xref: UMLS:C0152271
+is_a: MONDO:0005059
+is_a: MONDO:0005157
+property_value: exactMatch DOID:1037
+property_value: exactMatch http://identifiers.org/mesh/D007945
+property_value: exactMatch http://identifiers.org/snomedct/188726003
+property_value: exactMatch http://linkedlifedata.com/resource/umls/id/C0023448
+property_value: exactMatch http://linkedlifedata.com/resource/umls/id/C0152271
+property_value: exactMatch NCIT:C7539
+property_value: IAO:0000589 "lymphoid leukemia (disease)" xsd:string
+
+[Term]
+id: MONDO:0005462
+name: primitive neuroectodermal tumor
+def: "A malignant neoplasm that originates in the neuroectoderm. The neuroectoderm constitutes the portion of the ectoderm of the early embryo that gives rise to the central and peripheral nervous systems and includes some glial cell precursors." [NCIT:C3716]
+comment: Editor note: TODO check relationship to neuroepithelioma
+synonym: "neuroectodermal neoplasm" EXACT [NCIT:C3716]
+synonym: "neuroectodermal tumor" EXACT [MONDO:0002084, NCIT:C3716]
+synonym: "neuroectodermal tumour" EXACT OMO:0003005 []
+synonym: "neuroepithelioma" RELATED [NCIT:C3716]
+synonym: "PNET" EXACT ABBREVIATION [NCIT:C3716]
+synonym: "primitive neuroectodermal neoplasm" EXACT [DOID:171, NCIT:C3716]
+synonym: "primitive neuroectodermal tumor" EXACT [NCIT:C3716]
+synonym: "primitive neuroectodermal tumor (PNET)" EXACT [NCIT:C3716]
+synonym: "primitive neuroectodermal tumour (PNET)" EXACT OMO:0003005 []
+xref: DOID:171
+xref: EFO:0005235
+xref: ICDO:9473/3
+xref: ICDO:9503/3
+xref: MESH:D017599
+xref: NCIT:C3716
+xref: ONCOTREE:PNET
+is_a: MONDO:0016708
+relationship: excluded_subClassOf MONDO:0002510
+relationship: excluded_subClassOf MONDO:0005872
+property_value: exactMatch DOID:171
+property_value: exactMatch http://identifiers.org/mesh/D017599
+property_value: exactMatch NCIT:C3716
+
+[Term]
+id: MONDO:0005560
+name: brain disorder
+def: "A disease affecting the brain or part of the brain." [EFO:0005774]
+comment: Editor note: NCIT has different classes for brain disease and encephalopathy
+synonym: "brain disease" EXACT [MONDO:patterns/location]
+synonym: "brain disease or disorder" EXACT [MONDO:design_pattern, MONDO:patterns/location]
+synonym: "disease of brain" EXACT [MONDO:patterns/location_top]
+synonym: "disease or disorder of brain" EXACT []
+synonym: "disorder of brain" EXACT [MONDO:patterns/location_top]
+synonym: "encephalopathy" NARROW [DOID:936, NCIT:C26920]
+xref: DOID:936
+xref: EFO:0005774
+xref: ICD9:348.3
+xref: ICD9:348.30
+xref: ICD9:348.8
+xref: ICD9:348.9
+xref: MESH:D001927
+xref: NCIT:C96413
+xref: SCTID:81308009
+xref: UMLS:C0006111
+xref: UMLS:C0085584
+is_a: MONDO:0002602
+property_value: exactMatch DOID:936
+property_value: exactMatch http://identifiers.org/mesh/D001927
+property_value: exactMatch http://identifiers.org/snomedct/81308009
+property_value: exactMatch http://linkedlifedata.com/resource/umls/id/C0006111
+property_value: exactMatch http://linkedlifedata.com/resource/umls/id/C0085584
+property_value: exactMatch NCIT:C96413
+
+[Term]
+id: MONDO:0005564
+name: embryonal neoplasm
+def: "A usually malignant neoplasm composed of primitive (immature) tissues that resemble fetal tissues. Medulloblastoma, Ependymoblastoma, Pineoblastoma, and Wilms tumor are representative embryonal neoplasms. --2003" [NCIT:C3264]
+synonym: "embryo neoplasm" EXACT [DOID:688]
+synonym: "embryonal cancer" RELATED [DOID:688]
+synonym: "embryonal neoplasm" EXACT [NCIT:C3264]
+synonym: "embryonal tumor" EXACT [NCIT:C3264]
+synonym: "embryonal tumour" EXACT OMO:0003005 []
+synonym: "EMBT" RELATED ABBREVIATION [ONCOTREE:EMBT]
+xref: DOID:688
+xref: EFO:0005784
+xref: MESH:D009373
+xref: NCIT:C3264
+xref: ONCOTREE:EMBT
+xref: UMLS:C0027654
+is_a: MONDO:0005070
+property_value: exactMatch DOID:688
+property_value: exactMatch http://linkedlifedata.com/resource/umls/id/C0027654
+property_value: exactMatch NCIT:C3264
+
+[Term]
+id: MONDO:0005570
+name: hematologic disorder
+def: "A disease involving the hematopoietic system." [https://orcid.org/0000-0002-6601-2165]
+comment: placeholder for lymphoid disease
+subset: disease_grouping
+subset: ordo_group_of_disorders
+subset: rare_grouping
+synonym: "blood disease" EXACT [DOID:74]
+synonym: "blood disorder" EXACT [DOID:74, NCIT:C26323]
+synonym: "blood dyscrasia" EXACT [DOID:74]
+synonym: "disease of haematopoietic system" EXACT OMO:0003005 []
+synonym: "disease of hematopoietic system" EXACT [DOID:74, MONDO:patterns/location_top]
+synonym: "disease of the blood and blood-forming organs" EXACT [DOID:74, ICD9CM:280-289.99]
+synonym: "disease or disorder of haematopoietic system" EXACT OMO:0003005 []
+synonym: "disease or disorder of hematopoietic system" EXACT []
+synonym: "disorder of haematopoietic system" EXACT OMO:0003005 []
+synonym: "disorder of hematopoietic system" EXACT [MONDO:patterns/location_top]
+synonym: "haematological disease" EXACT OMO:0003005 []
+synonym: "haematological disorder" EXACT OMO:0003005 []
+synonym: "haematological disorders and malignancies" RELATED OMO:0003005 []
+synonym: "haematological system disease" EXACT OMO:0003005 []
+synonym: "haematopoietic disease" EXACT OMO:0003005 []
+synonym: "haematopoietic system disease" EXACT OMO:0003005 []
+synonym: "haematopoietic system disease or disorder" EXACT OMO:0003005 []
+synonym: "hematologic and lymphocytic disorder" EXACT [NCIT:C26323]
+synonym: "hematologic disorder" EXACT [NCIT:C26323]
+synonym: "hematological disease" EXACT [DOID:74, MTH:NOCODE]
+synonym: "hematological disorder" EXACT [MONDO:cjm, NCIT:C26323]
+synonym: "hematological disorders and malignancies" RELATED [GTR:AN1320635]
+synonym: "hematological system disease" EXACT [https://orcid.org/0000-0002-0736-9199]
+synonym: "hematopoietic disease" EXACT [DOID:74]
+synonym: "hematopoietic system disease" EXACT [MONDO:patterns/location]
+synonym: "hematopoietic system disease or disorder" EXACT [MONDO:design_pattern, MONDO:patterns/location]
+synonym: "rare hematologic disease" EXACT [MONDO:0020006]
+xref: DOID:74
+xref: EFO:0005803
+xref: GTR:AN1320635
+xref: ICD10CM:D50-D89
+xref: ICD9:280-289.99
+xref: ICD9:289.8
+xref: ICD9:289.9
+xref: MESH:D006402
+xref: NCIT:C26323
+xref: Orphanet:97992
+xref: SCTID:414022008
+xref: UMLS:C0018939
+xref: UMLS:CN206939
+xref: UMLS:CN882913
+is_a: MONDO:0700096
+relationship: has_characteristic MONDO:0021136
+property_value: exactMatch DOID:74
+property_value: exactMatch http://identifiers.org/mesh/D006402
+property_value: exactMatch http://identifiers.org/snomedct/414022008
+property_value: exactMatch http://linkedlifedata.com/resource/umls/id/C0018939
+property_value: exactMatch http://linkedlifedata.com/resource/umls/id/CN206939
+property_value: exactMatch http://linkedlifedata.com/resource/umls/id/CN882913
+property_value: exactMatch http://purl.bioontology.org/ontology/ICD10CM/D50-D89
+property_value: exactMatch NCIT:C26323
+property_value: exactMatch Orphanet:97992
+property_value: IAO:0000233 "https://github.com/monarch-initiative/mondo/issues/254" xsd:anyURI
+
+[Term]
+id: MONDO:0005626
+name: epithelial neoplasm
+def: "A benign or malignant neoplasm that arises from and is composed of epithelial cells. This category include adenomas, papillomas, and carcinomas." [NCIT:C3709]
+synonym: "epithelial neoplasm" EXACT [NCIT:C3709]
+synonym: "epithelioma" EXACT [NCIT:C3709]
+xref: EFO:0006858
+xref: MESH:D009375
+xref: NCIT:C3709
+xref: SCTID:118285006
+is_a: MONDO:0005070
+property_value: exactMatch http://identifiers.org/mesh/D009375
+property_value: exactMatch http://identifiers.org/snomedct/118285006
+property_value: exactMatch NCIT:C3709
+
+[Term]
+id: MONDO:0006316
+name: neuroblastic tumor
+def: "A group of nervous system tumors which display neuronal differentiation. It includes tumors that are composed of immature round cells and tumors that display advanced differentiation and the formation of ganglion cells." [NCIT:C6963]
+synonym: "neuroblastic tumor" EXACT [NCIT:C6963]
+xref: EFO:1000393
+xref: NCIT:C6963
+xref: UMLS:C1334953
+is_a: MONDO:0005462
+property_value: exactMatch http://linkedlifedata.com/resource/umls/id/C1334953
+property_value: exactMatch NCIT:C6963
+
+[Term]
+id: MONDO:0006424
+name: soft tissue neoplasm
+def: "A benign, intermediate, or malignant neoplasm that arises from the soft tissue. The most common types are lipomatous (fatty), vascular, smooth muscle, fibrous, and fibrohistiocytic neoplasms." [NCIT:C3377]
+synonym: "neoplasm of soft tissue" EXACT [NCIT:C3377]
+synonym: "neoplasm of the soft tissue" EXACT [NCIT:C3377]
+synonym: "soft tissue neoplasm" EXACT [NCIT:C3377]
+synonym: "soft tissue tumor" EXACT [NCIT:C3377]
+synonym: "soft tissue tumors" EXACT [NCIT:C3377]
+synonym: "soft tissue tumour" EXACT OMO:0003005 []
+synonym: "soft tissue tumours" EXACT OMO:0003005 []
+synonym: "SOFTTISSUE" RELATED ABBREVIATION [ONCOTREE:SOFTTISSUE]
+synonym: "tumor of soft tissue" EXACT [NCIT:C3377]
+synonym: "tumor of the soft tissue" EXACT [NCIT:C3377]
+synonym: "tumour of soft tissue" EXACT OMO:0003005 []
+synonym: "tumour of the soft tissue" EXACT OMO:0003005 []
+xref: EFO:1000541
+xref: NCIT:C3377
+xref: ONCOTREE:SOFTTISSUE
+xref: SCTID:387837005
+is_a: MONDO:0044334
+property_value: exactMatch http://identifiers.org/snomedct/387837005
+property_value: exactMatch NCIT:C3377
+
+[Term]
+id: MONDO:0006517
+name: childhood malignant neoplasm
+def: "A malignant tumor that occurs in children. Representative examples include soft tissue and bone sarcomas (e.g. osteosarcoma) and embryonal neoplasms (e.g. hepatoblastoma and rhabdoid tumor)." [NCIT:C4005]
+synonym: "childhood cancer" EXACT [NCIT:C4005]
+synonym: "childhood malignant neoplasm" EXACT [NCIT:C4005]
+synonym: "childhood neoplasm, malignant" EXACT [MONDO:patterns/malignant]
+synonym: "malignant childhood neoplasm" EXACT [NCIT:C4005]
+synonym: "malignant childhood tumor" EXACT [NCIT:C4005]
+synonym: "malignant childhood tumour" EXACT OMO:0003005 []
+synonym: "malignant neoplasm" NARROW [NCIT:C4005]
+synonym: "malignant paediatric neoplasm" EXACT OMO:0003005 []
+synonym: "malignant paediatric tumour" EXACT OMO:0003005 []
+synonym: "malignant pediatric neoplasm" EXACT [NCIT:C4005]
+synonym: "malignant pediatric tumor" EXACT [NCIT:C4005]
+synonym: "paediatric cancer" EXACT OMO:0003005 []
+synonym: "pediatric cancer" EXACT [NCIT:C4005]
+xref: EFO:1000654
+xref: NCIT:C4005
+xref: UMLS:C0278704
+is_a: MONDO:0004992
+is_a: MONDO:0021079
+property_value: exactMatch http://linkedlifedata.com/resource/umls/id/C0278704
+property_value: exactMatch NCIT:C4005
+
+[Term]
+id: MONDO:0008903
+name: lung cancer
+def: "A malignant neoplasm involving the lung." [https://orcid.org/0000-0002-6601-2165]
+synonym: "adenocarcinoma of lung, response to tyrosine kinase inhibitor in, autosomal dominant, somatic mutation" EXACT [OMIM:211980, OMIM:genemap2]
+synonym: "adenocarcinoma of lung, somatic" EXACT [OMIM:211980, OMIM:genemap2]
+synonym: "alveolar cell carcinoma" RELATED [OMIM:211980]
+synonym: "cancer of lung" EXACT [MONDO:patterns/cancer]
+synonym: "lung cancer" EXACT [MONDO:patterns/location]
+synonym: "lung cancer, protection against" RELATED [OMIM:211980]
+synonym: "lung cancer, protection against, autosomal dominant, somatic mutation" EXACT [OMIM:211980, OMIM:genemap2]
+synonym: "lung cancer, resistance to, autosomal dominant, somatic mutation" EXACT [OMIM:211980, OMIM:genemap2]
+synonym: "lung cancer, somatic" EXACT [OMIM:211980, OMIM:genemap2]
+synonym: "lung cancer, susceptibility to, autosomal dominant, somatic mutation" EXACT [OMIM:211980, OMIM:genemap2]
+synonym: "lung neoplasm" RELATED [DOID:1324]
+synonym: "malignant lung neoplasm" EXACT [MONDO:patterns/cancer]
+synonym: "malignant lung tumor" EXACT [NCIT:C7377]
+synonym: "malignant lung tumour" EXACT OMO:0003005 []
+synonym: "malignant neoplasm of lung" EXACT [MONDO:patterns/cancer, NCIT:C7377]
+synonym: "malignant neoplasm of the lung" EXACT [NCIT:C7377]
+synonym: "malignant tumor of lung" EXACT [NCIT:C7377]
+synonym: "malignant tumor of the lung" EXACT [NCIT:C7377]
+synonym: "malignant tumour of lung" EXACT OMO:0003005 []
+synonym: "malignant tumour of the lung" EXACT OMO:0003005 []
+synonym: "Nonsmall cell lung cancer" RELATED [OMIM:211980]
+synonym: "nonsmall cell lung cancer, response to tyrosine kinase inhibitor in, autosomal dominant, somatic mutation" EXACT [OMIM:211980, OMIM:genemap2]
+synonym: "nonsmall cell lung cancer, somatic" EXACT [OMIM:211980, OMIM:genemap2]
+synonym: "nonsmall cell lung cancer, susceptibility to, autosomal dominant, somatic mutation" EXACT [OMIM:211980, OMIM:genemap2]
+xref: DOID:1324
+xref: ICD9:162.3
+xref: ICD9:162.4
+xref: ICD9:162.5
+xref: ICD9:162.8
+xref: ICD9:162.9
+xref: NCIT:C7377
+xref: OMIM:211980
+xref: SCTID:363358000
+is_a: MONDO:0000376
+is_a: MONDO:0003274
+is_a: MONDO:0021117
+property_value: exactMatch DOID:1324
+property_value: exactMatch http://identifiers.org/snomedct/363358000
+property_value: exactMatch https://omim.org/entry/211980
+property_value: exactMatch NCIT:C7377
+property_value: IAO:0000233 "https://github.com/monarch-initiative/mondo/issues/4521" xsd:anyURI
+
+[Term]
+id: MONDO:0009539
+name: lymphoblastic leukemia, acute, with lymphomatous features
+synonym: "lall" RELATED [MONDO:Lexical, OMIM:247640]
+synonym: "leukemia, acute lymphoblastic" EXACT [OMIM:247640, OMIM:genemap2]
+synonym: "lymphoblastic leukemia, acute, with lymphomatous features" EXACT [MONDO:Lexical, OMIM:247640]
+synonym: "lymphomatous All" RELATED [OMIM:247640]
+xref: MESH:C565429
+xref: OMIM:247640
+xref: UMLS:C1855472
+is_a: MONDO:0004967
+property_value: exactMatch http://identifiers.org/mesh/C565429
+property_value: exactMatch http://linkedlifedata.com/resource/umls/id/C1855472
+property_value: exactMatch https://omim.org/entry/247640
+property_value: IAO:0000233 "https://github.com/monarch-initiative/mondo/issues/4521" xsd:anyURI
+
+[Term]
+id: MONDO:0010643
+name: acute leukemia
+def: "A clonal (malignant) hematopoietic disorder with an acute onset, affecting the bone marrow and the peripheral blood. The malignant cells show minimal differentiation and are called blasts, either myeloid blasts (myeloblasts) or lymphoid blasts (lymphoblasts)." [NCIT:C9300]
+synonym: "acute leukaemia (disease)" EXACT OMO:0003005 []
+synonym: "acute leukemia" EXACT [MONDO:ambiguous, NCIT:C9300]
+synonym: "acute leukemia (disease)" EXACT [https://orcid.org/0000-0002-6601-2165]
+synonym: "leukemia, acute, X-linked" RELATED [OMIM:308960]
+synonym: "stem cell leukaemia" RELATED OMO:0003005 []
+synonym: "stem cell leukaemia (disease)" RELATED OMO:0003005 []
+synonym: "stem cell leukemia" RELATED [DOID:12603, NCIT:C9298]
+synonym: "stem cell leukemia (disease)" RELATED [MONDO:patterns/location]
+xref: DOID:12603
+xref: EFO:1000068
+xref: HP:0002488
+xref: ICD9:208.0
+xref: ICD9:208.00
+xref: ICDO:9801/3
+xref: MESH:C564112
+xref: NCIT:C9298
+xref: NCIT:C9300
+xref: SCTID:91855006
+is_a: MONDO:0005059
+is_a: MONDO:0020683
+property_value: exactMatch DOID:12603
+property_value: exactMatch http://identifiers.org/mesh/C564112
+property_value: exactMatch http://identifiers.org/snomedct/91855006
+property_value: exactMatch NCIT:C9300
+
+[Term]
+id: MONDO:0010648
+name: major affective disorder 2
+synonym: "bipolar affective disorder" RELATED [OMIM:309200]
+synonym: "MAFD2" EXACT ABBREVIATION [MONDO:Lexical, OMIM:309200]
+synonym: "MAJOR affective disorder 2" RELATED [OMIM:309200]
+synonym: "major affective disorder 2" EXACT [OMIM:309200]
+synonym: "major affective disorder 2, X-linked dominant" EXACT [OMIM:309200, OMIM:genemap2]
+synonym: "manic-depressive illness" RELATED [OMIM:309200]
+synonym: "manic-depressive psychosis, X-linked" RELATED [OMIM:309200]
+xref: DOID:0080221
+xref: MESH:C564108
+xref: OMIM:309200
+is_a: MONDO:0000693
+is_a: MONDO:0003847
+property_value: exactMatch http://identifiers.org/mesh/C564108
+property_value: exactMatch https://omim.org/entry/309200
+property_value: IAO:0000233 "https://github.com/monarch-initiative/mondo/issues/4521" xsd:anyURI
+
+[Term]
+id: MONDO:0013082
+name: Hirschsprung disease-ganglioneuroblastoma syndrome
+def: "A rare, genetic, developmental defect during embryogenesis syndrome characterized by total or partial colonic aganglionosis associated with peripheral, usually multifocal, neuroblastic tumors (ganglioneuroblastoma, neuroblastoma, ganglioneuroma). Congenital central hypoventilation syndrome, with variable severity of respiratory compromise, cardiovascular and ophthalmologic symptoms, consistent with autonomic nervous system dysfunction, is occasionally associated." [Orphanet:2151]
+subset: ordo_malformation_syndrome
+subset: predisposition
+synonym: "Hirschsprung disease ganglioneuroblastoma" RELATED [GARD:0002695]
+synonym: "neuroblastoma with Hirschsprung disease" RELATED [OMIM:613013]
+xref: MESH:C538119
+xref: Orphanet:2151
+xref: Orphanet:635
+xref: UMLS:C2751683
+is_a: MONDO:0015246
+is_a: MONDO:0021189
+property_value: exactMatch http://identifiers.org/mesh/C538119
+property_value: exactMatch http://linkedlifedata.com/resource/umls/id/C2751683
+property_value: exactMatch Orphanet:2151
+
+[Term]
+id: MONDO:0013108
+name: leukemia, acute lymphocytic, susceptibility to, 1
+subset: predisposition
+synonym: "ALL" RELATED ABBREVIATION [MONDO:Lexical, OMIM:613065]
+synonym: "All1" RELATED [OMIM:613065]
+synonym: "leukemia, acute lymphoblastic" RELATED [MONDO:Lexical, OMIM:613065]
+synonym: "leukemia, acute lymphoblastic, B-Hyperdiploid, susceptibility to" RELATED [OMIM:613065]
+synonym: "leukemia, acute lymphoblastic, somatic" EXACT [OMIM:613065, OMIM:genemap2]
+synonym: "leukemia, acute lymphoblastic, susceptibility to, 1" RELATED [OMIM:613065]
+synonym: "leukemia, acute lymphocytic, Philadelphia chromosome positive, somatic" EXACT [OMIM:613065, OMIM:genemap2]
+synonym: "leukemia, acute lymphocytic, susceptibility to, 1" EXACT [OMIM:613065]
+synonym: "leukemia, B-cell acute lymphoblastic, susceptibility to" RELATED [OMIM:613065]
+synonym: "leukemia, T-cell acute lymphoblastic, somatic" EXACT [OMIM:613065, OMIM:genemap2]
+synonym: "leukemia, T-cell acute lymphoblastic, susceptibility to" RELATED [OMIM:613065]
+synonym: "leukemia, T-cell acute lymphocytic, somatic" EXACT [OMIM:613065, OMIM:genemap2]
+synonym: "T-cell acute lymphoblastic leukemia, somatic" EXACT [OMIM:613065, OMIM:genemap2]
+xref: OMIM:613065
+xref: UMLS:C2751595
+is_a: MONDO:0020573
+relationship: excluded_subClassOf MONDO:0004967
+relationship: predisposes_towards MONDO:0004967
+property_value: exactMatch http://linkedlifedata.com/resource/umls/id/C2751595
+property_value: exactMatch https://omim.org/entry/613065
+property_value: IAO:0000233 "https://github.com/monarch-initiative/mondo/issues/4521" xsd:anyURI
+property_value: IAO:0000233 "https://github.com/monarch-initiative/mondo/issues/4882" xsd:anyURI
+
+[Term]
+id: MONDO:0015246
+name: syndromic anorectal malformation
+def: "A anorectal malformation that is part of a larger syndrome." [MONDO:patterns/syndromic]
+comment: Reason: out of scope. MONDO:excludeGroupingClass. Term to consider:MONDO:0019938 anorectal malformation
+subset: disease_grouping
+subset: obsoletion_candidate
+subset: ordo_group_of_disorders
+synonym: "syndrome associated with anorectal malformation" EXACT [MONDO:patterns/syndromic]
+synonym: "syndromic anorectal malformation" EXACT [MONDO:patterns/syndromic]
+xref: Orphanet:117573
+xref: UMLS:CN226645
+is_a: MONDO:0002254
+is_a: MONDO:0019938
+intersection_of: MONDO:0019938
+intersection_of: has_characteristic MONDO:0021127
+property_value: exactMatch http://linkedlifedata.com/resource/umls/id/CN226645
+property_value: exactMatch Orphanet:117573
+property_value: IAO:0000233 "https://github.com/monarch-initiative/mondo/issues/5114" xsd:anyURI
+property_value: IAO:0006012 "2022-09-01" xsd:string
+
+[Term]
+id: MONDO:0015757
+name: lymphoid hemopathy
+subset: disease_grouping
+subset: ordo_group_of_disorders
+xref: Orphanet:171898
+is_a: MONDO:0019044
+property_value: exactMatch Orphanet:171898
+
+[Term]
+id: MONDO:0016708
+name: embryonal tumor of neuroepithelial tissue
+comment: Reason of obsoletion: out of scope - MONDO:excludeGroupingClass. This is part of a large mass-obsoletione effort for ORDO terms.
+subset: disease_grouping
+subset: obsoletion_candidate
+subset: ordo_group_of_disorders
+xref: Orphanet:251852
+xref: UMLS:CN201955
+is_a: MONDO:0005564
+is_a: MONDO:0021193
+relationship: has_characteristic MONDO:0021136
+property_value: exactMatch http://linkedlifedata.com/resource/umls/id/CN201955
+property_value: exactMatch Orphanet:251852
+property_value: IAO:0000233 "https://github.com/monarch-initiative/mondo/issues/5114" xsd:anyURI
+property_value: IAO:0006012 "2023-10-01" xsd:string
+
+[Term]
+id: MONDO:0018078
+name: soft tissue sarcoma
+def: "A malignant neoplasm arising from muscle tissue, adipose tissue, blood vessels, fibrous tissue, or other supportive tissues excluding the bones." [NCIT:C9306]
+subset: disease_grouping
+subset: gard_rare
+subset: ordo_group_of_disorders
+synonym: "connective tissue sarcoma" EXACT [NCIT:C9306]
+synonym: "malignant mesenchymal tumor" EXACT [Orphanet:3394]
+synonym: "malignant mesenchymal tumour" EXACT OMO:0003005 []
+synonym: "malignant soft tissue tumor" BROAD [Orphanet:3394]
+synonym: "malignant soft tissue tumour" BROAD OMO:0003005 []
+synonym: "non-Rhabdo. soft tissue sarcoma" EXACT [NCIT:C9306]
+synonym: "sarcoma of soft tissue" EXACT [NCIT:C9306]
+synonym: "sarcoma of the soft tissue" EXACT [NCIT:C9306]
+synonym: "soft part sarcoma" EXACT [Orphanet:3394]
+synonym: "soft tissue sarcoma" EXACT [NCIT:C9306]
+xref: EFO:1001968
+xref: NCIT:C9306
+xref: Orphanet:3394
+xref: SCTID:424952003
+xref: UMLS:CN204398
+is_a: MONDO:0005089
+is_a: MONDO:0024637
+relationship: has_characteristic MONDO:0021136
+property_value: exactMatch http://identifiers.org/snomedct/424952003
+property_value: exactMatch http://linkedlifedata.com/resource/umls/id/CN204398
+property_value: exactMatch NCIT:C9306
+property_value: exactMatch Orphanet:3394
+
+[Term]
+id: MONDO:0018908
+name: non-Hodgkin lymphoma
+def: "Distinct from Hodgkin lymphoma both morphologically and biologically, non-Hodgkin lymphoma (NHL) is characterized by the absence of Reed-Sternberg cells, can occur at any age, and usually presents as a localized or generalized lymphadenopathy associated with fever and weight loss. The clinical course varies according to the morphologic type. NHL is clinically classified as indolent, aggressive, or having a variable clinical course. NHL can be of B-or T-/NK-cell lineage." [NCIT:C3211]
+subset: disease_grouping
+subset: ordo_group_of_disorders
+synonym: "NHL" EXACT ABBREVIATION [NCIT:C3211, Orphanet:547]
+synonym: "non-Hodgkin lymphoma" EXACT [NCIT:C3211]
+synonym: "non-Hodgkin's lymphoma" EXACT [NCIT:C3211]
+synonym: "non-Hodgkin's lymphoma (NHL)" EXACT [NCIT:C3211]
+synonym: "non-Hodgkins lymphoma" EXACT [MONDO:0005587]
+xref: DOID:0060060
+xref: EFO:0005952
+xref: ICDO:9591/3
+xref: MedDRA:10029547
+xref: MESH:D008228
+xref: NCIT:C3211
+xref: ONCOTREE:NHL
+xref: Orphanet:547
+xref: UMLS:C0024305
+is_a: MONDO:0005062
+property_value: closeMatch http://identifiers.org/meddra/10029547
+property_value: exactMatch DOID:0060060
+property_value: exactMatch http://identifiers.org/mesh/D008228
+property_value: exactMatch http://linkedlifedata.com/resource/umls/id/C0024305
+property_value: exactMatch NCIT:C3211
+property_value: exactMatch Orphanet:547
+
+[Term]
+id: MONDO:0019044
+name: tumor of hematopoietic and lymphoid tissues
+comment: Reason of obsoletion: out of scope - MONDO:excludeGroupingClass. This is part of a large mass-obsoletion effort for ORDO terms.
+subset: disease_grouping
+subset: obsoletion_candidate
+subset: ordo_group_of_disorders
+xref: Orphanet:68347
+xref: UMLS:CN205528
+is_a: MONDO:0002334
+property_value: exactMatch http://linkedlifedata.com/resource/umls/id/CN205528
+property_value: exactMatch Orphanet:68347
+property_value: IAO:0000233 "https://github.com/monarch-initiative/mondo/issues/5114" xsd:anyURI
+property_value: IAO:0006012 "2023-10-01" xsd:string
+
+[Term]
+id: MONDO:0019755
+name: developmental defect during embryogenesis
+def: "A disease that has its basis in the disruption of embryonic morphogenesis." [MONDO:design_pattern]
+subset: disease_grouping
+subset: ordo_group_of_disorders
+synonym: "congenital malformation syndrome" EXACT []
+synonym: "developmental defect during embryogenesis" EXACT []
+synonym: "disorder of embryonic morphogenesis" EXACT [MONDO:design_pattern, MONDO:patterns/basis_in_disruption_of_process]
+synonym: "embryonic morphogenesis disease" EXACT [MONDO:design_pattern]
+synonym: "malformation syndrome" EXACT [Orphanet:93890]
+synonym: "rare developmental defect during embryogenesis" EXACT [Orphanet:93890]
+xref: ICD9:759.7
+xref: NCIT:C99267
+xref: Orphanet:93890
+xref: SCTID:400038003
+xref: UMLS:C1302790
+xref: UMLS:CN206687
+is_a: MONDO:0021147
+property_value: exactMatch http://identifiers.org/snomedct/400038003
+property_value: exactMatch http://linkedlifedata.com/resource/umls/id/C1302790
+property_value: exactMatch http://linkedlifedata.com/resource/umls/id/CN206687
+property_value: exactMatch NCIT:C99267
+property_value: exactMatch Orphanet:93890
+
+[Term]
+id: MONDO:0019938
+name: anorectal malformation
+subset: disease_grouping
+subset: ordo_group_of_disorders
+xref: ICD9:751.5
+xref: MESH:C537771
+xref: Orphanet:96346
+xref: SCTID:33225004
+is_a: MONDO:0020019
+property_value: exactMatch http://identifiers.org/mesh/C537771
+property_value: exactMatch http://identifiers.org/snomedct/33225004
+property_value: exactMatch Orphanet:96346
+
+[Term]
+id: MONDO:0020019
+name: digestive tract malformation
+comment: Reason of obsoletion: out of scope - MONDO:excludeGroupingClass. This is part of a large mass-obsoletion effort for ORDO terms.
+subset: disease_grouping
+subset: obsoletion_candidate
+subset: ordo_group_of_disorders
+xref: Orphanet:98039
+is_a: MONDO:0019755
+relationship: has_characteristic MONDO:0021136
+property_value: exactMatch Orphanet:98039
+property_value: IAO:0000233 "https://github.com/monarch-initiative/mondo/issues/5114" xsd:anyURI
+property_value: IAO:0006012 "2023-09-01" xsd:string
+
+[Term]
+id: MONDO:0020573
+name: inherited disease susceptibility
+def: "A latent susceptibility to disease at the genetic level, which may be activated under certain conditions." [MESH:D020022]
+subset: predisposition
+synonym: "genetic predisposition" RELATED [MESH:D020022]
+synonym: "genetic predispositions" RELATED [MESH:D020022]
+synonym: "genetic susceptibilities" RELATED [MESH:D020022]
+synonym: "genetic susceptibility" RELATED [MESH:D020022]
+synonym: "hereditary disease susceptibility" EXACT [MONDO:patterns/hereditary]
+synonym: "hereditary predisposition to disease" EXACT [MONDO:patterns/hereditary]
+synonym: "predisposition, genetic" RELATED [MESH:D020022]
+synonym: "predispositions, genetic" RELATED [MESH:D020022]
+synonym: "susceptibilities, genetic" RELATED [MESH:D020022]
+synonym: "susceptibility, genetic" RELATED [MESH:D020022]
+xref: ICD10CM:Z15
+xref: MESH:D020022
+is_a: MONDO:0042489
+intersection_of: MONDO:0042489
+intersection_of: has_characteristic MONDO:0021152
+relationship: has_characteristic MONDO:0021152
+property_value: exactMatch http://identifiers.org/mesh/D020022
+property_value: exactMatch http://purl.bioontology.org/ontology/ICD10CM/Z15
+property_value: http://purl.org/dc/terms/creator https://orcid.org/0000-0002-6601-2165
+creation_date: 2017-09-30T12:01:25Z
+
+[Term]
+id: MONDO:0020641
+name: respiratory tract neoplasm
+def: "A benign or malignant, primary or metastatic neoplasm involving the respiratory tract." [NCIT:C3355]
+synonym: "neoplasm of respiratory tract" EXACT [MONDO:patterns/neoplasm, NCIT:C3355]
+synonym: "neoplasm of the respiratory tract" EXACT [NCIT:C3355]
+synonym: "neoplasm, respiratory tract" EXACT [MESH:D012142]
+synonym: "neoplasms, respiratory tract" EXACT [MESH:D012142]
+synonym: "respiratory system neoplasm" EXACT [EFO:0003853]
+synonym: "respiratory tract neoplasm" EXACT [MESH:D012142, NCIT:C3355]
+synonym: "respiratory tract tumor" EXACT [MONDO:patterns/neoplasm, NCIT:C3355]
+synonym: "respiratory tract tumour" EXACT OMO:0003005 []
+synonym: "tract neoplasm, respiratory" EXACT [MESH:D012142]
+synonym: "tract neoplasms, respiratory" EXACT [MESH:D012142]
+synonym: "tumor of respiratory tract" EXACT [MONDO:patterns/neoplasm, NCIT:C3355]
+synonym: "tumor of the respiratory tract" EXACT [NCIT:C3355]
+synonym: "tumour of respiratory tract" EXACT OMO:0003005 []
+synonym: "tumour of the respiratory tract" EXACT OMO:0003005 []
+xref: EFO:0003853
+xref: ICD10CM:C30-C39
+xref: MESH:D012142
+xref: NCIT:C3355
+xref: SCTID:126667002
+is_a: MONDO:0005070
+is_a: MONDO:0005087
+property_value: exactMatch http://identifiers.org/mesh/D012142
+property_value: exactMatch http://identifiers.org/snomedct/126667002
+property_value: exactMatch NCIT:C3355
+property_value: relatedMatch http://purl.bioontology.org/ontology/ICD10CM/C30-C39
+
+[Term]
+id: MONDO:0020683
+name: acute disease
+def: "Disease having a short and relatively severe course." [MESH:D000208]
+synonym: "acute disease" EXACT [MESH:D000208, UMLS:C0001314]
+synonym: "acute diseases" EXACT [MESH:D000208]
+synonym: "disease, acute" EXACT [MESH:D000208]
+xref: ICD9:799.89
+xref: MESH:D000208
+xref: SCTID:2704003
+xref: UMLS:C0001314
+is_a: MONDO:0700096
+property_value: exactMatch http://identifiers.org/mesh/D000208
+property_value: exactMatch http://identifiers.org/snomedct/2704003
+property_value: exactMatch http://linkedlifedata.com/resource/umls/id/C0001314
+
+[Term]
+id: MONDO:0021058
+name: neoplastic syndrome
+def: "A broad classification for disorders in which the development of neoplasms typically occur in association with a characteristic set of signs or symptoms. These disorders may be inherited or acquired." [NCIT:C54705]
+synonym: "cancer-related syndrome" EXACT [NCIT:C54705]
+synonym: "neoplastic syndrome" EXACT [NCIT:C54705]
+synonym: "tumor syndrome" EXACT [NCIT:C54705]
+synonym: "tumour syndrome" EXACT OMO:0003005 []
+xref: NCIT:C54705
+is_a: MONDO:0002254
+is_a: MONDO:0023370
+intersection_of: MONDO:0002254
+intersection_of: disease_has_major_feature MONDO:0005070
+relationship: disease_has_major_feature MONDO:0005070
+relationship: has_characteristic MONDO:0021136
+property_value: exactMatch NCIT:C54705
+
+[Term]
+id: MONDO:0021079
+name: childhood neoplasm
+def: "A benign or malignant neoplasm arising during childhood." [NCIT:C6283]
+synonym: "childhood neoplasm" EXACT [NCIT:C6283]
+synonym: "childhood neoplasm (disease)" EXACT []
+synonym: "childhood tumor" EXACT [NCIT:C6283]
+synonym: "childhood tumour" EXACT OMO:0003005 []
+synonym: "neoplasm (disease) of childhood" EXACT [MONDO:patterns/childhood]
+synonym: "paediatric neoplasm" EXACT OMO:0003005 []
+synonym: "paediatric neoplasm (disease)" EXACT OMO:0003005 []
+synonym: "paediatric tumour" EXACT OMO:0003005 []
+synonym: "pediatric neoplasm" EXACT [NCIT:C6283]
+synonym: "pediatric neoplasm (disease)" EXACT [MONDO:patterns/childhood]
+synonym: "pediatric tumor" EXACT [NCIT:C6283]
+xref: NCIT:C6283
+is_a: MONDO:0005070
+property_value: exactMatch NCIT:C6283
+
+[Term]
+id: MONDO:0021117
+name: lung neoplasm
+def: "A benign or malignant, primary or metastatic neoplasm involving the lungs. Representative examples of benign neoplasms include adenoma, papilloma, chondroma, and endobronchial lipoma. Representative examples of malignant neoplasms include carcinoma, carcinoid tumor, sarcoma, and lymphoma." [NCIT:C3200]
+synonym: "lung" RELATED [ONCOTREE:LUNG]
+synonym: "lung neoplasm" EXACT [NCIT:C3200]
+synonym: "lung neoplasm (disease)" EXACT [MONDO:patterns/location]
+synonym: "lung neoplasms" EXACT [NCIT:C3200]
+synonym: "lung tumor" EXACT [MONDO:patterns/neoplasm, NCIT:C3200]
+synonym: "lung tumour" EXACT OMO:0003005 []
+synonym: "neoplasm of lung" EXACT [MONDO:patterns/neoplasm, NCIT:C3200]
+synonym: "neoplasm of the lung" EXACT [NCIT:C3200]
+synonym: "neoplasm, lung" RELATED [MESH:D008175]
+synonym: "neoplasm, pulmonary" RELATED [MESH:D008175]
+synonym: "neoplasms, lung" RELATED [MESH:D008175]
+synonym: "neoplasms, pulmonary" RELATED [MESH:D008175]
+synonym: "tumor of lung" EXACT [MONDO:patterns/neoplasm, NCIT:C3200]
+synonym: "tumor of the lung" EXACT [NCIT:C3200]
+synonym: "tumour of lung" EXACT OMO:0003005 []
+synonym: "tumour of the lung" EXACT OMO:0003005 []
+xref: MESH:D008175
+xref: NCIT:C3200
+xref: ONCOTREE:LUNG
+is_a: MONDO:0005275
+is_a: MONDO:0020641
+is_a: MONDO:0021350
+property_value: exactMatch http://identifiers.org/mesh/D008175
+property_value: exactMatch NCIT:C3200
+
+[Term]
+id: MONDO:0021147
+name: disorder of development or morphogenesis
+def: "Any disease or disorder that disrupts the process development of an anatomical structure. Can be due to genetic or environmental causes. Typically happens during embryogenesis, but also includes post-embryonic development." [MONDO:cjm]
+subset: harrisons_view
+subset: rare_grouping
+xref: ICD10CM:Q00-Q99
+is_a: MONDO:0700096
+property_value: exactMatch http://purl.bioontology.org/ontology/ICD10CM/Q00-Q99
+
+[Term]
+id: MONDO:0021189
+name: intestinal motility disease
+def: "A disease that has its basis in the disruption of intestinal motility." [MONDO:patterns/basis_in_disruption_of_process]
+synonym: "disorder of intestinal motility" EXACT [MONDO:patterns/basis_in_disruption_of_process]
+is_a: MONDO:0005020
+
+[Term]
+id: MONDO:0021193
+name: neuroepithelial neoplasm
+def: "A neoplasm of the nervous system that arises from the neuroepithelial tissues. Representative examples include astrocytic tumors, oligodendroglial tumors, ependymal tumors, and primitive neuroectodermal tumors." [NCIT:C3787]
+comment: Editor note consider adding grouping class for Neuroepithelial, Perineurial, and Schwann Cell Neoplasm
+synonym: "neoplasm of neuroepithelial tissue" EXACT [NCIT:C3787]
+synonym: "neoplasm of neuroepithelium" EXACT [NCIT:C3787]
+synonym: "neoplasm of the neuroepithelium" EXACT [NCIT:C3787]
+synonym: "neuroepithelial neoplasm" EXACT [NCIT:C3787]
+synonym: "neuroepithelial neoplasms" EXACT [NCIT:C3787]
+synonym: "neuroepithelial tissue neoplasm" EXACT [NCIT:C3787]
+synonym: "neuroepithelial tissue tumor" EXACT [NCIT:C3787]
+synonym: "neuroepithelial tissue tumour" EXACT OMO:0003005 []
+synonym: "neuroepithelial tumor" EXACT [NCIT:C3787]
+synonym: "neuroepithelial tumors" EXACT [NCIT:C3787]
+synonym: "neuroepithelial tumour" EXACT OMO:0003005 []
+synonym: "neuroepithelial tumours" EXACT OMO:0003005 []
+synonym: "primary neuroepithelial tumor" RELATED [ONCOTREE:PRNET]
+synonym: "primary neuroepithelial tumour" RELATED OMO:0003005 []
+synonym: "tumor of neuroepithelial tissue" EXACT [NCIT:C3787]
+synonym: "tumor of neuroepithelium" EXACT [NCIT:C3787]
+synonym: "tumor of the neuroepithelium" EXACT [NCIT:C3787]
+synonym: "tumour of neuroepithelial tissue" EXACT OMO:0003005 []
+synonym: "tumour of neuroepithelium" EXACT OMO:0003005 []
+synonym: "tumour of the neuroepithelium" EXACT OMO:0003005 []
+xref: MESH:D018302
+xref: NCIT:C3787
+xref: ONCOTREE:PRNET
+is_a: MONDO:0021248
+property_value: exactMatch http://identifiers.org/mesh/D018302
+property_value: exactMatch NCIT:C3787
+
+[Term]
+id: MONDO:0021248
+name: nervous system neoplasm
+def: "A neoplasm (disease) that involves the nervous system." [MONDO:patterns/location]
+synonym: "neoplasm of nervous system" EXACT [MONDO:patterns/neoplasm, NCIT:C3268]
+synonym: "neoplasm of the nervous system" EXACT [NCIT:C3268]
+synonym: "nervous system neoplasm (disease)" EXACT [MONDO:patterns/location]
+synonym: "nervous system neoplasms" EXACT [NCIT:C3268]
+synonym: "nervous system tumor" EXACT [MONDO:patterns/neoplasm, NCIT:C3268]
+synonym: "nervous system tumour" EXACT OMO:0003005 []
+synonym: "tumor of nervous system" EXACT [MONDO:patterns/neoplasm, NCIT:C3268]
+synonym: "tumor of the nervous system" EXACT [NCIT:C3268]
+synonym: "tumour of nervous system" EXACT OMO:0003005 []
+synonym: "tumour of the nervous system" EXACT OMO:0003005 []
+xref: NCIT:C3268
+is_a: MONDO:0005070
+is_a: MONDO:0005071
+property_value: exactMatch NCIT:C3268
+
+[Term]
+id: MONDO:0021350
+name: neoplasm of thorax
+def: "A neoplasm (disease) that involves the thoracic segment of trunk." [MONDO:patterns/location]
+synonym: "neoplasm of the thorax" EXACT [NCIT:C3406]
+synonym: "neoplasm of thoracic segment of trunk" EXACT [MONDO:patterns/neoplasm]
+synonym: "thoracic neoplasm" EXACT [NCIT:C3406]
+synonym: "thoracic segment of trunk neoplasm" EXACT []
+synonym: "thoracic segment of trunk neoplasm (disease)" EXACT [MONDO:patterns/location]
+synonym: "thoracic segment of trunk tumor" EXACT [MONDO:patterns/neoplasm]
+synonym: "thoracic segment of trunk tumour" EXACT OMO:0003005 []
+synonym: "thoracic tumor" EXACT [NCIT:C3406]
+synonym: "thoracic tumour" EXACT OMO:0003005 []
+synonym: "tumor of the thorax" EXACT [NCIT:C3406]
+synonym: "tumor of thoracic segment of trunk" EXACT [MONDO:patterns/neoplasm]
+synonym: "tumor of thorax" EXACT [NCIT:C3406]
+synonym: "tumour of the thorax" EXACT OMO:0003005 []
+synonym: "tumour of thoracic segment of trunk" EXACT OMO:0003005 []
+synonym: "tumour of thorax" EXACT OMO:0003005 []
+xref: ICD10CM:C30-C39
+xref: ICD9:239.89
+xref: NCIT:C3406
+xref: SCTID:255058005
+xref: UMLS:C0039981
+is_a: MONDO:0005070
+property_value: exactMatch http://identifiers.org/snomedct/255058005
+property_value: exactMatch http://linkedlifedata.com/resource/umls/id/C0039981
+property_value: exactMatch NCIT:C3406
+property_value: relatedMatch http://purl.bioontology.org/ontology/ICD10CM/C30-C39
+
+[Term]
+id: MONDO:0021354
+name: tumor of adipose tissue
+def: "A neoplasm (disease) that involves the adipose tissue." [MONDO:patterns/location]
+synonym: "adipose tissue neoplasm" EXACT [NCIT:C4248]
+synonym: "adipose tissue neoplasm (disease)" EXACT [MONDO:patterns/location]
+synonym: "adipose tissue tumor" EXACT [MONDO:patterns/neoplasm, NCIT:C4248]
+synonym: "adipose tissue tumour" EXACT OMO:0003005 []
+synonym: "lipomatous neoplasm" EXACT [NCIT:C4248]
+synonym: "lipomatous tumor" EXACT [NCIT:C4248]
+synonym: "lipomatous tumour" EXACT OMO:0003005 []
+synonym: "neoplasm of adipose tissue" EXACT [MONDO:patterns/neoplasm, NCIT:C4248]
+synonym: "neoplasm of the adipose tissue" EXACT [NCIT:C4248]
+synonym: "tumor of adipose tissue" EXACT [MONDO:patterns/neoplasm]
+synonym: "tumor of the adipose tissue" EXACT [NCIT:C4248]
+synonym: "tumour of the adipose tissue" EXACT OMO:0003005 []
+xref: ICD9:239.2
+xref: NCIT:C4248
+xref: SCTID:254831005
+xref: UMLS:C0206631
+is_a: MONDO:0002616
+is_a: MONDO:0021581
+property_value: exactMatch http://identifiers.org/snomedct/254831005
+property_value: exactMatch http://linkedlifedata.com/resource/umls/id/C0206631
+property_value: exactMatch NCIT:C4248
+
+[Term]
+id: MONDO:0021581
+name: connective tissue neoplasm
+def: "Neoplasms composed of connective tissue, including elastic, mucous, reticular, osseous, and cartilaginous tissue. The concept does not refer to neoplasms located in connective tissue." [MESH:D009372]
+synonym: "connective tissue neoplasm" EXACT [MESH:D009372]
+synonym: "connective tissue neoplasm (disease)" EXACT [MONDO:patterns/location]
+synonym: "connective tissue neoplasms" RELATED [MESH:D009372]
+synonym: "connective tissue tumor" EXACT [MONDO:patterns/neoplasm]
+synonym: "connective tissue tumour" EXACT OMO:0003005 []
+synonym: "neoplasm of connective tissue" EXACT [MONDO:patterns/neoplasm]
+synonym: "neoplasm of connective tissues" EXACT [DOID:201]
+synonym: "neoplasm, connective tissue" RELATED [MESH:D009372]
+synonym: "tumor of connective tissue" EXACT [https://orcid.org/0000-0002-6601-2165, MONDO:patterns/neoplasm]
+synonym: "tumour of connective tissue" EXACT OMO:0003005 []
+xref: ICD9:239.2
+xref: MESH:D009372
+xref: SCTID:126598008
+xref: UMLS:C0027656
+is_a: MONDO:0003900
+is_a: MONDO:0005070
+property_value: exactMatch http://identifiers.org/mesh/D009372
+property_value: exactMatch http://identifiers.org/snomedct/126598008
+property_value: exactMatch http://linkedlifedata.com/resource/umls/id/C0027656
+
+[Term]
+id: MONDO:0021635
+name: neurocristopathy
+def: "That disease that arises from defects in the development of tissues containing cells commonly derived from the embryonic neural crest cell lineage." [MONDO:cjm, Wikipedia:Neurocristopathy]
+synonym: "disorder of neural crest cell development" EXACT [MONDO:patterns/basis_in_disruption_of_process]
+synonym: "disorder of neural crest development" EXACT [MONDO:cjm]
+synonym: "neural crest cell development disease" EXACT []
+is_a: MONDO:0021147
+
+[Term]
+id: MONDO:0021656
+name: nongerminomatous germ cell tumor
+def: "A term that refers to teratoma, embryonal carcinoma, yolk sac tumor, choriocarcinoma, or mixed forms of these tumors." [NCIT:C121619]
+synonym: "non-dysgerminomatous germ cell tumor" EXACT [NCIT:C121619]
+synonym: "non-dysgerminomatous germ cell tumour" EXACT OMO:0003005 []
+synonym: "non-germinomatous germ cell tumor" EXACT [NCIT:C121619]
+synonym: "non-germinomatous germ cell tumour" EXACT OMO:0003005 []
+synonym: "non-seminomatous germ cell tumor" EXACT [NCIT:C121619]
+synonym: "non-seminomatous germ cell tumour" EXACT OMO:0003005 []
+synonym: "Nongerminomatous germ cell tumor" EXACT [NCIT:C121619]
+synonym: "Nongerminomatous germ cell tumor Including central nervous system" EXACT [NCIT:C121619]
+synonym: "Nongerminomatous germ cell tumour" EXACT OMO:0003005 []
+synonym: "Nongerminomatous germ cell tumour Including central nervous system" EXACT OMO:0003005 []
+synonym: "NSGCT" RELATED ABBREVIATION [ONCOTREE:NSGCT]
+xref: NCIT:C121619
+xref: ONCOTREE:NSGCT
+is_a: MONDO:0005040
+property_value: exactMatch NCIT:C121619
+
+[Term]
+id: MONDO:0023370
+name: neoplastic disease or syndrome
+def: "Either an isolated neoplasm or a syndrome with neoplasm as a major feature." [MONDO:cjm]
+synonym: "neoplastic disease" RELATED []
+synonym: "neoplastic disorder" RELATED []
+is_a: MONDO:0045024
+union_of: MONDO:0005070
+union_of: MONDO:0021058
+
+[Term]
+id: MONDO:0024637
+name: malignant soft tissue neoplasm
+def: "A malignant neoplasm arising exclusively from the soft tissues." [NCIT:C4867]
+synonym: "malignant neoplasm of soft tissue" EXACT [NCIT:C4867]
+synonym: "malignant neoplasm of the soft tissue" EXACT [NCIT:C4867]
+synonym: "malignant soft tissue neoplasm" EXACT [NCIT:C4867]
+synonym: "malignant soft tissue tumor" EXACT [NCIT:C4867]
+synonym: "malignant soft tissue tumour" EXACT OMO:0003005 []
+synonym: "malignant tumor of soft tissue" EXACT [NCIT:C4867]
+synonym: "malignant tumor of the soft tissue" EXACT [NCIT:C4867]
+synonym: "malignant tumour of soft tissue" EXACT OMO:0003005 []
+synonym: "malignant tumour of the soft tissue" EXACT OMO:0003005 []
+xref: NCIT:C4867
+xref: SCTID:269469005
+is_a: MONDO:0004992
+is_a: MONDO:0006424
+property_value: exactMatch http://identifiers.org/snomedct/269469005
+property_value: exactMatch NCIT:C4867
+
+[Term]
+id: MONDO:0024882
+name: secondary neoplasm
+def: "A neoplasm that arises from a pre-existing lower grade lesion, or as a result of a primary lesion that has spread to secondary sites, or due to a complication of a cancer treatment." [NCIT:C36255]
+comment: Note that we currently treat secondary neoplasms as being neoplastic diseases that are derived from neoplasm; classes such as 'neoplasm', 'carcinoma' are implicitly primary. This may change in future.
+synonym: "secondary neoplasm" EXACT [NCIT:C36255]
+synonym: "secondary tumor" EXACT [NCIT:C36255]
+synonym: "secondary tumour" EXACT OMO:0003005 []
+xref: NCIT:C36255
+is_a: MONDO:0023370
+intersection_of: MONDO:0023370
+intersection_of: disease_arises_from_feature MONDO:0005070
+relationship: disease_arises_from_feature MONDO:0005070
+property_value: exactMatch NCIT:C36255
+
+[Term]
+id: MONDO:0042489
+name: disease susceptibility
+def: "A constitution or condition of the body which makes the tissues react in special ways to certain extrinsic stimuli and thus tends to make the individual more than usually susceptible to certain diseases." [MESH:D004198]
+subset: predisposition
+synonym: "diatheses" RELATED [MESH:D004198]
+synonym: "diathesis" RELATED [MESH:D004198]
+synonym: "disease susceptibilities" RELATED [MESH:D004198]
+synonym: "susceptibilities, disease" RELATED [MESH:D004198]
+synonym: "susceptibility, disease" RELATED [MESH:D004198]
+xref: MESH:D004198
+property_value: exactMatch http://identifiers.org/mesh/D004198
+
+[Term]
+id: MONDO:0044334
+name: connective and soft tissue neoplasm
+def: "A benign, intermediate, or malignant neoplasm that affects the connective and soft tissue." [NCIT:C3810]
+comment: Editor note: we follow NCIT in making this a grouping of all soft tissue and connective tissue neoplasms, including bone
+synonym: "connective and soft tissue neoplasm" EXACT [NCIT:C3810]
+synonym: "connective and soft tissue tumor" EXACT [NCIT:C3810]
+synonym: "connective and soft tissue tumour" EXACT OMO:0003005 []
+synonym: "musculoskeletal and soft tissue neoplasm" EXACT [NCIT:C3810]
+synonym: "musculoskeletal and soft tissue tumor" EXACT [NCIT:C3810]
+synonym: "musculoskeletal and soft tissue tumour" EXACT OMO:0003005 []
+synonym: "neoplasm of skeletal and soft tissue" EXACT [NCIT:C3810]
+synonym: "neoplasm of soft tissue and bone" EXACT [NCIT:C3810]
+synonym: "neoplasm of soft tissue and skeleton" EXACT [NCIT:C3810]
+synonym: "skeletal and soft tissue neoplasm" EXACT [NCIT:C3810]
+synonym: "skeletal and soft tissue tumor" EXACT [NCIT:C3810]
+synonym: "skeletal and soft tissue tumour" EXACT OMO:0003005 []
+synonym: "soft tissue and bone neoplasm" EXACT [NCIT:C3810]
+synonym: "soft tissue and bone tumor" EXACT [NCIT:C3810]
+synonym: "soft tissue and bone tumour" EXACT OMO:0003005 []
+synonym: "tumor of skeletal and soft tissue" EXACT [NCIT:C3810]
+synonym: "tumor of soft tissue and bone" EXACT [NCIT:C3810]
+synonym: "tumor of soft tissue and skeleton" EXACT [NCIT:C3810]
+synonym: "tumour of skeletal and soft tissue" EXACT OMO:0003005 []
+synonym: "tumour of soft tissue and bone" EXACT OMO:0003005 []
+synonym: "tumour of soft tissue and skeleton" EXACT OMO:0003005 []
+xref: NCIT:C3810
+is_a: MONDO:0005070
+property_value: exactMatch NCIT:C3810
+
+[Term]
+id: MONDO:0044878
+name: adult germ cell tumor
+def: "A germ cell tumor that occurs during adulthood." [NCIT:C114777]
+synonym: "Adult germ cell tumor" EXACT [NCIT:C114777]
+synonym: "Adult germ cell tumour" EXACT OMO:0003005 []
+synonym: "germ cell tumor" BROAD [NCIT:C114777]
+synonym: "germ cell tumor of adults" EXACT [MONDO:design_pattern, MONDO:patterns/adult]
+synonym: "germ cell tumour" BROAD OMO:0003005 []
+synonym: "germ cell tumour of adults" EXACT OMO:0003005 []
+xref: NCIT:C114777
+is_a: MONDO:0005040
+property_value: exactMatch NCIT:C114777
+
+[Term]
+id: MONDO:0044881
+name: hematopoietic and lymphoid cell neoplasm
+def: "A neoplasm arising from hematopoietic cells found in the bone marrow, peripheral blood, lymph nodes and spleen (organs of the hematopoietic system). Hematopoietic cell neoplasms can also involve other anatomic sites (e.g. central nervous system, gastrointestinal tract), either by metastasis, direct tumor infiltration, or neoplastic transformation of extranodal lymphoid tissues. The commonest forms are the various types of leukemia, Hodgkin and non-Hodgkin lymphomas, myeloproliferative neoplasms, and myelodysplastic syndromes." [NCIT:C27134]
+synonym: "haematological neoplasm" EXACT OMO:0003005 []
+synonym: "haematological tumour" EXACT OMO:0003005 []
+synonym: "haematopoietic and lymphoid neoplasms" EXACT OMO:0003005 []
+synonym: "haematopoietic cancer" EXACT OMO:0003005 []
+synonym: "haematopoietic cell tumour" EXACT OMO:0003005 []
+synonym: "haematopoietic malignancy, NOS" EXACT OMO:0003005 []
+synonym: "haematopoietic neoplasm" EXACT OMO:0003005 []
+synonym: "haematopoietic neoplasms including lymphomas" EXACT OMO:0003005 []
+synonym: "haematopoietic tumour" EXACT OMO:0003005 []
+synonym: "hematologic cancer" EXACT [NCIT:C27134]
+synonym: "hematologic malignancy" EXACT [NCIT:C27134]
+synonym: "hematologic neoplasm" EXACT [NCIT:C27134]
+synonym: "hematological neoplasm" EXACT [NCIT:C27134]
+synonym: "hematological tumor" EXACT [NCIT:C27134]
+synonym: "hematopoietic and lymphoid cell neoplasm" EXACT [NCIT:C27134]
+synonym: "hematopoietic and lymphoid neoplasms" EXACT [NCIT:C27134]
+synonym: "hematopoietic cancer" EXACT [NCIT:C27134]
+synonym: "hematopoietic cell tumor" EXACT [NCIT:C27134]
+synonym: "hematopoietic malignancy, NOS" EXACT [NCIT:C27134]
+synonym: "hematopoietic neoplasm" EXACT [NCIT:C27134]
+synonym: "hematopoietic neoplasms including lymphomas" EXACT [NCIT:C27134]
+synonym: "hematopoietic tumor" EXACT [NCIT:C27134]
+synonym: "hematopoietic, Including myeloma" EXACT [NCIT:C27134]
+synonym: "HEMOLYMPHORETICULAR tumor, malignant" EXACT [NCIT:C27134]
+synonym: "malignant haematopoietic neoplasm" EXACT OMO:0003005 []
+synonym: "malignant hematologic neoplasm" EXACT [NCIT:C27134]
+synonym: "malignant hematopoietic neoplasm" EXACT [NCIT:C27134]
+xref: NCIT:C27134
+is_a: MONDO:0002334
+property_value: exactMatch NCIT:C27134
+
+[Term]
+id: MONDO:0045024
+name: cancer or benign tumor
+def: "Any disorder that features disrupted cell proliferation. Includes hyperplasia, neoplastic syndrome and isolated neoplasm diseases as well as precancerous conditions." [MONDO:cjm]
+subset: harrisons_view
+subset: rare_grouping
+synonym: "cell proliferation disorder" EXACT [https://orcid.org/0000-0002-4142-7153]
+synonym: "neoplasm" NARROW [https://www.cancer.gov/publications/dictionaries/cancer-terms/def/neoplasm]
+is_a: MONDO:0700096
+union_of: MONDO:0005043
+union_of: MONDO:0021074
+union_of: MONDO:0023370
+union_of: MONDO:0045054
+
+[Term]
+id: MONDO:0700096
+name: human disease
+subset: rare_grouping
+synonym: "human disease or disorder" EXACT [https://orcid.org/0000-0001-5208-3432]
+is_a: MONDO:0000001
+property_value: http://purl.org/dc/terms/creator https://orcid.org/0000-0002-4142-7153
+property_value: IAO:0000233 "https://github.com/monarch-initiative/mondo/issues/5858" xsd:anyURI
+property_value: RO:0002175 NCBITaxon:9606
+
+[Typedef]
+id: MONDO:0100332
+name: disease has primary infectious agent
+property_value: http://purl.org/dc/terms/creator https://orcid.org/0000-0001-5208-3432
+is_a: disease_has_infectious_agent
+
+[Typedef]
+id: MONDO:0100333
+name: disease caused by reactivation of latent infectious agent
+property_value: http://purl.org/dc/terms/creator https://orcid.org/0000-0001-5208-3432
+is_a: disease_has_infectious_agent
+
+[Typedef]
+id: disease_arises_from_feature
+name: disease arises from feature
+xref: RO:0004022
+
+[Typedef]
+id: disease_arises_from_structure
+name: disease arises from structure
+xref: RO:0004030
+
+[Typedef]
+id: disease_causes_dysfunction_of
+name: disease causes dysfunction of
+xref: RO:0004025
+
+[Typedef]
+id: disease_causes_feature
+name: disease causes feature
+
+[Typedef]
+id: disease_disrupts
+name: disease disrupts
+xref: RO:0004024
+
+[Typedef]
+id: disease_has_basis_in_accumulation_of
+name: disease has basis in accumulation of
+
+[Typedef]
+id: disease_has_basis_in_development_of
+name: disease_has_basis_in_development_of
+
+[Typedef]
+id: disease_has_basis_in_disruption_of
+name: disease caused by disruption of
+comment: Editor note: TODO property chain: disease_has_location <- dhbido o occurs_in
+xref: RO:0004021
+is_a: disease_disrupts
+
+[Typedef]
+id: disease_has_basis_in_dysfunction_of
+name: disease has basis in dysfunction of
+xref: RO:0004020
+
+[Typedef]
+id: disease_has_feature
+name: disease has feature
+xref: RO:0004029
+
+[Typedef]
+id: disease_has_infectious_agent
+name: disease has infectious agent
+xref: RO:0014001
+
+[Typedef]
+id: disease_has_inflammation_site
+name: disease has inflammation site
+xref: RO:0004027
+
+[Typedef]
+id: disease_has_location
+name: disease has location
+xref: RO:0004026
+
+[Typedef]
+id: disease_has_major_feature
+name: disease has major feature
+is_a: disease_has_feature
+
+[Typedef]
+id: disease_responds_to
+name: disease responds to
+
+[Typedef]
+id: disease_shares_features_of
+name: disease shares features of
+
+[Typedef]
+id: disease_triggers
+name: disease triggers
+
+[Typedef]
+id: excluded_subClassOf
+name: excluded subClassOf
+is_metadata_tag: true
+
+[Typedef]
+id: has_characteristic
+name: has characteristic
+xref: RO:0000053
+
+[Typedef]
+id: has_exclusion_reason
+name: has exclusion reason
+property_value: http://purl.org/dc/terms/creator https://orcid.org/0000-0001-5208-3432
+is_metadata_tag: true
+
+[Typedef]
+id: has_material_basis_in_germline_mutation_in
+name: has material basis in germline mutation in
+xref: RO:0004003
+
+[Typedef]
+id: has_onset
+name: has onset
+
+[Typedef]
+id: has_onset_before
+name: has_onset_before
+
+[Typedef]
+id: has_onset_during_or_after
+name: has_onset_during_or_after
+
+[Typedef]
+id: in_taxon
+name: in taxon
+xref: RO:0002162
+
+[Typedef]
+id: may_be_merged_into
+name: may_be_merged_into
+is_metadata_tag: true
+
+[Typedef]
+id: never_in_taxon
+name: never in taxon
+xref: RO:0002161
+is_metadata_tag: true
+is_class_level: true
+
+[Typedef]
+id: object_label
+name: object_label
+xref: https://w3id.org/sssom/object_label
+is_metadata_tag: true
+is_class_level: true
+
+[Typedef]
+id: part_of_progression_of_disease
+name: part of progression of disease
+
+[Typedef]
+id: predisposes_towards
+name: predisposes towards
+
+[Typedef]
+id: realized_in
+name: realized in
+xref: BFO:0000054
+
+[Typedef]
+id: realized_in_response_to
+name: realized in response to
+xref: RO:0009501
+
+[Typedef]
+id: realized_in_response_to_stimulus
+name: realized in response to stimulus
+xref: RO:0004028
+
+[Typedef]
+id: seeAlso
+name: seeAlso
+xref: http://www.w3.org/2000/01/rdf-schema#seeAlso
+is_metadata_tag: true
+is_class_level: true
+
+[Typedef]
+id: transmitted_by
+name: transmitted by
+xref: RO:0002451

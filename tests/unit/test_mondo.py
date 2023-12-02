@@ -21,6 +21,8 @@ def neuroblastoma():
             "concept_id": "mondo:0005072",
             "label": "neuroblastoma",
             "aliases": [
+                "NB",
+                "neuroblastoma",
                 "neural Crest tumor, malignant",
                 "neuroblastoma (Schwannian Stroma-poor)",
                 "neuroblastoma, malignant",

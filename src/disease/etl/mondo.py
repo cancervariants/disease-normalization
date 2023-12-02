@@ -1,7 +1,8 @@
 """Module to load disease data from Mondo Disease Ontology."""
 import logging
+import re
 from collections import defaultdict
-from typing import DefaultDict, Optional, Set
+from typing import DefaultDict, Dict, Optional, Set, Tuple
 
 import fastobo
 
@@ -43,7 +44,7 @@ class Mondo(Base):
             _logger.warning(f"Unrecognized namespace: {xref.id.prefix}")
             print(xref)
             return None
-        return f"{prefix}:{xref.id.local}"
+        return f"{prefix.value}:{xref.id.local}"
 
     def _construct_dependency_set(self, dag: DefaultDict, parent: str) -> Set[str]:
         """Recursively get all children concepts for a term
@@ -57,6 +58,97 @@ class Mondo(Base):
         for child in dag[parent]:
             children |= self._construct_dependency_set(dag, child)
         return children
+
+    _identifiers_url_pattern = r"http://identifiers.org/(.*)/(.*)"
+    _lui_patterns = [
+        (NamespacePrefix.OMIMPS, r"https://omim.org/phenotypicSeries/(.*)"),
+        (NamespacePrefix.OMIM, r"https://omim.org/entry/(.*)"),
+        (NamespacePrefix.UMLS, r"http://linkedlifedata.com/resource/umls/id/(.*)"),
+        (NamespacePrefix.ICD10CM, r"http://purl.bioontology.org/ontology/ICD10CM/(.*)"),
+        (NamespacePrefix.ICD10, r"https://icd.who.int/browse10/2019/en#/(.*)"),
+    ]
+
+    def _get_xref_from_url(self, url: str) -> Optional[Tuple[NamespacePrefix, str]]:
+        """Extract prefix and LUI from URL reference.
+
+        :param url: url string given as URL xref property
+        :return: prefix enum instance and LUI
+        """
+        if url.startswith("http://identifiers.org"):
+            match = re.match(self._identifiers_url_pattern, url)
+            if not match or not match.groups():
+                raise ValueError(f"Couldn't parse identifiers.org URL: {url}")
+            if match.groups()[0] == "snomedct":
+                return None
+            prefix = NamespacePrefix[match.groups()[0].upper()]
+            return (prefix, match.groups()[1])
+        for prefix, pattern in self._lui_patterns:
+            match = re.match(pattern, url)
+            if match and match.groups():
+                return (prefix, match.groups()[0])
+        # didn't match any patterns
+        _logger.warning(f"Unrecognized URL for xref: {url}")
+        return None
+
+    def _process_term_frame(self, frame: fastobo.term.TermFrame) -> Dict:
+        """Extract disease params from an OBO term frame.
+
+        :param frame: individual frame from OBO file
+        :return: disease params as a dictionary
+        """
+        params = {
+            "concept_id": str(frame.id).lower(),
+            "aliases": [],
+            "xrefs": [],
+            "associated_with": [],
+        }
+
+        for clause in frame:
+            tag = clause.raw_tag()
+            if tag == "name":
+                params["label"] = clause.raw_value()
+            elif tag == "synonym":
+                params["aliases"].append(clause.synonym.desc)
+            elif tag == "xref":
+                if clause.xref.id.prefix == "ONCOTREE":
+                    params["xrefs"].append(
+                        f"{NamespacePrefix.ONCOTREE.value}:{clause.xref.id.local}"
+                    )
+            elif tag == "property_value":
+                property_value = clause.property_value
+                if (
+                    not isinstance(property_value, fastobo.pv.ResourcePropertyValue)
+                    or not isinstance(
+                        property_value.relation, fastobo.id.UnprefixedIdent
+                    )
+                    or property_value.relation.unescaped
+                    not in ("exactMatch", "equivalentTo")
+                ):
+                    continue
+                if isinstance(property_value.value, fastobo.id.Url):
+                    xref_result = self._get_xref_from_url(str(property_value.value))
+                    if xref_result is None:
+                        continue
+                    prefix, local_id = xref_result
+                elif isinstance(property_value.value, fastobo.id.PrefixedIdent):
+                    prefix = NamespacePrefix[property_value.value.prefix.upper()]
+                    local_id = property_value.value.local
+                else:
+                    _logger.warning(
+                        f"Unrecognized property value type: {type(property_value.value)}"
+                    )
+                    continue
+                xref = f"{prefix.value}:{local_id}"
+                if prefix in (
+                    NamespacePrefix.OMIM,
+                    NamespacePrefix.NCIT,
+                    NamespacePrefix.DO,
+                    NamespacePrefix.ONCOTREE,
+                ):
+                    params["xrefs"].append(xref)
+                else:
+                    params["associated_with"].append(xref)
+        return params
 
     def _transform_data(self) -> None:
         """Get data from file and send disease records to database."""
@@ -79,21 +171,7 @@ class Mondo(Base):
             if concept_id.upper() not in diseases:
                 continue
 
-            params = {
-                "concept_id": str(item.id).lower(),
-                "aliases": [],
-                "xrefs": [],
-            }
-            for clause in item:
-                tag = clause.raw_tag()
-                if tag == "name":
-                    params["label"] = clause.raw_value()
-                elif tag == "synonym":
-                    params["aliases"].append(clause.synonym.desc)
-                elif tag == "xref":
-                    xref = self._process_xref(clause.xref)
-                    if xref:
-                        params["xrefs"].append(xref)
+            params = self._process_term_frame(item)
 
             if concept_id.upper() in pediatric_diseases:
                 params["pediatric_disease"] = True

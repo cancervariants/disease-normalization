@@ -1,7 +1,6 @@
 """Pytest test config tools."""
 import logging
 import os
-import tarfile
 from pathlib import Path
 from typing import List, Optional
 
@@ -11,7 +10,7 @@ from disease.database import AWS_ENV_VAR_NAME, create_db
 from disease.database.database import AbstractDatabase
 from disease.etl.base import Base
 from disease.query import QueryHandler
-from disease.schemas import Disease, MatchType, SourceName, SourceSearchMatches
+from disease.schemas import Disease, MatchType, SourceSearchMatches
 
 _logger = logging.getLogger(__name__)
 
@@ -90,27 +89,27 @@ def database():
     db.close_connection()
 
 
-def decompress_mondo_tar():
-    """Mondo fixture data was hard to subset down to a reasonably commmit-able size, so
-    it's stored as a tarball instead. We'll need to decompress it.
-
-    This method expects to find a single tarball in the test mondo directory. If
-    there's already a decompressed OWL file there too, it won't do any redundant work.
-    This does mean that you might have to manually delete your local copy of the OWL
-    file if a new version of the tarfile is committed to the repo.
-    """
-    mondo_data_dir = TEST_DATA_DIRECTORY / "mondo"
-    if len(list(mondo_data_dir.glob("mondo_*.owl"))) > 0:
-        return
-    tarball = list(mondo_data_dir.glob("fixture_mondo_*.owl.tar.gz"))[0]
-    with tarfile.open(tarball, "r:gz") as tar:
-        for member in tar.getmembers():
-            if member.name.endswith(".owl"):
-                member.name = os.path.basename(member.name)
-                tar.extract(member, path=mondo_data_dir)
-                break
-        else:
-            raise FileNotFoundError("Unable to find compressed Mondo OWL file")
+# def decompress_mondo_tar():
+#     """Mondo fixture data was hard to subset down to a reasonably commmit-able size, so
+#     it's stored as a tarball instead. We'll need to decompress it.
+#
+#     This method expects to find a single tarball in the test mondo directory. If
+#     there's already a decompressed OWL file there too, it won't do any redundant work.
+#     This does mean that you might have to manually delete your local copy of the OWL
+#     file if a new version of the tarfile is committed to the repo.
+#     """
+#     mondo_data_dir = TEST_DATA_DIRECTORY / "mondo"
+#     if len(list(mondo_data_dir.glob("mondo_*.owl"))) > 0:
+#         return
+#     tarball = list(mondo_data_dir.glob("fixture_mondo_*.owl.tar.gz"))[0]
+#     with tarfile.open(tarball, "r:gz") as tar:
+#         for member in tar.getmembers():
+#             if member.name.endswith(".owl"):
+#                 member.name = os.path.basename(member.name)
+#                 tar.extract(member, path=mondo_data_dir)
+#                 break
+#         else:
+#             raise FileNotFoundError("Unable to find compressed Mondo OWL file")
 
 
 @pytest.fixture(scope="module")
@@ -130,8 +129,8 @@ def test_source(database: AbstractDatabase, is_test_env: bool):
             test_class = EtlClass(
                 database, TEST_DATA_DIRECTORY / EtlClass.__name__.lower()
             )  # type: ignore
-            if EtlClass.__name__ == SourceName.MONDO:  # type: ignore
-                decompress_mondo_tar()
+            # if EtlClass.__name__ == SourceName.MONDO:  # type: ignore
+            #     decompress_mondo_tar()
             test_class.perform_etl(use_existing=True)
 
         class QueryGetter:
