@@ -31,6 +31,19 @@ class Mondo(Base):
         )
         self._database.add_source_metadata(self._src_name, metadata)
 
+    def _construct_dependency_set(self, dag: DefaultDict, parent: str) -> Set[str]:
+        """Recursively get all children concepts for a term
+
+        :param dag: dictionary where keys are ontology terms and values are lists of
+            terms with ``is_a`` relationships to the parent
+        :param parent: term to fetch children for
+        :return: Set of children concepts
+        """
+        children = {parent}
+        for child in dag[parent]:
+            children |= self._construct_dependency_set(dag, child)
+        return children
+
     @staticmethod
     def _process_xref(xref: fastobo.xref.Xref) -> Optional[str]:
         """From xref clause, format xref concept ID
@@ -45,19 +58,6 @@ class Mondo(Base):
             print(xref)
             return None
         return f"{prefix.value}:{xref.id.local}"
-
-    def _construct_dependency_set(self, dag: DefaultDict, parent: str) -> Set[str]:
-        """Recursively get all children concepts for a term
-
-        :param dag: dictionary where keys are ontology terms and values are lists of
-            terms with ``is_a`` relationships to the parent
-        :param parent: term to fetch children for
-        :return: Set of children concepts
-        """
-        children = {parent}
-        for child in dag[parent]:
-            children |= self._construct_dependency_set(dag, child)
-        return children
 
     _identifiers_url_pattern = r"http://identifiers.org/(.*)/(.*)"
     _lui_patterns = [
@@ -110,6 +110,29 @@ class Mondo(Base):
             elif tag == "synonym":
                 params["aliases"].append(clause.synonym.desc)
             elif tag == "xref":
+                raw_prefix = clause.xref.id.prefix
+                if raw_prefix not in (
+                    "ONCOTREE",
+                ):  # get xrefs not found in property value fields
+                    continue
+                try:
+                    prefix = NamespacePrefix[clause.xref.id.prefix.upper()]
+                except KeyError:
+                    _logger.warning(
+                        f"Unable to parse namespace prefix for {clause.xref}"
+                    )
+                    continue
+                xref = f"{prefix.value}:{clause.xref.id.local}"
+                if prefix in (
+                    NamespacePrefix.OMIM,
+                    NamespacePrefix.NCIT,
+                    NamespacePrefix.DO,
+                    NamespacePrefix.ONCOTREE,
+                ):
+                    params["xrefs"].append(xref)
+                else:
+                    params["associated_with"].append(xref)
+
                 if clause.xref.id.prefix == "ONCOTREE":
                     params["xrefs"].append(
                         f"{NamespacePrefix.ONCOTREE.value}:{clause.xref.id.local}"
