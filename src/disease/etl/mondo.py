@@ -44,21 +44,6 @@ class Mondo(Base):
             children |= self._construct_dependency_set(dag, child)
         return children
 
-    @staticmethod
-    def _process_xref(xref: fastobo.xref.Xref) -> Optional[str]:
-        """From xref clause, format xref concept ID
-
-        :param xref: xref clause from OBO file frame
-        :return: processed xref string if namespace is recognized
-        """
-        try:
-            prefix = NamespacePrefix[xref.id.prefix.upper()]
-        except KeyError:
-            _logger.warning(f"Unrecognized namespace: {xref.id.prefix}")
-            print(xref)
-            return None
-        return f"{prefix.value}:{xref.id.local}"
-
     _identifiers_url_pattern = r"http://identifiers.org/(.*)/(.*)"
     _lui_patterns = [
         (NamespacePrefix.OMIMPS, r"https://omim.org/phenotypicSeries/(.*)"),
