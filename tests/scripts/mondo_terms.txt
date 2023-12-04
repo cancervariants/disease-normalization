@@ -1,8 +1,0 @@
-http://purl.obolibrary.org/obo/MONDO_0005072
-http://purl.obolibrary.org/obo/MONDO_0002083
-http://purl.obolibrary.org/obo/MONDO_0003587
-http://purl.obolibrary.org/obo/MONDO_0004099
-http://purl.obolibrary.org/obo/MONDO_0005233
-http://purl.obolibrary.org/obo/MONDO_0010648
-http://purl.obolibrary.org/obo/MONDO_0009539
-http://purl.obolibrary.org/obo/MONDO_0013108
