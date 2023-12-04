@@ -90,6 +90,65 @@ class Mondo(Base):
         _logger.warning(f"Unrecognized URL for xref: {url}")
         return None
 
+    @staticmethod
+    def _get_xref_from_xref_clause(
+        clause: fastobo.term.XrefClause
+    ) -> Optional[Tuple[NamespacePrefix, str]]:
+        """Get dbXref from xref clause.
+
+        In the Mondo OBO distribution, some xrefs only show up in explicit xref clauses.
+        This method processes them.
+
+        :param clause: xref clause from term frame
+        :return: prefix and local ID if available
+        """
+        raw_prefix = clause.xref.id.prefix
+        if raw_prefix not in (
+            "ONCOTREE",
+            "EFO",
+        ):
+            return None
+        try:
+            prefix = NamespacePrefix[clause.xref.id.prefix.upper()]
+        except KeyError:
+            _logger.warning(f"Unable to parse namespace prefix for {clause.xref}")
+            return None
+        local_id = clause.xref.id.local
+        return prefix, local_id
+
+    def _get_xref_from_pv_clause(
+        self, clause: fastobo.term.PropertyValueClause
+    ) -> Optional[Tuple[NamespacePrefix, str]]:
+        """Get dbXref from property value clause.
+
+        These are a bit more semantically rich than the Mondo xref clauses, so for now,
+        we prefer to fetch most references from here.
+
+        :param clause: property value clause
+        :return: prefix and local ID if available
+        """
+        property_value = clause.property_value
+        if (
+            not isinstance(property_value, fastobo.pv.ResourcePropertyValue)
+            or not isinstance(property_value.relation, fastobo.id.UnprefixedIdent)
+            or property_value.relation.unescaped not in ("exactMatch", "equivalentTo")
+        ):
+            return None
+        if isinstance(property_value.value, fastobo.id.Url):
+            xref_result = self._get_xref_from_url(str(property_value.value))
+            if xref_result is None:
+                return None
+            prefix, local_id = xref_result
+        elif isinstance(property_value.value, fastobo.id.PrefixedIdent):
+            prefix = NamespacePrefix[property_value.value.prefix.upper()]
+            local_id = property_value.value.local
+        else:
+            _logger.warning(
+                f"Unrecognized property value type: {type(property_value.value)}"
+            )
+            return None
+        return prefix, local_id
+
     def _process_term_frame(self, frame: fastobo.term.TermFrame) -> Dict:
         """Extract disease params from an OBO term frame.
 
@@ -109,68 +168,25 @@ class Mondo(Base):
                 params["label"] = clause.raw_value()
             elif tag == "synonym":
                 params["aliases"].append(clause.synonym.desc)
-            elif tag == "xref":
-                raw_prefix = clause.xref.id.prefix
-                if raw_prefix not in (
-                    "ONCOTREE",
-                ):  # get xrefs not found in property value fields
-                    continue
-                try:
-                    prefix = NamespacePrefix[clause.xref.id.prefix.upper()]
-                except KeyError:
-                    _logger.warning(
-                        f"Unable to parse namespace prefix for {clause.xref}"
-                    )
-                    continue
-                xref = f"{prefix.value}:{clause.xref.id.local}"
-                if prefix in (
-                    NamespacePrefix.OMIM,
-                    NamespacePrefix.NCIT,
-                    NamespacePrefix.DO,
-                    NamespacePrefix.ONCOTREE,
-                ):
-                    params["xrefs"].append(xref)
+            elif tag in ("xref", "property_value"):
+                if tag == "xref":
+                    xref = self._get_xref_from_xref_clause(clause)
                 else:
-                    params["associated_with"].append(xref)
+                    xref = self._get_xref_from_pv_clause(clause)
+                if not xref:
+                    continue
+                prefix, local_id = xref
 
-                if clause.xref.id.prefix == "ONCOTREE":
-                    params["xrefs"].append(
-                        f"{NamespacePrefix.ONCOTREE.value}:{clause.xref.id.local}"
-                    )
-            elif tag == "property_value":
-                property_value = clause.property_value
-                if (
-                    not isinstance(property_value, fastobo.pv.ResourcePropertyValue)
-                    or not isinstance(
-                        property_value.relation, fastobo.id.UnprefixedIdent
-                    )
-                    or property_value.relation.unescaped
-                    not in ("exactMatch", "equivalentTo")
-                ):
-                    continue
-                if isinstance(property_value.value, fastobo.id.Url):
-                    xref_result = self._get_xref_from_url(str(property_value.value))
-                    if xref_result is None:
-                        continue
-                    prefix, local_id = xref_result
-                elif isinstance(property_value.value, fastobo.id.PrefixedIdent):
-                    prefix = NamespacePrefix[property_value.value.prefix.upper()]
-                    local_id = property_value.value.local
-                else:
-                    _logger.warning(
-                        f"Unrecognized property value type: {type(property_value.value)}"
-                    )
-                    continue
-                xref = f"{prefix.value}:{local_id}"
+                curie = f"{prefix.value}:{local_id}"
                 if prefix in (
                     NamespacePrefix.OMIM,
                     NamespacePrefix.NCIT,
                     NamespacePrefix.DO,
                     NamespacePrefix.ONCOTREE,
                 ):
-                    params["xrefs"].append(xref)
+                    params["xrefs"].append(curie)
                 else:
-                    params["associated_with"].append(xref)
+                    params["associated_with"].append(curie)
         return params
 
     def _transform_data(self) -> None:
