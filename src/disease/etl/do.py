@@ -52,7 +52,7 @@ class DO(OWLBase):
             if disease_class.deprecated:
                 continue
 
-            concept_id = f"{NamespacePrefix.DOID.value}:{uri.split('_')[-1]}"
+            concept_id = f"{NamespacePrefix.DO.value}:{uri.split('_')[-1]}"
             label = disease_class.label[0]
 
             synonyms = disease_class.hasExactSynonym
