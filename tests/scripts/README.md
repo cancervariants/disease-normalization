@@ -11,7 +11,7 @@ Most of them use a `TEST_IDS` constant to define data points to include (NCIt is
 
 ### ROBOT
 
-We use [ROBOT](http://robot.obolibrary.org/) to generate fixtures for Mondo and DO. There's some basic scripting to acquire the requisite files, but if it's not working, this is basically the idea:
+We use [ROBOT](http://robot.obolibrary.org/) to generate fixtures for DO. There's some basic scripting to acquire the requisite files, but if it's not working, this is basically the idea:
 
 1) Navigate to the `tests/scripts` directory
 
