@@ -52,10 +52,6 @@ def neuroblastoma():
                     "relation": "relatedMatch",
                 },
                 {
-                    "coding": {"code": "0007185", "system": "gard"},
-                    "relation": "relatedMatch",
-                },
-                {
                     "coding": {"code": "D009447", "system": "mesh"},
                     "relation": "relatedMatch",
                 },
@@ -73,6 +69,7 @@ def neuroblastoma():
                 },
             ],
             "aliases": [
+                "NB",
                 "neuroblastoma",
                 "Neural Crest Tumor, Malignant",
                 "Neuroblastoma (Schwannian Stroma-poor)",
@@ -121,6 +118,11 @@ def mafd2():
                 "BIPOLAR AFFECTIVE DISORDER",
                 "MANIC-DEPRESSIVE PSYCHOSIS, X-LINKED",
                 "major affective disorder 2, X-linked dominant",
+                "MAJOR affective disorder 2",
+                "bipolar affective disorder",
+                "major affective disorder 2",
+                "manic-depressive illness",
+                "manic-depressive psychosis, X-linked",
             ],
             "mappings": [
                 {

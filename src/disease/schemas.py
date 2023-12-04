@@ -49,7 +49,8 @@ class NamespacePrefix(Enum):
     # built-in sources
     NCIT = "ncit"
     MONDO = "mondo"
-    DO = "DOID"
+    DOID = "DOID"
+    DO = DOID
     OMIM = "omim"
     ONCOTREE = "oncotree"
     # external sources
@@ -57,10 +58,12 @@ class NamespacePrefix(Enum):
     DECIPHER = "decipher"
     EFO = "efo"
     GARD = "gard"
-    HPO = "HP"
+    HP = "HP"
+    HPO = HP
     ICD9 = "icd9"
     ICD9CM = "icd9.cm"
     ICD10 = "icd10"
+    ICD10WHO = ICD10
     ICD10CM = "icd10.cm"
     ICD11 = "icd11"
     ICDO = "icdo"

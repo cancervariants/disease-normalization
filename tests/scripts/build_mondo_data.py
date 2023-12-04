@@ -1,75 +1,69 @@
-"""Construct test data for Mondo source.
-
-This saves a tar file named `fixture_mondo_XXXX-XX-XX.ow.tar.gz` in the test data
-directory, because the OWL output is still too large to commit to the repo. Methods
-using it should a) make sure to check for files with the `fixture_` prefix, and b)
-remember to decompress it.
-"""
-import os
-import subprocess
-import tarfile
-from http import HTTPStatus
+"""Construct test data for Mondo source."""
+from collections import defaultdict
 from pathlib import Path
+from typing import DefaultDict, Set
 
-import requests
+import fastobo
 
 from disease.database import create_db
 from disease.etl import Mondo
 
 mondo = Mondo(create_db())
 mondo._extract_data()
-
-infile = mondo._data_file.absolute()
+infile = str(mondo._data_file.absolute())
 
 scripts_dir = Path(__file__).resolve().parent
 test_data_dir = scripts_dir.parent / "data" / "mondo"
 
-robot_file = scripts_dir / "robot"
-if not robot_file.exists():
-    response = requests.get(
-        "https://raw.githubusercontent.com/ontodev/robot/master/bin/robot"
-    )
-    if response.status_code != HTTPStatus.OK:
-        raise requests.HTTPError("Couldn't acquire robot script")
-    with open(robot_file, "wb") as f:
-        f.write(response.content)
-    try:
-        os.chmod(robot_file, 0o755)
-    except PermissionError:
-        pass  # handle below
-if not os.access(robot_file, os.X_OK):
-    raise PermissionError(
-        "robot file isn't executable by the user -- see 'getting started': http://robot.obolibrary.org/"  # noqa: E501
-    )
+reader = fastobo.iter(infile)
+dag = defaultdict(list)
+for frame in reader:
+    item_id = str(frame.id)
+    for clause in frame:
+        if clause.raw_tag() == "is_a":
+            dag[item_id].append(clause.raw_value())
 
-robot_jar = scripts_dir / "robot.jar"
-if not robot_jar.exists():
-    response = requests.get(
-        "https://api.github.com/repos/ontodev/robot/releases/latest"
-    )
-    if response.status_code != HTTPStatus.OK:
-        raise requests.HTTPError("Couldn't get ROBOT release info from GitHub")
-    json = response.json()
-    assert json["assets"][0]["name"] == "robot.jar"
-    jar_url = json["assets"][0]["url"]
-    jar_response = requests.get(jar_url)
-    if jar_response.status_code != HTTPStatus.OK:
-        raise requests.HTTPError("Couldn't download ROBOT JAR from GitHub")
-    with open(robot_jar, "wb") as f:
-        f.write(jar_response.content)
 
-terms_file = scripts_dir / "mondo_terms.txt"
-if not terms_file.exists():
-    raise FileNotFoundError("Could not find mondo_terms.txt")
+def construct_inheritance_set(dag: DefaultDict, child: str) -> Set[str]:
+    """Get IDs for concepts that a child concept inherits from
+
+    :param dag: dictionary keying IDs to parent concepts
+    :param child: concept to fetch parents of
+    :return: set of parent concepts
+    """
+    parents = {child}
+    for parent in dag[child]:
+        parents |= construct_inheritance_set(dag, parent)
+    return parents
+
+
+relevant_terms = set()
+for term in (
+    "MONDO:0005072",
+    "MONDO:0002083",
+    "MONDO:0003587",
+    "MONDO:0004099",
+    "MONDO:0005233",
+    "MONDO:0010648",
+    "MONDO:0009539",
+    "MONDO:0013108",
+    "MONDO:0013082",
+):
+    relevant_terms |= construct_inheritance_set(dag, term)
 
 outfile = test_data_dir / mondo._data_file.name
 outfile.parent.mkdir(exist_ok=True)
-cmd_str = f"{robot_file} extract --method star --input {infile} --term-file {terms_file} --output {outfile}"  # noqa: E501
+with open(outfile, "w") as f:
+    doc = fastobo.load(infile)
+    f.write(str(doc.header))
+    f.write("\n")
 
-subprocess.run(cmd_str, shell=True)
-
-# save compressed file as `fixture_mondo_XXXX-XX-XX.owl.tar.gz`
-tarball = outfile.parent / f"fixture_{outfile.name}.tar.gz"
-
-with tarfile.open(tarball, "w:gz") as tar:
-    tar.add(outfile, arcname=outfile.name)
+    reader = fastobo.iter(infile)
+    for frame in reader:
+        if isinstance(frame, fastobo.term.TermFrame):
+            if str(frame.id) in relevant_terms:
+                f.write(str(frame))
+                f.write("\n")
+        else:
+            f.write(str(frame))
+            f.write("\n")

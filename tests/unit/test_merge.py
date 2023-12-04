@@ -48,6 +48,7 @@ def neuroblastoma():
         "xrefs": ["mondo:0005072", "oncotree:NBL", "DOID:769"],
         "label": "Neuroblastoma",
         "aliases": [
+            "NB",
             "neuroblastoma",
             "Neural Crest Tumor, Malignant",
             "Neuroblastoma (Schwannian Stroma-poor)",
@@ -61,7 +62,6 @@ def neuroblastoma():
         ],
         "associated_with": [
             "efo:0000621",
-            "gard:0007185",
             "gard:7185",
             "icdo:9500/3",
             "mesh:D009447",
@@ -129,7 +129,6 @@ def richter():
         ],
         "associated_with": [
             "umls:C0349631",
-            "gard:0007578",
             "gard:7578",
             "icd10.cm:C91.1",
         ],
@@ -145,6 +144,7 @@ def ped_liposarcoma():
         "xrefs": ["mondo:0003587", "DOID:5695"],
         "label": "Childhood Liposarcoma",
         "aliases": [
+            "liposarcoma",
             "Liposarcoma",
             "Pediatric Liposarcoma",
             "childhood liposarcoma",
@@ -163,7 +163,11 @@ def teratoma():
         "concept_id": "ncit:C9012",
         "xrefs": ["mondo:0004099", "DOID:7079"],
         "label": "Adult Cystic Teratoma",
-        "aliases": ["Adult cystic teratoma", "cystic teratoma of adults"],
+        "aliases": [
+            "Adult cystic teratoma",
+            "cystic teratoma of adults",
+            "adult cystic teratoma",
+        ],
         "associated_with": ["icdo:9080/0", "umls:C1368888"],
         "item_type": "merger",
     }
@@ -187,6 +191,11 @@ def mafd2():
             "MDI",
             "MDX",
             "major affective disorder 2, X-linked dominant",
+            "MAJOR affective disorder 2",
+            "bipolar affective disorder",
+            "major affective disorder 2",
+            "manic-depressive illness",
+            "manic-depressive psychosis, X-linked",
         ],
         "xrefs": [
             "omim:309200",

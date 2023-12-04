@@ -1,59 +1,18 @@
 """Module to load disease data from Mondo Disease Ontology."""
-from itertools import groupby
-from typing import Dict, List, Optional
+import logging
+import re
+from collections import defaultdict
+from typing import DefaultDict, Dict, Optional, Set, Tuple
 
-import owlready2 as owl
-from owlready2.rdflib_store import TripleLiteRDFlibGraph as RDFGraph
+import fastobo
 
-from disease import PREFIX_LOOKUP, logger
+from disease.etl.base import Base
 from disease.schemas import NamespacePrefix, SourceMeta
 
-from .base import OWLBase
-
-MONDO_PREFIX_LOOKUP = {
-    "http://purl.obolibrary.org/obo/MONDO": NamespacePrefix.MONDO.value,
-    # xref
-    "http://purl.obolibrary.org/obo/DOID": NamespacePrefix.DO.value,
-    "DOID": NamespacePrefix.DO.value,
-    "https://omim.org/entry": NamespacePrefix.OMIM.value,
-    "OMIM": NamespacePrefix.OMIM.value,
-    "http://purl.obolibrary.org/obo/NCIT": NamespacePrefix.NCIT.value,
-    "NCIT": NamespacePrefix.NCIT.value,
-    "ONCOTREE": NamespacePrefix.ONCOTREE.value,
-    # associated_with
-    "SCDO": NamespacePrefix.SCDO.value,
-    "Orphanet": NamespacePrefix.ORPHANET.value,
-    "http://www.orpha.net/ORDO/Orphanet": NamespacePrefix.ORPHANET.value,
-    "UMLS": NamespacePrefix.UMLS.value,
-    "http://linkedlifedata.com/resource/umls/id": NamespacePrefix.UMLS.value,
-    "https://omim.org/phenotypicSeries": NamespacePrefix.OMIMPS.value,
-    "http://purl.bioontology.org/ontology/ICD10CM": NamespacePrefix.ICD10CM.value,
-    "efo": NamespacePrefix.EFO.value,
-    "EFO": NamespacePrefix.EFO.value,
-    "GARD": NamespacePrefix.GARD.value,
-    "HP": NamespacePrefix.HPO.value,
-    "ICD9": NamespacePrefix.ICD9.value,
-    "ICD9CM": NamespacePrefix.ICD9CM.value,
-    "ICD10WHO": NamespacePrefix.ICD10.value,
-    "https://icd.who.int/browse10/2019/en#": NamespacePrefix.ICD10.value,
-    "ICD10CM": NamespacePrefix.ICD10CM.value,
-    "ICD11": NamespacePrefix.ICD11.value,
-    "DECIPHER": NamespacePrefix.DECIPHER.value,
-    "MEDGEN": NamespacePrefix.MEDGEN.value,
-    "http://identifiers.org/medgen": NamespacePrefix.MEDGEN.value,
-    "MESH": NamespacePrefix.MESH.value,
-    "http://identifiers.org/mesh": NamespacePrefix.MESH.value,
-    "MPATH": NamespacePrefix.MPATH.value,
-    "MedDRA": NamespacePrefix.MEDDRA.value,
-    "http://identifiers.org/meddra": NamespacePrefix.MEDDRA.value,
-    "OBI": NamespacePrefix.OBI.value,
-    "OGMS": NamespacePrefix.OGMS.value,
-    "OMIMPS": NamespacePrefix.OMIMPS.value,
-    "Wikidata": NamespacePrefix.WIKIDATA.value,
-}
+_logger = logging.getLogger(__name__)
 
 
-class Mondo(OWLBase):
+class Mondo(Base):
     """Gather and load data from Mondo."""
 
     def _load_meta(self) -> None:
@@ -72,112 +31,173 @@ class Mondo(OWLBase):
         )
         self._database.add_source_metadata(self._src_name, metadata)
 
-    def _get_concept_id(self, ref: str) -> Optional[str]:
-        """Format concept ID for given reference.
-        :param ref: may be an IRI or other concept code structure
-        :return: standardized concept ID if successful
+    def _construct_dependency_set(self, dag: DefaultDict, parent: str) -> Set[str]:
+        """Recursively get all children concepts for a term
+
+        :param dag: dictionary where keys are ontology terms and values are lists of
+            terms with ``is_a`` relationships to the parent
+        :param parent: term to fetch children for
+        :return: Set of children concepts
         """
-        if ref.startswith("http"):
-            if "snomedct" in ref:
+        children = {parent}
+        for child in dag[parent]:
+            children |= self._construct_dependency_set(dag, child)
+        return children
+
+    _identifiers_url_pattern = r"http://identifiers.org/(.*)/(.*)"
+    _lui_patterns = [
+        (NamespacePrefix.OMIMPS, r"https://omim.org/phenotypicSeries/(.*)"),
+        (NamespacePrefix.OMIM, r"https://omim.org/entry/(.*)"),
+        (NamespacePrefix.UMLS, r"http://linkedlifedata.com/resource/umls/id/(.*)"),
+        (NamespacePrefix.ICD10CM, r"http://purl.bioontology.org/ontology/ICD10CM/(.*)"),
+        (NamespacePrefix.ICD10, r"https://icd.who.int/browse10/2019/en#/(.*)"),
+    ]
+
+    def _get_xref_from_url(self, url: str) -> Optional[Tuple[NamespacePrefix, str]]:
+        """Extract prefix and LUI from URL reference.
+
+        :param url: url string given as URL xref property
+        :return: prefix enum instance and LUI
+        """
+        if url.startswith("http://identifiers.org"):
+            match = re.match(self._identifiers_url_pattern, url)
+            if not match or not match.groups():
+                raise ValueError(f"Couldn't parse identifiers.org URL: {url}")
+            if match.groups()[0] == "snomedct":
                 return None
-            elif ref.startswith(("http://purl.obo", "http://www.orpha")):
-                prefix, id_no = ref.split("_")
-            else:
-                prefix, id_no = ref.rsplit("/", 1)
-        else:
-            if ref.startswith("SCTID"):
-                return None
-            elif "/" in ref:
-                prefix, id_no = ref.rsplit("/", 1)
-            else:
-                try:
-                    prefix, id_no = ref.split(":")
-                except ValueError as e:
-                    logger.warning(
-                        f"{ref} raised a ValueError when trying to get "
-                        f"prefix and ID: {e}"
-                    )
-                    return None
-        try:
-            concept_id = f"{MONDO_PREFIX_LOOKUP[prefix]}:{id_no}"
-        except KeyError:
-            logger.warning(f"Unable to produce concept ID for reference: {ref}")
+            prefix = NamespacePrefix[match.groups()[0].upper()]
+            return (prefix, match.groups()[1])
+        for prefix, pattern in self._lui_patterns:
+            match = re.match(pattern, url)
+            if match and match.groups():
+                return (prefix, match.groups()[0])
+        # didn't match any patterns
+        _logger.warning(f"Unrecognized URL for xref: {url}")
+        return None
+
+    @staticmethod
+    def _get_xref_from_xref_clause(
+        clause: fastobo.term.XrefClause
+    ) -> Optional[Tuple[NamespacePrefix, str]]:
+        """Get dbXref from xref clause.
+
+        In the Mondo OBO distribution, some xrefs only show up in explicit xref clauses.
+        This method processes them.
+
+        :param clause: xref clause from term frame
+        :return: prefix and local ID if available
+        """
+        raw_prefix = clause.xref.id.prefix
+        if raw_prefix not in (
+            "ONCOTREE",
+            "EFO",
+        ):
             return None
-        return concept_id
+        try:
+            prefix = NamespacePrefix[clause.xref.id.prefix.upper()]
+        except KeyError:
+            _logger.warning(f"Unable to parse namespace prefix for {clause.xref}")
+            return None
+        local_id = clause.xref.id.local
+        return prefix, local_id
 
-    def _get_equivalent_xrefs(self, graph: RDFGraph) -> Dict[str, List[Optional[str]]]:
-        """Extract all MONDO:equivalentTo relations.
-        :param graph: RDFLib graph produced from OWL default world
-        :return: MONDO terms mapped to their equivalence relations
-        """
-        equiv_annotations_query = """
-            PREFIX owl: <http://www.w3.org/2002/07/owl#>
-            prefix oboInOwl: <http://www.geneontology.org/formats/oboInOwl#>
+    def _get_xref_from_pv_clause(
+        self, clause: fastobo.term.PropertyValueClause
+    ) -> Optional[Tuple[NamespacePrefix, str]]:
+        """Get dbXref from property value clause.
 
-            SELECT ?source ?child
-            WHERE {
-                ?annotation owl:annotatedSource ?source ;
-                            owl:annotatedTarget ?child ;
-                            oboInOwl:source "MONDO:equivalentTo"
-            }
+        These are a bit more semantically rich than the Mondo xref clauses, so for now,
+        we prefer to fetch most references from here.
+
+        :param clause: property value clause
+        :return: prefix and local ID if available
         """
-        equiv_rels_result = graph.query(equiv_annotations_query)
-        grouped = groupby(
-            equiv_rels_result,
-            lambda i: i[0].split("_")[1],  # type: ignore
-        )
-        keyed = {
-            str(key): [self._get_concept_id(g[1]) for g in group]  # type: ignore
-            for key, group in grouped
+        property_value = clause.property_value
+        if (
+            not isinstance(property_value, fastobo.pv.ResourcePropertyValue)
+            or not isinstance(property_value.relation, fastobo.id.UnprefixedIdent)
+            or property_value.relation.unescaped not in ("exactMatch", "equivalentTo")
+        ):
+            return None
+        if isinstance(property_value.value, fastobo.id.Url):
+            xref_result = self._get_xref_from_url(str(property_value.value))
+            if xref_result is None:
+                return None
+            prefix, local_id = xref_result
+        elif isinstance(property_value.value, fastobo.id.PrefixedIdent):
+            prefix = NamespacePrefix[property_value.value.prefix.upper()]
+            local_id = property_value.value.local
+        else:
+            _logger.warning(
+                f"Unrecognized property value type: {type(property_value.value)}"
+            )
+            return None
+        return prefix, local_id
+
+    def _process_term_frame(self, frame: fastobo.term.TermFrame) -> Dict:
+        """Extract disease params from an OBO term frame.
+
+        :param frame: individual frame from OBO file
+        :return: disease params as a dictionary
+        """
+        params = {
+            "concept_id": str(frame.id).lower(),
+            "aliases": [],
+            "xrefs": [],
+            "associated_with": [],
         }
-        return keyed
+
+        for clause in frame:
+            tag = clause.raw_tag()
+            if tag == "name":
+                params["label"] = clause.raw_value()
+            elif tag == "synonym":
+                params["aliases"].append(clause.synonym.desc)
+            elif tag in ("xref", "property_value"):
+                if tag == "xref":
+                    xref = self._get_xref_from_xref_clause(clause)
+                else:
+                    xref = self._get_xref_from_pv_clause(clause)
+                if not xref:
+                    continue
+                prefix, local_id = xref
+
+                curie = f"{prefix.value}:{local_id}"
+                if prefix in (
+                    NamespacePrefix.OMIM,
+                    NamespacePrefix.NCIT,
+                    NamespacePrefix.DO,
+                    NamespacePrefix.ONCOTREE,
+                ):
+                    params["xrefs"].append(curie)
+                else:
+                    params["associated_with"].append(curie)
+        return params
 
     def _transform_data(self) -> None:
-        """Gather and transform disease entities."""
-        mondo = owl.get_ontology(self._data_file.absolute().as_uri()).load()
-        graph = owl.default_world.as_rdflib_graph()
+        """Get data from file and send disease records to database."""
+        reader = fastobo.iter(str(self._data_file.absolute()))
+        dag = defaultdict(list)
+        for item in reader:
+            item_id = str(item.id)
+            for clause in item:
+                if clause.raw_tag() == "is_a":
+                    dag[clause.raw_value()].append(item_id)
 
-        # gather constants/search materials
-        disease_root = "http://purl.obolibrary.org/obo/MONDO_0000001"
-        disease_uris = self._get_subclasses(disease_root, graph)
-        peds_neoplasm_root = "http://purl.obolibrary.org/obo/MONDO_0006517"
-        peds_uris = self._get_subclasses(peds_neoplasm_root, graph)
-        equiv_rels = self._get_equivalent_xrefs(graph)
+        disease_root = "MONDO:0000001"
+        diseases = self._construct_dependency_set(dag, disease_root)
+        peds_neoplasm_root = "MONDO:0006517"
+        pediatric_diseases = self._construct_dependency_set(dag, peds_neoplasm_root)
 
-        for uri in disease_uris:
-            try:
-                disease = mondo.search_one(iri=uri)
-            except TypeError:
-                logger.error(
-                    f"Mondo.transform_data could not retrieve class " f"for URI {uri}"
-                )
-                continue
-            try:
-                label = disease.label[0]
-            except IndexError:
-                logger.debug(f"No label for Mondo concept {uri}")
+        reader = fastobo.iter(str(self._data_file.absolute()))
+        for item in reader:
+            concept_id = str(item.id).lower()
+            if concept_id.upper() not in diseases:
                 continue
 
-            concept_id = disease.id[0].lower()
-            aliases = list({d for d in disease.hasExactSynonym if d != label})
-            params = {
-                "concept_id": concept_id,
-                "label": label,
-                "aliases": aliases,
-                "xrefs": [],
-                "associated_with": [],
-            }
-            exact_matches = {self._get_concept_id(m) for m in disease.exactMatch}
-            equiv_xrefs = equiv_rels.get(concept_id.split(":")[1], set())
-            xrefs = {x for x in exact_matches.union(equiv_xrefs) if x}
+            params = self._process_term_frame(item)
 
-            for ref in xrefs:
-                if ref.split(":")[0].lower() in PREFIX_LOOKUP:
-                    params["xrefs"].append(ref)
-                else:
-                    params["associated_with"].append(ref)
-
-            if disease.iri in peds_uris:
+            if concept_id.upper() in pediatric_diseases:
                 params["pediatric_disease"] = True
 
             self._load_disease(params)

@@ -21,6 +21,8 @@ def neuroblastoma():
             "concept_id": "mondo:0005072",
             "label": "neuroblastoma",
             "aliases": [
+                "NB",
+                "neuroblastoma",
                 "neural Crest tumor, malignant",
                 "neuroblastoma (Schwannian Stroma-poor)",
                 "neuroblastoma, malignant",
@@ -34,7 +36,6 @@ def neuroblastoma():
                 "orphanet:635",
                 "umls:C0027819",
                 "umls:CN205405",
-                "gard:0007185",
                 "efo:0000621",
                 "mesh:D009447",
             ],
@@ -51,6 +52,7 @@ def richter_syndrome():
             "concept_id": "mondo:0002083",
             "label": "Richter syndrome",
             "aliases": [
+                "Richter syndrome",
                 "Richter's syndrome",
                 "Richter transformation",
                 "Richter's transformation",
@@ -58,7 +60,6 @@ def richter_syndrome():
             "xrefs": ["ncit:C35424", "DOID:1703"],
             "associated_with": [
                 "umls:C0349631",
-                "gard:0007578",
             ],
             "pediatric_disease": None,
         }
@@ -75,7 +76,9 @@ def pediatric_liposarcoma():
             "concept_id": "mondo:0003587",
             "label": "pediatric liposarcoma",
             "aliases": [
+                "pediatric liposarcoma",
                 "childhood liposarcoma",
+                "liposarcoma",
             ],
             "xrefs": ["DOID:5695", "ncit:C8091"],
             "associated_with": ["umls:C0279984"],
@@ -93,7 +96,7 @@ def cystic_teratoma_adult():
         **{
             "concept_id": "mondo:0004099",
             "label": "adult cystic teratoma",
-            "aliases": ["cystic teratoma of adults"],
+            "aliases": ["cystic teratoma of adults", "adult cystic teratoma"],
             "pediatric_disease": None,
             "xrefs": ["ncit:C9012", "DOID:7079"],
             "associated_with": ["umls:C1368888"],
@@ -117,6 +120,7 @@ def nsclc():
                 "non-small cell lung cancer",
                 "non-small cell cancer of the lung",
                 "NSCLC",
+                "non-small cell lung carcinoma",
             ],
             "xrefs": ["ncit:C2926", "oncotree:NSCLC", "DOID:3908"],
             "associated_with": [
@@ -273,7 +277,7 @@ def test_associated_with_match(
     actual_disease = response.records[0]
     compare_records(actual_disease, neuroblastoma)
 
-    response = mondo.search("gard:0007578")
+    response = mondo.search("umls:C0349631")
     assert response.match_type == MatchType.ASSOCIATED_WITH
     assert len(response.records) == 1
     actual_disease = response.records[0]
@@ -294,7 +298,7 @@ def test_meta(mondo):
         response.source_meta_.data_license_url
         == "https://creativecommons.org/licenses/by/4.0/legalcode"
     )
-    assert re.match(r"\d{4}-\d{2}-\d{2}", response.source_meta_.version)
+    assert re.match(r"\d{4}\d{2}\d{2}", response.source_meta_.version)
     assert (
         response.source_meta_.data_url
         == "https://mondo.monarchinitiative.org/pages/download/"
