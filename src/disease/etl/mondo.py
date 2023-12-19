@@ -75,7 +75,7 @@ class Mondo(Base):
 
     @staticmethod
     def _get_xref_from_xref_clause(
-        clause: fastobo.term.XrefClause
+        clause: fastobo.term.XrefClause,
     ) -> Optional[Tuple[NamespacePrefix, str]]:
         """Get dbXref from xref clause.
 
