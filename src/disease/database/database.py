@@ -103,11 +103,13 @@ class AbstractDatabase(abc.ABC):
         """
 
     @abc.abstractmethod
-    def get_source_metadata(self, src_name: Union[str, SourceName]) -> Optional[Dict]:
+    def get_source_metadata(
+        self, src_name: Union[str, SourceName]
+    ) -> Optional[SourceMeta]:
         """Get license, versioning, data lookup, etc information for a source.
 
         :param src_name: name of the source to get data for
-        :return: Dict containing metadata if lookup is successful
+        :return: source metadata, if lookup is successful
         """
 
     @abc.abstractmethod
@@ -162,11 +164,11 @@ class AbstractDatabase(abc.ABC):
         """
 
     @abc.abstractmethod
-    def add_source_metadata(self, src_name: SourceName, data: SourceMeta) -> None:
+    def add_source_metadata(self, src_name: SourceName, meta: SourceMeta) -> None:
         """Add new source metadata entry.
 
         :param src_name: name of source
-        :param data: known source attributes
+        :param meta: known source attributes
         :raise DatabaseWriteException: if write fails
         """
 

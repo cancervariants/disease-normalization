@@ -109,8 +109,6 @@ def test_meta(oncotree):
     assert response.source_meta_.version == "2021-11-02"
     assert response.source_meta_.data_url == "http://oncotree.mskcc.org/#/home?tab=api"
     assert response.source_meta_.rdp_url is None
-    assert response.source_meta_.data_license_attributes == {
-        "non_commercial": False,
-        "share_alike": False,
-        "attribution": True,
-    }
+    assert not response.source_meta_.data_license_attributes.non_commercial
+    assert not response.source_meta_.data_license_attributes.share_alike
+    assert response.source_meta_.data_license_attributes.attribution

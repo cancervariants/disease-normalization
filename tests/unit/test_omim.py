@@ -130,8 +130,6 @@ def test_meta(omim):
     assert re.match(r"\d{4}-\d{2}-\d{2}", response.source_meta_.version)
     assert response.source_meta_.data_url == "https://www.omim.org/downloads"
     assert response.source_meta_.rdp_url == "http://reusabledata.org/omim.html"
-    assert response.source_meta_.data_license_attributes == {
-        "non_commercial": False,
-        "share_alike": True,
-        "attribution": True,
-    }
+    assert not response.source_meta_.data_license_attributes.non_commercial
+    assert response.source_meta_.data_license_attributes.share_alike
+    assert response.source_meta_.data_license_attributes.attribution

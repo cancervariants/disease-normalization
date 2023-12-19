@@ -23,7 +23,13 @@ from disease.database.database import (
     DatabaseWriteException,
     confirm_aws_db_use,
 )
-from disease.schemas import RecordType, RefType, SourceMeta, SourceName
+from disease.schemas import (
+    DataLicenseAttributes,
+    RecordType,
+    RefType,
+    SourceMeta,
+    SourceName,
+)
 
 _logger = logging.getLogger()
 _logger.setLevel(logging.DEBUG)
@@ -87,7 +93,7 @@ class DynamoDbDatabase(AbstractDatabase):
 
         self.diseases = self.dynamodb.Table(self.disease_table)
         self.batch = self.diseases.batch_writer()
-        self._cached_sources = {}
+        self._cached_sources: Dict[str, SourceMeta] = {}
         atexit.register(self.close_connection)
 
     def list_tables(self) -> List[str]:
@@ -200,11 +206,13 @@ class DynamoDbDatabase(AbstractDatabase):
         if not self.check_schema_initialized():
             self._create_diseases_table()
 
-    def get_source_metadata(self, src_name: Union[str, SourceName]) -> Optional[Dict]:
+    def get_source_metadata(
+        self, src_name: Union[str, SourceName]
+    ) -> Optional[SourceMeta]:
         """Get license, versioning, data lookup, etc information for a source.
 
         :param src_name: name of the source to get data for
-        :return: Dict containing metadata if lookup is successful
+        :return: source metadata, if lookup is successful
         """
         if isinstance(src_name, SourceName):
             src_name = src_name.value
@@ -213,13 +221,23 @@ class DynamoDbDatabase(AbstractDatabase):
         else:
             pk = f"{src_name.lower()}##source"
             concept_id = f"source:{src_name.lower()}"
-            metadata = self.diseases.get_item(
+            retrieved_metadata = self.diseases.get_item(
                 Key={"label_and_type": pk, "concept_id": concept_id}
             ).get("Item")
-            if not metadata:
+            if not retrieved_metadata:
                 return None
-            self._cached_sources[src_name] = metadata
-            return metadata
+            formatted_metadata = SourceMeta(
+                data_license=retrieved_metadata["data_license"],
+                data_license_url=retrieved_metadata["data_license_url"],
+                version=retrieved_metadata["version"],
+                data_url=retrieved_metadata["data_url"],
+                rdp_url=retrieved_metadata["rdp_url"],
+                data_license_attributes=DataLicenseAttributes(
+                    **retrieved_metadata["data_license_attributes"]
+                ),
+            )
+            self._cached_sources[src_name] = formatted_metadata
+            return formatted_metadata
 
     def get_record_by_id(
         self, concept_id: str, case_sensitive: bool = True, merge: bool = False
@@ -351,15 +369,15 @@ class DynamoDbDatabase(AbstractDatabase):
             if not last_evaluated_key:
                 break
 
-    def add_source_metadata(self, src_name: SourceName, metadata: SourceMeta) -> None:
+    def add_source_metadata(self, src_name: SourceName, meta: SourceMeta) -> None:
         """Add new source metadata entry.
 
         :param src_name: name of source
-        :param data: known source attributes
+        :param meta: known source attributes
         :raise DatabaseWriteException: if write fails
         """
         src_name_value = src_name.value
-        metadata_item = metadata.model_dump()
+        metadata_item = meta.model_dump()
         metadata_item["src_name"] = src_name_value
         metadata_item["label_and_type"] = f"{str(src_name_value).lower()}##source"
         metadata_item["concept_id"] = f"source:{str(src_name_value).lower()}"
