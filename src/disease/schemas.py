@@ -128,14 +128,6 @@ class Disease(BaseModel):
     )
 
 
-class DataLicenseAttributes(BaseModel):
-    """Define constraints for data license attributes."""
-
-    non_commercial: StrictBool
-    share_alike: StrictBool
-    attribution: StrictBool
-
-
 class RecordType(str, Enum):
     """Record item types."""
 
@@ -153,6 +145,14 @@ class RefType(str, Enum):
     ASSOCIATED_WITH = "associated_with"
 
 
+class DataLicenseAttributes(BaseModel):
+    """Define constraints for data license attributes."""
+
+    non_commercial: StrictBool
+    share_alike: StrictBool
+    attribution: StrictBool
+
+
 class SourceMeta(BaseModel):
     """Metadata for a given source to return in response object."""
 
@@ -161,7 +161,7 @@ class SourceMeta(BaseModel):
     version: StrictStr
     data_url: Optional[StrictStr] = None
     rdp_url: Optional[StrictStr] = None
-    data_license_attributes: Dict[StrictStr, StrictBool]
+    data_license_attributes: DataLicenseAttributes
 
     model_config = ConfigDict(
         json_schema_extra={

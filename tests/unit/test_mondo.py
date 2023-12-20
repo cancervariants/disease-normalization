@@ -304,8 +304,6 @@ def test_meta(mondo):
         == "https://mondo.monarchinitiative.org/pages/download/"
     )
     assert response.source_meta_.rdp_url == "http://reusabledata.org/monarch.html"
-    assert response.source_meta_.data_license_attributes == {
-        "non_commercial": False,
-        "share_alike": False,
-        "attribution": True,
-    }
+    assert not response.source_meta_.data_license_attributes.non_commercial
+    assert not response.source_meta_.data_license_attributes.share_alike
+    assert response.source_meta_.data_license_attributes.attribution

@@ -7,7 +7,7 @@ from typing import DefaultDict, Dict, Optional, Set, Tuple
 import fastobo
 
 from disease.etl.base import Base
-from disease.schemas import NamespacePrefix, SourceMeta
+from disease.schemas import DataLicenseAttributes, NamespacePrefix, SourceMeta
 
 _logger = logging.getLogger(__name__)
 
@@ -23,11 +23,9 @@ class Mondo(Base):
             version=self._version,
             data_url="https://mondo.monarchinitiative.org/pages/download/",
             rdp_url="http://reusabledata.org/monarch.html",
-            data_license_attributes={
-                "non_commercial": False,
-                "share_alike": False,
-                "attribution": True,
-            },
+            data_license_attributes=DataLicenseAttributes(
+                non_commercial=False, share_alike=False, attribution=True
+            ),
         )
         self._database.add_source_metadata(self._src_name, metadata)
 
@@ -77,7 +75,7 @@ class Mondo(Base):
 
     @staticmethod
     def _get_xref_from_xref_clause(
-        clause: fastobo.term.XrefClause
+        clause: fastobo.term.XrefClause,
     ) -> Optional[Tuple[NamespacePrefix, str]]:
         """Get dbXref from xref clause.
 

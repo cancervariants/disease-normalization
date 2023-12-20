@@ -18,7 +18,13 @@ from psycopg.errors import (
 )
 
 from disease.database import AbstractDatabase, DatabaseException, DatabaseWriteException
-from disease.schemas import RecordType, RefType, SourceMeta, SourceName
+from disease.schemas import (
+    DataLicenseAttributes,
+    RecordType,
+    RefType,
+    SourceMeta,
+    SourceName,
+)
 
 logger = logging.getLogger()
 
@@ -57,7 +63,7 @@ class PostgresDatabase(AbstractDatabase):
 
         self.conn = psycopg.connect(conninfo)
         self.initialize_db()
-        self._cached_sources = {}
+        self._cached_sources: Dict[str, SourceMeta] = {}
 
         atexit.register(self.close_connection)
 
@@ -255,11 +261,13 @@ class PostgresDatabase(AbstractDatabase):
 
     _source_metadata_query = b"SELECT * FROM disease_sources WHERE name = %s;"
 
-    def get_source_metadata(self, src_name: Union[str, SourceName]) -> Optional[Dict]:
+    def get_source_metadata(
+        self, src_name: Union[str, SourceName]
+    ) -> Optional[SourceMeta]:
         """Get license, versioning, data lookup, etc information for a source.
 
         :param src_name: name of the source to get data for
-        :return: Dict containing metadata if lookup is successful
+        :return: source metadata, if lookup is successful
         """
         if isinstance(src_name, SourceName):
             src_name = src_name.value
@@ -272,18 +280,18 @@ class PostgresDatabase(AbstractDatabase):
             metadata_result = cur.fetchone()
             if not metadata_result:
                 return None
-            metadata = {
-                "data_license": metadata_result[1],
-                "data_license_url": metadata_result[2],
-                "version": metadata_result[3],
-                "data_url": metadata_result[4],
-                "rdp_url": metadata_result[5],
-                "data_license_attributes": {
-                    "non_commercial": metadata_result[6],
-                    "attribution": metadata_result[7],
-                    "share_alike": metadata_result[8],
-                },
-            }
+            metadata = SourceMeta(
+                data_license=metadata_result[1],
+                data_license_url=metadata_result[2],
+                version=metadata_result[3],
+                data_url=metadata_result[4],
+                rdp_url=metadata_result[5],
+                data_license_attributes=DataLicenseAttributes(
+                    non_commercial=metadata_result[6],
+                    attribution=metadata_result[7],
+                    share_alike=metadata_result[8],
+                ),
+            )
             self._cached_sources[src_name] = metadata
             return metadata
 
@@ -513,9 +521,9 @@ class PostgresDatabase(AbstractDatabase):
                     meta.version,
                     meta.data_url,
                     meta.rdp_url,
-                    meta.data_license_attributes["non_commercial"],
-                    meta.data_license_attributes["attribution"],
-                    meta.data_license_attributes["share_alike"],
+                    meta.data_license_attributes.non_commercial,
+                    meta.data_license_attributes.attribution,
+                    meta.data_license_attributes.share_alike,
                 ],
             )
         self.conn.commit()

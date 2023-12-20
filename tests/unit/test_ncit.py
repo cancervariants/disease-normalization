@@ -142,8 +142,6 @@ def test_meta(ncit):
         response.source_meta_.data_url == "https://evs.nci.nih.gov/ftp1/NCI_Thesaurus/"
     )
     assert response.source_meta_.rdp_url == "http://reusabledata.org/ncit.html"
-    assert response.source_meta_.data_license_attributes == {
-        "non_commercial": False,
-        "share_alike": False,
-        "attribution": True,
-    }
+    assert not response.source_meta_.data_license_attributes.non_commercial
+    assert not response.source_meta_.data_license_attributes.share_alike
+    assert response.source_meta_.data_license_attributes.attribution
