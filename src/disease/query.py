@@ -384,7 +384,7 @@ class QueryHandler:
             "warnings": self._emit_warnings(query),
             "service_meta_": ServiceMeta(
                 version=__version__,
-                response_datetime=datetime.now(),
+                response_datetime=datetime.datetime.now(tz=datetime.timezone.utc),
             ),
         }
         if query == "":
