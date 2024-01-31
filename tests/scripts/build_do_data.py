@@ -1,4 +1,5 @@
 """Construct test data for DO source."""
+import contextlib
 import os
 import subprocess
 from http import HTTPStatus
@@ -20,43 +21,44 @@ test_data_dir = scripts_dir.parent / "data" / "do"
 robot_file = scripts_dir / "robot"
 if not robot_file.exists():
     response = requests.get(
-        "https://raw.githubusercontent.com/ontodev/robot/master/bin/robot"
-    )  # noqa: E501
+        "https://raw.githubusercontent.com/ontodev/robot/master/bin/robot", timeout=30
+    )
     if response.status_code != HTTPStatus.OK:
-        raise requests.HTTPError("Couldn't acquire robot script")
-    with open(robot_file, "wb") as f:
+        msg = "Couldn't acquire robot script"
+        raise requests.HTTPError(msg)
+    with robot_file.open("wb") as f:
         f.write(response.content)
-    try:
-        os.chmod(robot_file, 0o755)
-    except PermissionError:
-        pass  # handle below
+    with contextlib.suppress(PermissionError):
+        robot_file.chmod(0o755)
 if not os.access(robot_file, os.X_OK):
-    raise PermissionError(
-        "robot file isn't executable by the user -- see 'getting started': http://robot.obolibrary.org/"  # noqa: E501
-    )  # noqa: E501
+    msg = "robot file isn't executable by the user -- see 'getting started': http://robot.obolibrary.org/"
+    raise PermissionError(msg)
 
 robot_jar = scripts_dir / "robot.jar"
 if not robot_jar.exists():
     response = requests.get(
-        "https://api.github.com/repos/ontodev/robot/releases/latest"
-    )  # noqa: E501
+        "https://api.github.com/repos/ontodev/robot/releases/latest", timeout=30
+    )
     if response.status_code != HTTPStatus.OK:
-        raise requests.HTTPError("Couldn't get ROBOT release info from GitHub")
+        msg = "Couldn't get ROBOT release info from GitHub"
+        raise requests.HTTPError(msg)
     json = response.json()
     assert json["assets"][0]["name"] == "robot.jar"
     jar_url = json["assets"][0]["url"]
-    jar_response = requests.get(jar_url)
+    jar_response = requests.get(jar_url, timeout=30)
     if jar_response.status_code != HTTPStatus.OK:
-        raise requests.HTTPError("Couldn't download ROBOT JAR from GitHub")
-    with open(robot_jar, "wb") as f:
+        msg = "Couldn't download ROBOT JAR from GitHub"
+        raise requests.HTTPError(msg)
+    with robot_jar.open("wb") as f:
         f.write(jar_response.content)
 
 terms_file = scripts_dir / "do_terms.txt"
 if not terms_file.exists():
-    raise FileNotFoundError("Could not find do_terms.txt")
+    msg = "Could not find do_terms.txt"
+    raise FileNotFoundError(msg)
 
 outfile = test_data_dir / do._data_file.name
 outfile.parent.mkdir(exist_ok=True)
-cmd_str = f"{robot_file} extract --method star --input {infile} --term-file {terms_file} --output {outfile}"  # noqa: E501
+cmd_str = f"{robot_file} extract --method star --input {infile} --term-file {terms_file} --output {outfile}"
 
-subprocess.run(cmd_str, shell=True)
+subprocess.run(cmd_str, shell=True)  # noqa: S602

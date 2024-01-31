@@ -38,7 +38,7 @@ class Base(ABC):
         self._src_name = SourceName(self.__class__.__name__)
         self._data_source: Union[
             NcitData, OncoTreeData, MondoData, DoData, CustomData
-        ] = self._get_data_handler(data_path)  # type: ignore
+        ] = self._get_data_handler(data_path)
         self._database = database
         self._store_ids = self.__class__.__name__ in SOURCES_FOR_MERGE
         if self._store_ids:
@@ -66,8 +66,7 @@ class Base(ABC):
         self._database.complete_write_transaction()
         if self._store_ids:
             return self._added_ids
-        else:
-            return []
+        return []
 
     def _extract_data(self, use_existing: bool = False) -> None:
         """Get source file from data directory.
@@ -88,7 +87,7 @@ class Base(ABC):
 
     def _load_disease(self, disease: Dict) -> None:
         """Load individual disease record."""
-        assert Disease(**disease)
+        _ = Disease(**disease)
         concept_id = disease["concept_id"]
 
         for attr_type in ITEM_TYPES:
@@ -100,11 +99,10 @@ class Base(ABC):
                     else:
                         disease[attr_type] = list(set(value))
                         items = {item.lower() for item in value}
-                        if attr_type == "aliases":
-                            if len(items) > 20:
-                                logger.debug(f"{concept_id} has > 20 aliases.")
-                                del disease[attr_type]
-                                continue
+                        if (attr_type == "aliases") and (len(items) > 20):
+                            logger.debug(f"{concept_id} has > 20 aliases.")
+                            del disease[attr_type]
+                            continue
 
                 else:
                     del disease[attr_type]

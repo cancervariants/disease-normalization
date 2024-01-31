@@ -115,7 +115,7 @@ test_classes = {
 
 parent_concepts = set()
 for c in test_classes:
-    parent_concepts |= c.ancestors()  # type: ignore
+    parent_concepts |= c.ancestors()
 parent_concepts.remove(owl.Thing)
 parent_concept_iris = {p.iri for p in parent_concepts}
 
@@ -157,7 +157,7 @@ pi = XET.ProcessingInstruction(  # TODO get encoding attrib out
     target='xml version="1.0"'
 )
 pi_string = XET.tostring(pi).decode("ASCII")
-with open(outfile_path, "r+") as f:
+with outfile_path.open("r+") as f:
     content = f.read()
     f.seek(0, 0)
     f.write(pi_string.rstrip("\r\n") + "\n" + content)

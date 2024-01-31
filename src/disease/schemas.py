@@ -1,5 +1,5 @@
 """Contains data models for representing VICC normalized disease records."""
-from datetime import datetime
+import datetime
 from enum import Enum, IntEnum
 from typing import Dict, List, Literal, Optional
 
@@ -36,9 +36,9 @@ class SourceIDAfterNamespace(Enum):
 
     NCIT = "C"
     MONDO = ""
-    DO = ""
-    ONCOTREE = ""
-    OMIM = ""
+    DO = ""  # noqa: PIE796
+    ONCOTREE = ""  # noqa: PIE796
+    OMIM = ""  # noqa: PIE796
 
 
 class NamespacePrefix(Enum):
@@ -236,7 +236,7 @@ class ServiceMeta(BaseModel):
 
     name: Literal["disease-normalizer"] = "disease-normalizer"
     version: StrictStr
-    response_datetime: datetime
+    response_datetime: datetime.datetime
     url: Literal[
         "https://github.com/cancervariants/disease-normalization"
     ] = "https://github.com/cancervariants/disease-normalization"

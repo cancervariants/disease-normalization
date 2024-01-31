@@ -16,7 +16,7 @@ logger.setLevel(logging.DEBUG)
 logger.handlers = []
 
 
-from disease.schemas import (  # noqa: E402 F401
+from disease.schemas import (  # noqa: E402
     NamespacePrefix,
     RefType,
     SourceIDAfterNamespace,
@@ -38,7 +38,7 @@ SOURCES_LOWER_LOOKUP = {
 PREFIX_LOOKUP = {
     v.value.lower(): SourceName[k].value
     for k, v in NamespacePrefix.__members__.items()
-    if k in SourceName.__members__.keys()
+    if k in SourceName.__members__
 }
 
 # use to generate namespace prefix from source ID value

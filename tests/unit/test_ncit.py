@@ -17,23 +17,21 @@ def ncit(test_source):
 def neuroblastoma():
     """Build neuroblastoma test fixture."""
     return Disease(
-        **{
-            "label_and_type": "ncit:c3270##identity",
-            "concept_id": "ncit:C3270",
-            "label": "Neuroblastoma",
-            "aliases": [
-                "Neural Crest Tumor, Malignant",
-                "Neuroblastoma (NBL)",
-                "Neuroblastoma (Schwannian Stroma-poor)",
-                "Neuroblastoma (Schwannian Stroma-Poor)",
-                "NEUROBLASTOMA, MALIGNANT",
-                "Neuroblastoma, NOS",
-                "neuroblastoma",
-            ],
-            "xrefs": [],
-            "associated_with": ["umls:C2751421", "icdo:9500/3"],
-            "src_name": "NCIt",
-        }
+        label_and_type="ncit:c3270##identity",
+        concept_id="ncit:C3270",
+        label="Neuroblastoma",
+        aliases=[
+            "Neural Crest Tumor, Malignant",
+            "Neuroblastoma (NBL)",
+            "Neuroblastoma (Schwannian Stroma-poor)",
+            "Neuroblastoma (Schwannian Stroma-Poor)",
+            "NEUROBLASTOMA, MALIGNANT",
+            "Neuroblastoma, NOS",
+            "neuroblastoma",
+        ],
+        xrefs=[],
+        associated_with=["umls:C2751421", "icdo:9500/3"],
+        src_name="NCIt",
     )
 
 
@@ -41,25 +39,23 @@ def neuroblastoma():
 def nsclc():
     """Build fixture for non-small cell lung carcinoma"""
     return Disease(
-        **{
-            "concept_id": "ncit:C2926",
-            "label": "Lung Non-Small Cell Carcinoma",
-            "aliases": [
-                "Non Small Cell Lung Cancer NOS",
-                "Non-Small Cell Lung Cancer",
-                "Non-Small Cell Cancer of the Lung",
-                "NSCLC",
-                "non-small cell lung cancer",
-                "Non-Small Cell Carcinoma of the Lung",
-                "Non-Small Cell Cancer of Lung",
-                "Non-small cell lung cancer, NOS",
-                "Non-Small Cell Carcinoma of Lung",
-                "NSCLC - Non-Small Cell Lung Cancer",
-                "Non-Small Cell Lung Carcinoma",
-            ],
-            "xrefs": [],
-            "associated_with": ["umls:C0007131"],
-        }
+        concept_id="ncit:C2926",
+        label="Lung Non-Small Cell Carcinoma",
+        aliases=[
+            "Non Small Cell Lung Cancer NOS",
+            "Non-Small Cell Lung Cancer",
+            "Non-Small Cell Cancer of the Lung",
+            "NSCLC",
+            "non-small cell lung cancer",
+            "Non-Small Cell Carcinoma of the Lung",
+            "Non-Small Cell Cancer of Lung",
+            "Non-small cell lung cancer, NOS",
+            "Non-Small Cell Carcinoma of Lung",
+            "NSCLC - Non-Small Cell Lung Cancer",
+            "Non-Small Cell Lung Carcinoma",
+        ],
+        xrefs=[],
+        associated_with=["umls:C0007131"],
     )
 
 

@@ -21,14 +21,11 @@ def merge_instance(test_source: Callable, is_test_env: bool):
     database = create_db()
     if is_test_env:
         if os.environ.get(AWS_ENV_VAR_NAME):
-            assert False, (
-                f"Running the full disease ETL pipeline test on an AWS environment is "
-                f"forbidden -- either unset {AWS_ENV_VAR_NAME} or unset DISEASE_TEST"
-            )
-        else:
-            for SourceClass in (Mondo, DO, NCIt, OncoTree, OMIM):  # noqa: N806
-                if not database.get_source_metadata(SourceName(SourceClass.__name__)):
-                    test_source(SourceClass)
+            msg = f"Running the full disease ETL pipeline test on an AWS environment is forbidden -- either unset {AWS_ENV_VAR_NAME} or unset DISEASE_TEST"
+            raise AssertionError(msg)
+        for SourceClass in (Mondo, DO, NCIt, OncoTree, OMIM):  # noqa: N806
+            if not database.get_source_metadata(SourceName(SourceClass.__name__)):
+                test_source(SourceClass)
 
     m = Merge(database)
     if is_test_env:

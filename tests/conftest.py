@@ -65,7 +65,8 @@ def pytest_sessionstart():
     """Wipe DB before testing if in test environment."""
     if IS_TEST_ENV:
         if os.environ.get(AWS_ENV_VAR_NAME):
-            assert False, f"Cannot have both DISEASE_TEST and {AWS_ENV_VAR_NAME} set."
+            msg = f"Cannot have both DISEASE_TEST and {AWS_ENV_VAR_NAME} set."
+            raise AssertionError(msg)
         db = create_db()
         db.drop_db()
         db.initialize_db()
@@ -102,16 +103,16 @@ def test_source(database: AbstractDatabase, is_test_env: bool):
 
     def test_source_factory(EtlClass: Base):  # noqa: N803
         if IS_TEST_ENV:
-            _logger.debug(f"Reloading DB with data from {TEST_DATA_DIRECTORY}")
+            _logger.debug("Reloading DB with data from %s", TEST_DATA_DIRECTORY)
             test_class = EtlClass(
                 database, TEST_DATA_DIRECTORY / EtlClass.__name__.lower()
-            )  # type: ignore
+            )
             test_class.perform_etl(use_existing=True)
 
         class QueryGetter:
             def __init__(self):
                 self.query_handler = QueryHandler(database)
-                self._src_name = EtlClass.__name__  # type: ignore
+                self._src_name = EtlClass.__name__
 
             def search(self, query_str: str):
                 resp = self.query_handler.search(query_str, incl=self._src_name)
@@ -170,11 +171,14 @@ def _compare_response(
         fixture_list otherwise)
     """
     if fixture and fixture_list:
-        raise Exception("Args provided for both `fixture` and `fixture_list`")
-    elif not fixture and not fixture_list:
-        raise Exception("Must pass 1 of {fixture, fixture_list}")
+        msg = "Args provided for both `fixture` and `fixture_list`"
+        raise Exception(msg)
+    if not fixture and not fixture_list:
+        msg = "Must pass 1 of {fixture, fixture_list}"
+        raise Exception(msg)
     if fixture and num_records:
-        raise Exception("`num_records` should only be given with `fixture_list`.")
+        msg = "`num_records` should only be given with `fixture_list`."
+        raise Exception(msg)
 
     assert response.match_type == match_type
     if fixture:
@@ -190,8 +194,7 @@ def _compare_response(
                 if fixt.concept_id == record.concept_id:
                     _compare_records(record, fixt)
                     break
-            else:
-                assert False  # test fixture not found in response
+            raise AssertionError  # test fixture not found in response
 
 
 @pytest.fixture(scope="session")

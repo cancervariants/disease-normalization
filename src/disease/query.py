@@ -1,6 +1,6 @@
 """Provides methods for handling queries."""
+import datetime
 import re
-from datetime import datetime
 from typing import Dict, Optional, Set, Tuple
 
 from botocore.exceptions import ClientError
@@ -67,7 +67,7 @@ class QueryHandler:
         src_name = item["src_name"]
 
         matches = response["source_matches"]
-        if src_name not in matches.keys():
+        if src_name not in matches:
             pass
         elif matches[src_name] is None:
             matches[src_name] = {
@@ -116,7 +116,7 @@ class QueryHandler:
         :return: response object with empty source slots filled with
                 NO_MATCH results and corresponding source metadata
         """
-        for src_name in resp["source_matches"].keys():
+        for src_name in resp["source_matches"]:
             if resp["source_matches"][src_name] is None:
                 resp["source_matches"][src_name] = {
                     "match_type": MatchType.NO_MATCH,
@@ -137,11 +137,11 @@ class QueryHandler:
             sources
         """
         concept_id_items = []
-        if [p for p in PREFIX_LOOKUP.keys() if query.startswith(p)]:
+        if [p for p in PREFIX_LOOKUP if query.startswith(p)]:
             record = self.db.get_record_by_id(query, False)
             if record:
                 concept_id_items.append(record)
-        for prefix in [p for p in NAMESPACE_LOOKUP.keys() if query.startswith(p)]:
+        for prefix in [p for p in NAMESPACE_LOOKUP if query.startswith(p)]:
             concept_id = f"{NAMESPACE_LOOKUP[prefix]}:{query}"
             id_lookup = self.db.get_record_by_id(concept_id, False)
             if id_lookup:
@@ -186,8 +186,7 @@ class QueryHandler:
             "source_matches": {source: None for source in sources},
         }
         if query == "":
-            response = self._fill_no_matches(response)
-            return response
+            return self._fill_no_matches(response)
         query = query.lower()
 
         # check if concept ID match
@@ -218,7 +217,7 @@ class QueryHandler:
         :raises InvalidParameterException: if both incl and excl args are
             provided, or if invalid source names are given.
         """
-        sources = dict()
+        sources = {}
         for k, v in SOURCES_LOWER_LOOKUP.items():
             if self.db.get_source_metadata(v):
                 sources[k] = v
@@ -232,7 +231,7 @@ class QueryHandler:
             invalid_sources = []
             query_sources = set()
             for source in req_sources:
-                if source.lower() in sources.keys():
+                if source.lower() in sources:
                     query_sources.add(sources[source.lower()])
                 else:
                     invalid_sources.append(source)
@@ -245,10 +244,10 @@ class QueryHandler:
             invalid_sources = []
             query_sources = set()
             for req_l, req in req_excl_dict.items():
-                if req_l not in sources.keys():
+                if req_l not in sources:
                     invalid_sources.append(req)
             for src_l, src in sources.items():
-                if src_l not in req_excl_dict.keys():
+                if src_l not in req_excl_dict:
                     query_sources.add(src)
             if invalid_sources:
                 detail = f"Invalid source name(s): {invalid_sources}"
@@ -260,7 +259,7 @@ class QueryHandler:
 
         response["service_meta_"] = ServiceMeta(
             version=__version__,
-            response_datetime=datetime.now(),
+            response_datetime=datetime.datetime.now(tz=datetime.timezone.utc),
         ).model_dump()
         return SearchService(**response)
 
@@ -385,7 +384,7 @@ class QueryHandler:
             "warnings": self._emit_warnings(query),
             "service_meta_": ServiceMeta(
                 version=__version__,
-                response_datetime=datetime.now(),
+                response_datetime=datetime.datetime.now(tz=datetime.timezone.utc),
             ),
         }
         if query == "":
@@ -408,10 +407,8 @@ class QueryHandler:
                 )
                 if merge is None:
                     return self._handle_failed_merge_ref(record, response, query_str)
-                else:
-                    return self._add_disease(response, merge, MatchType.CONCEPT_ID)
-            else:
-                non_merged_match = (record, "concept_id")
+                return self._add_disease(response, merge, MatchType.CONCEPT_ID)
+            non_merged_match = (record, "concept_id")
 
         # check other match types
         for match_type in RefType:
@@ -420,14 +417,11 @@ class QueryHandler:
             matching_records = [
                 self.db.get_record_by_id(ref, False) for ref in matching_refs
             ]
-            matching_records.sort(key=self._record_order)  # type: ignore
+            matching_records.sort(key=self._record_order)
 
             # attempt merge ref resolution until successful
             for match in matching_records:
-                record = self.db.get_record_by_id(
-                    match["concept_id"],
-                    False,  # type: ignore
-                )
+                record = self.db.get_record_by_id(match["concept_id"], False)
                 if record:
                     if "merge_ref" in record:
                         merge = self.db.get_record_by_id(
@@ -437,13 +431,11 @@ class QueryHandler:
                             return self._handle_failed_merge_ref(
                                 record, response, query_str
                             )
-                        else:
-                            return self._add_disease(
-                                response, merge, MatchType[match_type.upper()]
-                            )
-                    else:
-                        if not non_merged_match:
-                            non_merged_match = (record, match_type)
+                        return self._add_disease(
+                            response, merge, MatchType[match_type.upper()]
+                        )
+                    if not non_merged_match:
+                        non_merged_match = (record, match_type)
 
         # if no successful match, try available non-merged match
         if non_merged_match:

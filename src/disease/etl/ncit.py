@@ -18,7 +18,7 @@ class NCIt(OWLBase):
         """Load metadata"""
         metadata = SourceMeta(
             data_license="CC BY 4.0",
-            data_license_url="https://creativecommons.org/licenses/by/4.0/legalcode",  # noqa F401
+            data_license_url="https://creativecommons.org/licenses/by/4.0/legalcode",  # F401
             version=self._version,
             data_url="https://evs.nci.nih.gov/ftp1/NCI_Thesaurus/",
             rdp_url="http://reusabledata.org/ncit.html",
@@ -43,8 +43,7 @@ class NCIt(OWLBase):
         dos = self._get_by_property_value(p106, "Disease or Syndrome", graph)
         p310 = "http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#P106"
         retired = self._get_by_property_value(p310, "Retired_Concept", graph)
-        uris = neopl.union(dos) - retired
-        return uris
+        return neopl.union(dos) - retired
 
     def _transform_data(self) -> None:
         """Get data from file and construct object for loading."""

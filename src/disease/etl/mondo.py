@@ -2,7 +2,7 @@
 import logging
 import re
 from collections import defaultdict
-from typing import DefaultDict, Dict, Optional, Set, Tuple
+from typing import ClassVar, DefaultDict, Dict, Optional, Set, Tuple
 
 import fastobo
 
@@ -43,7 +43,7 @@ class Mondo(Base):
         return children
 
     _identifiers_url_pattern = r"http://identifiers.org/(.*)/(.*)"
-    _lui_patterns = [
+    _lui_patterns: ClassVar = [
         (NamespacePrefix.OMIMPS, r"https://omim.org/phenotypicSeries/(.*)"),
         (NamespacePrefix.OMIM, r"https://omim.org/entry/(.*)"),
         (NamespacePrefix.UMLS, r"http://linkedlifedata.com/resource/umls/id/(.*)"),
@@ -60,7 +60,8 @@ class Mondo(Base):
         if url.startswith("http://identifiers.org"):
             match = re.match(self._identifiers_url_pattern, url)
             if not match or not match.groups():
-                raise ValueError(f"Couldn't parse identifiers.org URL: {url}")
+                msg = f"Couldn't parse identifiers.org URL: {url}"
+                raise ValueError(msg)
             if match.groups()[0] == "snomedct":
                 return None
             prefix = NamespacePrefix[match.groups()[0].upper()]
@@ -70,7 +71,7 @@ class Mondo(Base):
             if match and match.groups():
                 return (prefix, match.groups()[0])
         # didn't match any patterns
-        _logger.warning(f"Unrecognized URL for xref: {url}")
+        _logger.warning("Unrecognized URL for xref: %s", url)
         return None
 
     @staticmethod
@@ -86,15 +87,12 @@ class Mondo(Base):
         :return: prefix and local ID if available
         """
         raw_prefix = clause.xref.id.prefix
-        if raw_prefix not in (
-            "ONCOTREE",
-            "EFO",
-        ):
+        if raw_prefix not in ("ONCOTREE", "EFO"):
             return None
         try:
             prefix = NamespacePrefix[clause.xref.id.prefix.upper()]
         except KeyError:
-            _logger.warning(f"Unable to parse namespace prefix for {clause.xref}")
+            _logger.warning("Unable to parse namespace prefix for %s", clause.xref)
             return None
         local_id = clause.xref.id.local
         return prefix, local_id
@@ -127,7 +125,7 @@ class Mondo(Base):
             local_id = property_value.value.local
         else:
             _logger.warning(
-                f"Unrecognized property value type: {type(property_value.value)}"
+                "Unrecognized property value type: %s", type(property_value.value)
             )
             return None
         return prefix, local_id

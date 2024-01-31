@@ -41,10 +41,7 @@ class Merge:
                 logger.error(f"generate_merged_concepts couldn't find " f"{concept_id}")
                 continue
             xrefs = record.get("xrefs", None)
-            if xrefs:
-                group = set(xrefs + [concept_id])
-            else:
-                group = {concept_id}
+            group = {*xrefs, concept_id} if xrefs else {concept_id}
             self._groups.append((concept_id, group))
         end = timer()
         self._database.complete_write_transaction()

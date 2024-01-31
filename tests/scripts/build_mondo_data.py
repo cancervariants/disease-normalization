@@ -53,7 +53,7 @@ for term in (
 
 outfile = test_data_dir / mondo._data_file.name
 outfile.parent.mkdir(exist_ok=True)
-with open(outfile, "w") as f:
+with outfile.open("w") as f:
     doc = fastobo.load(infile)
     f.write(str(doc.header))
     f.write("\n")
