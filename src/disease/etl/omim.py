@@ -13,11 +13,8 @@ class OMIM(Base):
 
     def _raise_access_error(self) -> None:
         """Raise improper data access error and describe proper data access."""
-        raise FileNotFoundError(
-            "Could not locate OMIM data. Per README, OMIM "
-            "source files must be manually placed in "
-            f"{self._data_source.data_dir.absolute().as_uri()}"
-        )
+        msg = f"Could not locate OMIM data. Per README, OMIM source files must be manually placed in {self._data_source.data_dir.absolute().as_uri()}"
+        raise FileNotFoundError(msg)
 
     def _get_data_handler(self, data_path: Optional[Path] = None) -> DataSource:
         """Construct data handler instance for source. Overwrites base class method
@@ -60,10 +57,10 @@ class OMIM(Base):
 
     def _transform_data(self) -> None:
         """Modulate data and prepare for loading."""
-        with open(self._data_file, "r") as f:
+        with self._data_file.open() as f:
             rows = f.readlines()
         rows = [r.rstrip() for r in rows if not r.startswith("#")]
-        rows = [[g for g in r.split("\t")] for r in rows]
+        rows = [r.split("\t") for r in rows]
         rows = [r for r in rows if r[0] not in ("Asterisk", "Caret", "Plus")]
         for row in rows:
             disease = {

@@ -15,20 +15,18 @@ def do(test_source):
 def neuroblastoma():
     """Build neuroblastoma fixture."""
     return Disease(
-        **{
-            "concept_id": "DOID:769",
-            "label": "neuroblastoma",
-            "xrefs": ["ncit:C3270"],
-            "associated_with": [
-                "efo:0000621",
-                "gard:7185",
-                "icdo:9500/3",
-                "mesh:D009447",
-                "orphanet:635",
-                "umls:C0027819",
-            ],
-            "aliases": [],
-        }
+        concept_id="DOID:769",
+        label="neuroblastoma",
+        xrefs=["ncit:C3270"],
+        associated_with=[
+            "efo:0000621",
+            "gard:7185",
+            "icdo:9500/3",
+            "mesh:D009447",
+            "orphanet:635",
+            "umls:C0027819",
+        ],
+        aliases=[],
     )
 
 
@@ -36,13 +34,11 @@ def neuroblastoma():
 def pediatric_liposarcoma():
     """Create test fixture for pediatric liposarcoma."""
     return Disease(
-        **{
-            "concept_id": "DOID:5695",
-            "label": "childhood liposarcoma",
-            "xrefs": ["ncit:C8091"],
-            "associated_with": ["umls:C0279984"],
-            "aliases": ["pediatric liposarcoma"],
-        }
+        concept_id="DOID:5695",
+        label="childhood liposarcoma",
+        xrefs=["ncit:C8091"],
+        associated_with=["umls:C0279984"],
+        aliases=["pediatric liposarcoma"],
     )
 
 
@@ -50,13 +46,11 @@ def pediatric_liposarcoma():
 def richter():
     """Create test fixture for Richter's Syndrome."""
     return Disease(
-        **{
-            "concept_id": "DOID:1703",
-            "label": "Richter's syndrome",
-            "aliases": ["Richter syndrome"],
-            "xrefs": ["ncit:C35424"],
-            "associated_with": ["umls:C0349631", "gard:7578", "icd10.cm:C91.1"],
-        }
+        concept_id="DOID:1703",
+        label="Richter's syndrome",
+        aliases=["Richter syndrome"],
+        xrefs=["ncit:C35424"],
+        associated_with=["umls:C0349631", "gard:7578", "icd10.cm:C91.1"],
     )
 
 

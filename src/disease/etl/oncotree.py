@@ -4,7 +4,7 @@ from typing import Dict
 
 from disease import logger
 from disease.etl.base import Base
-from disease.schemas import Disease, NamespacePrefix, SourceMeta
+from disease.schemas import NamespacePrefix, SourceMeta
 
 
 class OncoTree(Base):
@@ -14,7 +14,7 @@ class OncoTree(Base):
         """Load metadata"""
         metadata = SourceMeta(
             data_license="CC BY 4.0",
-            data_license_url="https://creativecommons.org/licenses/by/4.0/legalcode",  # noqa F401
+            data_license_url="https://creativecommons.org/licenses/by/4.0/legalcode",  # F401
             version=self._version,
             data_url="http://oncotree.mskcc.org/#/home?tab=api",
             rdp_url=None,
@@ -54,7 +54,6 @@ class OncoTree(Base):
                 else:
                     logger.warning(f"Unrecognized prefix: {prefix}")
                     continue
-            assert Disease(**disease)
             self._load_disease(disease)
         if disease_node.get("children", None):
             for child in disease_node["children"].values():
@@ -62,6 +61,6 @@ class OncoTree(Base):
 
     def _transform_data(self) -> None:
         """Initiate OncoTree data transformation."""
-        with open(self._data_file, "r") as f:
+        with self._data_file.open() as f:
             oncotree = json.load(f)
         self._traverse_tree(oncotree["TISSUE"])

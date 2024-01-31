@@ -56,10 +56,7 @@ class DO(OWLBase):
             label = disease_class.label[0]
 
             synonyms = disease_class.hasExactSynonym
-            if synonyms:
-                aliases = list({s for s in synonyms if s != label})
-            else:
-                aliases = []
+            aliases = list({s for s in synonyms if s != label}) if synonyms else []
 
             xrefs = []
             associated_with = []

@@ -36,9 +36,9 @@ class SourceIDAfterNamespace(Enum):
 
     NCIT = "C"
     MONDO = ""
-    DO = ""
-    ONCOTREE = ""
-    OMIM = ""
+    DO = ""  # noqa: PIE796
+    ONCOTREE = ""  # noqa: PIE796
+    OMIM = ""  # noqa: PIE796
 
 
 class NamespacePrefix(Enum):

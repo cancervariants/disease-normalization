@@ -15,14 +15,12 @@ def oncotree(test_source):
 def neuroblastoma():
     """Return neuroblastoma test fixture."""
     return Disease(
-        **{
-            "label": "Neuroblastoma",
-            "concept_id": "oncotree:NBL",
-            "aliases": [],
-            "xrefs": ["ncit:C3270"],
-            "associated_with": ["umls:C0027819"],
-            "pediatric_disease": None,
-        }
+        label="Neuroblastoma",
+        concept_id="oncotree:NBL",
+        aliases=[],
+        xrefs=["ncit:C3270"],
+        associated_with=["umls:C0027819"],
+        pediatric_disease=None,
     )
 
 
@@ -30,14 +28,12 @@ def neuroblastoma():
 def nsclc():
     """Return non small cell lung cancer fixture"""
     return Disease(
-        **{
-            "label": "Non-Small Cell Lung Cancer",
-            "concept_id": "oncotree:NSCLC",
-            "aliases": [],
-            "xrefs": ["ncit:C2926"],
-            "associated_with": ["umls:C0007131"],
-            "pediatric_disease": None,
-        }
+        label="Non-Small Cell Lung Cancer",
+        concept_id="oncotree:NSCLC",
+        aliases=[],
+        xrefs=["ncit:C2926"],
+        associated_with=["umls:C0007131"],
+        pediatric_disease=None,
     )
 
 
@@ -45,14 +41,12 @@ def nsclc():
 def ipn():
     """Return fixture for intracholecystic papillary neoplasm"""
     return Disease(
-        **{
-            "label": "Intracholecystic Papillary Neoplasm",
-            "concept_id": "oncotree:ICPN",
-            "aliases": [],
-            "xrefs": [],
-            "associated_with": [],
-            "pediatric_disease": None,
-        }
+        label="Intracholecystic Papillary Neoplasm",
+        concept_id="oncotree:ICPN",
+        aliases=[],
+        xrefs=[],
+        associated_with=[],
+        pediatric_disease=None,
     )
 
 

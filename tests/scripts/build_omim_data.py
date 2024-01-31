@@ -17,7 +17,7 @@ TEST_DATA_DIR = Path(__file__).resolve().parents[1] / "data" / "omim"
 outfile_path = TEST_DATA_DIR / omim._data_file.name
 outfile_path.parent.mkdir(exist_ok=True)
 
-with open(omim._data_file, "r") as f:
+with omim._data_file.open() as f:
     rows = list(csv.reader(f, delimiter="\t"))
 
 write_rows = []
@@ -31,6 +31,6 @@ for row in rows:
     if row[0].startswith("#") or row[1] in TEST_IDS:
         write_rows.append(row)
 
-with open(outfile_path, "w") as f:
+with outfile_path.open("w") as f:
     writer = csv.writer(f, delimiter="\t")
     writer.writerows(write_rows)

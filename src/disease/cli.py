@@ -69,7 +69,7 @@ def update_from_remote(data_url: Optional[str], db_url: str) -> None:
         )
         click.get_current_context().exit(1)
     except DatabaseException as e:
-        click.echo(f"Encountered exception during update: {str(e)}")
+        click.echo(f"Encountered exception during update: {e!s}")
         click.get_current_context().exit(1)
 
 
@@ -89,7 +89,7 @@ def dump_database(output_directory: Path, db_url: str) -> None:
     :param db_url: URL to normalizer database
     """  # noqa: D301
     if not output_directory:
-        output_directory = Path(".")
+        output_directory = Path()
 
     db = create_db(db_url, False)
     try:
@@ -100,7 +100,7 @@ def dump_database(output_directory: Path, db_url: str) -> None:
         )
         click.get_current_context().exit(1)
     except DatabaseException as e:
-        click.echo(f"Encountered exception during update: {str(e)}")
+        click.echo(f"Encountered exception during update: {e!s}")
         click.get_current_context().exit(1)
 
 
@@ -118,7 +118,7 @@ def _update_sources(
         records
     :param from_local: if true, use locally available data only
     """
-    processed_ids = list()
+    processed_ids = []
     for n in sources:
         delete_time = _delete_source(n, db)
         _load_source(n, db, delete_time, processed_ids, from_local)
@@ -175,7 +175,7 @@ def _load_source(
             f"Encountered ModuleNotFoundError attempting to import {e.name}. Are ETL dependencies installed?"
         )
         click.get_current_context().exit()
-    SourceClass = eval(n.value)  # noqa: N806
+    SourceClass = eval(n.value)  # noqa: N806 S307 PGH001
 
     source = SourceClass(database=db, silent=False)
     processed_ids += source.perform_etl(use_existing=from_local)
@@ -288,12 +288,14 @@ def update_db(
         sources_split = sources.lower().split()
 
         if len(sources_split) == 0:
-            raise Exception("Must enter one or more source names")
+            msg = "Must enter one or more source names"
+            raise Exception(msg)
 
         non_sources = set(sources_split) - set(SOURCES_LOWER_LOOKUP)
 
         if len(non_sources) != 0:
-            raise Exception(f"Not valid source(s): {non_sources}")
+            msg = f"Not valid source(s): {non_sources}"
+            raise Exception(msg)
 
         sources_to_update = {SourceName(SOURCES_LOWER_LOOKUP[s]) for s in sources_split}
         _update_sources(sources_to_update, db, update_merged, from_local)

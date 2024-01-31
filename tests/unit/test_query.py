@@ -18,70 +18,68 @@ def query_handler(database):
 def neuroblastoma():
     """Create neuroblastoma fixture."""
     return core_models.Disease(
-        **{
-            "type": "Disease",
-            "id": "normalize.disease.ncit:C3270",
-            "label": "Neuroblastoma",
-            "mappings": [
-                {
-                    "coding": {"code": "0005072", "system": "mondo"},
-                    "relation": "relatedMatch",
-                },
-                {
-                    "coding": {"code": "NBL", "system": "oncotree"},
-                    "relation": "relatedMatch",
-                },
-                {
-                    "coding": {"code": "769", "system": "doid"},
-                    "relation": "relatedMatch",
-                },
-                {
-                    "coding": {"code": "C0027819", "system": "umls"},
-                    "relation": "relatedMatch",
-                },
-                {
-                    "coding": {"code": "9500/3", "system": "icdo"},
-                    "relation": "relatedMatch",
-                },
-                {
-                    "coding": {"code": "0000621", "system": "efo"},
-                    "relation": "relatedMatch",
-                },
-                {
-                    "coding": {"code": "7185", "system": "gard"},
-                    "relation": "relatedMatch",
-                },
-                {
-                    "coding": {"code": "D009447", "system": "mesh"},
-                    "relation": "relatedMatch",
-                },
-                {
-                    "coding": {"code": "635", "system": "orphanet"},
-                    "relation": "relatedMatch",
-                },
-                {
-                    "coding": {"code": "C2751421", "system": "umls"},
-                    "relation": "relatedMatch",
-                },
-                {
-                    "coding": {"code": "CN205405", "system": "umls"},
-                    "relation": "relatedMatch",
-                },
-            ],
-            "aliases": [
-                "NB",
-                "neuroblastoma",
-                "Neural Crest Tumor, Malignant",
-                "Neuroblastoma (Schwannian Stroma-poor)",
-                "neuroblastoma (Schwannian Stroma-poor)",
-                "Neuroblastoma (Schwannian Stroma-Poor)",
-                "Neuroblastoma, NOS",
-                "NEUROBLASTOMA, MALIGNANT",
-                "Neuroblastoma (NBL)",
-                "neural Crest tumor, malignant",
-                "neuroblastoma, malignant",
-            ],
-        }
+        type="Disease",
+        id="normalize.disease.ncit:C3270",
+        label="Neuroblastoma",
+        mappings=[
+            {
+                "coding": {"code": "0005072", "system": "mondo"},
+                "relation": "relatedMatch",
+            },
+            {
+                "coding": {"code": "NBL", "system": "oncotree"},
+                "relation": "relatedMatch",
+            },
+            {
+                "coding": {"code": "769", "system": "doid"},
+                "relation": "relatedMatch",
+            },
+            {
+                "coding": {"code": "C0027819", "system": "umls"},
+                "relation": "relatedMatch",
+            },
+            {
+                "coding": {"code": "9500/3", "system": "icdo"},
+                "relation": "relatedMatch",
+            },
+            {
+                "coding": {"code": "0000621", "system": "efo"},
+                "relation": "relatedMatch",
+            },
+            {
+                "coding": {"code": "7185", "system": "gard"},
+                "relation": "relatedMatch",
+            },
+            {
+                "coding": {"code": "D009447", "system": "mesh"},
+                "relation": "relatedMatch",
+            },
+            {
+                "coding": {"code": "635", "system": "orphanet"},
+                "relation": "relatedMatch",
+            },
+            {
+                "coding": {"code": "C2751421", "system": "umls"},
+                "relation": "relatedMatch",
+            },
+            {
+                "coding": {"code": "CN205405", "system": "umls"},
+                "relation": "relatedMatch",
+            },
+        ],
+        aliases=[
+            "NB",
+            "neuroblastoma",
+            "Neural Crest Tumor, Malignant",
+            "Neuroblastoma (Schwannian Stroma-poor)",
+            "neuroblastoma (Schwannian Stroma-poor)",
+            "Neuroblastoma (Schwannian Stroma-Poor)",
+            "Neuroblastoma, NOS",
+            "NEUROBLASTOMA, MALIGNANT",
+            "Neuroblastoma (NBL)",
+            "neural Crest tumor, malignant",
+            "neuroblastoma, malignant",
+        ],
     )
 
 
@@ -89,12 +87,10 @@ def neuroblastoma():
 def skin_myo():
     """Create a test fixture for skin myopithelioma"""
     return core_models.Disease(
-        **{
-            "type": "Disease",
-            "id": "normalize.disease.ncit:C167370",
-            "label": "Skin Myoepithelioma",
-            "aliases": ["Cutaneous Myoepithelioma"],
-        }
+        type="Disease",
+        id="normalize.disease.ncit:C167370",
+        label="Skin Myoepithelioma",
+        aliases=["Cutaneous Myoepithelioma"],
     )
 
 
@@ -104,37 +100,35 @@ def mafd2():
     include a "pediatric_disease" Extension object.
     """
     return core_models.Disease(
-        **{
-            "type": "Disease",
-            "id": "normalize.disease.mondo:0010648",
-            "label": "major affective disorder 2",
-            "aliases": [
-                "MAFD2",
-                "MDI",
-                "MDX",
-                "MANIC-DEPRESSIVE ILLNESS",
-                "BPAD",
-                "MAFD2",
-                "BIPOLAR AFFECTIVE DISORDER",
-                "MANIC-DEPRESSIVE PSYCHOSIS, X-LINKED",
-                "major affective disorder 2, X-linked dominant",
-                "MAJOR affective disorder 2",
-                "bipolar affective disorder",
-                "major affective disorder 2",
-                "manic-depressive illness",
-                "manic-depressive psychosis, X-linked",
-            ],
-            "mappings": [
-                {
-                    "coding": {"code": "309200", "system": "omim"},
-                    "relation": "relatedMatch",
-                },
-                {
-                    "coding": {"code": "C564108", "system": "mesh"},
-                    "relation": "relatedMatch",
-                },
-            ],
-        }
+        type="Disease",
+        id="normalize.disease.mondo:0010648",
+        label="major affective disorder 2",
+        aliases=[
+            "MAFD2",
+            "MDI",
+            "MDX",
+            "MANIC-DEPRESSIVE ILLNESS",
+            "BPAD",
+            "MAFD2",
+            "BIPOLAR AFFECTIVE DISORDER",
+            "MANIC-DEPRESSIVE PSYCHOSIS, X-LINKED",
+            "major affective disorder 2, X-linked dominant",
+            "MAJOR affective disorder 2",
+            "bipolar affective disorder",
+            "major affective disorder 2",
+            "manic-depressive illness",
+            "manic-depressive psychosis, X-linked",
+        ],
+        mappings=[
+            {
+                "coding": {"code": "309200", "system": "omim"},
+                "relation": "relatedMatch",
+            },
+            {
+                "coding": {"code": "C564108", "system": "mesh"},
+                "relation": "relatedMatch",
+            },
+        ],
     )
 
 
@@ -170,11 +164,10 @@ def compare_disease(actual, fixture):
     def get_extension(extensions, name):
         matches = [e for e in extensions if e.name == name]
         if len(matches) > 1:
-            assert False
-        elif len(matches) == 1:
+            raise AssertionError
+        if len(matches) == 1:
             return matches[0]
-        else:
-            return None
+        return None
 
     assert bool(actual.extensions) == bool(fixture.extensions)
     if actual.extensions:

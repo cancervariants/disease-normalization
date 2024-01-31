@@ -17,30 +17,28 @@ def mondo(test_source):
 def neuroblastoma():
     """Construct a test fixture for neuroblastoma"""
     return Disease(
-        **{
-            "concept_id": "mondo:0005072",
-            "label": "neuroblastoma",
-            "aliases": [
-                "NB",
-                "neuroblastoma",
-                "neural Crest tumor, malignant",
-                "neuroblastoma (Schwannian Stroma-poor)",
-                "neuroblastoma, malignant",
-            ],
-            "xrefs": [
-                "ncit:C3270",
-                "DOID:769",
-                "oncotree:NBL",
-            ],
-            "associated_with": [
-                "orphanet:635",
-                "umls:C0027819",
-                "umls:CN205405",
-                "efo:0000621",
-                "mesh:D009447",
-            ],
-            "pediatric_disease": None,
-        }
+        concept_id="mondo:0005072",
+        label="neuroblastoma",
+        aliases=[
+            "NB",
+            "neuroblastoma",
+            "neural Crest tumor, malignant",
+            "neuroblastoma (Schwannian Stroma-poor)",
+            "neuroblastoma, malignant",
+        ],
+        xrefs=[
+            "ncit:C3270",
+            "DOID:769",
+            "oncotree:NBL",
+        ],
+        associated_with=[
+            "orphanet:635",
+            "umls:C0027819",
+            "umls:CN205405",
+            "efo:0000621",
+            "mesh:D009447",
+        ],
+        pediatric_disease=None,
     )
 
 
@@ -48,21 +46,19 @@ def neuroblastoma():
 def richter_syndrome():
     """Construct a test fixture for Richter Syndrome"""
     return Disease(
-        **{
-            "concept_id": "mondo:0002083",
-            "label": "Richter syndrome",
-            "aliases": [
-                "Richter syndrome",
-                "Richter's syndrome",
-                "Richter transformation",
-                "Richter's transformation",
-            ],
-            "xrefs": ["ncit:C35424", "DOID:1703"],
-            "associated_with": [
-                "umls:C0349631",
-            ],
-            "pediatric_disease": None,
-        }
+        concept_id="mondo:0002083",
+        label="Richter syndrome",
+        aliases=[
+            "Richter syndrome",
+            "Richter's syndrome",
+            "Richter transformation",
+            "Richter's transformation",
+        ],
+        xrefs=["ncit:C35424", "DOID:1703"],
+        associated_with=[
+            "umls:C0349631",
+        ],
+        pediatric_disease=None,
     )
 
 
@@ -72,18 +68,16 @@ def pediatric_liposarcoma():
     pediatric flag.
     """
     return Disease(
-        **{
-            "concept_id": "mondo:0003587",
-            "label": "pediatric liposarcoma",
-            "aliases": [
-                "pediatric liposarcoma",
-                "childhood liposarcoma",
-                "liposarcoma",
-            ],
-            "xrefs": ["DOID:5695", "ncit:C8091"],
-            "associated_with": ["umls:C0279984"],
-            "pediatric_disease": True,
-        }
+        concept_id="mondo:0003587",
+        label="pediatric liposarcoma",
+        aliases=[
+            "pediatric liposarcoma",
+            "childhood liposarcoma",
+            "liposarcoma",
+        ],
+        xrefs=["DOID:5695", "ncit:C8091"],
+        associated_with=["umls:C0279984"],
+        pediatric_disease=True,
     )
 
 
@@ -93,14 +87,12 @@ def cystic_teratoma_adult():
     pediatric flag.
     """
     return Disease(
-        **{
-            "concept_id": "mondo:0004099",
-            "label": "adult cystic teratoma",
-            "aliases": ["cystic teratoma of adults", "adult cystic teratoma"],
-            "pediatric_disease": None,
-            "xrefs": ["ncit:C9012", "DOID:7079"],
-            "associated_with": ["umls:C1368888"],
-        }
+        concept_id="mondo:0004099",
+        label="adult cystic teratoma",
+        aliases=["cystic teratoma of adults", "adult cystic teratoma"],
+        pediatric_disease=None,
+        xrefs=["ncit:C9012", "DOID:7079"],
+        associated_with=["umls:C1368888"],
     )
 
 
@@ -108,27 +100,25 @@ def cystic_teratoma_adult():
 def nsclc():
     """Construct a test fixture for non small cell lung cancer."""
     return Disease(
-        **{
-            "concept_id": "mondo:0005233",
-            "label": "non-small cell lung carcinoma",
-            "aliases": [
-                "NSCLC - non-small cell lung cancer",
-                "non-small cell lung carcinoma (disease)",
-                "non-small cell carcinoma of lung",
-                "non-small cell carcinoma of the lung",
-                "non-small cell cancer of lung",
-                "non-small cell lung cancer",
-                "non-small cell cancer of the lung",
-                "NSCLC",
-                "non-small cell lung carcinoma",
-            ],
-            "xrefs": ["ncit:C2926", "oncotree:NSCLC", "DOID:3908"],
-            "associated_with": [
-                "mesh:D002289",
-                "umls:C0007131",
-                "efo:0003060",
-            ],
-        }
+        concept_id="mondo:0005233",
+        label="non-small cell lung carcinoma",
+        aliases=[
+            "NSCLC - non-small cell lung cancer",
+            "non-small cell lung carcinoma (disease)",
+            "non-small cell carcinoma of lung",
+            "non-small cell carcinoma of the lung",
+            "non-small cell cancer of lung",
+            "non-small cell lung cancer",
+            "non-small cell cancer of the lung",
+            "NSCLC",
+            "non-small cell lung carcinoma",
+        ],
+        xrefs=["ncit:C2926", "oncotree:NSCLC", "DOID:3908"],
+        associated_with=[
+            "mesh:D002289",
+            "umls:C0007131",
+            "efo:0003060",
+        ],
     )
 
 

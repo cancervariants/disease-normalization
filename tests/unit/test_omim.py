@@ -17,22 +17,20 @@ def omim(test_source):
 def mafd2():
     """Build MAFD2 test fixture."""
     return Disease(
-        **{
-            "concept_id": "omim:309200",
-            "label": "MAJOR AFFECTIVE DISORDER 2",
-            "aliases": [
-                "MAFD2",
-                "MANIC-DEPRESSIVE ILLNESS",
-                "MDI",
-                "MANIC-DEPRESSIVE PSYCHOSIS, X-LINKED",
-                "MDX",
-                "BIPOLAR AFFECTIVE DISORDER",
-                "BPAD",
-            ],
-            "xrefs": [],
-            "associated_with": [],
-            "pediatric_disease": None,
-        }
+        concept_id="omim:309200",
+        label="MAJOR AFFECTIVE DISORDER 2",
+        aliases=[
+            "MAFD2",
+            "MANIC-DEPRESSIVE ILLNESS",
+            "MDI",
+            "MANIC-DEPRESSIVE PSYCHOSIS, X-LINKED",
+            "MDX",
+            "BIPOLAR AFFECTIVE DISORDER",
+            "BPAD",
+        ],
+        xrefs=[],
+        associated_with=[],
+        pediatric_disease=None,
     )
 
 
@@ -40,22 +38,20 @@ def mafd2():
 def acute_ll():
     """Build ALL fixture."""
     return Disease(
-        **{
-            "concept_id": "omim:613065",
-            "label": "LEUKEMIA, ACUTE LYMPHOBLASTIC",
-            "aliases": [
-                "ALL",
-                "LEUKEMIA, ACUTE LYMPHOBLASTIC, SUSCEPTIBILITY TO, 1",
-                "ALL1",
-                "LEUKEMIA, ACUTE LYMPHOCYTIC, SUSCEPTIBILITY TO, 1",
-                "LEUKEMIA, B-CELL ACUTE LYMPHOBLASTIC, SUSCEPTIBILITY TO",
-                "LEUKEMIA, T-CELL ACUTE LYMPHOBLASTIC, SUSCEPTIBILITY TO",
-                "LEUKEMIA, ACUTE LYMPHOBLASTIC, B-HYPERDIPLOID, SUSCEPTIBILITY TO",
-            ],
-            "xrefs": [],
-            "associated_with": [],
-            "pediatric_disease": None,
-        }
+        concept_id="omim:613065",
+        label="LEUKEMIA, ACUTE LYMPHOBLASTIC",
+        aliases=[
+            "ALL",
+            "LEUKEMIA, ACUTE LYMPHOBLASTIC, SUSCEPTIBILITY TO, 1",
+            "ALL1",
+            "LEUKEMIA, ACUTE LYMPHOCYTIC, SUSCEPTIBILITY TO, 1",
+            "LEUKEMIA, B-CELL ACUTE LYMPHOBLASTIC, SUSCEPTIBILITY TO",
+            "LEUKEMIA, T-CELL ACUTE LYMPHOBLASTIC, SUSCEPTIBILITY TO",
+            "LEUKEMIA, ACUTE LYMPHOBLASTIC, B-HYPERDIPLOID, SUSCEPTIBILITY TO",
+        ],
+        xrefs=[],
+        associated_with=[],
+        pediatric_disease=None,
     )
 
 
@@ -63,14 +59,12 @@ def acute_ll():
 def lall():
     """Build LALL fixture."""
     return Disease(
-        **{
-            "concept_id": "omim:247640",
-            "label": "LYMPHOBLASTIC LEUKEMIA, ACUTE, WITH LYMPHOMATOUS FEATURES",
-            "aliases": ["LALL", "LYMPHOMATOUS ALL"],
-            "xrefs": [],
-            "associated_with": [],
-            "pediatric_disease": None,
-        }
+        concept_id="omim:247640",
+        label="LYMPHOBLASTIC LEUKEMIA, ACUTE, WITH LYMPHOMATOUS FEATURES",
+        aliases=["LALL", "LYMPHOMATOUS ALL"],
+        xrefs=[],
+        associated_with=[],
+        pediatric_disease=None,
     )
 
 
