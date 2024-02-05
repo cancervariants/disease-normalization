@@ -1,4 +1,4 @@
-"""Module to load disease data from NCIt."""
+"""Get NCIt disease data."""
 import re
 from typing import Set
 

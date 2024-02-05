@@ -1,4 +1,4 @@
-"""Provides methods for handling queries."""
+"""Provides query handler class, which receives and responses to user search queries."""
 import datetime
 import re
 from typing import Dict, Optional, Set, Tuple
@@ -31,9 +31,19 @@ class QueryHandler:
     """
 
     def __init__(self, database: AbstractDatabase) -> None:
-        """Initialize Normalizer instance.
+        """Initialize QueryHandler instance. Requires a created database object to
+        initialize. The most straightforward way to do this is via the
+        :py:meth:`~disease.database.database.create_db` method:
 
-        :param database: storage backend to query against
+        >>> from disease.query import QueryHandler
+        >>> from disease.database import create_db
+        >>> q = QueryHandler(create_db())
+
+        We'll generally call ``create_db`` without any arguments in code examples, for
+        the sake of brevity. See the :py:meth:`~disease.database.database.create_db` API
+        description for more details.
+
+        :param database: storage backend to search against
         """
         self.db = database
 
@@ -205,7 +215,14 @@ class QueryHandler:
         return self._fill_no_matches(response)
 
     def search(self, query_str: str, incl: str = "", excl: str = "") -> SearchService:
-        """Fetch normalized disease objects.
+        """Return highest match for each source.
+
+        >>> from disease.query import QueryHandler
+        >>> from disease.database import create_db
+        >>> q = QueryHandler(create_db())
+        >>> result = q.search("NSCLC")
+        >>> result.source_matches["Mondo"].records[0].concept_id
+        'mondo:0005233'
 
         :param str query_str: query, a string, to search for
         :param str incl: str containing comma-separated names of sources to
@@ -373,9 +390,19 @@ class QueryHandler:
         return NormalizationService(**response)
 
     def normalize(self, query: str) -> NormalizationService:
-        """Return normalized concept for given search term.
-        :param str query: string to search against
-        :return: NormalizationService object with complete response
+        """Return normalized concept for query.
+
+        Use to retrieve normalized disease concept records:
+
+        >>> from disease.query import QueryHandler
+        >>> from disease.database import create_db
+        >>> q = QueryHandler(create_db())
+        >>> result = q.normalize("NSCLC")
+        >>> result.normalized_id
+        'ncit:C2926'
+
+        :param query: String to find normalized concept for
+        :return: Normalized disease concept
         """
         # prepare basic response
         response = {

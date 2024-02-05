@@ -36,7 +36,7 @@ _logger.setLevel(logging.DEBUG)
 
 
 class DynamoDbDatabase(AbstractDatabase):
-    """Database class employing DynamoDB."""
+    """Disease Normalizer database client for DynamoDB."""
 
     def __init__(self, db_url: Optional[str] = None, **db_args) -> None:
         """Initialize Database class.
@@ -165,6 +165,7 @@ class DynamoDbDatabase(AbstractDatabase):
 
     def check_tables_populated(self) -> bool:
         """Perform rudimentary checks to see if tables are populated.
+
         Emphasis is on rudimentary -- if some fiendish element has deleted half of the
         disease aliases, this method won't pick it up. It just wants to see if a few
         critical tables have at least a small number of records.
@@ -240,12 +241,13 @@ class DynamoDbDatabase(AbstractDatabase):
         self, concept_id: str, case_sensitive: bool = True, merge: bool = False
     ) -> Optional[Dict]:
         """Fetch record corresponding to provided concept ID
+
         :param str concept_id: concept ID for disease record
         :param bool case_sensitive: if true, performs exact lookup, which is more
-        efficient. Otherwise, performs filter operation, which doesn't require correct
-        casing.
+            efficient. Otherwise, performs filter operation, which doesn't require
+            correct casing.
         :param bool merge: if true, look for merged record; look for identity record
-        otherwise.
+            otherwise.
         :return: complete record, if match is found; None otherwise
         """
         try:
@@ -331,7 +333,7 @@ class DynamoDbDatabase(AbstractDatabase):
         records that are otherwise ungrouped).
         For example,
 
-        .. code-block::pycon
+        .. code-block:: pycon
 
            >>> from disease.database import create_db
            >>> from disease.schemas import RecordType

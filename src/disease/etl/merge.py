@@ -8,7 +8,7 @@ from disease.schemas import SourcePriority
 
 
 class Merge:
-    """Handles record merging."""
+    """Manage construction of record mergers for normalization."""
 
     def __init__(self, database: AbstractDatabase) -> None:
         """Initialize Merge instance.
@@ -20,6 +20,7 @@ class Merge:
 
     def create_merged_concepts(self, record_ids: Collection[str]) -> None:
         """Create concept groups, generate merged concept records, and update database.
+
         Our normalization protocols only generate record ID sets that include Mondo
         terms, meaning only Mondo IDs should be submitted to this method.
 
