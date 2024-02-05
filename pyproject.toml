@@ -120,6 +120,7 @@ fixable = [
     "SIM",
     "RUF"
 ]
+# ANN101 - missing-type-self
 # ANN003 - missing-type-kwargs
 # D203 - one-blank-line-before-class
 # D205 - blank-line-after-summary
@@ -135,7 +136,7 @@ fixable = [
 # W191 - tab-indentation*
 # *ignored for compatibility with formatter
 ignore = [
-    "ANN003",
+    "ANN101", "ANN003",
     "D203", "D205", "D206", "D213", "D300", "D400", "D415",
     "E111", "E114", "E117", "E501",
     "W191"
@@ -144,9 +145,10 @@ ignore = [
 [tool.ruff.lint.per-file-ignores]
 # ANN001 - missing-type-function-argument
 # ANN2 - missing-return-type
+# ANN102 - missing-type-cls
 # N805 - invalid-first-argument-name-for-method
 # S101 - assert
 # RUF001 - ambiguous-unicode-character-string
-"tests/*" = ["ANN001", "ANN2", "S101"]
+"tests/*" = ["ANN001", "ANN2", "ANN102", "S101"]
 "tests/unit/test_emit_warnings.py" = ["RUF001"]
 "src/disease/schemas.py" = ["ANN201", "N805", "ANN001"]
