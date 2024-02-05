@@ -38,7 +38,7 @@ dynamic = ["version"]
 pg = ["psycopg[binary]", "requests"]
 etl = ["owlready2==0.40", "rdflib", "wags-tails>=0.1.2", "fastobo"]
 test = ["pytest>=6.0", "pytest-cov", "httpx"]
-dev = ["pre-commit", "ruff>=0.1.14", "lxml", "xmlformatter"]
+dev = ["pre-commit", "ruff==0.2.0", "lxml", "xmlformatter"]
 
 [project.urls]
 Homepage = "https://github.com/cancervariants/disease-normalization"
@@ -75,6 +75,8 @@ branch = true
 
 [tool.ruff]
 src = ["src"]
+
+[tool.ruff.lint]
 select = [
     "F",  # https://docs.astral.sh/ruff/rules/#pyflakes-f
     "E", "W",  # https://docs.astral.sh/ruff/rules/#pycodestyle-e-w
@@ -140,7 +142,7 @@ ignore = [
     "W191"
 ]
 
-[tool.ruff.per-file-ignores]
+[tool.ruff.lint.per-file-ignores]
 # ANN001 - missing-type-function-argument
 # ANN2 - missing-return-type
 # ANN102 - missing-type-cls
