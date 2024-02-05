@@ -32,7 +32,7 @@ class OncoTree(Base):
         :param Dict disease_node: node in tree containing info for individual
             disease.
         """
-        if disease_node.get("level", None) >= 2:
+        if disease_node.get("level") >= 2:
             disease = {
                 "concept_id": f"{NamespacePrefix.ONCOTREE.value}:{disease_node['code']}",
                 "label": disease_node["name"],
@@ -55,7 +55,7 @@ class OncoTree(Base):
                     logger.warning(f"Unrecognized prefix: {prefix}")
                     continue
             self._load_disease(disease)
-        if disease_node.get("children", None):
+        if disease_node.get("children"):
             for child in disease_node["children"].values():
                 self._traverse_tree(child)
 

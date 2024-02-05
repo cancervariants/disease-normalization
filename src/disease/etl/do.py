@@ -63,7 +63,7 @@ class DO(OWLBase):
             db_associated_with = set(disease_class.hasDbXref)
             for xref in db_associated_with:
                 prefix, id_no = xref.split(":", 1)
-                normed_prefix = DO_PREFIX_LOOKUP.get(prefix, None)
+                normed_prefix = DO_PREFIX_LOOKUP.get(prefix)
                 if normed_prefix:
                     xref_no = f"{normed_prefix}:{id_no}"
                     if normed_prefix.lower() in PREFIX_LOOKUP:

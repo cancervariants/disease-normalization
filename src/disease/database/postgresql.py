@@ -746,7 +746,7 @@ class PostgresDatabase(AbstractDatabase):
             tar_dump_file = next(
                 f for f in tar.getmembers() if f.name.startswith("disease_norm_")
             )
-            tar.extractall(path=tempdir_path, members=[tar_dump_file])
+            tar.extractall(path=tempdir_path, members=[tar_dump_file])  # noqa: S202 RUF100
             dump_file = tempdir_path / tar_dump_file.name
 
             if self.conn.info.password:
