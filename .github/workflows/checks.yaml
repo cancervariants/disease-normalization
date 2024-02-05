@@ -79,7 +79,7 @@ jobs:
       - name: Install dependencies
         run: |
           python3 -m pip install --upgrade pip
-          python3 -m pip install '.[docs]'
+          python3 -m pip install '.[docs,etl,pg]'
 
       - name: Attempt docs build
         working-directory: ./docs
