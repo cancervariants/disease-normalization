@@ -1,4 +1,4 @@
-"""Module to load disease data from OMIM."""
+"""Get OMIM disease data."""
 from pathlib import Path
 from typing import Optional
 

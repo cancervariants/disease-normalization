@@ -1,4 +1,4 @@
-"""Disease Ontology ETL module."""
+"""Get Human Disease Ontology data."""
 import owlready2 as owl
 
 from disease import PREFIX_LOOKUP

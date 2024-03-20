@@ -1,4 +1,9 @@
-"""Provide core database classes and parameters."""
+"""Provide core database classes and helper methods.
+
+Users shouldn't need to interact with the base class directly, but
+:py:meth:`~disease.database.database.create_db` is the recommended way to create a
+database connection.
+"""
 import abc
 import sys
 from enum import Enum
@@ -149,7 +154,7 @@ class AbstractDatabase(abc.ABC):
         records that are otherwise ungrouped).
         For example,
 
-        .. code-block::pycon
+        .. code-block:: pycon
 
            >>> from disease.database import create_db
            >>> from disease.schemas import RecordType
@@ -278,7 +283,7 @@ def create_db(
 
     Generally prefers to return a DynamoDB instance, unless all DDB-relevant
     environment variables are unset and a libpq-compliant URI is passed to
-    `db_url`.
+    ``db_url``.
 
     :param db_url: address to database instance
     :param aws_instance: use hosted DynamoDB instance, not local DB

@@ -33,19 +33,25 @@ SCRIPTS_DIR = Path(__file__).parent / "postgresql"
 
 
 class PostgresDatabase(AbstractDatabase):
-    """Database class employing PostgreSQL."""
+    """Disease Normalizer database client for PostgreSQL."""
 
     def __init__(self, db_url: Optional[str] = None, **db_args) -> None:
         """Initialize Postgres connection.
 
-        :param db_url: libpq compliant database connection URI
-        :param **db_args: see below
+        .. code-block:: pycon
 
+           >>> from disease.database.postgresql import PostgresDatabase
+           >>> db = PostgresDatabase(
+           >>>     user="postgres",
+           >>>     password="matthew_cannon2",
+           >>>     db_name="disease_normalizer"
+           >>> )
+
+        :param db_url: libpq compliant database connection URI
         :Keyword Arguments:
             * user: Postgres username
             * password: Postgres password (optional or blank if unneeded)
             * db_name: name of database to connect to
-
         :raise DatabaseInitializationException: if initial setup fails
         """
         if db_url:
@@ -377,11 +383,12 @@ class PostgresDatabase(AbstractDatabase):
         self, concept_id: str, case_sensitive: bool = True, merge: bool = False
     ) -> Optional[Dict]:
         """Fetch record corresponding to provided concept ID
+
         :param str concept_id: concept ID for disease record
         :param bool case_sensitive: not used by this implementation -- lookups use
-        case-insensitive index
+           case-insensitive index
         :param bool merge: if true, look for merged record; look for identity record
-        otherwise.
+           otherwise.
         :return: complete disease record, if match is found; None otherwise
         """
         if merge:
@@ -453,7 +460,7 @@ class PostgresDatabase(AbstractDatabase):
 
         For example,
 
-        .. code-block::pycon
+        .. code-block:: pycon
 
            >>> from disease.database import create_db
            >>> from disease.schemas import RecordType
@@ -759,7 +766,7 @@ class PostgresDatabase(AbstractDatabase):
 
         :param export_location: path to directory to save DB dump in
         :return: Nothing, but saves results of pg_dump to file named
-            `disease_norm_<date and time>.sql`
+            ``disease_norm_<date and time>.sql``
         :raise ValueError: if output directory isn't a directory or doesn't exist
         :raise DatabaseException: if psql call fails
         """

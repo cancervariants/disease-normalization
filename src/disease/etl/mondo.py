@@ -1,4 +1,4 @@
-"""Module to load disease data from Mondo Disease Ontology."""
+"""Get Mondo Disease Ontology data."""
 import logging
 import re
 from collections import defaultdict

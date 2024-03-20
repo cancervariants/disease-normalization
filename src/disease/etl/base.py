@@ -1,4 +1,7 @@
-"""A base class for extraction, transformation, and loading of data."""
+"""Provides abstract base classes for source ETL procedures.
+
+Generally, users shouldn't ever have to work directly with the classes contained within.
+"""
 from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Dict, List, Optional, Set, Union
@@ -54,8 +57,9 @@ class Base(ABC):
 
     def perform_etl(self, use_existing: bool = False) -> List:
         """Public-facing method to begin ETL procedures on given data.
+
         :param use_existing: if True, use local data instead of retrieving most recent
-        version
+            version
         :return: List of concept IDs to be added to merge generation.
         """
         self._extract_data(use_existing)

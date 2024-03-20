@@ -1,4 +1,4 @@
-"""Module to load disease data from OncoTree."""
+"""Get OncoTree data."""
 import json
 from typing import Dict
 
