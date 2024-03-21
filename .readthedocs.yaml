@@ -11,6 +11,8 @@ python:
       path: .
       extra_requirements:
         - docs
+        - etl
+        - pg
 
 sphinx:
   configuration: docs/source/conf.py
