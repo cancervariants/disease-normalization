@@ -3,7 +3,7 @@
 [![image](https://img.shields.io/pypi/v/disease-normalizer.svg)](https://pypi.python.org/pypi/disease-normalizer)
 [![image](https://img.shields.io/pypi/l/disease-normalizer.svg)](https://pypi.python.org/pypi/disease-normalizer)
 [![image](https://img.shields.io/pypi/pyversions/disease-normalizer.svg)](https://pypi.python.org/pypi/disease-normalizer)
-[![Actions status](https://github.com/cancervariants/disease-normalization/workflows/checks.yaml/badge.svg)](https://github.com/cancervariants/disease-normalization/actions/workflows/checks.yaml)
+[![Actions status](https://github.com/cancervariants/disease-normalization/actions/workflows/checks.yaml/badge.svg)](https://github.com/cancervariants/disease-normalization/actions/workflows/checks.yaml)
 
 <!-- description -->
 The Disease Normalizer resolves ambiguous references and descriptions of human diseases to consistently-structured, normalized terms. For concepts extracted from [NCIt](https://ncithesaurus.nci.nih.gov/ncitbrowser/), [Mondo Disease Ontology](https://mondo.monarchinitiative.org/), [The Human Disease Ontology](https://disease-ontology.org/), [OMIM](https://www.omim.org/), and [OncoTree](https://oncotree.info/#/home), it designates a [CURIE](https://en.wikipedia.org/wiki/CURIE), and provides additional metadata like aliases and cross-references.
