@@ -20,6 +20,7 @@ classifiers = [
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
 ]
 requires-python = ">=3.8"
 description = "VICC normalization routines for diseases"
@@ -64,7 +65,7 @@ disease_norm_dump = "disease.cli:dump_database"
 disease_norm_check_db = "disease.cli:check_db"
 
 [build-system]
-requires = ["setuptools>=61.0"]
+requires = ["setuptools>=64"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.dynamic]
