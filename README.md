@@ -61,25 +61,6 @@ Or utilize the [Python API](https://disease-normalizer.readthedocs.io/latest/ref
 
 ---
 
----
-
 ## Feedback and contributing
 
 We welcome bug reports, feature requests, and code contributions from users and interested collaborators. The [documentation](https://disease-normalizer.readthedocs.io/latest/contributing.html) contains guidance for submitting feedback and contributing new code.
-
-### Running unit tests
-
-Tests are provided via pytest.
-
-```commandline
-pytest
-```
-
-By default, tests will employ an existing DynamoDB database. For test environments where this is unavailable (e.g. in CI), the `DISEASE_TEST` environment variable can be set to initialize a local DynamoDB instance with miniature versions of input data files before tests are executed.
-
-```comandline
-export DISEASE_TEST=true
-pytest
-```
-
-Sometimes, sources will update their data, and our test fixtures and data will become incorrect. The `tests/scripts/` subdirectory includes scripts to rebuild data files, although most fixtures will need to be updated manually.
