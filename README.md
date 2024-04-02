@@ -11,7 +11,7 @@ The Disease Normalizer resolves ambiguous references and descriptions of human d
 
 ---
 
-**[Documentation](https://disease-normalizer.readthedocs.io/stable/)** · [Installation](https://disease-normalizer.readthedocs.io/stable/install.html) · [Usage](https://disease-normalizer.readthedocs.io/stable/usage.html) · [API reference](https://disease-normalizer.readthedocs.io/stable/reference/index.html)
+**[Documentation](https://disease-normalizer.readthedocs.io/latest/)** · [Installation](https://disease-normalizer.readthedocs.io/latest/install.html) · [API reference](https://disease-normalizer.readthedocs.io/latest/reference/index.html)
 
 ---
 
