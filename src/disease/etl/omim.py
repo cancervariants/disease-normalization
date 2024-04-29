@@ -2,6 +2,7 @@
 from pathlib import Path
 from typing import Optional
 
+from tqdm import tqdm
 from wags_tails import CustomData, DataSource
 
 from disease.etl.base import Base
@@ -62,7 +63,7 @@ class OMIM(Base):
         rows = [r.rstrip() for r in rows if not r.startswith("#")]
         rows = [r.split("\t") for r in rows]
         rows = [r for r in rows if r[0] not in ("Asterisk", "Caret", "Plus")]
-        for row in rows:
+        for row in tqdm(rows, ncols=80, disable=self._silent):
             disease = {
                 "concept_id": f"{NamespacePrefix.OMIM.value}:{row[1]}",
             }

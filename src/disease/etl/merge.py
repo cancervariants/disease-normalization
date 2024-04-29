@@ -2,6 +2,8 @@
 from timeit import default_timer as timer
 from typing import Collection, Dict, List, Set, Tuple
 
+from tqdm import tqdm
+
 from disease import logger
 from disease.database.database import AbstractDatabase
 from disease.schemas import SourcePriority
@@ -10,12 +12,14 @@ from disease.schemas import SourcePriority
 class Merge:
     """Manage construction of record mergers for normalization."""
 
-    def __init__(self, database: AbstractDatabase) -> None:
+    def __init__(self, database: AbstractDatabase, silent: bool = True) -> None:
         """Initialize Merge instance.
 
         :param Database database: db instance to use for record retrieval and creation.
+        :param silent: if ``True``, suppress console output
         """
         self._database = database
+        self._silent = silent
         self._groups = []  # list of tuples: (mondo_concept_id, set_of_ids)
 
     def create_merged_concepts(self, record_ids: Collection[str]) -> None:
@@ -29,7 +33,7 @@ class Merge:
         # build groups
         logger.info(f"Generating record ID sets from {len(record_ids)} records")
         start = timer()
-        for concept_id in record_ids:
+        for concept_id in tqdm(record_ids, ncols=80, disable=self._silent):
             try:
                 record = self._database.get_record_by_id(concept_id)
             except AttributeError:
@@ -51,7 +55,7 @@ class Merge:
         # build merged concepts
         logger.info("Creating merged records and updating database...")
         start = timer()
-        for record_id, group in self._groups:
+        for record_id, group in tqdm(self._groups, ncols=80, disable=self._silent):
             try:
                 merged_record, merged_ids = self._generate_merged_record(group)
             except AttributeError:

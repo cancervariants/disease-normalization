@@ -2,6 +2,8 @@
 import json
 from typing import Dict
 
+from tqdm import tqdm
+
 from disease import logger
 from disease.etl.base import Base
 from disease.schemas import NamespacePrefix, SourceMeta
@@ -27,40 +29,55 @@ class OncoTree(Base):
         self._database.add_source_metadata(self._src_name, metadata)
 
     def _traverse_tree(self, disease_node: Dict) -> None:
-        """Traverse JSON tree and load diseases where possible.
+        """Traverse JSON tree and queue diseases for loading where possible.
 
-        :param Dict disease_node: node in tree containing info for individual
-            disease.
+        :param disease_node: node in tree containing info for individual disease.
         """
-        if disease_node.get("level") >= 2:
-            disease = {
-                "concept_id": f"{NamespacePrefix.ONCOTREE.value}:{disease_node['code']}",
-                "label": disease_node["name"],
-                "xrefs": [],
-                "associated_with": [],
-            }
-            refs = disease_node.get("externalReferences", [])
-            for prefix, codes in refs.items():
-                if prefix == "UMLS":
-                    normed_prefix = NamespacePrefix.UMLS.value
-                    for code in codes:
-                        normed_id = f"{normed_prefix}:{code}"
-                        disease["associated_with"].append(normed_id)
-                elif prefix == "NCI":
-                    normed_prefix = NamespacePrefix.NCIT.value
-                    for code in codes:
-                        normed_id = f"{normed_prefix}:{code}"
-                        disease["xrefs"].append(normed_id)
-                else:
-                    logger.warning(f"Unrecognized prefix: {prefix}")
-                    continue
-            self._load_disease(disease)
+        if disease_node["level"] >= 2:
+            self._nodes.append(
+                {
+                    "code": disease_node["code"],
+                    "name": disease_node["name"],
+                    "externalReferences": disease_node.get("externalReferences", []),
+                }
+            )
         if disease_node.get("children"):
             for child in disease_node["children"].values():
                 self._traverse_tree(child)
+
+    def _add_disease(self, disease_node: Dict) -> None:
+        """Grab data from disease node and load into DB.
+
+        :param disease_node: individual node taken from OncoTree tree
+        """
+        disease = {
+            "concept_id": f"{NamespacePrefix.ONCOTREE.value}:{disease_node['code']}",
+            "label": disease_node["name"],
+            "xrefs": [],
+            "associated_with": [],
+        }
+        refs = disease_node.get("externalReferences", [])
+        for prefix, codes in refs.items():
+            if prefix == "UMLS":
+                normed_prefix = NamespacePrefix.UMLS.value
+                for code in codes:
+                    normed_id = f"{normed_prefix}:{code}"
+                    disease["associated_with"].append(normed_id)
+            elif prefix == "NCI":
+                normed_prefix = NamespacePrefix.NCIT.value
+                for code in codes:
+                    normed_id = f"{normed_prefix}:{code}"
+                    disease["xrefs"].append(normed_id)
+            else:
+                logger.warning(f"Unrecognized prefix: {prefix}")
+                continue
+        self._load_disease(disease)
 
     def _transform_data(self) -> None:
         """Initiate OncoTree data transformation."""
         with self._data_file.open() as f:
             oncotree = json.load(f)
+        self._nodes = []
         self._traverse_tree(oncotree["TISSUE"])
+        for node in tqdm(self._nodes, ncols=80, disable=self._silent):
+            self._add_disease(node)

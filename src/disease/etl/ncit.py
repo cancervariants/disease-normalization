@@ -3,6 +3,7 @@ import re
 from typing import Set
 
 import owlready2 as owl
+from tqdm import tqdm
 
 from disease import logger
 from disease.etl.base import OWLBase
@@ -49,7 +50,7 @@ class NCIt(OWLBase):
         """Get data from file and construct object for loading."""
         ncit = owl.get_ontology(self._data_file.absolute().as_uri()).load()
         disease_uris = self._get_disease_classes()
-        for uri in disease_uris:
+        for uri in tqdm(disease_uris, ncols=80, disable=self._silent):
             disease_class = ncit.search(iri=uri)[0]
             concept_id = f"{NamespacePrefix.NCIT.value}:{disease_class.name}"
             if disease_class.P108:

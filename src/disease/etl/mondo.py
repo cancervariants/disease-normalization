@@ -5,6 +5,7 @@ from collections import defaultdict
 from typing import ClassVar, DefaultDict, Dict, Optional, Set, Tuple
 
 import fastobo
+from tqdm import tqdm
 
 from disease.etl.base import Base
 from disease.schemas import DataLicenseAttributes, NamespacePrefix, SourceMeta
@@ -186,7 +187,7 @@ class Mondo(Base):
         pediatric_diseases = self._construct_dependency_set(dag, peds_neoplasm_root)
 
         reader = fastobo.iter(str(self._data_file.absolute()))
-        for item in reader:
+        for item in tqdm(reader, ncols=80, disable=self._silent):
             concept_id = str(item.id).lower()
             if concept_id.upper() not in diseases:
                 continue
