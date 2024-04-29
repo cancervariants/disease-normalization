@@ -46,7 +46,10 @@ class OncoTree(Base):
                 self._traverse_tree(child)
 
     def _add_disease(self, disease_node: Dict) -> None:
-        """Pass"""
+        """Grab data from disease node and load into DB.
+
+        :param disease_node: individual node taken from OncoTree tree
+        """
         disease = {
             "concept_id": f"{NamespacePrefix.ONCOTREE.value}:{disease_node['code']}",
             "label": disease_node["name"],
