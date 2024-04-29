@@ -1,5 +1,6 @@
 """Get Human Disease Ontology data."""
 import owlready2 as owl
+from tqdm import tqdm
 
 from disease import PREFIX_LOOKUP
 from disease.etl.base import OWLBase
@@ -47,7 +48,7 @@ class DO(OWLBase):
         diseases = self._get_subclasses(
             disease_uri, owl.default_world.as_rdflib_graph()
         )
-        for uri in diseases:
+        for uri in tqdm(diseases, ncols=80, disable=self._silent):
             disease_class = do.search(iri=uri)[0]
             if disease_class.deprecated:
                 continue
