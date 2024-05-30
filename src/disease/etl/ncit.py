@@ -1,13 +1,15 @@
 """Get NCIt disease data."""
+import logging
 import re
 from typing import Set
 
 import owlready2 as owl
 from tqdm import tqdm
 
-from disease import logger
 from disease.etl.base import OWLBase
 from disease.schemas import NamespacePrefix, SourceMeta, SourceName
+
+_logger = logging.getLogger(__name__)
 
 icdo_re = re.compile("[0-9]+/[0-9]+")
 
@@ -56,7 +58,7 @@ class NCIt(OWLBase):
             if disease_class.P108:
                 label = disease_class.P108.first()
             else:
-                logger.warning(f"No label for concept {concept_id}")
+                _logger.warning("No label for concept %s", concept_id)
                 continue
             aliases = [a for a in disease_class.P90 if a != label]
 
