@@ -87,6 +87,7 @@ def update_from_remote(data_url: Optional[str], db_url: str) -> None:
     except DatabaseException as e:
         click.echo(f"Encountered exception during update: {e!s}")
         click.get_current_context().exit(1)
+    _logger.info("Successfully loaded data from remote snapshot.")
 
 
 @click.command()
@@ -318,6 +319,7 @@ def update_db(
 
         sources_to_update = {SourceName(SOURCES_LOWER_LOOKUP[s]) for s in sources_split}
         _update_sources(sources_to_update, db, update_merged, from_local)
+    _logger.info("Database update successful.")
 
 
 if __name__ == "__main__":
