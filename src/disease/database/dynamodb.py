@@ -32,7 +32,6 @@ from disease.schemas import (
 )
 
 _logger = logging.getLogger()
-_logger.setLevel(logging.DEBUG)
 
 
 class DynamoDbDatabase(AbstractDatabase):

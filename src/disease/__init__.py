@@ -1,19 +1,9 @@
 """The VICC library for normalizing diseases."""
-import logging
 from pathlib import Path
 
 from .version import __version__  # noqa: F401
 
 APP_ROOT = Path(__file__).resolve().parents[0]
-
-# set up logging
-logging.basicConfig(
-    filename="disease.log",
-    format="[%(asctime)s] - %(name)s - %(levelname)s : %(message)s",
-)
-logger = logging.getLogger("disease")
-logger.setLevel(logging.DEBUG)
-logger.handlers = []
 
 
 from disease.schemas import (  # noqa: E402

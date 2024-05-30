@@ -26,7 +26,7 @@ from disease.schemas import (
     SourceName,
 )
 
-logger = logging.getLogger()
+_logger = logging.getLogger()
 
 
 SCRIPTS_DIR = Path(__file__).parent / "postgresql"
@@ -118,7 +118,7 @@ class PostgresDatabase(AbstractDatabase):
         with self.conn.cursor() as cur:
             cur.execute(self._drop_db_query)
             self.conn.commit()
-        logger.info("Dropped all existing disease normalizer tables.")
+        _logger.info("Dropped all existing disease normalizer tables.")
 
     def check_schema_initialized(self) -> bool:
         """Check if database schema is properly initialized.
@@ -131,7 +131,7 @@ class PostgresDatabase(AbstractDatabase):
         except DuplicateTable:
             self.conn.rollback()
         else:
-            logger.info("Disease table existence check failed.")
+            _logger.info("Disease table existence check failed.")
             self.conn.rollback()
             return False
         try:
@@ -140,7 +140,7 @@ class PostgresDatabase(AbstractDatabase):
         except DuplicateObject:
             self.conn.rollback()
         else:
-            logger.info("Disease foreign key existence check failed.")
+            _logger.info("Disease foreign key existence check failed.")
             self.conn.rollback()
             return False
         try:
@@ -151,7 +151,7 @@ class PostgresDatabase(AbstractDatabase):
         except DuplicateTable:
             self.conn.rollback()
         else:
-            logger.info("Disease normalized view lookup failed.")
+            _logger.info("Disease normalized view lookup failed.")
             self.conn.rollback()
             return False
         try:
@@ -160,7 +160,7 @@ class PostgresDatabase(AbstractDatabase):
         except DuplicateTable:
             self.conn.rollback()
         else:
-            logger.info("Disease indexes check failed.")
+            _logger.info("Disease indexes check failed.")
             self.conn.rollback()
             return False
 
@@ -182,21 +182,21 @@ class PostgresDatabase(AbstractDatabase):
             cur.execute(self._check_sources_query)
             results = cur.fetchall()
         if len(results) < len(SourceName):
-            logger.info("Disease sources table is missing expected sources.")
+            _logger.info("Disease sources table is missing expected sources.")
             return False
 
         with self.conn.cursor() as cur:
             cur.execute(self._check_concepts_query)
             result = cur.fetchone()
         if not result or result[0] < 1:
-            logger.info("Disease records table is empty.")
+            _logger.info("Disease records table is empty.")
             return False
 
         with self.conn.cursor() as cur:
             cur.execute(self._check_merged_query)
             result = cur.fetchone()
         if not result or result[0] < 1:
-            logger.info("Normalized disease records table is empty.")
+            _logger.info("Normalized disease records table is empty.")
             return False
 
         return True
@@ -258,7 +258,7 @@ class PostgresDatabase(AbstractDatabase):
 
     def _create_tables(self) -> None:
         """Create all tables, indexes, and views."""
-        logger.debug("Creating new disease normalizer tables.")
+        _logger.debug("Creating new disease normalizer tables.")
         tables_query = (SCRIPTS_DIR / "create_tables.sql").read_bytes()
 
         with self.conn.cursor() as cur:
@@ -569,7 +569,7 @@ class PostgresDatabase(AbstractDatabase):
                     cur.execute(self._insert_assoc_query, [a, concept_id])
                 self.conn.commit()
             except UniqueViolation:
-                logger.error("Record with ID %s already exists", concept_id)
+                _logger.error("Record with ID %s already exists", concept_id)
                 self.conn.rollback()
 
     _add_merged_record_query = b"""
@@ -784,6 +784,7 @@ class PostgresDatabase(AbstractDatabase):
         pw_param = f"-W {self.conn.info.password}" if self.conn.info.password else "-w"
 
         system_call = f"pg_dump -E UTF8 -f {output_location} -U {user} {pw_param} -h {host} -p {port} {database_name}"
+        _logger.debug("Executing DB dump system call: %s", system_call)
         result = os.system(system_call)  # noqa: S605
         if result != 0:
             msg = f"System call '{system_call}' returned failing exit code."
