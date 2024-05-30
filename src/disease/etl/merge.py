@@ -1,12 +1,14 @@
 """Create concept groups and merged records."""
+import logging
 from timeit import default_timer as timer
 from typing import Collection, Dict, List, Set, Tuple
 
 from tqdm import tqdm
 
-from disease import logger
 from disease.database.database import AbstractDatabase
 from disease.schemas import SourcePriority
+
+_logger = logging.getLogger(__name__)
 
 
 class Merge:
@@ -31,37 +33,38 @@ class Merge:
         :param record_ids: concept identifiers from which groups should be generated.
         """
         # build groups
-        logger.info(f"Generating record ID sets from {len(record_ids)} records")
+        _logger.info("Generating record ID sets from %s records", len(record_ids))
         start = timer()
         for concept_id in tqdm(record_ids, ncols=80, disable=self._silent):
             try:
                 record = self._database.get_record_by_id(concept_id)
             except AttributeError:
-                logger.error(
-                    f"`create_merged_concepts` received invalid "
-                    f"concept ID: {concept_id}"
+                _logger.error(
+                    "`create_merged_concepts` received invalid concept ID: %s",
+                    concept_id,
                 )
                 continue
             if not record:
-                logger.error(f"generate_merged_concepts couldn't find " f"{concept_id}")
+                _logger.error("generate_merged_concepts couldn't find %s", concept_id)
                 continue
             xrefs = record.get("xrefs", None)
             group = {*xrefs, concept_id} if xrefs else {concept_id}
             self._groups.append((concept_id, group))
         end = timer()
         self._database.complete_write_transaction()
-        logger.debug(f"Built record ID sets in {end - start} seconds")
+        _logger.debug("Built record ID sets in %s seconds", end - start)
 
         # build merged concepts
-        logger.info("Creating merged records and updating database...")
+        _logger.info("Creating merged records and updating database...")
         start = timer()
         for record_id, group in tqdm(self._groups, ncols=80, disable=self._silent):
             try:
                 merged_record, merged_ids = self._generate_merged_record(group)
             except AttributeError:
-                logger.error(
-                    "`create_merged_concepts` received invalid group:"
-                    f"{group} for concept {record_id}"
+                _logger.error(
+                    "`create_merged_concepts` received invalid group: %s for concept %s",
+                    group,
+                    record_id,
                 )
                 continue
             self._database.add_merged_record(merged_record)
@@ -71,8 +74,8 @@ class Merge:
                 self._database.update_merge_ref(concept_id, merge_ref)
         self._database.complete_write_transaction()
         end = timer()
-        logger.info("merged concept generation successful.")
-        logger.debug(f"Generated and added concepts in {end - start} seconds)")
+        _logger.info("merged concept generation successful.")
+        _logger.debug("Generated and added concepts in %s seconds", end - start)
 
     def _generate_merged_record(self, record_id_set: Set[str]) -> Tuple[Dict, List]:
         """Generate merged record from provided concept ID group.
@@ -94,9 +97,10 @@ class Merge:
                 records.append(record)
                 final_ids.append(record["concept_id"])
             else:
-                logger.error(
-                    f"generate_merged_record could not retrieve "
-                    f"record for {record_id} in {record_id_set}"
+                _logger.error(
+                    "generate_merged_record could not retrieve record for %s in %s",
+                    record_id,
+                    record_id_set,
                 )
 
         def record_order(record: Dict) -> Tuple:
