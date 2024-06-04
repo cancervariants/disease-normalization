@@ -1,12 +1,14 @@
 """Get OncoTree data."""
 import json
+import logging
 from typing import Dict
 
 from tqdm import tqdm
 
-from disease import logger
 from disease.etl.base import Base
 from disease.schemas import NamespacePrefix, SourceMeta
+
+_logger = logging.getLogger(__name__)
 
 
 class OncoTree(Base):
@@ -69,7 +71,7 @@ class OncoTree(Base):
                     normed_id = f"{normed_prefix}:{code}"
                     disease["xrefs"].append(normed_id)
             else:
-                logger.warning(f"Unrecognized prefix: {prefix}")
+                _logger.warning("Unrecognized prefix: %s", prefix)
                 continue
         self._load_disease(disease)
 

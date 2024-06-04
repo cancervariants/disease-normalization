@@ -1,12 +1,13 @@
 """Provides query handler class, which receives and responses to user search queries."""
 import datetime
+import logging
 import re
 from typing import Dict, Optional, Set, Tuple
 
 from botocore.exceptions import ClientError
 from ga4gh.core import core_models
 
-from disease import NAMESPACE_LOOKUP, PREFIX_LOOKUP, SOURCES_LOWER_LOOKUP, logger
+from disease import NAMESPACE_LOOKUP, PREFIX_LOOKUP, SOURCES_LOWER_LOOKUP
 from disease.database.database import AbstractDatabase
 from disease.schemas import (
     Disease,
@@ -19,6 +20,8 @@ from disease.schemas import (
 )
 
 from .version import __version__
+
+_logger = logging.getLogger(__name__)
 
 
 class InvalidParameterException(Exception):  # noqa: N818
@@ -56,8 +59,8 @@ class QueryHandler:
         nbsp = re.search("\xa0|&nbsp;", query_str)
         if nbsp:
             warnings = {"nbsp": "Query contains non breaking space characters."}
-            logger.warning(
-                f"Query ({query_str}) contains non breaking space characters."
+            _logger.warning(
+                "Query (%s) contains non breaking space characters.", query_str
             )
         return warnings
 
@@ -111,12 +114,12 @@ class QueryHandler:
                     concept_id.lower(), case_sensitive=False
                 )
                 if match is None:
-                    logger.error(f"Reference to {concept_id} failed.")
+                    _logger.error("Reference to %s failed.", concept_id)
                 else:
                     (response, src) = self._add_record(response, match, match_type)
                     matched_sources.add(src)
             except ClientError as e:
-                logger.error(e.response["Error"]["Message"])
+                _logger.error(e.response["Error"]["Message"])
         return response, matched_sources
 
     def _fill_no_matches(self, resp: Dict[str, Dict]) -> Dict:
@@ -368,7 +371,7 @@ class QueryHandler:
         elif src == SourceName.DO.value:
             source_rank = 5
         else:
-            logger.warning(f"query.record_order: Invalid source name for " f"{record}")
+            _logger.warning("query.record_order: Invalid source name for %s", record)
             source_rank = 4
         return source_rank, record["concept_id"]
 
@@ -382,9 +385,11 @@ class QueryHandler:
         :param str query: original query value
         :return: Normalized response with no match
         """
-        logger.error(
-            f"Merge ref lookup failed for ref {record['merge_ref']} "
-            f"in record {record['concept_id']} from query {query}"
+        _logger.error(
+            "Merge ref lookup failed for ref %s in record %s from query %s",
+            record["merge_ref"],
+            record["concept_id"],
+            query,
         )
         response["match_type"] = MatchType.NO_MATCH
         return NormalizationService(**response)

@@ -1,4 +1,5 @@
 """Provides a CLI util to make updates to normalizer database."""
+import logging
 import os
 from pathlib import Path
 from timeit import default_timer as timer
@@ -6,7 +7,7 @@ from typing import Collection, List, Optional, Set
 
 import click
 
-from disease import SOURCES_FOR_MERGE, SOURCES_LOWER_LOOKUP, logger
+from disease import SOURCES_FOR_MERGE, SOURCES_LOWER_LOOKUP
 from disease.database.database import (
     AbstractDatabase,
     DatabaseException,
@@ -15,6 +16,17 @@ from disease.database.database import (
     create_db,
 )
 from disease.schemas import SourceName
+
+_logger = logging.getLogger(__name__)
+
+
+def _configure_logging() -> None:
+    """Configure logging."""
+    logging.basicConfig(
+        filename=f"{__package__}.log",
+        format="[%(asctime)s] - %(name)s - %(levelname)s : %(message)s",
+    )
+    logging.getLogger(__package__).setLevel(logging.DEBUG)
 
 
 @click.command()
@@ -28,6 +40,7 @@ def check_db(db_url: str, verbose: bool = False) -> None:
     :param db_url: URL to normalizer database
     :param verbose: if true, print result to console
     """  # noqa: D301
+    _configure_logging()
     db = create_db(db_url, False)
     if not db.check_schema_initialized():
         if verbose:
@@ -39,8 +52,10 @@ def check_db(db_url: str, verbose: bool = False) -> None:
             click.echo("Health check failed: DB is incompletely populated.")
         click.get_current_context().exit(1)
 
+    msg = "DB health check successful: tables appear complete."
     if verbose:
-        click.echo("DB health check successful: tables appear complete.")
+        click.echo(msg)
+    _logger.info(msg)
 
 
 @click.command()
@@ -55,6 +70,7 @@ def update_from_remote(data_url: Optional[str], db_url: str) -> None:
     :param data_url: user-specified location to pull DB dump from
     :param db_url: URL to normalizer database
     """  # noqa: D301
+    _configure_logging()
     if not click.confirm("Are you sure you want to overwrite existing data?"):
         click.get_current_context().exit()
     if not data_url:
@@ -71,6 +87,7 @@ def update_from_remote(data_url: Optional[str], db_url: str) -> None:
     except DatabaseException as e:
         click.echo(f"Encountered exception during update: {e!s}")
         click.get_current_context().exit(1)
+    _logger.info("Successfully loaded data from remote snapshot.")
 
 
 @click.command()
@@ -88,6 +105,7 @@ def dump_database(output_directory: Path, db_url: str) -> None:
     :param output_directory: path to existing directory
     :param db_url: URL to normalizer database
     """  # noqa: D301
+    _configure_logging()
     if not output_directory:
         output_directory = Path()
 
@@ -102,6 +120,7 @@ def dump_database(output_directory: Path, db_url: str) -> None:
     except DatabaseException as e:
         click.echo(f"Encountered exception during update: {e!s}")
         click.get_current_context().exit(1)
+    _logger.info("Database dump successful.")
 
 
 def _update_sources(
@@ -136,14 +155,14 @@ def _delete_source(n: SourceName, db: AbstractDatabase) -> float:
     """
     msg = f"Deleting {n.value}..."
     click.echo(f"\n{msg}")
-    logger.info(msg)
+    _logger.info(msg)
     start_delete = timer()
     db.delete_source(n)
     end_delete = timer()
     delete_time = end_delete - start_delete
     msg = f"Deleted {n.value} in {delete_time:.5f} seconds."
     click.echo(f"{msg}\n")
-    logger.info(msg)
+    _logger.info(msg)
     return delete_time
 
 
@@ -164,7 +183,7 @@ def _load_source(
     """
     msg = f"Loading {n.value}..."
     click.echo(msg)
-    logger.info(msg)
+    _logger.info(msg)
     start_load = timer()
 
     # used to get source class name from string
@@ -183,10 +202,10 @@ def _load_source(
     load_time = end_load - start_load
     msg = f"Loaded {n.value} in {load_time:.5f} seconds."
     click.echo(msg)
-    logger.info(msg)
+    _logger.info(msg)
     msg = f"Total time for {n.value}: {(delete_time + load_time):.5f} seconds."
     click.echo(msg)
-    logger.info(msg)
+    _logger.info(msg)
 
 
 def _delete_normalized_data(database: AbstractDatabase) -> None:
@@ -270,6 +289,7 @@ def update_db(
     :param update_merged: if true, update normalized records
     :param from_local: if true, use locally available data only
     """  # noqa: D301
+    _configure_logging()
     db = create_db(db_url, aws_instance)
 
     if update_all:
@@ -299,6 +319,7 @@ def update_db(
 
         sources_to_update = {SourceName(SOURCES_LOWER_LOOKUP[s]) for s in sources_split}
         _update_sources(sources_to_update, db, update_merged, from_local)
+    _logger.info("Database update successful.")
 
 
 if __name__ == "__main__":

@@ -2,6 +2,7 @@
 
 Generally, users shouldn't ever have to work directly with the classes contained within.
 """
+import logging
 from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Dict, List, Optional, Set, Union
@@ -10,7 +11,7 @@ import click
 from owlready2.rdflib_store import TripleLiteRDFlibGraph as RDFGraph
 from wags_tails import CustomData, DataSource, DoData, MondoData, NcitData, OncoTreeData
 
-from disease import ITEM_TYPES, SOURCES_FOR_MERGE, logger
+from disease import ITEM_TYPES, SOURCES_FOR_MERGE
 from disease.database import AbstractDatabase
 from disease.schemas import Disease, SourceName
 
@@ -20,6 +21,8 @@ DATA_DISPATCH = {
     SourceName.MONDO: MondoData,
     SourceName.DO: DoData,
 }
+
+_logger = logging.getLogger(__name__)
 
 
 class Base(ABC):
@@ -104,7 +107,7 @@ class Base(ABC):
                         disease[attr_type] = list(set(value))
                         items = {item.lower() for item in value}
                         if (attr_type == "aliases") and (len(items) > 20):
-                            logger.debug(f"{concept_id} has > 20 aliases.")
+                            _logger.debug("%s has > 20 aliases.", concept_id)
                             del disease[attr_type]
                             continue
 
