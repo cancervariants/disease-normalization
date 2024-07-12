@@ -374,7 +374,10 @@ class PostgresDatabase(AbstractDatabase):
         return self._format_merged_record(result)
 
     def get_record_by_id(
-        self, concept_id: str, case_sensitive: bool = True, merge: bool = False
+        self,
+        concept_id: str,
+        case_sensitive: bool = True,  # noqa: ARG002
+        merge: bool = False,
     ) -> dict | None:
         """Fetch record corresponding to provided concept ID
 
@@ -386,8 +389,8 @@ class PostgresDatabase(AbstractDatabase):
         :return: complete disease record, if match is found; None otherwise
         """
         if merge:
-            return self._get_merged_record(concept_id, case_sensitive)
-        return self._get_record(concept_id, case_sensitive)
+            return self._get_merged_record(concept_id)
+        return self._get_record(concept_id)
 
     _ref_types_query: ClassVar[dict] = {
         RefType.LABEL: b"SELECT concept_id FROM disease_labels WHERE lower(label) = %s;",
