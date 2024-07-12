@@ -1,12 +1,14 @@
 """Provide PostgreSQL client."""
+
 import atexit
 import datetime
 import logging
 import os
 import tarfile
 import tempfile
+from collections.abc import Generator
 from pathlib import Path
-from typing import Any, ClassVar, Dict, Generator, List, Optional, Set, Tuple, Union
+from typing import Any, ClassVar
 
 import psycopg
 import requests
@@ -35,7 +37,7 @@ SCRIPTS_DIR = Path(__file__).parent / "postgresql"
 class PostgresDatabase(AbstractDatabase):
     """Disease Normalizer database client for PostgreSQL."""
 
-    def __init__(self, db_url: Optional[str] = None, **db_args) -> None:
+    def __init__(self, db_url: str | None = None, **db_args) -> None:
         """Initialize Postgres connection.
 
         .. code-block:: pycon
@@ -69,7 +71,7 @@ class PostgresDatabase(AbstractDatabase):
 
         self.conn = psycopg.connect(conninfo)
         self.initialize_db()
-        self._cached_sources: Dict[str, SourceMeta] = {}
+        self._cached_sources: dict[str, SourceMeta] = {}
 
         atexit.register(self.close_connection)
 
@@ -79,7 +81,7 @@ class PostgresDatabase(AbstractDatabase):
     AND table_type = 'BASE TABLE';
     """
 
-    def list_tables(self) -> List[str]:
+    def list_tables(self) -> list[str]:
         """Return names of tables in database.
 
         :return: Table names in database
@@ -267,9 +269,7 @@ class PostgresDatabase(AbstractDatabase):
 
     _source_metadata_query = b"SELECT * FROM disease_sources WHERE name = %s;"
 
-    def get_source_metadata(
-        self, src_name: Union[str, SourceName]
-    ) -> Optional[SourceMeta]:
+    def get_source_metadata(self, src_name: str | SourceName) -> SourceMeta | None:
         """Get license, versioning, data lookup, etc information for a source.
 
         :param src_name: name of the source to get data for
@@ -303,7 +303,7 @@ class PostgresDatabase(AbstractDatabase):
 
     _record_query = b"SELECT * FROM record_lookup_view WHERE lower(concept_id) = %s;"
 
-    def _format_source_record(self, source_row: Tuple) -> Dict:
+    def _format_source_record(self, source_row: tuple) -> dict:
         """Restructure row from disease_concepts table as source record result object.
 
         :param source_row: result tuple from psycopg
@@ -322,13 +322,11 @@ class PostgresDatabase(AbstractDatabase):
         }
         return {k: v for k, v in disease_record.items() if v}
 
-    def _get_record(self, concept_id: str, case_sensitive: bool) -> Optional[Dict]:
+    def _get_record(self, concept_id: str) -> dict | None:
         """Retrieve non-merged record. The query is pretty different, so this method
         is broken out for PostgreSQL.
 
         :param concept_id: ID of concept to get
-        :param case_sensitive: record lookups are performed using a case-insensitive
-            index, so this parameter isn't used by Postgres
         :return: complete record object if successful
         """
         concept_id_param = concept_id.lower()
@@ -343,7 +341,7 @@ class PostgresDatabase(AbstractDatabase):
 
     _merged_record_query = b"SELECT * FROM disease_merged WHERE lower(concept_id) = %s;"
 
-    def _format_merged_record(self, merged_row: Tuple) -> Dict:
+    def _format_merged_record(self, merged_row: tuple) -> dict:
         """Restructure row from disease_merged table as normalized result object.
 
         :param merged_row: result tuple from psycopg
@@ -360,14 +358,10 @@ class PostgresDatabase(AbstractDatabase):
         }
         return {k: v for k, v in merged_record.items() if v}
 
-    def _get_merged_record(
-        self, concept_id: str, case_sensitive: bool
-    ) -> Optional[Dict]:
+    def _get_merged_record(self, concept_id: str) -> dict | None:
         """Retrieve normalized record from DB.
 
         :param concept_id: normalized ID for the merged record
-        :param case_sensitive: record lookups are performed using a case-insensitive
-            index, so this parameter isn't used by Postgres
         :return: normalized record if successful
         """
         concept_id = concept_id.lower()
@@ -381,7 +375,7 @@ class PostgresDatabase(AbstractDatabase):
 
     def get_record_by_id(
         self, concept_id: str, case_sensitive: bool = True, merge: bool = False
-    ) -> Optional[Dict]:
+    ) -> dict | None:
         """Fetch record corresponding to provided concept ID
 
         :param str concept_id: concept ID for disease record
@@ -395,14 +389,14 @@ class PostgresDatabase(AbstractDatabase):
             return self._get_merged_record(concept_id, case_sensitive)
         return self._get_record(concept_id, case_sensitive)
 
-    _ref_types_query: ClassVar[Dict] = {
+    _ref_types_query: ClassVar[dict] = {
         RefType.LABEL: b"SELECT concept_id FROM disease_labels WHERE lower(label) = %s;",
         RefType.ALIASES: b"SELECT concept_id FROM disease_aliases WHERE lower(alias) = %s;",
         RefType.XREFS: "SELECT concept_id FROM disease_xrefs WHERE lower(xref) = %s;",
         RefType.ASSOCIATED_WITH: "SELECT concept_id FROM disease_associations WHERE lower(associated_with) = %s;",
     }
 
-    def get_refs_by_type(self, search_term: str, ref_type: RefType) -> List[str]:
+    def get_refs_by_type(self, search_term: str, ref_type: RefType) -> list[str]:
         """Retrieve concept IDs for records matching the user's query. Other methods
         are responsible for actually retrieving full records.
 
@@ -429,7 +423,7 @@ class PostgresDatabase(AbstractDatabase):
     """
     _all_ids_query = b"SELECT concept_id FROM disease_concepts;"
 
-    def get_all_concept_ids(self, source: Optional[SourceName] = None) -> Set[str]:
+    def get_all_concept_ids(self, source: SourceName | None = None) -> set[str]:
         """Retrieve concept IDs for use in generating normalized records.
 
         :param source: optionally, just get all IDs for a specific source
@@ -453,7 +447,7 @@ class PostgresDatabase(AbstractDatabase):
     )
     _get_all_source_records_query = b"SELECT * FROM record_lookup_view;"
 
-    def get_all_records(self, record_type: RecordType) -> Generator[Dict, None, None]:
+    def get_all_records(self, record_type: RecordType) -> Generator[dict, None, None]:
         """Retrieve all source or normalized records. Either return all source records,
         or all records that qualify as "normalized" (i.e., merged groups + source
         records that are otherwise ungrouped).
@@ -547,7 +541,7 @@ class PostgresDatabase(AbstractDatabase):
     _insert_xref_query = b"INSERT INTO disease_xrefs (xref, concept_id) VALUES (%s, %s)"
     _insert_assoc_query = b"INSERT INTO disease_associations (associated_with, concept_id) VALUES (%s, %s)"
 
-    def add_record(self, record: Dict, src_name: SourceName) -> None:
+    def add_record(self, record: dict, src_name: SourceName) -> None:
         """Add new record to database.
 
         :param record: record to upload
@@ -579,7 +573,7 @@ class PostgresDatabase(AbstractDatabase):
     VALUES (%s, %s, %s, %s, %s, %s);
     """
 
-    def add_merged_record(self, record: Dict) -> None:
+    def add_merged_record(self, record: dict) -> None:
         """Add merged record to database.
 
         :param record: merged record to add
@@ -719,7 +713,7 @@ class PostgresDatabase(AbstractDatabase):
             self.conn.commit()
             self.conn.close()
 
-    def load_from_remote(self, url: Optional[str]) -> None:
+    def load_from_remote(self, url: str | None) -> None:
         """Load DB from remote dump. Warning: Deletes all existing data. If not
         passed as an argument, will try to grab latest release from VICC S3 bucket.
 

@@ -3,6 +3,7 @@ We already have tests and data validation to ensure correctness of the underlyin
 response objects -- here, we're checking for bad branch logic and for basic assurances
 that routes integrate correctly with query methods.
 """
+
 import pytest
 from fastapi.testclient import TestClient
 

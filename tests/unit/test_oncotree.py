@@ -1,4 +1,5 @@
 """Test Oncotree ETL methods."""
+
 import pytest
 
 from disease.etl.oncotree import OncoTree

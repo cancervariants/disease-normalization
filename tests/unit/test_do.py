@@ -1,4 +1,5 @@
 """Test retrieval of Disease Ontology source data."""
+
 import pytest
 
 from disease.etl.do import DO

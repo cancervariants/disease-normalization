@@ -1,4 +1,5 @@
 """Construct test data for DO source."""
+
 import contextlib
 import os
 import subprocess

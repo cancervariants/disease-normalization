@@ -1,6 +1,7 @@
 """Test merged record generation."""
+
 import os
-from typing import Callable
+from collections.abc import Callable
 
 import pytest
 

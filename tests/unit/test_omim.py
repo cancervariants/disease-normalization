@@ -1,4 +1,5 @@
 """Test OMIM source."""
+
 import re
 
 import pytest

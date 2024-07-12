@@ -17,7 +17,7 @@ matplotlib = "*"
 lxml = "*"
 xmlformatter = "*"
 psycopg = {version = "*", extras=["binary"]}
-ruff = "*"
+ruff = "==0.5.0"
 httpx = "*"
 
 [packages]

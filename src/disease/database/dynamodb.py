@@ -1,10 +1,12 @@
 """Provide DynamoDB client."""
+
 import atexit
 import logging
 import sys
+from collections.abc import Generator
 from os import environ
 from pathlib import Path
-from typing import Any, Dict, Generator, List, Optional, Set, Union
+from typing import Any
 
 import boto3
 import click
@@ -37,7 +39,7 @@ _logger = logging.getLogger()
 class DynamoDbDatabase(AbstractDatabase):
     """Disease Normalizer database client for DynamoDB."""
 
-    def __init__(self, db_url: Optional[str] = None, **db_args) -> None:
+    def __init__(self, db_url: str | None = None, **db_args) -> None:
         """Initialize Database class.
 
         :param str db_url: URL endpoint for DynamoDB source
@@ -90,10 +92,10 @@ class DynamoDbDatabase(AbstractDatabase):
 
         self.diseases = self.dynamodb.Table(self.disease_table)
         self.batch = self.diseases.batch_writer()
-        self._cached_sources: Dict[str, SourceMeta] = {}
+        self._cached_sources: dict[str, SourceMeta] = {}
         atexit.register(self.close_connection)
 
-    def list_tables(self) -> List[str]:
+    def list_tables(self) -> list[str]:
         """Return names of tables in database.
 
         :return: Table names in DynamoDB
@@ -204,9 +206,7 @@ class DynamoDbDatabase(AbstractDatabase):
         if not self.check_schema_initialized():
             self._create_diseases_table()
 
-    def get_source_metadata(
-        self, src_name: Union[str, SourceName]
-    ) -> Optional[SourceMeta]:
+    def get_source_metadata(self, src_name: str | SourceName) -> SourceMeta | None:
         """Get license, versioning, data lookup, etc information for a source.
 
         :param src_name: name of the source to get data for
@@ -238,7 +238,7 @@ class DynamoDbDatabase(AbstractDatabase):
 
     def get_record_by_id(
         self, concept_id: str, case_sensitive: bool = True, merge: bool = False
-    ) -> Optional[Dict]:
+    ) -> dict | None:
         """Fetch record corresponding to provided concept ID
 
         :param str concept_id: concept ID for disease record
@@ -277,7 +277,7 @@ class DynamoDbDatabase(AbstractDatabase):
         except (KeyError, IndexError):  # record doesn't exist
             return None
 
-    def get_refs_by_type(self, search_term: str, ref_type: RefType) -> List[str]:
+    def get_refs_by_type(self, search_term: str, ref_type: RefType) -> list[str]:
         """Retrieve concept IDs for records matching the user's query. Other methods
         are responsible for actually retrieving full records.
 
@@ -298,7 +298,7 @@ class DynamoDbDatabase(AbstractDatabase):
             )
             return []
 
-    def get_all_concept_ids(self, source: Optional[SourceName] = None) -> Set[str]:
+    def get_all_concept_ids(self, source: SourceName | None = None) -> set[str]:
         """Retrieve concept IDs for use in generating normalized records.
 
         :param source: optionally, just get all IDs for a specific source
@@ -306,7 +306,7 @@ class DynamoDbDatabase(AbstractDatabase):
         """
         last_evaluated_key = None
         concept_ids = []
-        params: Dict[str, Union[str, Equals]] = {
+        params: dict[str, str | Equals] = {
             "ProjectionExpression": "concept_id",
         }
         if source is not None:
@@ -319,14 +319,13 @@ class DynamoDbDatabase(AbstractDatabase):
             else:
                 response = self.diseases.scan(**params)
             records = response["Items"]
-            for record in records:
-                concept_ids.append(record["concept_id"])
+            concept_ids.extend(record["concept_id"] for record in records)
             last_evaluated_key = response.get("LastEvaluatedKey")
             if not last_evaluated_key:
                 break
         return set(concept_ids)
 
-    def get_all_records(self, record_type: RecordType) -> Generator[Dict, None, None]:
+    def get_all_records(self, record_type: RecordType) -> Generator[dict, None, None]:
         """Retrieve all source or normalized records. Either return all source records,
         or all records that qualify as "normalized" (i.e., merged groups + source
         records that are otherwise ungrouped).
@@ -385,7 +384,7 @@ class DynamoDbDatabase(AbstractDatabase):
         except ClientError as e:
             raise DatabaseWriteException(e) from e
 
-    def add_record(self, record: Dict, src_name: SourceName) -> None:
+    def add_record(self, record: dict, src_name: SourceName) -> None:
         """Add new record to database.
 
         :param Dict record: record to upload
@@ -418,7 +417,7 @@ class DynamoDbDatabase(AbstractDatabase):
                         item, record["concept_id"], item_type, src_name
                     )
 
-    def add_merged_record(self, record: Dict) -> None:
+    def add_merged_record(self, record: dict) -> None:
         """Add merged record to database.
 
         :param record: merged record to add
@@ -550,16 +549,16 @@ class DynamoDbDatabase(AbstractDatabase):
             with self.diseases.batch_writer(
                 overwrite_by_pkeys=["label_and_type", "concept_id"]
             ) as batch:
-                for record in records:
-                    try:
+                try:
+                    for record in records:
                         batch.delete_item(
                             Key={
                                 "label_and_type": record["label_and_type"],
                                 "concept_id": record["concept_id"],
                             }
                         )
-                    except ClientError as e:
-                        raise DatabaseWriteException(e) from e
+                except ClientError as e:
+                    raise DatabaseWriteException(e) from e
 
     def complete_write_transaction(self) -> None:
         """Conclude transaction or batch writing if relevant."""
@@ -570,7 +569,7 @@ class DynamoDbDatabase(AbstractDatabase):
         """Perform any manual connection closure procedures if necessary."""
         self.batch.__exit__(*sys.exc_info())
 
-    def load_from_remote(self, url: Optional[str] = None) -> None:
+    def load_from_remote(self, url: str | None = None) -> None:
         """Load DB from remote dump. Not available for DynamoDB database backend.
 
         :param url: remote location to retrieve gzipped dump file from

@@ -1,4 +1,5 @@
 """Get Human Disease Ontology data."""
+
 import owlready2 as owl
 from tqdm import tqdm
 

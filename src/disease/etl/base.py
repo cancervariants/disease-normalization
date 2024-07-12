@@ -2,10 +2,10 @@
 
 Generally, users shouldn't ever have to work directly with the classes contained within.
 """
+
 import logging
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import Dict, List, Optional, Set, Union
 
 import click
 from owlready2.rdflib_store import TripleLiteRDFlibGraph as RDFGraph
@@ -31,7 +31,7 @@ class Base(ABC):
     def __init__(
         self,
         database: AbstractDatabase,
-        data_path: Optional[Path] = None,
+        data_path: Path | None = None,
         silent: bool = True,
     ) -> None:
         """Extract from sources.
@@ -42,15 +42,15 @@ class Base(ABC):
         """
         self._silent = silent
         self._src_name = SourceName(self.__class__.__name__)
-        self._data_source: Union[
-            NcitData, OncoTreeData, MondoData, DoData, CustomData
-        ] = self._get_data_handler(data_path)
+        self._data_source: NcitData | OncoTreeData | MondoData | DoData | CustomData = (
+            self._get_data_handler(data_path)
+        )
         self._database = database
         self._store_ids = self.__class__.__name__ in SOURCES_FOR_MERGE
         if self._store_ids:
             self._added_ids = []
 
-    def _get_data_handler(self, data_path: Optional[Path] = None) -> DataSource:
+    def _get_data_handler(self, data_path: Path | None = None) -> DataSource:
         """Construct data handler instance for source. Overwrite for edge-case sources.
 
         :param data_path: location of data storage
@@ -58,7 +58,7 @@ class Base(ABC):
         """
         return DATA_DISPATCH[self._src_name](data_dir=data_path, silent=self._silent)
 
-    def perform_etl(self, use_existing: bool = False) -> List:
+    def perform_etl(self, use_existing: bool = False) -> list:
         """Public-facing method to begin ETL procedures on given data.
 
         :param use_existing: if True, use local data instead of retrieving most recent
@@ -92,7 +92,7 @@ class Base(ABC):
     def _load_meta(self, *args, **kwargs) -> None:  # noqa: ANN002
         raise NotImplementedError
 
-    def _load_disease(self, disease: Dict) -> None:
+    def _load_disease(self, disease: dict) -> None:
         """Load individual disease record."""
         _ = Disease(**disease)
         concept_id = disease["concept_id"]
@@ -125,7 +125,7 @@ class Base(ABC):
 class OWLBase(Base):
     """Base class for sources that use OWL files."""
 
-    def _get_subclasses(self, uri: str, graph: RDFGraph) -> Set[str]:
+    def _get_subclasses(self, uri: str, graph: RDFGraph) -> set[str]:
         """Retrieve URIs for all terms that are subclasses of given URI.
 
         :param uri: URI for class
@@ -141,7 +141,7 @@ class OWLBase(Base):
 
     def _get_by_property_value(
         self, prop: str, value: str, graph: RDFGraph
-    ) -> Set[str]:
+    ) -> set[str]:
         """Get all classes with given value for a specific property.
 
         :param prop: property URI
