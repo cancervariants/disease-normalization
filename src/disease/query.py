@@ -337,7 +337,7 @@ class QueryHandler:
             disease_obj.mappings = mappings
 
         if "aliases" in record:
-            disease_obj.aliases = record["aliases"]
+            disease_obj.alternativeLabels = record["aliases"]
 
         if "pediatric_disease" in record and record["pediatric_disease"] is not None:
             disease_obj.extensions = [
