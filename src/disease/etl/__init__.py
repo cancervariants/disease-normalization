@@ -1,4 +1,5 @@
 """Module to load and init namespace at package level."""
+
 from .do import DO
 from .merge import Merge
 from .mondo import Mondo

@@ -1,7 +1,7 @@
 """Construct test data for Mondo source."""
+
 from collections import defaultdict
 from pathlib import Path
-from typing import DefaultDict, Set
 
 import fastobo
 
@@ -24,7 +24,7 @@ for frame in reader:
             dag[item_id].append(clause.raw_value())
 
 
-def construct_inheritance_set(dag: DefaultDict, child: str) -> Set[str]:
+def construct_inheritance_set(dag: defaultdict, child: str) -> set[str]:
     """Get IDs for concepts that a child concept inherits from
 
     :param dag: dictionary keying IDs to parent concepts

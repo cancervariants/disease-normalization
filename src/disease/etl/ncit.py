@@ -1,7 +1,7 @@
 """Get NCIt disease data."""
+
 import logging
 import re
-from typing import Set
 
 import owlready2 as owl
 from tqdm import tqdm
@@ -33,7 +33,7 @@ class NCIt(OWLBase):
         )
         self._database.add_source_metadata(self._src_name, metadata)
 
-    def _get_disease_classes(self) -> Set[str]:
+    def _get_disease_classes(self) -> set[str]:
         """Get all nodes with semantic_type 'Neoplastic Process' or 'Disease
         or Syndrome'.
 

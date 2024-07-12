@@ -1,6 +1,6 @@
 """Get OMIM disease data."""
+
 from pathlib import Path
-from typing import Optional
 
 from tqdm import tqdm
 from wags_tails import CustomData, DataSource
@@ -17,7 +17,7 @@ class OMIM(Base):
         msg = f"Could not locate OMIM data. Per README, OMIM source files must be manually placed in {self._data_source.data_dir.absolute().as_uri()}"
         raise FileNotFoundError(msg)
 
-    def _get_data_handler(self, data_path: Optional[Path] = None) -> DataSource:
+    def _get_data_handler(self, data_path: Path | None = None) -> DataSource:
         """Construct data handler instance for source. Overwrites base class method
         to use custom data handler instead.
 
@@ -28,11 +28,11 @@ class OMIM(Base):
             "omim",
             "tsv",
             latest_version_cb=lambda: "",
-            download_cb=lambda latest_file, latest_version: self._raise_access_error(),
+            download_cb=lambda: self._raise_access_error(),
             data_dir=data_path,
         )
 
-    def _extract_data(self, use_existing: bool = False) -> None:
+    def _extract_data(self, use_existing: bool = False) -> None:  # noqa: ARG002
         """Get source file from data directory.
 
         :param use_existing: if True, use local data regardless of whether it's up to

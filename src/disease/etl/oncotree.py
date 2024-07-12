@@ -1,7 +1,7 @@
 """Get OncoTree data."""
+
 import json
 import logging
-from typing import Dict
 
 from tqdm import tqdm
 
@@ -30,7 +30,7 @@ class OncoTree(Base):
         )
         self._database.add_source_metadata(self._src_name, metadata)
 
-    def _traverse_tree(self, disease_node: Dict) -> None:
+    def _traverse_tree(self, disease_node: dict) -> None:
         """Traverse JSON tree and queue diseases for loading where possible.
 
         :param disease_node: node in tree containing info for individual disease.
@@ -47,7 +47,7 @@ class OncoTree(Base):
             for child in disease_node["children"].values():
                 self._traverse_tree(child)
 
-    def _add_disease(self, disease_node: Dict) -> None:
+    def _add_disease(self, disease_node: dict) -> None:
         """Grab data from disease node and load into DB.
 
         :param disease_node: individual node taken from OncoTree tree

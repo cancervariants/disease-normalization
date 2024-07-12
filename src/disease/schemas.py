@@ -1,7 +1,8 @@
 """Contains data models for representing VICC normalized disease records."""
+
 import datetime
 from enum import Enum, IntEnum
-from typing import Dict, List, Literal, Optional
+from typing import Literal
 
 from ga4gh.core import domain_models
 from pydantic import BaseModel, ConfigDict, StrictBool, StrictStr
@@ -103,10 +104,10 @@ class Disease(BaseModel):
 
     label: StrictStr
     concept_id: StrictStr
-    aliases: List[StrictStr] = []
-    xrefs: List[StrictStr] = []
-    associated_with: List[StrictStr] = []
-    pediatric_disease: Optional[bool] = None
+    aliases: list[StrictStr] = []
+    xrefs: list[StrictStr] = []
+    associated_with: list[StrictStr] = []
+    pediatric_disease: bool | None = None
 
     model_config = ConfigDict(
         json_schema_extra={
@@ -159,8 +160,8 @@ class SourceMeta(BaseModel):
     data_license: StrictStr
     data_license_url: StrictStr
     version: StrictStr
-    data_url: Optional[StrictStr] = None
-    rdp_url: Optional[StrictStr] = None
+    data_url: StrictStr | None = None
+    rdp_url: StrictStr | None = None
     data_license_attributes: DataLicenseAttributes
 
     model_config = ConfigDict(
@@ -185,7 +186,7 @@ class SourceSearchMatches(BaseModel):
     """Container for matching information from an individual source."""
 
     match_type: MatchType
-    records: List[Disease] = []
+    records: list[Disease] = []
     source_meta_: SourceMeta
 
     model_config = ConfigDict(
@@ -237,9 +238,9 @@ class ServiceMeta(BaseModel):
     name: Literal["disease-normalizer"] = "disease-normalizer"
     version: StrictStr
     response_datetime: datetime.datetime
-    url: Literal[
+    url: Literal["https://github.com/cancervariants/disease-normalization"] = (
         "https://github.com/cancervariants/disease-normalization"
-    ] = "https://github.com/cancervariants/disease-normalization"
+    )
 
     model_config = ConfigDict(
         json_schema_extra={
@@ -257,11 +258,11 @@ class NormalizationService(BaseModel):
     """Response containing one or more merged records and source data."""
 
     query: StrictStr
-    warnings: Optional[Dict] = None
+    warnings: dict | None = None
     match_type: MatchType
-    normalized_id: Optional[str] = None
-    disease: Optional[domain_models.Disease] = None
-    source_meta_: Optional[Dict[SourceName, SourceMeta]] = None
+    normalized_id: str | None = None
+    disease: domain_models.Disease | None = None
+    source_meta_: dict[SourceName, SourceMeta] | None = None
     service_meta_: ServiceMeta
 
     model_config = ConfigDict(
@@ -356,8 +357,8 @@ class SearchService(BaseModel):
     """Core response schema containing matches for each source"""
 
     query: StrictStr
-    warnings: Optional[Dict] = None
-    source_matches: Dict[SourceName, SourceSearchMatches]
+    warnings: dict | None = None
+    source_matches: dict[SourceName, SourceSearchMatches]
     service_meta_: ServiceMeta
 
     model_config = ConfigDict(
