@@ -182,3 +182,6 @@ ignore = [
 "tests/unit/test_emit_warnings.py" = ["RUF001"]
 "src/disease/schemas.py" = ["ANN201", "N805", "ANN001"]
 "docs/source/conf.py" = ["D100", "I001", "D103", "ANN201", "ANN001"]
+
+[tool.ruff.format]
+docstring-code-format = true
