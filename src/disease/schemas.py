@@ -7,7 +7,7 @@ from typing import Literal
 from ga4gh.core import domain_models
 from pydantic import BaseModel, ConfigDict, StrictBool, StrictStr
 
-from disease.version import __version__
+from disease import __version__
 
 
 class MatchType(IntEnum):
