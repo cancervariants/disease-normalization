@@ -3,7 +3,7 @@
 from datetime import datetime
 
 import pytest
-from ga4gh.core import core_models
+from ga4gh.core import domain_models
 
 from disease.query import InvalidParameterException, QueryHandler
 from disease.schemas import MatchType, SourceName
@@ -18,7 +18,7 @@ def query_handler(database):
 @pytest.fixture(scope="module")
 def neuroblastoma():
     """Create neuroblastoma fixture."""
-    return core_models.Disease(
+    return domain_models.Disease(
         type="Disease",
         id="normalize.disease.ncit:C3270",
         label="Neuroblastoma",
@@ -68,7 +68,7 @@ def neuroblastoma():
                 "relation": "relatedMatch",
             },
         ],
-        aliases=[
+        alternativeLabels=[
             "NB",
             "neuroblastoma",
             "Neural Crest Tumor, Malignant",
@@ -87,11 +87,11 @@ def neuroblastoma():
 @pytest.fixture(scope="module")
 def skin_myo():
     """Create a test fixture for skin myopithelioma"""
-    return core_models.Disease(
+    return domain_models.Disease(
         type="Disease",
         id="normalize.disease.ncit:C167370",
         label="Skin Myoepithelioma",
-        aliases=["Cutaneous Myoepithelioma"],
+        alternativeLabels=["Cutaneous Myoepithelioma"],
     )
 
 
@@ -100,11 +100,11 @@ def mafd2():
     """Create a test fixture for major affective disorder 2. Query should not
     include a "pediatric_disease" Extension object.
     """
-    return core_models.Disease(
+    return domain_models.Disease(
         type="Disease",
         id="normalize.disease.mondo:0010648",
         label="major affective disorder 2",
-        aliases=[
+        alternativeLabels=[
             "MAFD2",
             "MDI",
             "MDX",
@@ -158,9 +158,9 @@ def compare_disease(actual, fixture):
         assert no_matches == [], no_matches
         assert len(actual.mappings) == len(fixture.mappings)
 
-    assert bool(actual.aliases) == bool(fixture.aliases)
-    if actual.aliases:
-        assert set(actual.aliases) == set(fixture.aliases)
+    assert bool(actual.alternativeLabels) == bool(fixture.alternativeLabels)
+    if actual.alternativeLabels:
+        assert set(actual.alternativeLabels) == set(fixture.alternativeLabels)
 
     def get_extension(extensions, name):
         matches = [e for e in extensions if e.name == name]

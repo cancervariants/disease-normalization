@@ -5,7 +5,7 @@ import logging
 import re
 
 from botocore.exceptions import ClientError
-from ga4gh.core import core_models
+from ga4gh.core import domain_models, entity_models
 
 from disease import NAMESPACE_LOOKUP, PREFIX_LOOKUP, SOURCES_LOWER_LOOKUP
 from disease.database.database import AbstractDatabase
@@ -320,7 +320,7 @@ class QueryHandler:
         :param match_type: type of match achieved
         :return: completed normalized response object ready to return to user
         """
-        disease_obj = core_models.Disease(
+        disease_obj = domain_models.Disease(
             id=f"normalize.disease.{record['concept_id']}", label=record["label"]
         )
 
@@ -329,22 +329,22 @@ class QueryHandler:
         for source_id in source_ids:
             system, code = source_id.split(":")
             mappings.append(
-                core_models.Mapping(
-                    coding=core_models.Coding(
-                        code=core_models.Code(code), system=system.lower()
+                entity_models.ConceptMapping(
+                    coding=entity_models.Coding(
+                        code=entity_models.Code(code), system=system.lower()
                     ),
-                    relation=core_models.Relation.RELATED_MATCH,
+                    relation=entity_models.Relation.RELATED_MATCH,
                 )
             )
         if mappings:
             disease_obj.mappings = mappings
 
         if "aliases" in record:
-            disease_obj.aliases = record["aliases"]
+            disease_obj.alternativeLabels = record["aliases"]
 
         if "pediatric_disease" in record and record["pediatric_disease"] is not None:
             disease_obj.extensions = [
-                core_models.Extension(
+                entity_models.Extension(
                     name="pediatric_disease",
                     value=record["pediatric_disease"],
                 )
