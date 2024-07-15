@@ -7,7 +7,7 @@ import re
 from botocore.exceptions import ClientError
 from ga4gh.core import domain_models, entity_models
 
-from disease import NAMESPACE_LOOKUP, PREFIX_LOOKUP, SOURCES_LOWER_LOOKUP
+from disease import NAMESPACE_LOOKUP, PREFIX_LOOKUP, SOURCES_LOWER_LOOKUP, __version__
 from disease.database.database import AbstractDatabase
 from disease.schemas import (
     Disease,
@@ -18,8 +18,6 @@ from disease.schemas import (
     ServiceMeta,
     SourceName,
 )
-
-from .version import __version__
 
 _logger = logging.getLogger(__name__)
 
