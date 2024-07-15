@@ -1,7 +1,8 @@
 """Create concept groups and merged records."""
+
 import logging
+from collections.abc import Collection
 from timeit import default_timer as timer
-from typing import Collection, Dict, List, Set, Tuple
 
 from tqdm import tqdm
 
@@ -77,7 +78,7 @@ class Merge:
         _logger.info("merged concept generation successful.")
         _logger.debug("Generated and added concepts in %s seconds", end - start)
 
-    def _generate_merged_record(self, record_id_set: Set[str]) -> Tuple[Dict, List]:
+    def _generate_merged_record(self, record_id_set: set[str]) -> tuple[dict, list]:
         """Generate merged record from provided concept ID group.
         Where attributes are sets, they should be merged, and where they are
         scalars, assign from the highest-priority source where that attribute
@@ -103,7 +104,7 @@ class Merge:
                     record_id_set,
                 )
 
-        def record_order(record: Dict) -> Tuple:
+        def record_order(record: dict) -> tuple:
             """Provide priority values of concepts for sort function."""
             src = record["src_name"].upper()
             source_rank = SourcePriority[src].value

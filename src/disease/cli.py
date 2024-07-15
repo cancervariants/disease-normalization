@@ -1,9 +1,10 @@
 """Provides a CLI util to make updates to normalizer database."""
+
 import logging
 import os
+from collections.abc import Collection
 from pathlib import Path
 from timeit import default_timer as timer
-from typing import Collection, List, Optional, Set
 
 import click
 
@@ -61,7 +62,7 @@ def check_db(db_url: str, verbose: bool = False) -> None:
 @click.command()
 @click.option("--data_url", help="URL to data dump")
 @click.option("--db_url", help="URL endpoint for the application database.")
-def update_from_remote(data_url: Optional[str], db_url: str) -> None:
+def update_from_remote(data_url: str | None, db_url: str) -> None:
     """Update data from remotely-hosted DB dump. By default, fetches from latest
     available dump on VICC S3 bucket; specific URLs can be provided instead by
     command line option or DISEASE_NORM_REMOTE_DB_URL environment variable.
@@ -170,7 +171,7 @@ def _load_source(
     n: SourceName,
     db: AbstractDatabase,
     delete_time: float,
-    processed_ids: List[str],
+    processed_ids: list[str],
     from_local: bool,
 ) -> None:
     """Load individual source data.
@@ -225,7 +226,7 @@ def _delete_normalized_data(database: AbstractDatabase) -> None:
     click.echo(f"Deleted normalized records in {delete_time:.5f} seconds.")
 
 
-def _load_merge(db: AbstractDatabase, processed_ids: Set[str]) -> None:
+def _load_merge(db: AbstractDatabase, processed_ids: set[str]) -> None:
     """Load merged concepts
 
     :param db: database instance

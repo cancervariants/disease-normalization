@@ -1,8 +1,8 @@
 """Provides query handler class, which receives and responses to user search queries."""
+
 import datetime
 import logging
 import re
-from typing import Dict, Optional, Set, Tuple
 
 from botocore.exceptions import ClientError
 from ga4gh.core import core_models
@@ -50,7 +50,7 @@ class QueryHandler:
         """
         self.db = database
 
-    def _emit_warnings(self, query_str: str) -> Optional[Dict]:
+    def _emit_warnings(self, query_str: str) -> dict | None:
         """Emit warnings if query contains non breaking space characters.
         :param str query_str: query string
         :return: dict keying warning type to warning description
@@ -65,8 +65,8 @@ class QueryHandler:
         return warnings
 
     def _add_record(
-        self, response: Dict[str, Dict], item: Dict, match_type: str
-    ) -> Tuple[Dict, str]:
+        self, response: dict[str, dict], item: dict, match_type: str
+    ) -> tuple[dict, str]:
         """Add individual record to response object
 
         :param Dict[str, Dict] response: in-progress response object to return
@@ -94,8 +94,8 @@ class QueryHandler:
         return response, src_name
 
     def _fetch_records(
-        self, response: Dict[str, Dict], concept_ids: Set[str], match_type: str
-    ) -> Tuple[Dict, Set]:
+        self, response: dict[str, dict], concept_ids: set[str], match_type: str
+    ) -> tuple[dict, set]:
         """Return matched Disease records as a structured response for a given
         collection of concept IDs.
 
@@ -108,8 +108,9 @@ class QueryHandler:
             IDs, and Set of source names of matched records
         """
         matched_sources = set()
-        for concept_id in concept_ids:
-            try:
+
+        try:
+            for concept_id in concept_ids:
                 match = self.db.get_record_by_id(
                     concept_id.lower(), case_sensitive=False
                 )
@@ -118,11 +119,11 @@ class QueryHandler:
                 else:
                     (response, src) = self._add_record(response, match, match_type)
                     matched_sources.add(src)
-            except ClientError as e:
-                _logger.error(e.response["Error"]["Message"])
+        except ClientError as e:
+            _logger.error(e.response["Error"]["Message"])
         return response, matched_sources
 
-    def _fill_no_matches(self, resp: Dict[str, Dict]) -> Dict:
+    def _fill_no_matches(self, resp: dict[str, dict]) -> dict:
         """Fill all empty source_matches slots with NO_MATCH results.
 
         :param Dict[str, Dict] resp: incoming response object
@@ -139,8 +140,8 @@ class QueryHandler:
         return resp
 
     def _check_concept_id(
-        self, query: str, resp: Dict, sources: Set[str]
-    ) -> Tuple[Dict, Set]:
+        self, query: str, resp: dict, sources: set[str]
+    ) -> tuple[dict, set]:
         """Check query for concept ID match. Should only find 0 or 1 matches.
 
         :param str query: search string
@@ -165,8 +166,8 @@ class QueryHandler:
         return resp, sources
 
     def _check_match_type(
-        self, query: str, resp: Dict, sources: Set[str], match_type: RefType
-    ) -> Tuple[Dict, Set]:
+        self, query: str, resp: dict, sources: set[str], match_type: RefType
+    ) -> tuple[dict, set]:
         """Check query for selected match type.
 
         :param str query: search string
@@ -185,7 +186,7 @@ class QueryHandler:
             sources = sources - matched_srcs
         return resp, sources
 
-    def _get_search_response(self, query: str, sources: Set[str]) -> Dict:
+    def _get_search_response(self, query: str, sources: set[str]) -> dict:
         """Return response as dict where key is source name and value is a list of
         records.
 
@@ -237,10 +238,12 @@ class QueryHandler:
         :raises InvalidParameterException: if both incl and excl args are
             provided, or if invalid source names are given.
         """
-        sources = {}
-        for k, v in SOURCES_LOWER_LOOKUP.items():
-            if self.db.get_source_metadata(v):
-                sources[k] = v
+        sources = {
+            k: v
+            for k, v in SOURCES_LOWER_LOOKUP.items()
+            if self.db.get_source_metadata(v)
+        }
+
         if not incl and not excl:
             query_sources = set(sources.values())
         elif incl and excl:
@@ -283,7 +286,7 @@ class QueryHandler:
         ).model_dump()
         return SearchService(**response)
 
-    def _add_merged_meta(self, response: Dict) -> Dict:
+    def _add_merged_meta(self, response: dict) -> dict:
         """Add source metadata to response object.
 
         :param Dict response: in-progress response object
@@ -298,7 +301,7 @@ class QueryHandler:
         for src in sources:
             try:
                 src_name = PREFIX_LOOKUP[src]
-            except KeyError:
+            except KeyError:  # noqa: PERF203
                 # not an imported source
                 continue
             else:
@@ -308,7 +311,7 @@ class QueryHandler:
         return response
 
     def _add_disease(
-        self, response: Dict, record: Dict, match_type: MatchType
+        self, response: dict, record: dict, match_type: MatchType
     ) -> NormalizationService:
         """Format received DB record as core Disease object and update response object.
 
@@ -353,7 +356,7 @@ class QueryHandler:
         response = self._add_merged_meta(response)
         return NormalizationService(**response)
 
-    def _record_order(self, record: Dict) -> Tuple[int, str]:
+    def _record_order(self, record: dict) -> tuple[int, str]:
         """Construct priority order for matching. Only called by sort().
 
         :param Dict record: individual record item in iterable to sort
@@ -376,7 +379,7 @@ class QueryHandler:
         return source_rank, record["concept_id"]
 
     def _handle_failed_merge_ref(
-        self, record: Dict, response: Dict, query: str
+        self, record: dict, response: dict, query: str
     ) -> NormalizationService:
         """Log + fill out response for a failed merge reference lookup.
 

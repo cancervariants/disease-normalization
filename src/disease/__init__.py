@@ -1,7 +1,8 @@
 """The VICC library for normalizing diseases."""
+
 from pathlib import Path
 
-from .version import __version__  # noqa: F401
+from .version import __version__
 
 APP_ROOT = Path(__file__).resolve().parents[0]
 

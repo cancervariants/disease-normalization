@@ -1,8 +1,8 @@
 """Pytest test config tools."""
+
 import logging
 import os
 from pathlib import Path
-from typing import List, Optional
 
 import pytest
 
@@ -154,8 +154,8 @@ def compare_records():
 def _compare_response(
     response: SourceSearchMatches,
     match_type: MatchType,
-    fixture: Optional[Disease] = None,
-    fixture_list: Optional[List[Disease]] = None,
+    fixture: Disease | None = None,
+    fixture_list: list[Disease] | None = None,
     num_records: int = 0,
 ):
     """Check that test response is correct. Only 1 of {fixture, fixture_list}

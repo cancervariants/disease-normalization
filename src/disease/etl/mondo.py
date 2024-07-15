@@ -1,8 +1,9 @@
 """Get Mondo Disease Ontology data."""
+
 import logging
 import re
 from collections import defaultdict
-from typing import ClassVar, DefaultDict, Dict, Optional, Set, Tuple
+from typing import ClassVar
 
 import fastobo
 from tqdm import tqdm
@@ -30,7 +31,7 @@ class Mondo(Base):
         )
         self._database.add_source_metadata(self._src_name, metadata)
 
-    def _construct_dependency_set(self, dag: DefaultDict, parent: str) -> Set[str]:
+    def _construct_dependency_set(self, dag: defaultdict, parent: str) -> set[str]:
         """Recursively get all children concepts for a term
 
         :param dag: dictionary where keys are ontology terms and values are lists of
@@ -52,7 +53,7 @@ class Mondo(Base):
         (NamespacePrefix.ICD10, r"https://icd.who.int/browse10/2019/en#/(.*)"),
     ]
 
-    def _get_xref_from_url(self, url: str) -> Optional[Tuple[NamespacePrefix, str]]:
+    def _get_xref_from_url(self, url: str) -> tuple[NamespacePrefix, str] | None:
         """Extract prefix and LUI from URL reference.
 
         :param url: url string given as URL xref property
@@ -78,7 +79,7 @@ class Mondo(Base):
     @staticmethod
     def _get_xref_from_xref_clause(
         clause: fastobo.term.XrefClause,
-    ) -> Optional[Tuple[NamespacePrefix, str]]:
+    ) -> tuple[NamespacePrefix, str] | None:
         """Get dbXref from xref clause.
 
         In the Mondo OBO distribution, some xrefs only show up in explicit xref clauses.
@@ -100,7 +101,7 @@ class Mondo(Base):
 
     def _get_xref_from_pv_clause(
         self, clause: fastobo.term.PropertyValueClause
-    ) -> Optional[Tuple[NamespacePrefix, str]]:
+    ) -> tuple[NamespacePrefix, str] | None:
         """Get dbXref from property value clause.
 
         These are a bit more semantically rich than the Mondo xref clauses, so for now,
@@ -131,7 +132,7 @@ class Mondo(Base):
             return None
         return prefix, local_id
 
-    def _process_term_frame(self, frame: fastobo.term.TermFrame) -> Dict:
+    def _process_term_frame(self, frame: fastobo.term.TermFrame) -> dict:
         """Extract disease params from an OBO term frame.
 
         :param frame: individual frame from OBO file

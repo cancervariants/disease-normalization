@@ -1,4 +1,5 @@
 """Build OMIM test data."""
+
 import csv
 from pathlib import Path
 
@@ -27,9 +28,7 @@ write_rows.append(rows.pop(0))
 write_rows.append(rows.pop(0))
 write_rows.append(rows.pop(0))
 
-for row in rows:
-    if row[0].startswith("#") or row[1] in TEST_IDS:
-        write_rows.append(row)
+write_rows.extend(row for row in rows if row[0].startswith("#") or row[1] in TEST_IDS)
 
 with outfile_path.open("w") as f:
     writer = csv.writer(f, delimiter="\t")

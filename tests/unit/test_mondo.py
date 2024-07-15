@@ -1,4 +1,5 @@
 """Test MONDO ETL methods."""
+
 import re
 
 import pytest
