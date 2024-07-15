@@ -60,9 +60,9 @@ sys.path.insert(0, os.path.abspath("../../src/disease"))
 autodoc_preserve_defaults = True
 
 # -- get version -------------------------------------------------------------
-from importlib.metadata import version
+from disease import __version__
 
-release = version = version("disease_normalizer")
+release = version = __version__
 
 # -- linkcode ----------------------------------------------------------------
 def linkcode_resolve(domain, info):

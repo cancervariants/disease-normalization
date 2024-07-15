@@ -1,10 +1,17 @@
 """The VICC library for normalizing diseases."""
 
+from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
 
-from .version import __version__
-
 APP_ROOT = Path(__file__).resolve().parents[0]
+
+
+try:
+    __version__ = version("disease-normalizer")
+except PackageNotFoundError:
+    __version__ = "unknown"
+finally:
+    del version, PackageNotFoundError
 
 
 from disease.schemas import (  # noqa: E402
