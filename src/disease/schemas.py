@@ -52,7 +52,7 @@ class NamespacePrefix(Enum):
     MONDO = "mondo"
     DOID = "DOID"
     DO = DOID
-    OMIM = "omim"
+    OMIM = "MIM"
     ONCOTREE = "oncotree"
     # external sources
     COHD = "cohd"
@@ -80,7 +80,6 @@ class NamespacePrefix(Enum):
     NIFSTD = "nifstd"
     OBI = "obi"
     OGMS = "ogms"
-    OMIMPS = "omimps"
     ORPHANET = "orphanet"
     PATO = "pato"
     SCDO = "scdo"

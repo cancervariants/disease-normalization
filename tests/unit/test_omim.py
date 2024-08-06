@@ -18,7 +18,7 @@ def omim(test_source):
 def mafd2():
     """Build MAFD2 test fixture."""
     return Disease(
-        concept_id="omim:309200",
+        concept_id="MIM:309200",
         label="MAJOR AFFECTIVE DISORDER 2",
         aliases=[
             "MAFD2",
@@ -39,7 +39,7 @@ def mafd2():
 def acute_ll():
     """Build ALL fixture."""
     return Disease(
-        concept_id="omim:613065",
+        concept_id="MIM:613065",
         label="LEUKEMIA, ACUTE LYMPHOBLASTIC",
         aliases=[
             "ALL",
@@ -60,7 +60,7 @@ def acute_ll():
 def lall():
     """Build LALL fixture."""
     return Disease(
-        concept_id="omim:247640",
+        concept_id="MIM:247640",
         label="LYMPHOBLASTIC LEUKEMIA, ACUTE, WITH LYMPHOMATOUS FEATURES",
         aliases=["LALL", "LYMPHOMATOUS ALL"],
         xrefs=[],
@@ -71,13 +71,13 @@ def lall():
 
 def test_concept_id_match(omim, mafd2, acute_ll, lall, compare_response):
     """Test concept ID search resolution."""
-    response = omim.search("omim:309200")
+    response = omim.search("MIM:309200")
     compare_response(response, MatchType.CONCEPT_ID, mafd2)
 
-    response = omim.search("omim:613065")
+    response = omim.search("MIM:613065")
     compare_response(response, MatchType.CONCEPT_ID, acute_ll)
 
-    response = omim.search("omim:247640")
+    response = omim.search("MIM:247640")
     compare_response(response, MatchType.CONCEPT_ID, lall)
 
 

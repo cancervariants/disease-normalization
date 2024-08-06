@@ -196,7 +196,7 @@ def mafd2():
             "manic-depressive psychosis, X-linked",
         ],
         "xrefs": [
-            "omim:309200",
+            "MIM:309200",
         ],
         "associated_with": ["mesh:C564108"],
     }
@@ -211,7 +211,7 @@ def record_id_groups():
         "richter": ["ncit:C35424", "mondo:0002083", "DOID:1703"],
         "ped_liposarcoma": ["ncit:C8091", "mondo:0003587", "DOID:5695"],
         "teratoma": ["ncit:C9012", "mondo:0004099", "DOID:7079"],
-        "mafd2": ["mondo:0010648", "omim:309200"],
+        "mafd2": ["mondo:0010648", "MIM:309200"],
     }
 
 
@@ -277,5 +277,5 @@ def test_generate_merged_record(
 
     mafd2_ids = record_id_groups["mafd2"]
     response, r_ids = merge_instance._generate_merged_record(mafd2_ids)
-    assert set(r_ids) == {"mondo:0010648", "omim:309200"}
+    assert set(r_ids) == {"mondo:0010648", "MIM:309200"}
     compare_merged_records(response, mafd2)

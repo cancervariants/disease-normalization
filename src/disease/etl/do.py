@@ -17,7 +17,7 @@ DO_PREFIX_LOOKUP = {
     "UMLS_CUI": NamespacePrefix.UMLS.value,
     "ICD9CM": NamespacePrefix.ICD9CM.value,
     "ICD10CM": NamespacePrefix.ICD10CM.value,
-    "OMIM": NamespacePrefix.OMIM.value,
+    "MIM": NamespacePrefix.OMIM.value,
     "KEGG": NamespacePrefix.KEGG.value,
     "MEDDRA": NamespacePrefix.MEDDRA.value,
 }
@@ -69,7 +69,12 @@ class DO(OWLBase):
                 if normed_prefix:
                     xref_no = f"{normed_prefix}:{id_no}"
                     if normed_prefix.lower() in PREFIX_LOOKUP:
-                        xrefs.append(xref_no)
+                        if normed_prefix == NamespacePrefix.OMIM and id_no.startswith(
+                            "PS"
+                        ):
+                            associated_with.append(xref_no)
+                        else:
+                            xrefs.append(xref_no)
                     else:
                         associated_with.append(xref_no)
 
