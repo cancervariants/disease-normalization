@@ -122,7 +122,7 @@ def mafd2():
         ],
         mappings=[
             {
-                "coding": {"code": "309200", "system": "omim"},
+                "coding": {"code": "309200", "system": "mim"},
                 "relation": "relatedMatch",
             },
             {

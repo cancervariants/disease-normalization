@@ -46,7 +46,7 @@ class Mondo(Base):
 
     _identifiers_url_pattern = r"http://identifiers.org/(.*)/(.*)"
     _lui_patterns: ClassVar = [
-        (NamespacePrefix.OMIMPS, r"https://omim.org/phenotypicSeries/(.*)"),
+        # (NamespacePrefix.OMIMPS, r"https://omim.org/phenotypicSeries/(.*)"),
         (NamespacePrefix.OMIM, r"https://omim.org/entry/(.*)"),
         (NamespacePrefix.UMLS, r"http://linkedlifedata.com/resource/umls/id/(.*)"),
         (NamespacePrefix.ICD10CM, r"http://purl.bioontology.org/ontology/ICD10CM/(.*)"),
