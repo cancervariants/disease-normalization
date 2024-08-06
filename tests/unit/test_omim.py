@@ -122,7 +122,7 @@ def test_meta(omim):
     response = omim.search("irrelevant-search-string")
     assert response.source_meta_.data_license == "custom"
     assert response.source_meta_.data_license_url == "https://omim.org/help/agreement"
-    assert re.match(r"\d{4}-\d{2}-\d{2}", response.source_meta_.version)
+    assert re.match(r"\d{4}\d{2}\d{2}", response.source_meta_.version)
     assert response.source_meta_.data_url == "https://www.omim.org/downloads"
     assert response.source_meta_.rdp_url == "http://reusabledata.org/omim.html"
     assert not response.source_meta_.data_license_attributes.non_commercial
