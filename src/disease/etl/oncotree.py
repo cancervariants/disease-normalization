@@ -57,6 +57,7 @@ class OncoTree(Base):
             "label": disease_node["name"],
             "xrefs": [],
             "associated_with": [],
+            "oncologic": True,
         }
         refs = disease_node.get("externalReferences", [])
         for prefix, codes in refs.items():

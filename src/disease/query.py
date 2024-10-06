@@ -319,7 +319,9 @@ class QueryHandler:
         :return: completed normalized response object ready to return to user
         """
         disease_obj = domain_models.Disease(
-            id=f"normalize.disease.{record['concept_id']}", label=record["label"]
+            id=f"normalize.disease.{record['concept_id']}",
+            label=record["label"],
+            extensions=[],
         )
 
         source_ids = record.get("xrefs", []) + record.get("associated_with", [])
@@ -341,12 +343,18 @@ class QueryHandler:
             disease_obj.alternativeLabels = record["aliases"]
 
         if "pediatric_disease" in record and record["pediatric_disease"] is not None:
-            disease_obj.extensions = [
+            disease_obj.extensions.append(
                 entity_models.Extension(
                     name="pediatric_disease",
                     value=record["pediatric_disease"],
                 )
-            ]
+            )
+        if "oncologic" in record and record["oncologic"] is not None:
+            disease_obj.extensions.append(
+                entity_models.Extension(
+                    name="oncologic_disease", value=record["oncologic"]
+                )
+            )
 
         response["match_type"] = match_type
         response["disease"] = disease_obj

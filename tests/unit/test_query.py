@@ -3,7 +3,7 @@
 from datetime import datetime
 
 import pytest
-from ga4gh.core import domain_models
+from ga4gh.core import domain_models, entity_models
 
 from disease.query import InvalidParameterException, QueryHandler
 from disease.schemas import MatchType, SourceName
@@ -81,6 +81,7 @@ def neuroblastoma():
             "neural Crest tumor, malignant",
             "neuroblastoma, malignant",
         ],
+        extensions=[entity_models.Extension(name="oncologic_disease", value=True)],
     )
 
 
@@ -92,6 +93,7 @@ def skin_myo():
         id="normalize.disease.ncit:C167370",
         label="Skin Myoepithelioma",
         alternativeLabels=["Cutaneous Myoepithelioma"],
+        extensions=[entity_models.Extension(name="oncologic_disease", value=True)],
     )
 
 
