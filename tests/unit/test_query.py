@@ -181,8 +181,15 @@ def compare_disease(actual, fixture):
         ped_fixture = get_extension(ext_fixture, "pediatric_disease")
         assert (ped_actual is None) == (ped_fixture is None)
         if ped_actual and ped_fixture:
-            assert set(ped_actual.value) == set(ped_fixture.value)
+            assert ped_actual.value == ped_fixture.value
             assert ped_actual.value
+
+        onco_actual = get_extension(ext_actual, "oncologic_disease")
+        onco_fixture = get_extension(ext_fixture, "oncologic_disease")
+        assert (onco_actual is None) == (onco_fixture is None)
+        if onco_actual and onco_fixture:
+            assert onco_actual.value == onco_fixture.value
+            assert onco_actual.value
 
 
 def test_query(query_handler):

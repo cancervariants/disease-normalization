@@ -201,6 +201,6 @@ class Mondo(Base):
                 params["pediatric_disease"] = True
 
             if concept_id.upper() in cancers:
-                params["oncologic"] = True
+                params["oncologic_disease"] = True
 
             self._load_disease(params)

@@ -7,6 +7,7 @@ SELECT dc.concept_id,
        dc.source,
        dc.merge_ref,
        dc.pediatric_disease,
+       dc.oncologic_disease,
        lower(dc.concept_id) AS concept_id_lowercase
 FROM disease_concepts dc
 FULL JOIN (

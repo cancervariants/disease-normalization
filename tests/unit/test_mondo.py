@@ -40,7 +40,7 @@ def neuroblastoma():
             "mesh:D009447",
         ],
         pediatric_disease=None,
-        oncologic=True,
+        oncologic_disease=True,
     )
 
 
@@ -61,7 +61,7 @@ def richter_syndrome():
             "umls:C0349631",
         ],
         pediatric_disease=None,
-        oncologic=True,
+        oncologic_disease=True,
     )
 
 
@@ -81,7 +81,7 @@ def pediatric_liposarcoma():
         xrefs=["DOID:5695", "ncit:C8091"],
         associated_with=["umls:C0279984"],
         pediatric_disease=True,
-        oncologic=True,
+        oncologic_disease=True,
     )
 
 
@@ -97,7 +97,7 @@ def cystic_teratoma_adult():
         pediatric_disease=None,
         xrefs=["ncit:C9012", "DOID:7079"],
         associated_with=["umls:C1368888"],
-        oncologic=True,
+        oncologic_disease=True,
     )
 
 
@@ -124,7 +124,7 @@ def nsclc():
             "umls:C0007131",
             "efo:0003060",
         ],
-        oncologic=True,
+        oncologic_disease=True,
     )
 
 

@@ -114,8 +114,9 @@ class Base(ABC):
                 else:
                     del disease[attr_type]
 
-        if "pediatric_disease" in disease and disease["pediatric_disease"] is None:
-            del disease["pediatric_disease"]
+        for field in ("pediatric_disease", "oncologic_disease"):
+            if field in disease and disease[field] is None:
+                del disease[field]
 
         self._database.add_record(disease, self._src_name)
         if self._store_ids:

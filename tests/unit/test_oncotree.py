@@ -22,6 +22,7 @@ def neuroblastoma():
         xrefs=["ncit:C3270"],
         associated_with=["umls:C0027819"],
         pediatric_disease=None,
+        oncologic_disease=True,
     )
 
 
@@ -35,6 +36,7 @@ def nsclc():
         xrefs=["ncit:C2926"],
         associated_with=["umls:C0007131"],
         pediatric_disease=None,
+        oncologic_disease=True,
     )
 
 
@@ -48,6 +50,7 @@ def ipn():
         xrefs=[],
         associated_with=[],
         pediatric_disease=None,
+        oncologic_disease=True,
     )
 
 

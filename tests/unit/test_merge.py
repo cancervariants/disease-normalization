@@ -68,7 +68,7 @@ def neuroblastoma():
             "umls:C2751421",
             "umls:CN205405",
         ],
-        "pediatric": None,
+        "oncologic_disease": True,
     }
 
 
@@ -107,6 +107,7 @@ def lnscc():
             "kegg.disease:05223",
         ],
         "item_type": "merger",
+        "oncologic_disease": True,
     }
 
 
@@ -131,6 +132,7 @@ def richter():
             "icd10.cm:C91.1",
         ],
         "item_type": "merger",
+        "oncologic_disease": True,
     }
 
 
@@ -150,6 +152,7 @@ def ped_liposarcoma():
         ],
         "associated_with": ["umls:C0279984"],
         "pediatric_disease": True,
+        "oncologic_disease": True,
         "item_type": "merger",
     }
 
@@ -168,6 +171,7 @@ def teratoma():
         ],
         "associated_with": ["icdo:9080/0", "umls:C1368888"],
         "item_type": "merger",
+        "oncologic_disease": True,
     }
 
 
@@ -237,6 +241,10 @@ def compare_merged_records(actual, fixture):
     assert ("pediatric_disease" in actual) == ("pediatric_disease" in fixture)
     if "pediatric_disease" in actual or "pediatric_disease" in fixture:
         assert actual["pediatric_disease"] == fixture["pediatric_disease"]
+
+    assert ("oncologic_disease" in actual) == ("oncologic_disease" in fixture)
+    if "oncologic_disease" in actual or "oncologic_disease" in fixture:
+        assert actual["oncologic_disease"] == fixture["oncologic_disease"]
 
 
 def test_generate_merged_record(
