@@ -93,7 +93,7 @@ def skin_myo():
         id="normalize.disease.ncit:C167370",
         label="Skin Myoepithelioma",
         alternativeLabels=["Cutaneous Myoepithelioma"],
-        extensions=[entity_models.Extension(name="oncologic_disease", value=True)],
+        extensions=[],
     )
 
 
@@ -132,6 +132,7 @@ def mafd2():
                 "relation": "relatedMatch",
             },
         ],
+        extensions=[],
     )
 
 
