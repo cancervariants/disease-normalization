@@ -107,6 +107,7 @@ class Disease(BaseModel):
     xrefs: list[StrictStr] = []
     associated_with: list[StrictStr] = []
     pediatric_disease: bool | None = None
+    oncologic_disease: bool | None = None
 
     model_config = ConfigDict(
         json_schema_extra={
@@ -123,6 +124,7 @@ class Disease(BaseModel):
                 "xrefs": [],
                 "associated_with": ["umls:C0019562"],
                 "pediatric_disease": None,
+                "oncologic_disease": None,
             }
         }
     )

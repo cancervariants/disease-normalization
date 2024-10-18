@@ -144,6 +144,10 @@ def _compare_records(actual: Disease, fixt: Disease):
     if (actual.pediatric_disease is not None) and (fixt.pediatric_disease is not None):
         assert actual.pediatric_disease == fixt.pediatric_disease
 
+    assert (actual.oncologic_disease is None) == (fixt.oncologic_disease is None)
+    if (actual.oncologic_disease is not None) and (fixt.oncologic_disease is not None):
+        assert actual.oncologic_disease == fixt.oncologic_disease
+
 
 @pytest.fixture(scope="session")
 def compare_records():

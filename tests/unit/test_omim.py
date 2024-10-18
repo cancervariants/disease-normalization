@@ -32,6 +32,7 @@ def mafd2():
         xrefs=[],
         associated_with=[],
         pediatric_disease=None,
+        oncologic_disease=None,
     )
 
 
@@ -53,6 +54,7 @@ def acute_ll():
         xrefs=[],
         associated_with=[],
         pediatric_disease=None,
+        oncologic_disease=None,
     )
 
 
@@ -66,6 +68,7 @@ def lall():
         xrefs=[],
         associated_with=[],
         pediatric_disease=None,
+        oncologic_disease=None,
     )
 
 

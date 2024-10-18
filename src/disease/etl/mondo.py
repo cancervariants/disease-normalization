@@ -186,6 +186,8 @@ class Mondo(Base):
         diseases = self._construct_dependency_set(dag, disease_root)
         peds_neoplasm_root = "MONDO:0006517"
         pediatric_diseases = self._construct_dependency_set(dag, peds_neoplasm_root)
+        cancer_root = "MONDO:0045024"
+        cancers = self._construct_dependency_set(dag, cancer_root)
 
         reader = fastobo.iter(str(self._data_file.absolute()))
         for item in tqdm(reader, ncols=80, disable=self._silent):
@@ -197,5 +199,8 @@ class Mondo(Base):
 
             if concept_id.upper() in pediatric_diseases:
                 params["pediatric_disease"] = True
+
+            if concept_id.upper() in cancers:
+                params["oncologic_disease"] = True
 
             self._load_disease(params)

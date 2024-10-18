@@ -3,7 +3,7 @@
 from datetime import datetime
 
 import pytest
-from ga4gh.core import domain_models
+from ga4gh.core import domain_models, entity_models
 
 from disease.query import InvalidParameterException, QueryHandler
 from disease.schemas import MatchType, SourceName
@@ -81,6 +81,7 @@ def neuroblastoma():
             "neural Crest tumor, malignant",
             "neuroblastoma, malignant",
         ],
+        extensions=[entity_models.Extension(name="oncologic_disease", value=True)],
     )
 
 
@@ -92,6 +93,7 @@ def skin_myo():
         id="normalize.disease.ncit:C167370",
         label="Skin Myoepithelioma",
         alternativeLabels=["Cutaneous Myoepithelioma"],
+        extensions=[],
     )
 
 
@@ -130,6 +132,7 @@ def mafd2():
                 "relation": "relatedMatch",
             },
         ],
+        extensions=[],
     )
 
 
@@ -179,8 +182,15 @@ def compare_disease(actual, fixture):
         ped_fixture = get_extension(ext_fixture, "pediatric_disease")
         assert (ped_actual is None) == (ped_fixture is None)
         if ped_actual and ped_fixture:
-            assert set(ped_actual.value) == set(ped_fixture.value)
+            assert ped_actual.value == ped_fixture.value
             assert ped_actual.value
+
+        onco_actual = get_extension(ext_actual, "oncologic_disease")
+        onco_fixture = get_extension(ext_fixture, "oncologic_disease")
+        assert (onco_actual is None) == (onco_fixture is None)
+        if onco_actual and onco_fixture:
+            assert onco_actual.value == onco_fixture.value
+            assert onco_actual.value
 
 
 def test_query(query_handler):

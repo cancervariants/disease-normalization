@@ -10,7 +10,8 @@ CREATE TABLE disease_merged (
     aliases TEXT [],
     associated_with TEXT [],
     xrefs TEXT [],
-    pediatric_disease BOOLEAN
+    pediatric_disease BOOLEAN,
+    oncologic_disease BOOLEAN
 );
 ALTER TABLE disease_concepts ADD CONSTRAINT disease_concepts_merge_ref_fkey
     FOREIGN KEY (merge_ref) REFERENCES disease_merged (concept_id);

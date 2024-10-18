@@ -318,6 +318,7 @@ class PostgresDatabase(AbstractDatabase):
             "src_name": source_row[5],
             "merge_ref": source_row[6],
             "pediatric_disease": source_row[7],
+            "oncologic_disease": source_row[8],
             "item_type": RecordType.IDENTITY.value,
         }
         return {k: v for k, v in disease_record.items() if v}
@@ -354,6 +355,7 @@ class PostgresDatabase(AbstractDatabase):
             "associated_with": merged_row[3],
             "xrefs": merged_row[4],
             "pediatric_disease": merged_row[5],
+            "oncologic_disease": merged_row[6],
             "item_type": RecordType.MERGER.value,
         }
         return {k: v for k, v in merged_record.items() if v}
@@ -532,8 +534,8 @@ class PostgresDatabase(AbstractDatabase):
         self.conn.commit()
 
     _add_record_query = b"""
-        INSERT INTO disease_concepts (concept_id, source, pediatric_disease)
-        VALUES (%s, %s, %s);
+        INSERT INTO disease_concepts (concept_id, source, pediatric_disease, oncologic_disease)
+        VALUES (%s, %s, %s, %s);
     """
     _insert_label_query = (
         b"INSERT INTO disease_labels (label, concept_id) VALUES (%s, %s)"
@@ -555,7 +557,12 @@ class PostgresDatabase(AbstractDatabase):
             try:
                 cur.execute(
                     self._add_record_query,
-                    [concept_id, src_name.value, record.get("pediatric_disease")],
+                    [
+                        concept_id,
+                        src_name.value,
+                        record.get("pediatric_disease"),
+                        record.get("oncologic_disease"),
+                    ],
                 )
                 cur.execute(self._insert_label_query, [record["label"], concept_id])
                 for a in record.get("aliases", []):
@@ -571,9 +578,9 @@ class PostgresDatabase(AbstractDatabase):
 
     _add_merged_record_query = b"""
     INSERT INTO disease_merged (
-        concept_id, label, aliases, associated_with, xrefs, pediatric_disease
+        concept_id, label, aliases, associated_with, xrefs, pediatric_disease, oncologic_disease
     )
-    VALUES (%s, %s, %s, %s, %s, %s);
+    VALUES (%s, %s, %s, %s, %s, %s, %s);
     """
 
     def add_merged_record(self, record: dict) -> None:
@@ -591,6 +598,7 @@ class PostgresDatabase(AbstractDatabase):
                     record.get("associated_with"),
                     record.get("xrefs"),
                     record.get("pediatric_disease"),
+                    record.get("oncologic_disease"),
                 ],
             )
             self.conn.commit()
