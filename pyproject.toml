@@ -171,12 +171,25 @@ ignore = [
 # N805 - invalid-first-argument-name-for-method
 # S101 - assert
 # D100 - undocumented-public-module
+# D102 - undocumented-public-class
 # D103 - undocumented-public-function
 # I001 - unsorted-imports
+# B011 - assert-false
 # INP001 - implicit-namespace-package
 # ARG001 - unused-function-argument
 # SLF001 - private-member-acces
-"tests/*" = ["ANN001", "ANN2", "ANN102", "S101", "INP001", "SLF001", "ARG001"]
+"tests/*" = [
+    "ANN001",
+    "ANN2",
+    "ANN102",
+    "D100",
+    "D102",
+    "S101",
+    "B011",
+    "INP001",
+    "SLF001",
+    "ARG001"
+]
 "*__init__.py" = ["F401"]
 "tests/unit/test_emit_warnings.py" = ["RUF001"]
 "src/disease/schemas.py" = ["ANN201", "N805", "ANN001"]
