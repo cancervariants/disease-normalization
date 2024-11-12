@@ -280,7 +280,7 @@ class QueryHandler:
 
         response["service_meta_"] = ServiceMeta(
             version=__version__,
-            response_datetime=datetime.datetime.now(tz=datetime.timezone.utc),
+            response_datetime=datetime.datetime.now(tz=datetime.UTC),
         ).model_dump()
         return SearchService(**response)
 
@@ -299,7 +299,7 @@ class QueryHandler:
         for src in sources:
             try:
                 src_name = PREFIX_LOOKUP[src]
-            except KeyError:  # noqa: PERF203
+            except KeyError:
                 # not an imported source
                 continue
             else:
@@ -418,7 +418,7 @@ class QueryHandler:
             "warnings": self._emit_warnings(query),
             "service_meta_": ServiceMeta(
                 version=__version__,
-                response_datetime=datetime.datetime.now(tz=datetime.timezone.utc),
+                response_datetime=datetime.datetime.now(tz=datetime.UTC),
             ),
         }
         if query == "":

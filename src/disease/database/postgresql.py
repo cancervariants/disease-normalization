@@ -780,7 +780,7 @@ class PostgresDatabase(AbstractDatabase):
                 f"Output location {output_directory} isn't a directory or doesn't exist"
             )
             raise ValueError(msg)
-        now = datetime.datetime.now(tz=datetime.timezone.utc).strftime("%Y%m%d%H%M%S")
+        now = datetime.datetime.now(tz=datetime.UTC).strftime("%Y%m%d%H%M%S")
         output_location = output_directory / f"disease_norm_{now}.sql"
         user = self.conn.info.user
         host = self.conn.info.host
