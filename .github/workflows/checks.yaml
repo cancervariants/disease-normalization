@@ -68,9 +68,10 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        - cmd: "end-of-file-fixer"
-        - cmd: "trailing-whitespace"
-        - cmd: "mixed-line-ending"
+        hook:
+          - "end-of-file-fixer"
+          - "trailing-whitespace"
+          - "mixed-line-ending"
     steps:
       - uses: actions/checkout@v4
 
@@ -81,7 +82,7 @@ jobs:
 
       - uses: pre-commit/action@v3.0.1
         with:
-          extra_args: ${{ matrix.cmd }} --all-files
+          extra_args: ${{ matrix.hook }} --all-files
   docs:
     runs-on: ubuntu-latest
     env:
