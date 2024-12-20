@@ -4,7 +4,7 @@ import datetime
 from enum import Enum, IntEnum
 from typing import Literal
 
-from ga4gh.core import domain_models
+from ga4gh.core.models import MappableConcept
 from pydantic import BaseModel, ConfigDict, StrictBool, StrictStr
 
 from disease import __version__
@@ -262,7 +262,7 @@ class NormalizationService(BaseModel):
     warnings: dict | None = None
     match_type: MatchType
     normalized_id: str | None = None
-    disease: domain_models.Disease | None = None
+    disease: MappableConcept | None = None
     source_meta_: dict[SourceName, SourceMeta] | None = None
     service_meta_: ServiceMeta
 
