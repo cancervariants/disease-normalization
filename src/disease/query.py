@@ -5,7 +5,14 @@ import logging
 import re
 
 from botocore.exceptions import ClientError
-from ga4gh.core import domain_models, entity_models
+from ga4gh.core.models import (
+    Coding,
+    ConceptMapping,
+    Extension,
+    MappableConcept,
+    Relation,
+    code,
+)
 
 from disease import NAMESPACE_LOOKUP, PREFIX_LOOKUP, SOURCES_LOWER_LOOKUP, __version__
 from disease.database.database import AbstractDatabase
@@ -318,8 +325,9 @@ class QueryHandler:
         :param match_type: type of match achieved
         :return: completed normalized response object ready to return to user
         """
-        disease_obj = domain_models.Disease(
+        disease_obj = MappableConcept(
             id=f"normalize.disease.{record['concept_id']}",
+            conceptType="Disease",
             label=record["label"],
             extensions=[],
         )
@@ -327,27 +335,20 @@ class QueryHandler:
         source_ids = record.get("xrefs", []) + record.get("associated_with", [])
         mappings = []
         for source_id in source_ids:
-            system, code = source_id.split(":")
+            system, source_code = source_id.split(":")
             mappings.append(
-                entity_models.ConceptMapping(
-                    coding=entity_models.Coding(
-                        code=entity_models.Code(code), system=system.lower()
-                    ),
-                    relation=entity_models.Relation.RELATED_MATCH,
+                ConceptMapping(
+                    coding=Coding(code=code(source_code), system=system.lower()),
+                    relation=Relation.RELATED_MATCH,
                 )
             )
         if mappings:
             disease_obj.mappings = mappings
 
-        if "aliases" in record:
-            disease_obj.alternativeLabels = record["aliases"]
-
-        for field in ("pediatric_disease", "oncologic_disease"):
+        for field in ("pediatric_disease", "oncologic_disease", "aliases"):
             value = record.get(field)
             if value is not None:
-                disease_obj.extensions.append(
-                    entity_models.Extension(name=field, value=value)
-                )
+                disease_obj.extensions.append(Extension(name=field, value=value))
 
         response["match_type"] = match_type
         response["disease"] = disease_obj

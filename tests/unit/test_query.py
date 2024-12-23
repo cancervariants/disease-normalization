@@ -3,7 +3,7 @@
 from datetime import datetime
 
 import pytest
-from ga4gh.core import domain_models, entity_models
+from ga4gh.core.models import Extension, MappableConcept
 
 from disease.query import InvalidParameterException, QueryHandler
 from disease.schemas import MatchType, SourceName
@@ -18,8 +18,8 @@ def query_handler(database):
 @pytest.fixture(scope="module")
 def neuroblastoma():
     """Create neuroblastoma fixture."""
-    return domain_models.Disease(
-        type="Disease",
+    return MappableConcept(
+        conceptType="Disease",
         id="normalize.disease.ncit:C3270",
         label="Neuroblastoma",
         mappings=[
@@ -68,32 +68,36 @@ def neuroblastoma():
                 "relation": "relatedMatch",
             },
         ],
-        alternativeLabels=[
-            "NB",
-            "neuroblastoma",
-            "Neural Crest Tumor, Malignant",
-            "Neuroblastoma (Schwannian Stroma-poor)",
-            "neuroblastoma (Schwannian Stroma-poor)",
-            "Neuroblastoma (Schwannian Stroma-Poor)",
-            "Neuroblastoma, NOS",
-            "NEUROBLASTOMA, MALIGNANT",
-            "Neuroblastoma (NBL)",
-            "neural Crest tumor, malignant",
-            "neuroblastoma, malignant",
+        extensions=[
+            Extension(name="oncologic_disease", value=True),
+            Extension(
+                name="aliases",
+                value=[
+                    "NB",
+                    "neuroblastoma",
+                    "Neural Crest Tumor, Malignant",
+                    "Neuroblastoma (Schwannian Stroma-poor)",
+                    "neuroblastoma (Schwannian Stroma-poor)",
+                    "Neuroblastoma (Schwannian Stroma-Poor)",
+                    "Neuroblastoma, NOS",
+                    "NEUROBLASTOMA, MALIGNANT",
+                    "Neuroblastoma (NBL)",
+                    "neural Crest tumor, malignant",
+                    "neuroblastoma, malignant",
+                ],
+            ),
         ],
-        extensions=[entity_models.Extension(name="oncologic_disease", value=True)],
     )
 
 
 @pytest.fixture(scope="module")
 def skin_myo():
     """Create a test fixture for skin myopithelioma"""
-    return domain_models.Disease(
-        type="Disease",
+    return MappableConcept(
+        conceptType="Disease",
         id="normalize.disease.ncit:C167370",
         label="Skin Myoepithelioma",
-        alternativeLabels=["Cutaneous Myoepithelioma"],
-        extensions=[],
+        extensions=[Extension(name="aliases", value=["Cutaneous Myoepithelioma"])],
     )
 
 
@@ -102,26 +106,10 @@ def mafd2():
     """Create a test fixture for major affective disorder 2. Query should not
     include a "pediatric_disease" Extension object.
     """
-    return domain_models.Disease(
-        type="Disease",
+    return MappableConcept(
+        conceptType="Disease",
         id="normalize.disease.mondo:0010648",
         label="major affective disorder 2",
-        alternativeLabels=[
-            "MAFD2",
-            "MDI",
-            "MDX",
-            "MANIC-DEPRESSIVE ILLNESS",
-            "BPAD",
-            "MAFD2",
-            "BIPOLAR AFFECTIVE DISORDER",
-            "MANIC-DEPRESSIVE PSYCHOSIS, X-LINKED",
-            "major affective disorder 2, X-linked dominant",
-            "MAJOR affective disorder 2",
-            "bipolar affective disorder",
-            "major affective disorder 2",
-            "manic-depressive illness",
-            "manic-depressive psychosis, X-linked",
-        ],
         mappings=[
             {
                 "coding": {"code": "309200", "system": "mim"},
@@ -140,7 +128,27 @@ def mafd2():
                 "relation": "relatedMatch",
             },
         ],
-        extensions=[],
+        extensions=[
+            Extension(
+                name="aliases",
+                value=[
+                    "MAFD2",
+                    "MDI",
+                    "MDX",
+                    "MANIC-DEPRESSIVE ILLNESS",
+                    "BPAD",
+                    "MAFD2",
+                    "BIPOLAR AFFECTIVE DISORDER",
+                    "MANIC-DEPRESSIVE PSYCHOSIS, X-LINKED",
+                    "major affective disorder 2, X-linked dominant",
+                    "MAJOR affective disorder 2",
+                    "bipolar affective disorder",
+                    "major affective disorder 2",
+                    "manic-depressive illness",
+                    "manic-depressive psychosis, X-linked",
+                ],
+            )
+        ],
     )
 
 
@@ -152,7 +160,7 @@ def compare_disease(actual, fixture):
     fixture_keys = fixture.model_dump(exclude_none=True).keys()
     assert actual_keys == fixture_keys
     assert actual.id == fixture.id
-    assert actual.type == fixture.type
+    assert actual.conceptType == fixture.conceptType
     assert actual.label == fixture.label
 
     assert bool(actual.mappings) == bool(fixture.mappings)
@@ -168,10 +176,6 @@ def compare_disease(actual, fixture):
                 no_matches.append(actual_mapping)
         assert no_matches == [], no_matches
         assert len(actual.mappings) == len(fixture.mappings)
-
-    assert bool(actual.alternativeLabels) == bool(fixture.alternativeLabels)
-    if actual.alternativeLabels:
-        assert set(actual.alternativeLabels) == set(fixture.alternativeLabels)
 
     def get_extension(extensions, name):
         matches = [e for e in extensions if e.name == name]
