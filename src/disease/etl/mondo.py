@@ -111,11 +111,13 @@ class Mondo(Base):
         :return: prefix and local ID if available
         """
         property_value = clause.property_value
-        if (
-            not isinstance(property_value, fastobo.pv.ResourcePropertyValue)
-            or not isinstance(property_value.relation, fastobo.id.UnprefixedIdent)
-            or property_value.relation.unescaped not in ("exactMatch", "equivalentTo")
-        ):
+        # of all property values, all we care about are those which are skos:exactMatch,
+        # so we can ignore other relations and any non-resource property values.
+        # previously there may have been usage of mondo:equivalentTo but that seems to
+        # be irrelevant for property values
+        if not isinstance(
+            property_value, fastobo.pv.ResourcePropertyValue
+        ) or property_value.relation != fastobo.id.PrefixedIdent("skos", "exactMatch"):
             return None
         if isinstance(property_value.value, fastobo.id.Url):
             xref_result = self._get_xref_from_url(str(property_value.value))

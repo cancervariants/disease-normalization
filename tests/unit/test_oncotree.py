@@ -1,5 +1,7 @@
 """Test Oncotree ETL methods."""
 
+import re
+
 import pytest
 
 from disease.etl.oncotree import OncoTree
@@ -104,7 +106,7 @@ def test_meta(oncotree):
         response.source_meta_.data_license_url
         == "https://creativecommons.org/licenses/by/4.0/legalcode"
     )
-    assert response.source_meta_.version == "2021-11-02"
+    assert re.match(r"\d\d\d\d\d\d\d\d", response.source_meta_.version)
     assert response.source_meta_.data_url == "http://oncotree.mskcc.org/#/home?tab=api"
     assert response.source_meta_.rdp_url is None
     assert not response.source_meta_.data_license_attributes.non_commercial

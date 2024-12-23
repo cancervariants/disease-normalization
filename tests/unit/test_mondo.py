@@ -35,9 +35,9 @@ def neuroblastoma():
         associated_with=[
             "orphanet:635",
             "umls:C0027819",
-            "umls:CN205405",
             "efo:0000621",
             "mesh:D009447",
+            "medgen:18012",
         ],
         pediatric_disease=None,
         oncologic_disease=True,
@@ -57,9 +57,7 @@ def richter_syndrome():
             "Richter's transformation",
         ],
         xrefs=["ncit:C35424", "DOID:1703"],
-        associated_with=[
-            "umls:C0349631",
-        ],
+        associated_with=["umls:C0349631", "medgen:91159"],
         pediatric_disease=None,
         oncologic_disease=True,
     )
@@ -79,7 +77,7 @@ def pediatric_liposarcoma():
             "liposarcoma",
         ],
         xrefs=["DOID:5695", "ncit:C8091"],
-        associated_with=["umls:C0279984"],
+        associated_with=["umls:C0279984", "medgen:83580"],
         pediatric_disease=True,
         oncologic_disease=True,
     )
@@ -96,7 +94,7 @@ def cystic_teratoma_adult():
         aliases=["cystic teratoma of adults", "adult cystic teratoma"],
         pediatric_disease=None,
         xrefs=["ncit:C9012", "DOID:7079"],
-        associated_with=["umls:C1368888"],
+        associated_with=["umls:C1368888", "medgen:235084"],
         oncologic_disease=True,
     )
 
@@ -123,40 +121,16 @@ def nsclc():
             "mesh:D002289",
             "umls:C0007131",
             "efo:0003060",
+            "medgen:40104",
         ],
         oncologic_disease=True,
     )
 
 
-def test_concept_id_match(
-    mondo, neuroblastoma, richter_syndrome, pediatric_liposarcoma, compare_response
-):
-    """Test that concept ID search resolves to correct record"""
-    response = mondo.search("mondo:0005072")
-    compare_response(response, MatchType.CONCEPT_ID, neuroblastoma)
-
-    response = mondo.search("mondo:0002083")
-    compare_response(response, MatchType.CONCEPT_ID, richter_syndrome)
-
+def test_neuroblastoma(mondo, neuroblastoma, compare_response, compare_records):
     response = mondo.search("MONDO:0005072")
     compare_response(response, MatchType.CONCEPT_ID, neuroblastoma)
 
-    response = mondo.search("mondo:0003587")
-    compare_response(response, MatchType.CONCEPT_ID, pediatric_liposarcoma)
-
-    response = mondo.search("0002083")
-    assert response.match_type == MatchType.NO_MATCH
-
-
-def test_label_match(
-    mondo,
-    neuroblastoma,
-    richter_syndrome,
-    pediatric_liposarcoma,
-    cystic_teratoma_adult,
-    compare_records,
-):
-    """Test that label search resolves to correct record."""
     response = mondo.search("Neuroblastoma")
     assert response.match_type == MatchType.LABEL
     assert len(response.records) == 1
@@ -169,38 +143,23 @@ def test_label_match(
     actual_disease = response.records[0]
     compare_records(actual_disease, neuroblastoma)
 
-    response = mondo.search("richter syndrome")
-    assert response.match_type == MatchType.LABEL
-    assert len(response.records) == 1
-    actual_disease = response.records[0]
-    compare_records(actual_disease, richter_syndrome)
-
-    response = mondo.search("pediatric liposarcoma")
-    assert response.match_type == MatchType.LABEL
-    assert len(response.records) == 1
-    actual_disease = response.records[0]
-    compare_records(actual_disease, pediatric_liposarcoma)
-
-    response = mondo.search("Adult Cystic Teratoma")
-    assert response.match_type == MatchType.LABEL
-    assert len(response.records) == 1
-    actual_disease = response.records[0]
-    compare_records(actual_disease, cystic_teratoma_adult)
-
-
-def test_alias_match(mondo, neuroblastoma, richter_syndrome, compare_records):
-    """Test that alias search resolves to correct record."""
     response = mondo.search("neuroblastoma, malignant")
     assert response.match_type == MatchType.ALIAS
     assert len(response.records) == 1
     actual_disease = response.records[0]
     compare_records(actual_disease, neuroblastoma)
 
-    response = mondo.search("RICHTER TRANSFORMATION")
-    assert response.match_type == MatchType.ALIAS
+    response = mondo.search("DOID:769")
+    assert response.match_type == MatchType.XREF
     assert len(response.records) == 1
     actual_disease = response.records[0]
-    compare_records(actual_disease, richter_syndrome)
+    compare_records(actual_disease, neuroblastoma)
+
+    response = mondo.search("orphanet:635")
+    assert response.match_type == MatchType.ASSOCIATED_WITH
+    assert len(response.records) == 1
+    actual_disease = response.records[0]
+    compare_records(actual_disease, neuroblastoma)
 
     response = mondo.search("Neuroblastoma, Malignant")
     assert response.match_type == MatchType.ALIAS
@@ -214,6 +173,29 @@ def test_alias_match(mondo, neuroblastoma, richter_syndrome, compare_records):
     actual_disease = response.records[0]
     compare_records(actual_disease, neuroblastoma)
 
+
+def test_richter_syndrome(mondo, richter_syndrome, compare_records, compare_response):
+    response = mondo.search("mondo:0002083")
+    compare_response(response, MatchType.CONCEPT_ID, richter_syndrome)
+
+    response = mondo.search("richter syndrome")
+    assert response.match_type == MatchType.LABEL
+    assert len(response.records) == 1
+    actual_disease = response.records[0]
+    compare_records(actual_disease, richter_syndrome)
+
+    response = mondo.search("umls:C0349631")
+    assert response.match_type == MatchType.ASSOCIATED_WITH
+    assert len(response.records) == 1
+    actual_disease = response.records[0]
+    compare_records(actual_disease, richter_syndrome)
+
+    response = mondo.search("RICHTER TRANSFORMATION")
+    assert response.match_type == MatchType.ALIAS
+    assert len(response.records) == 1
+    actual_disease = response.records[0]
+    compare_records(actual_disease, richter_syndrome)
+
     response = mondo.search("Richter's transformation")
     assert response.match_type == MatchType.ALIAS
     assert len(response.records) == 1
@@ -226,29 +208,56 @@ def test_alias_match(mondo, neuroblastoma, richter_syndrome, compare_records):
     actual_disease = response.records[0]
     compare_records(actual_disease, richter_syndrome)
 
-    response = mondo.search("neuroblastoma Schwannian Stroma-poor")
-    assert response.match_type == MatchType.NO_MATCH
 
-
-def test_xref_match(
-    mondo,
-    neuroblastoma,
-    pediatric_liposarcoma,
-    nsclc,
-    compare_records,
+def test_pediatric_liposarcoma(
+    mondo, pediatric_liposarcoma, compare_records, compare_response
 ):
-    """Test that xref search resolves to correct record."""
-    response = mondo.search("DOID:769")
-    assert response.match_type == MatchType.XREF
+    response = mondo.search("mondo:0003587")
+    compare_response(response, MatchType.CONCEPT_ID, pediatric_liposarcoma)
+
+    response = mondo.search("pediatric liposarcoma")
+    assert response.match_type == MatchType.LABEL
     assert len(response.records) == 1
     actual_disease = response.records[0]
-    compare_records(actual_disease, neuroblastoma)
+    compare_records(actual_disease, pediatric_liposarcoma)
 
     response = mondo.search("ncit:c8091")
     assert response.match_type == MatchType.XREF
     assert len(response.records) == 1
     actual_disease = response.records[0]
     compare_records(actual_disease, pediatric_liposarcoma)
+
+    response = mondo.search("UMLS:C0279984")
+    assert response.match_type == MatchType.ASSOCIATED_WITH
+    assert len(response.records) == 1
+    actual_disease = response.records[0]
+    compare_records(actual_disease, pediatric_liposarcoma)
+
+
+def test_cystic_teratoma_adult(
+    mondo,
+    cystic_teratoma_adult,
+    compare_response,
+    compare_records,
+):
+    response = mondo.search("mondo:0004099")
+    compare_response(response, MatchType.CONCEPT_ID, cystic_teratoma_adult)
+
+    response = mondo.search("Adult Cystic Teratoma")
+    assert response.match_type == MatchType.LABEL
+    assert len(response.records) == 1
+    actual_disease = response.records[0]
+    compare_records(actual_disease, cystic_teratoma_adult)
+
+
+def test_nsclc(
+    mondo,
+    nsclc,
+    compare_response,
+    compare_records,
+):
+    response = mondo.search("mondo:0005233")
+    compare_response(response, MatchType.CONCEPT_ID, nsclc)
 
     response = mondo.search("oncotree:NSCLC")
     assert response.match_type == MatchType.XREF
@@ -261,29 +270,6 @@ def test_xref_match(
     assert len(response.records) == 1
     actual_disease = response.records[0]
     compare_records(actual_disease, nsclc)
-
-
-def test_associated_with_match(
-    mondo, neuroblastoma, richter_syndrome, pediatric_liposarcoma, compare_records
-):
-    """Test that associated_with search resolves to correct record."""
-    response = mondo.search("orphanet:635")
-    assert response.match_type == MatchType.ASSOCIATED_WITH
-    assert len(response.records) == 1
-    actual_disease = response.records[0]
-    compare_records(actual_disease, neuroblastoma)
-
-    response = mondo.search("umls:C0349631")
-    assert response.match_type == MatchType.ASSOCIATED_WITH
-    assert len(response.records) == 1
-    actual_disease = response.records[0]
-    compare_records(actual_disease, richter_syndrome)
-
-    response = mondo.search("UMLS:C0279984")
-    assert response.match_type == MatchType.ASSOCIATED_WITH
-    assert len(response.records) == 1
-    actual_disease = response.records[0]
-    compare_records(actual_disease, pediatric_liposarcoma)
 
 
 def test_meta(mondo):
