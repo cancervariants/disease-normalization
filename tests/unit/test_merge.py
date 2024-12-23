@@ -63,10 +63,10 @@ def neuroblastoma():
             "gard:7185",
             "icdo:9500/3",
             "mesh:D009447",
+            "medgen:18012",
             "orphanet:635",
             "umls:C0027819",
             "umls:C2751421",
-            "umls:CN205405",
         ],
         "oncologic_disease": True,
     }
@@ -105,6 +105,7 @@ def lnscc():
             "mesh:D002289",
             "efo:0003060",
             "kegg.disease:05223",
+            "medgen:40104",
         ],
         "item_type": "merger",
         "oncologic_disease": True,
@@ -130,6 +131,7 @@ def richter():
             "umls:C0349631",
             "gard:7578",
             "icd10.cm:C91.1",
+            "medgen:91159",
         ],
         "item_type": "merger",
         "oncologic_disease": True,
@@ -150,7 +152,7 @@ def ped_liposarcoma():
             "childhood liposarcoma",
             "pediatric liposarcoma",
         ],
-        "associated_with": ["umls:C0279984"],
+        "associated_with": ["umls:C0279984", "medgen:83580"],
         "pediatric_disease": True,
         "oncologic_disease": True,
         "item_type": "merger",
@@ -169,7 +171,7 @@ def teratoma():
             "cystic teratoma of adults",
             "adult cystic teratoma",
         ],
-        "associated_with": ["icdo:9080/0", "umls:C1368888"],
+        "associated_with": ["icdo:9080/0", "umls:C1368888", "medgen:235084"],
         "item_type": "merger",
         "oncologic_disease": True,
     }
@@ -202,7 +204,7 @@ def mafd2():
         "xrefs": [
             "MIM:309200",
         ],
-        "associated_with": ["mesh:C564108"],
+        "associated_with": ["mesh:C564108", "medgen:326975", "umls:C1839839"],
     }
 
 

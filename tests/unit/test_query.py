@@ -64,7 +64,7 @@ def neuroblastoma():
                 "relation": "relatedMatch",
             },
             {
-                "coding": {"code": "CN205405", "system": "umls"},
+                "coding": {"code": "18012", "system": "medgen"},
                 "relation": "relatedMatch",
             },
         ],
@@ -129,6 +129,14 @@ def mafd2():
             },
             {
                 "coding": {"code": "C564108", "system": "mesh"},
+                "relation": "relatedMatch",
+            },
+            {
+                "coding": {"code": "326975", "system": "medgen"},
+                "relation": "relatedMatch",
+            },
+            {
+                "coding": {"code": "C1839839", "system": "umls"},
                 "relation": "relatedMatch",
             },
         ],
