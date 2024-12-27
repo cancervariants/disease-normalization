@@ -316,15 +316,24 @@ class NormalizationService(BaseModel):
                     ],
                     "mappings": [
                         {
-                            "coding": {"code": "0004355", "system": "mondo"},
+                            "coding": {
+                                "code": "0004355",
+                                "system": "https://monarchinitiative.org/MONDO:",
+                            },
                             "relation": "relatedMatch",
                         },
                         {
-                            "coding": {"code": "7757", "system": "doid"},
+                            "coding": {
+                                "code": "7757",
+                                "system": "https://www.ebi.ac.uk/ols4/ontologies/doid/terms?obo_id=DOID:",
+                            },
                             "relation": "relatedMatch",
                         },
                         {
-                            "coding": {"code": "C1332977", "system": "umls"},
+                            "coding": {
+                                "code": "C1332977",
+                                "system": "https://linkedlifedata.com/resource/umls/id/",
+                            },
                             "relation": "relatedMatch",
                         },
                     ],
