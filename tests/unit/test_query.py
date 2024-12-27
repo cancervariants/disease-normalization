@@ -24,19 +24,31 @@ def neuroblastoma():
         label="Neuroblastoma",
         mappings=[
             {
-                "coding": {"code": "0005072", "system": "mondo"},
+                "coding": {
+                    "code": "0005072",
+                    "system": "https://monarchinitiative.org/MONDO:",
+                },
                 "relation": "relatedMatch",
             },
             {
-                "coding": {"code": "NBL", "system": "oncotree"},
+                "coding": {
+                    "code": "NBL",
+                    "system": "https://oncotree.mskcc.org/?version=oncotree_latest_stable&field=NAME&search=",
+                },
                 "relation": "relatedMatch",
             },
             {
-                "coding": {"code": "769", "system": "doid"},
+                "coding": {
+                    "code": "769",
+                    "system": "https://www.ebi.ac.uk/ols4/ontologies/doid/terms?obo_id=DOID:",
+                },
                 "relation": "relatedMatch",
             },
             {
-                "coding": {"code": "C0027819", "system": "umls"},
+                "coding": {
+                    "code": "C0027819",
+                    "system": "https://linkedlifedata.com/resource/umls/id/",
+                },
                 "relation": "relatedMatch",
             },
             {
@@ -44,7 +56,10 @@ def neuroblastoma():
                 "relation": "relatedMatch",
             },
             {
-                "coding": {"code": "0000621", "system": "efo"},
+                "coding": {
+                    "code": "0000621",
+                    "system": "https://www.ebi.ac.uk/efo/EFO_",
+                },
                 "relation": "relatedMatch",
             },
             {
@@ -52,19 +67,28 @@ def neuroblastoma():
                 "relation": "relatedMatch",
             },
             {
-                "coding": {"code": "D009447", "system": "mesh"},
+                "coding": {"code": "D009447", "system": "https://id.nlm.nih.gov/mesh/"},
                 "relation": "relatedMatch",
             },
             {
-                "coding": {"code": "635", "system": "orphanet"},
+                "coding": {
+                    "code": "635",
+                    "system": "https://www.orpha.net/consor/cgi-bin/OC_Exp.php?Lng=EN&Expert=",
+                },
                 "relation": "relatedMatch",
             },
             {
-                "coding": {"code": "C2751421", "system": "umls"},
+                "coding": {
+                    "code": "C2751421",
+                    "system": "https://linkedlifedata.com/resource/umls/id/",
+                },
                 "relation": "relatedMatch",
             },
             {
-                "coding": {"code": "18012", "system": "medgen"},
+                "coding": {
+                    "code": "18012",
+                    "system": "https://www.ncbi.nlm.nih.gov/medgen/",
+                },
                 "relation": "relatedMatch",
             },
         ],
@@ -112,19 +136,25 @@ def mafd2():
         label="major affective disorder 2",
         mappings=[
             {
-                "coding": {"code": "309200", "system": "mim"},
+                "coding": {"code": "309200", "system": "https://www.omim.org/entry/"},
                 "relation": "relatedMatch",
             },
             {
-                "coding": {"code": "C564108", "system": "mesh"},
+                "coding": {"code": "C564108", "system": "https://id.nlm.nih.gov/mesh/"},
                 "relation": "relatedMatch",
             },
             {
-                "coding": {"code": "326975", "system": "medgen"},
+                "coding": {
+                    "code": "326975",
+                    "system": "https://www.ncbi.nlm.nih.gov/medgen/",
+                },
                 "relation": "relatedMatch",
             },
             {
-                "coding": {"code": "C1839839", "system": "umls"},
+                "coding": {
+                    "code": "C1839839",
+                    "system": "https://linkedlifedata.com/resource/umls/id/",
+                },
                 "relation": "relatedMatch",
             },
         ],

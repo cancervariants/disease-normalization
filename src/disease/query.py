@@ -17,8 +17,11 @@ from ga4gh.core.models import (
 from disease import NAMESPACE_LOOKUP, PREFIX_LOOKUP, SOURCES_LOWER_LOOKUP, __version__
 from disease.database.database import AbstractDatabase
 from disease.schemas import (
+    NAMESPACE_TO_SYSTEM_URI,
+    SYSTEM_URI_TO_NAMESPACE,
     Disease,
     MatchType,
+    NamespacePrefix,
     NormalizationService,
     RefType,
     SearchService,
@@ -299,19 +302,20 @@ class QueryHandler:
         """
         sources_meta = {}
         disease = response["disease"]
-        sources = [response["normalized_id"].split(":")[0]]
-        if disease.mappings:
-            sources += [m.coding.system for m in disease.mappings]
+
+        sources = []
+        concept_id_source = response["normalized_id"].split(":")[0]
+        if concept_id_source in PREFIX_LOOKUP:
+            sources.append(PREFIX_LOOKUP[concept_id_source])
+
+        for m in disease.mappings or []:
+            ns = SYSTEM_URI_TO_NAMESPACE.get(m.coding.system, "").lower()
+            if ns in PREFIX_LOOKUP:
+                sources.append(PREFIX_LOOKUP[ns])
 
         for src in sources:
-            try:
-                src_name = PREFIX_LOOKUP[src]
-            except KeyError:
-                # not an imported source
-                continue
-            else:
-                if src_name not in sources_meta:
-                    sources_meta[src_name] = self.db.get_source_metadata(src_name)
+            if src not in sources_meta:
+                sources_meta[src] = self.db.get_source_metadata(src)
         response["source_meta_"] = sources_meta
         return response
 
@@ -325,6 +329,33 @@ class QueryHandler:
         :param match_type: type of match achieved
         :return: completed normalized response object ready to return to user
         """
+
+        def _create_concept_mapping(
+            concept_id: str, relation: Relation = Relation.RELATED_MATCH
+        ) -> ConceptMapping:
+            """Create concept mapping for identifier
+
+            :param concept_id: Concept identifier represented as a curie
+            :param relation: SKOS mapping relationship, default is relatedMatch
+            :return: Concept mapping for identifier
+            """
+            source, source_id = concept_id.split(":")
+
+            try:
+                source = NamespacePrefix(source)
+            except ValueError:
+                try:
+                    source = NamespacePrefix(source.upper())
+                except ValueError as e:
+                    err_msg = f"Namespace prefix not supported: {source}"
+                    raise ValueError(err_msg) from e
+
+            system = NAMESPACE_TO_SYSTEM_URI.get(source, source)
+
+            return ConceptMapping(
+                coding=Coding(code=code(source_id), system=system), relation=relation
+            )
+
         disease_obj = MappableConcept(
             id=f"normalize.disease.{record['concept_id']}",
             conceptType="Disease",
@@ -333,15 +364,7 @@ class QueryHandler:
         )
 
         source_ids = record.get("xrefs", []) + record.get("associated_with", [])
-        mappings = []
-        for source_id in source_ids:
-            system, source_code = source_id.split(":")
-            mappings.append(
-                ConceptMapping(
-                    coding=Coding(code=code(source_code), system=system.lower()),
-                    relation=Relation.RELATED_MATCH,
-                )
-            )
+        mappings = [_create_concept_mapping(source_id) for source_id in source_ids]
         if mappings:
             disease_obj.mappings = mappings
 

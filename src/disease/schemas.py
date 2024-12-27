@@ -88,6 +88,36 @@ class NamespacePrefix(Enum):
     WIKIDATA = "wikidata"
 
 
+# Source to URI (from identifiers.org, if found)
+NAMESPACE_TO_SYSTEM_URI: dict[NamespacePrefix, str] = {
+    NamespacePrefix.NCIT: "https://www.ebi.ac.uk/ols4/ontologies/ncit/classes?short_form=NCIT_",
+    NamespacePrefix.MONDO: "https://monarchinitiative.org/MONDO:",
+    NamespacePrefix.DO: "https://www.ebi.ac.uk/ols4/ontologies/doid/terms?obo_id=DOID:",
+    NamespacePrefix.DOID: "https://www.ebi.ac.uk/ols4/ontologies/doid/terms?obo_id=DOID:",
+    NamespacePrefix.OMIM: "https://www.omim.org/entry/",
+    NamespacePrefix.ONCOTREE: "https://oncotree.mskcc.org/?version=oncotree_latest_stable&field=NAME&search=",
+    NamespacePrefix.EFO: "https://www.ebi.ac.uk/efo/EFO_",
+    NamespacePrefix.HP: "https://hpo.jax.org/app/browse/term/HP:",
+    NamespacePrefix.HPO: "https://hpo.jax.org/app/browse/term/HP:",
+    NamespacePrefix.KEGG: "https://www.kegg.jp/entry/",
+    NamespacePrefix.MEDDRA: "https://purl.bioontology.org/ontology/MEDDRA/",
+    NamespacePrefix.MEDGEN: "https://www.ncbi.nlm.nih.gov/medgen/",
+    NamespacePrefix.MESH: "https://id.nlm.nih.gov/mesh/",
+    NamespacePrefix.MP: "https://www.ebi.ac.uk/ols4/ontologies/mp/terms?obo_id=MP:",
+    NamespacePrefix.OBI: "https://purl.obolibrary.org/obo/",
+    NamespacePrefix.ORPHANET: "https://www.orpha.net/consor/cgi-bin/OC_Exp.php?Lng=EN&Expert=",
+    NamespacePrefix.PATO: "https://www.ebi.ac.uk/ols4/ontologies/pato/terms?obo_id=PATO:",
+    NamespacePrefix.UMLS: "https://linkedlifedata.com/resource/umls/id/",
+    NamespacePrefix.WIKIPEDIA: "https://en.wikipedia.org/wiki/",
+    NamespacePrefix.WIKIDATA: "https://www.wikidata.org/entity/",
+}
+
+# URI to source
+SYSTEM_URI_TO_NAMESPACE = {
+    system_uri: ns.value for ns, system_uri in NAMESPACE_TO_SYSTEM_URI.items()
+}
+
+
 class SourcePriority(IntEnum):
     """Define priorities for sources in building merged concepts."""
 
