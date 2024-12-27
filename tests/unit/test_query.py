@@ -3,7 +3,7 @@
 from datetime import datetime
 
 import pytest
-from ga4gh.core.models import Extension, MappableConcept
+from ga4gh.core.models import Extension, MappableConcept, code
 
 from disease.query import InvalidParameterException, QueryHandler
 from disease.schemas import MatchType, SourceName
@@ -21,8 +21,16 @@ def neuroblastoma():
     return MappableConcept(
         conceptType="Disease",
         id="normalize.disease.ncit:C3270",
+        primaryCode=code(root="ncit:C3270"),
         label="Neuroblastoma",
         mappings=[
+            {
+                "coding": {
+                    "code": "C3270",
+                    "system": "https://www.ebi.ac.uk/ols4/ontologies/ncit/classes?short_form=NCIT_",
+                },
+                "relation": "exactMatch",
+            },
             {
                 "coding": {
                     "code": "0005072",
@@ -120,7 +128,17 @@ def skin_myo():
     return MappableConcept(
         conceptType="Disease",
         id="normalize.disease.ncit:C167370",
+        primaryCode=code(root="ncit:C167370"),
         label="Skin Myoepithelioma",
+        mappings=[
+            {
+                "coding": {
+                    "code": "C167370",
+                    "system": "https://www.ebi.ac.uk/ols4/ontologies/ncit/classes?short_form=NCIT_",
+                },
+                "relation": "exactMatch",
+            },
+        ],
         extensions=[Extension(name="aliases", value=["Cutaneous Myoepithelioma"])],
     )
 
@@ -133,8 +151,16 @@ def mafd2():
     return MappableConcept(
         conceptType="Disease",
         id="normalize.disease.mondo:0010648",
+        primaryCode=code(root="mondo:0010648"),
         label="major affective disorder 2",
         mappings=[
+            {
+                "coding": {
+                    "code": "0010648",
+                    "system": "https://monarchinitiative.org/MONDO:",
+                },
+                "relation": "exactMatch",
+            },
             {
                 "coding": {"code": "309200", "system": "https://www.omim.org/entry/"},
                 "relation": "relatedMatch",
@@ -184,7 +210,7 @@ def mafd2():
 
 def compare_disease(actual, fixture):
     """Verify correctness of returned Disease core object against test fixture."""
-    assert actual.normalized_id == fixture.id.split("normalize.disease.")[-1]
+    assert actual.disease.primaryCode.root == fixture.id.split("normalize.disease.")[-1]
     actual = actual.disease
     actual_keys = actual.model_dump(exclude_none=True).keys()
     fixture_keys = fixture.model_dump(exclude_none=True).keys()

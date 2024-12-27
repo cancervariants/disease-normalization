@@ -24,9 +24,9 @@ A `public REST instance of the service <https://normalize.cancervariants.org/dis
 
    >>> import requests
    >>> result = requests.get("https://normalize.cancervariants.org/disease/normalize?q=nsclc").json()
-   >>> result["normalized_id"]
+   >>> result["disease"]["primaryCode"]
    'ncit:C2926'
-   >>> result["disease"]["aliases"][:5]
+   >>> next(ext for ext in result["disease"]["extensions"] if ext["name"] == "aliases")["value"][:5]
    ['Non-Small Cell Carcinoma of Lung', 'NSCLC - non-small cell lung cancer', 'Non-small cell lung cancer', 'Non-Small Cell Carcinoma of the Lung', 'non-small cell cancer of the lung']
 
 The Disease Normalizer can also be installed locally as a Python package for fast access:
@@ -37,9 +37,9 @@ The Disease Normalizer can also be installed locally as a Python package for fas
     >>> from disease.database import create_db
     >>> q = QueryHandler(create_db())
     >>> result = q.normalize("nsclc")
-    >>> result.normalized_id
+    >>> result.disease.primaryCode.root
     'ncit:C2926'
-    >>> result.disease.aliases[:5]
+    >>> next(ext for ext in result.disease.extensions if ext.name == "aliases").value[:5]
     ['Non-Small Cell Carcinoma of Lung', 'NSCLC - non-small cell lung cancer', 'Non-small cell lung cancer', 'Non-Small Cell Carcinoma of the Lung', 'non-small cell cancer of the lung']
 
 The Disease Normalizer was created to support the `Knowledgebase Integration Project <https://cancervariants.org/projects/integration/>`_ of the `Variant Interpretation for Cancer Consortium (VICC) <https://cancervariants.org/>`_. It is developed primarily by the `Wagner Lab <https://www.nationwidechildrens.org/specialties/institute-for-genomic-medicine/research-labs/wagner-lab>`_. Full source code is available on `GitHub <https://github.com/cancervariants/disease-normalization>`_.
