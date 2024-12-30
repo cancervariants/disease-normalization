@@ -76,7 +76,7 @@ property_value: terms:source http://purl.obolibrary.org/obo/ncbitaxon.owl
 property_value: terms:source http://purl.obolibrary.org/obo/ncit.owl
 property_value: terms:source http://purl.obolibrary.org/obo/uberon.owl
 property_value: terms:source http://www.orpha.net/ontology/orphanet.owl
-property_value: terms:source https://id.nlm.nih.gov/mesh/
+property_value: terms:source https://identifiers.org/mesh:
 property_value: terms:source https://rarediseases.info.nih.gov/
 
 [Term]

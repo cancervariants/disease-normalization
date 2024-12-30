@@ -801,7 +801,7 @@
         <owl:annotatedSource rdf:resource="http://purl.obolibrary.org/obo/DOID_0080601"/>
         <owl:annotatedProperty rdf:resource="http://purl.obolibrary.org/obo/IAO_0000115"/>
         <owl:annotatedTarget xml:lang="en">A benign neoplasm that derives_from germ cells.</owl:annotatedTarget>
-        <oboInOwl:hasDbXref>url:https://en.wikipedia.org/wiki/Germ_cell_tumor</oboInOwl:hasDbXref>
+        <oboInOwl:hasDbXref>url:https://en.wikipedia.orgGerm_cell_tumor</oboInOwl:hasDbXref>
     </owl:Axiom>
 
 

@@ -27,35 +27,35 @@ def neuroblastoma():
             {
                 "coding": {
                     "code": "C3270",
-                    "system": "https://www.ebi.ac.uk/ols4/ontologies/ncit/classes?short_form=NCIT_",
+                    "system": "http://purl.obolibrary.org/obo/ncit.owl",
                 },
                 "relation": "exactMatch",
             },
             {
                 "coding": {
                     "code": "0005072",
-                    "system": "https://monarchinitiative.org/MONDO:",
+                    "system": "http://purl.obolibrary.org/obo/mondo.owl",
                 },
                 "relation": "relatedMatch",
             },
             {
                 "coding": {
                     "code": "NBL",
-                    "system": "https://oncotree.mskcc.org/?version=oncotree_latest_stable&field=NAME&search=",
+                    "system": "https://oncotree.mskcc.org",
                 },
                 "relation": "relatedMatch",
             },
             {
                 "coding": {
                     "code": "769",
-                    "system": "https://www.ebi.ac.uk/ols4/ontologies/doid/terms?obo_id=DOID:",
+                    "system": "http://purl.obolibrary.org/obo/doid.owl",
                 },
                 "relation": "relatedMatch",
             },
             {
                 "coding": {
                     "code": "C0027819",
-                    "system": "https://linkedlifedata.com/resource/umls/id/",
+                    "system": "https://www.nlm.nih.gov/research/umls/index.html",
                 },
                 "relation": "relatedMatch",
             },
@@ -66,7 +66,7 @@ def neuroblastoma():
             {
                 "coding": {
                     "code": "0000621",
-                    "system": "https://www.ebi.ac.uk/efo/EFO_",
+                    "system": "https://www.ebi.ac.uk/efo",
                 },
                 "relation": "relatedMatch",
             },
@@ -81,14 +81,14 @@ def neuroblastoma():
             {
                 "coding": {
                     "code": "635",
-                    "system": "https://www.orpha.net/consor/cgi-bin/OC_Exp.php?Lng=EN&Expert=",
+                    "system": "https://www.orpha.net",
                 },
                 "relation": "relatedMatch",
             },
             {
                 "coding": {
                     "code": "C2751421",
-                    "system": "https://linkedlifedata.com/resource/umls/id/",
+                    "system": "https://www.nlm.nih.gov/research/umls/index.html",
                 },
                 "relation": "relatedMatch",
             },
@@ -134,7 +134,7 @@ def skin_myo():
             {
                 "coding": {
                     "code": "C167370",
-                    "system": "https://www.ebi.ac.uk/ols4/ontologies/ncit/classes?short_form=NCIT_",
+                    "system": "http://purl.obolibrary.org/obo/ncit.owl",
                 },
                 "relation": "exactMatch",
             },
@@ -157,12 +157,12 @@ def mafd2():
             {
                 "coding": {
                     "code": "0010648",
-                    "system": "https://monarchinitiative.org/MONDO:",
+                    "system": "http://purl.obolibrary.org/obo/mondo.owl",
                 },
                 "relation": "exactMatch",
             },
             {
-                "coding": {"code": "309200", "system": "https://www.omim.org/entry/"},
+                "coding": {"code": "309200", "system": "https://www.omim.org"},
                 "relation": "relatedMatch",
             },
             {
@@ -179,7 +179,7 @@ def mafd2():
             {
                 "coding": {
                     "code": "C1839839",
-                    "system": "https://linkedlifedata.com/resource/umls/id/",
+                    "system": "https://www.nlm.nih.gov/research/umls/index.html",
                 },
                 "relation": "relatedMatch",
             },

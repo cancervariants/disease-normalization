@@ -88,28 +88,28 @@ class NamespacePrefix(Enum):
     WIKIDATA = "wikidata"
 
 
-# Source to URI (from identifiers.org, if found)
+# Source to URI. Will use OBO Foundry persistent URL (PURL) or source homepage
 NAMESPACE_TO_SYSTEM_URI: dict[NamespacePrefix, str] = {
-    NamespacePrefix.NCIT: "https://www.ebi.ac.uk/ols4/ontologies/ncit/classes?short_form=NCIT_",
-    NamespacePrefix.MONDO: "https://monarchinitiative.org/MONDO:",
-    NamespacePrefix.DO: "https://www.ebi.ac.uk/ols4/ontologies/doid/terms?obo_id=DOID:",
-    NamespacePrefix.DOID: "https://www.ebi.ac.uk/ols4/ontologies/doid/terms?obo_id=DOID:",
-    NamespacePrefix.OMIM: "https://www.omim.org/entry/",
-    NamespacePrefix.ONCOTREE: "https://oncotree.mskcc.org/?version=oncotree_latest_stable&field=NAME&search=",
-    NamespacePrefix.EFO: "https://www.ebi.ac.uk/efo/EFO_",
-    NamespacePrefix.HP: "https://hpo.jax.org/app/browse/term/HP:",
-    NamespacePrefix.HPO: "https://hpo.jax.org/app/browse/term/HP:",
-    NamespacePrefix.KEGG: "https://www.kegg.jp/entry/",
-    NamespacePrefix.MEDDRA: "https://purl.bioontology.org/ontology/MEDDRA/",
+    NamespacePrefix.NCIT: "http://purl.obolibrary.org/obo/ncit.owl",
+    NamespacePrefix.MONDO: "http://purl.obolibrary.org/obo/mondo.owl",
+    NamespacePrefix.DO: "http://purl.obolibrary.org/obo/doid.owl",
+    NamespacePrefix.DOID: "http://purl.obolibrary.org/obo/doid.owl",
+    NamespacePrefix.OMIM: "https://www.omim.org",
+    NamespacePrefix.ONCOTREE: "https://oncotree.mskcc.org",
+    NamespacePrefix.EFO: "https://www.ebi.ac.uk/efo",
+    NamespacePrefix.HP: "http://purl.obolibrary.org/obo/hp.owl",
+    NamespacePrefix.HPO: "http://purl.obolibrary.org/obo/hp.owl",
+    NamespacePrefix.KEGG: "https://www.genome.jp/kegg/disease/",
+    NamespacePrefix.MEDDRA: "https://www.meddra.org/",
     NamespacePrefix.MEDGEN: "https://www.ncbi.nlm.nih.gov/medgen/",
     NamespacePrefix.MESH: "https://id.nlm.nih.gov/mesh/",
-    NamespacePrefix.MP: "https://www.ebi.ac.uk/ols4/ontologies/mp/terms?obo_id=MP:",
-    NamespacePrefix.OBI: "https://purl.obolibrary.org/obo/",
-    NamespacePrefix.ORPHANET: "https://www.orpha.net/consor/cgi-bin/OC_Exp.php?Lng=EN&Expert=",
-    NamespacePrefix.PATO: "https://www.ebi.ac.uk/ols4/ontologies/pato/terms?obo_id=PATO:",
-    NamespacePrefix.UMLS: "https://linkedlifedata.com/resource/umls/id/",
-    NamespacePrefix.WIKIPEDIA: "https://en.wikipedia.org/wiki/",
-    NamespacePrefix.WIKIDATA: "https://www.wikidata.org/entity/",
+    NamespacePrefix.MP: "http://purl.obolibrary.org/obo/mp.owl",
+    NamespacePrefix.OBI: "http://purl.obolibrary.org/obo/obi.owl",
+    NamespacePrefix.ORPHANET: "https://www.orpha.net",
+    NamespacePrefix.PATO: "http://purl.obolibrary.org/obo/pato.owl",
+    NamespacePrefix.UMLS: "https://www.nlm.nih.gov/research/umls/index.html",
+    NamespacePrefix.WIKIPEDIA: "https://en.wikipedia.org",
+    NamespacePrefix.WIKIDATA: "https://www.wikidata.org",
 }
 
 # URI to source
@@ -317,21 +317,21 @@ class NormalizationService(BaseModel):
                         {
                             "coding": {
                                 "code": "0004355",
-                                "system": "https://monarchinitiative.org/MONDO:",
+                                "system": "http://purl.obolibrary.org/obo/mondo.owl",
                             },
                             "relation": "relatedMatch",
                         },
                         {
                             "coding": {
                                 "code": "7757",
-                                "system": "https://www.ebi.ac.uk/ols4/ontologies/doid/terms?obo_id=DOID:",
+                                "system": "http://purl.obolibrary.org/obo/doid.owl",
                             },
                             "relation": "relatedMatch",
                         },
                         {
                             "coding": {
                                 "code": "C1332977",
-                                "system": "https://linkedlifedata.com/resource/umls/id/",
+                                "system": "https://www.nlm.nih.gov/research/umls/index.html",
                             },
                             "relation": "relatedMatch",
                         },
