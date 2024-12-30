@@ -39,11 +39,11 @@ jobs:
 
     - name: Install DynamoDB dependencies
       if: ${{ env.DISEASE_NORM_DB_URL == 'http://localhost:8002' }}
-      run: python3 -m pip install ".[etl,tests]"
+      run: python3 -m pip install ".[etl,test]"
 
     - name: Install PG dependencies
       if: ${{ env.DISEASE_NORM_DB_URL != 'http://localhost:8002' }}
-      run: python3 -m pip install ".[pg,etl,tests]"
+      run: python3 -m pip install ".[pg,etl,test]"
 
     - name: Run tests
       run: python3 -m pytest tests/
