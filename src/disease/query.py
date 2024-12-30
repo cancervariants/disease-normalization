@@ -335,6 +335,9 @@ class QueryHandler:
         ) -> ConceptMapping:
             """Create concept mapping for identifier
 
+            ``system`` will use OBO Foundry persistent URL (PURL), source homepage, or
+            namespace prefix, in that order of preference, if available.
+
             :param concept_id: Concept identifier represented as a curie
             :param relation: SKOS mapping relationship, default is relatedMatch
             :return: Concept mapping for identifier
