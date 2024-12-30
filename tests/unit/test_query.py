@@ -52,7 +52,10 @@ def neuroblastoma():
                 "relation": "relatedMatch",
             },
             {
-                "coding": {"code": "9500/3", "system": "icdo"},
+                "coding": {
+                    "code": "9500/3",
+                    "system": "https://www.who.int/standards/classifications/other-classifications/international-classification-of-diseases-for-oncology",
+                },
                 "relation": "relatedMatch",
             },
             {
@@ -63,7 +66,10 @@ def neuroblastoma():
                 "relation": "relatedMatch",
             },
             {
-                "coding": {"code": "7185", "system": "gard"},
+                "coding": {
+                    "code": "7185",
+                    "system": "https://rarediseases.info.nih.gov",
+                },
                 "relation": "relatedMatch",
             },
             {
