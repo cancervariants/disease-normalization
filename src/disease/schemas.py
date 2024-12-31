@@ -96,11 +96,16 @@ NAMESPACE_TO_SYSTEM_URI: dict[NamespacePrefix, str] = {
     NamespacePrefix.DOID: "http://purl.obolibrary.org/obo/doid.owl",
     NamespacePrefix.OMIM: "https://www.omim.org",
     NamespacePrefix.ONCOTREE: "https://oncotree.mskcc.org",
-    NamespacePrefix.EFO: "https://www.ebi.ac.uk/efo",
+    NamespacePrefix.COHD: "https://cohd.io",
+    NamespacePrefix.DECIPHER: "https://www.deciphergenomics.org",
+    NamespacePrefix.EFO: "https://www.ebi.ac.uk/efo/",
+    NamespacePrefix.GARD: "https://rarediseases.info.nih.gov",
     NamespacePrefix.HP: "http://purl.obolibrary.org/obo/hp.owl",
     NamespacePrefix.HPO: "http://purl.obolibrary.org/obo/hp.owl",
+    NamespacePrefix.ICD11: "https://icd.who.int/en/",
+    NamespacePrefix.ICDO: "https://www.who.int/standards/classifications/other-classifications/international-classification-of-diseases-for-oncology/",
     NamespacePrefix.KEGG: "https://www.genome.jp/kegg/disease/",
-    NamespacePrefix.MEDDRA: "https://www.meddra.org/",
+    NamespacePrefix.MEDDRA: "https://www.meddra.org",
     NamespacePrefix.MEDGEN: "https://www.ncbi.nlm.nih.gov/medgen/",
     NamespacePrefix.MESH: "https://id.nlm.nih.gov/mesh/",
     NamespacePrefix.MP: "http://purl.obolibrary.org/obo/mp.owl",
@@ -309,28 +314,28 @@ class NormalizationService(BaseModel):
                     "mappings": [
                         {
                             "coding": {
-                                "code": "C4989",
+                                "code": "ncit:C4989",
                                 "system": "https://www.ebi.ac.uk/ols4/ontologies/ncit/classes?short_form=NCIT_",
                             },
                             "relation": "exactMatch",
                         },
                         {
                             "coding": {
-                                "code": "0004355",
+                                "code": "mondo:0004355",
                                 "system": "http://purl.obolibrary.org/obo/mondo.owl",
                             },
                             "relation": "relatedMatch",
                         },
                         {
                             "coding": {
-                                "code": "7757",
+                                "code": "DOID:7757",
                                 "system": "http://purl.obolibrary.org/obo/doid.owl",
                             },
                             "relation": "relatedMatch",
                         },
                         {
                             "coding": {
-                                "code": "C1332977",
+                                "code": "umls:C1332977",
                                 "system": "https://www.nlm.nih.gov/research/umls/index.html",
                             },
                             "relation": "relatedMatch",
