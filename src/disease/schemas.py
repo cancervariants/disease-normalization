@@ -296,7 +296,6 @@ class NormalizationService(BaseModel):
     query: StrictStr
     warnings: dict | None = None
     match_type: MatchType
-    normalized_id: str | None = None
     disease: MappableConcept | None = None
     source_meta_: dict[SourceName, SourceMeta] | None = None
     service_meta_: ServiceMeta
@@ -307,12 +306,19 @@ class NormalizationService(BaseModel):
                 "query": "childhood leukemia",
                 "warnings": None,
                 "match_type": 80,
-                "normalized_id": "ncit:C4989",
                 "disease": {
                     "id": "normalize.disease.ncit:C4989",
+                    "primaryCode": "ncit:C4989",
                     "conceptType": "Disease",
                     "label": "Childhood Leukemia",
                     "mappings": [
+                        {
+                            "coding": {
+                                "code": "ncit:C4989",
+                                "system": "https://www.ebi.ac.uk/ols4/ontologies/ncit/classes?short_form=NCIT_",
+                            },
+                            "relation": "exactMatch",
+                        },
                         {
                             "coding": {
                                 "code": "mondo:0004355",

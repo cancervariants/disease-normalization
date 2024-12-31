@@ -304,10 +304,6 @@ class QueryHandler:
         disease = response["disease"]
 
         sources = []
-        concept_id_source = response["normalized_id"].split(":")[0]
-        if concept_id_source in PREFIX_LOOKUP:
-            sources.append(PREFIX_LOOKUP[concept_id_source])
-
         for m in disease.mappings or []:
             ns = SYSTEM_URI_TO_NAMESPACE.get(m.coding.system, "").lower()
             if ns in PREFIX_LOOKUP:
@@ -361,13 +357,18 @@ class QueryHandler:
 
         disease_obj = MappableConcept(
             id=f"normalize.disease.{record['concept_id']}",
+            primaryCode=code(root=record["concept_id"]),
             conceptType="Disease",
             label=record["label"],
             extensions=[],
         )
 
+        # mappings
+        mappings = [
+            _create_concept_mapping(record["concept_id"], relation=Relation.EXACT_MATCH)
+        ]
         source_ids = record.get("xrefs", []) + record.get("associated_with", [])
-        mappings = [_create_concept_mapping(source_id) for source_id in source_ids]
+        mappings.extend(_create_concept_mapping(source_id) for source_id in source_ids)
         if mappings:
             disease_obj.mappings = mappings
 
@@ -378,7 +379,6 @@ class QueryHandler:
 
         response["match_type"] = match_type
         response["disease"] = disease_obj
-        response["normalized_id"] = record["concept_id"]
         response = self._add_merged_meta(response)
         return NormalizationService(**response)
 
@@ -432,7 +432,7 @@ class QueryHandler:
         >>> from disease.database import create_db
         >>> q = QueryHandler(create_db())
         >>> result = q.normalize("NSCLC")
-        >>> result.normalized_id
+        >>> result.disease.primaryCode.root
         'ncit:C2926'
 
         :param query: String to find normalized concept for

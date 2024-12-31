@@ -38,9 +38,9 @@ $ curl -s 'https://normalize.cancervariants.org/disease/normalize?q=liver%20canc
     "query": "liver cancer",
     "warnings": null,
     "match_type": 80,
-    "normalized_id": "ncit:C34803",
     "disease": {
-        "type": "Disease",
+        "conceptType": "Disease",
+        "primaryCode": "ncit:C34803",
         "id": "normalize.disease:liver%20cancer",
         "label": "Primary Malignant Liver Neoplasm",
         # ...
@@ -55,7 +55,7 @@ Or utilize the [Python API](https://disease-normalizer.readthedocs.io/latest/ref
 >>> from disease.database import create_db
 >>> q = QueryHandler(create_db())
 >>> result = q.normalize("NSCLC")
->>> result.normalized_id
+>>> result.disease.primaryCode.root
 'ncit:C2926'
 ```
 
