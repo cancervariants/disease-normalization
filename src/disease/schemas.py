@@ -105,7 +105,7 @@ NAMESPACE_TO_SYSTEM_URI: dict[NamespacePrefix, str] = {
     NamespacePrefix.ICD11: "https://icd.who.int/en/",
     NamespacePrefix.ICDO: "https://www.who.int/standards/classifications/other-classifications/international-classification-of-diseases-for-oncology/",
     NamespacePrefix.KEGG: "https://www.genome.jp/kegg/disease/",
-    NamespacePrefix.MEDDRA: "https://www.meddra.org/",
+    NamespacePrefix.MEDDRA: "https://www.meddra.org",
     NamespacePrefix.MEDGEN: "https://www.ncbi.nlm.nih.gov/medgen/",
     NamespacePrefix.MESH: "https://id.nlm.nih.gov/mesh/",
     NamespacePrefix.MP: "http://purl.obolibrary.org/obo/mp.owl",
