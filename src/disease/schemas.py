@@ -310,39 +310,42 @@ class NormalizationService(BaseModel):
                 "normalized_id": "ncit:C4989",
                 "disease": {
                     "id": "normalize.disease.ncit:C4989",
-                    "type": "Disease",
+                    "conceptType": "Disease",
                     "label": "Childhood Leukemia",
-                    "aliases": [
-                        "childhood leukemia (disease)",
-                        "leukemia",
-                        "pediatric leukemia (disease)",
-                        "Leukemia",
-                        "leukemia (disease) of childhood",
-                    ],
                     "mappings": [
                         {
                             "coding": {
-                                "code": "0004355",
+                                "code": "mondo:0004355",
                                 "system": "http://purl.obolibrary.org/obo/mondo.owl",
                             },
                             "relation": "relatedMatch",
                         },
                         {
                             "coding": {
-                                "code": "7757",
+                                "code": "DOID:7757",
                                 "system": "http://purl.obolibrary.org/obo/doid.owl",
                             },
                             "relation": "relatedMatch",
                         },
                         {
                             "coding": {
-                                "code": "C1332977",
+                                "code": "umls:C1332977",
                                 "system": "https://www.nlm.nih.gov/research/umls/index.html",
                             },
                             "relation": "relatedMatch",
                         },
                     ],
                     "extensions": [
+                        {
+                            "name": "aliases",
+                            "value": [
+                                "childhood leukemia (disease)",
+                                "leukemia",
+                                "pediatric leukemia (disease)",
+                                "Leukemia",
+                                "leukemia (disease) of childhood",
+                            ],
+                        },
                         {
                             "name": "pediatric_disease",
                             "value": True,

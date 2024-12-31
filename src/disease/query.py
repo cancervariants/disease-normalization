@@ -342,7 +342,7 @@ class QueryHandler:
             :param relation: SKOS mapping relationship, default is relatedMatch
             :return: Concept mapping for identifier
             """
-            source, source_id = concept_id.split(":")
+            source = concept_id.split(":")[0]
 
             try:
                 source = NamespacePrefix(source)
@@ -356,7 +356,7 @@ class QueryHandler:
             system = NAMESPACE_TO_SYSTEM_URI.get(source, source)
 
             return ConceptMapping(
-                coding=Coding(code=code(source_id), system=system), relation=relation
+                coding=Coding(code=code(concept_id), system=system), relation=relation
             )
 
         disease_obj = MappableConcept(
