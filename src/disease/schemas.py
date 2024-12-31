@@ -88,6 +88,41 @@ class NamespacePrefix(Enum):
     WIKIDATA = "wikidata"
 
 
+# Source to URI. Will use OBO Foundry persistent URL (PURL) or source homepage
+NAMESPACE_TO_SYSTEM_URI: dict[NamespacePrefix, str] = {
+    NamespacePrefix.NCIT: "http://purl.obolibrary.org/obo/ncit.owl",
+    NamespacePrefix.MONDO: "http://purl.obolibrary.org/obo/mondo.owl",
+    NamespacePrefix.DO: "http://purl.obolibrary.org/obo/doid.owl",
+    NamespacePrefix.DOID: "http://purl.obolibrary.org/obo/doid.owl",
+    NamespacePrefix.OMIM: "https://www.omim.org",
+    NamespacePrefix.ONCOTREE: "https://oncotree.mskcc.org",
+    NamespacePrefix.COHD: "https://cohd.io",
+    NamespacePrefix.DECIPHER: "https://www.deciphergenomics.org",
+    NamespacePrefix.EFO: "https://www.ebi.ac.uk/efo/",
+    NamespacePrefix.GARD: "https://rarediseases.info.nih.gov",
+    NamespacePrefix.HP: "http://purl.obolibrary.org/obo/hp.owl",
+    NamespacePrefix.HPO: "http://purl.obolibrary.org/obo/hp.owl",
+    NamespacePrefix.ICD11: "https://icd.who.int/en/",
+    NamespacePrefix.ICDO: "https://www.who.int/standards/classifications/other-classifications/international-classification-of-diseases-for-oncology/",
+    NamespacePrefix.KEGG: "https://www.genome.jp/kegg/disease/",
+    NamespacePrefix.MEDDRA: "https://www.meddra.org",
+    NamespacePrefix.MEDGEN: "https://www.ncbi.nlm.nih.gov/medgen/",
+    NamespacePrefix.MESH: "https://id.nlm.nih.gov/mesh/",
+    NamespacePrefix.MP: "http://purl.obolibrary.org/obo/mp.owl",
+    NamespacePrefix.OBI: "http://purl.obolibrary.org/obo/obi.owl",
+    NamespacePrefix.ORPHANET: "https://www.orpha.net",
+    NamespacePrefix.PATO: "http://purl.obolibrary.org/obo/pato.owl",
+    NamespacePrefix.UMLS: "https://www.nlm.nih.gov/research/umls/index.html",
+    NamespacePrefix.WIKIPEDIA: "https://en.wikipedia.org",
+    NamespacePrefix.WIKIDATA: "https://www.wikidata.org",
+}
+
+# URI to source
+SYSTEM_URI_TO_NAMESPACE = {
+    system_uri: ns.value for ns, system_uri in NAMESPACE_TO_SYSTEM_URI.items()
+}
+
+
 class SourcePriority(IntEnum):
     """Define priorities for sources in building merged concepts."""
 
@@ -275,30 +310,42 @@ class NormalizationService(BaseModel):
                 "normalized_id": "ncit:C4989",
                 "disease": {
                     "id": "normalize.disease.ncit:C4989",
-                    "type": "Disease",
+                    "conceptType": "Disease",
                     "label": "Childhood Leukemia",
-                    "aliases": [
-                        "childhood leukemia (disease)",
-                        "leukemia",
-                        "pediatric leukemia (disease)",
-                        "Leukemia",
-                        "leukemia (disease) of childhood",
-                    ],
                     "mappings": [
                         {
-                            "coding": {"code": "0004355", "system": "mondo"},
+                            "coding": {
+                                "code": "mondo:0004355",
+                                "system": "http://purl.obolibrary.org/obo/mondo.owl",
+                            },
                             "relation": "relatedMatch",
                         },
                         {
-                            "coding": {"code": "7757", "system": "doid"},
+                            "coding": {
+                                "code": "DOID:7757",
+                                "system": "http://purl.obolibrary.org/obo/doid.owl",
+                            },
                             "relation": "relatedMatch",
                         },
                         {
-                            "coding": {"code": "C1332977", "system": "umls"},
+                            "coding": {
+                                "code": "umls:C1332977",
+                                "system": "https://www.nlm.nih.gov/research/umls/index.html",
+                            },
                             "relation": "relatedMatch",
                         },
                     ],
                     "extensions": [
+                        {
+                            "name": "aliases",
+                            "value": [
+                                "childhood leukemia (disease)",
+                                "leukemia",
+                                "pediatric leukemia (disease)",
+                                "Leukemia",
+                                "leukemia (disease) of childhood",
+                            ],
+                        },
                         {
                             "name": "pediatric_disease",
                             "value": True,
