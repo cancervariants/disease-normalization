@@ -54,14 +54,14 @@ def neuroblastoma():
             {
                 "coding": {
                     "code": "9500/3",
-                    "system": "https://www.who.int/standards/classifications/other-classifications/international-classification-of-diseases-for-oncology",
+                    "system": "https://www.who.int/standards/classifications/other-classifications/international-classification-of-diseases-for-oncology/",
                 },
                 "relation": "relatedMatch",
             },
             {
                 "coding": {
                     "code": "0000621",
-                    "system": "https://www.ebi.ac.uk/efo",
+                    "system": "https://www.ebi.ac.uk/efo/",
                 },
                 "relation": "relatedMatch",
             },
