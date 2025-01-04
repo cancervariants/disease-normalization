@@ -120,7 +120,7 @@ class QueryHandler:
                     (response, src) = self._add_record(response, match, match_type)
                     matched_sources.add(src)
         except ClientError as e:
-            _logger.error(e.response["Error"]["Message"])
+            _logger.exception(e.response["Error"]["Message"])
         return response, matched_sources
 
     def _fill_no_matches(self, resp: dict[str, dict]) -> dict:

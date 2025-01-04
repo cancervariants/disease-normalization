@@ -114,8 +114,8 @@ class PostgresDatabase(AbstractDatabase):
         try:
             if not self._check_delete_okay():
                 return
-        except DatabaseWriteException as e:
-            raise e
+        except DatabaseWriteException:  # noqa: TRY203
+            raise
 
         with self.conn.cursor() as cur:
             cur.execute(self._drop_db_query)
@@ -566,7 +566,7 @@ class PostgresDatabase(AbstractDatabase):
                     cur.execute(self._insert_assoc_query, [a, concept_id])
                 self.conn.commit()
             except UniqueViolation:
-                _logger.error("Record with ID %s already exists", concept_id)
+                _logger.exception("Record with ID %s already exists", concept_id)
                 self.conn.rollback()
 
     _add_merged_record_query = b"""
@@ -739,12 +739,12 @@ class PostgresDatabase(AbstractDatabase):
                     for chunk in r.iter_content(chunk_size=8192):
                         if chunk:
                             h.write(chunk)
-            tar = tarfile.open(temp_tarfile, "r:gz")
-            tar_dump_file = next(
-                f for f in tar.getmembers() if f.name.startswith("disease_norm_")
-            )
-            tar.extractall(path=tempdir_path, members=[tar_dump_file])  # noqa: S202 RUF100
-            dump_file = tempdir_path / tar_dump_file.name
+            with tarfile.open(temp_tarfile, "r:gz") as tar:
+                tar_dump_file = next(
+                    f for f in tar.getmembers() if f.name.startswith("disease_norm_")
+                )
+                tar.extractall(path=tempdir_path, members=[tar_dump_file])  # noqa: S202
+                dump_file = tempdir_path / tar_dump_file.name
 
             if self.conn.info.password:
                 pw_param = f"-W {self.conn.info.password}"

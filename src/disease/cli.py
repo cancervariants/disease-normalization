@@ -195,7 +195,7 @@ def _load_source(
             f"Encountered ModuleNotFoundError attempting to import {e.name}. Are ETL dependencies installed?"
         )
         click.get_current_context().exit()
-    SourceClass = eval(n.value)  # noqa: N806 S307 PGH001
+    SourceClass = eval(n.value)  # noqa: N806, S307
 
     source = SourceClass(database=db, silent=False)
     processed_ids += source.perform_etl(use_existing=from_local)
@@ -310,13 +310,13 @@ def update_db(
 
         if len(sources_split) == 0:
             msg = "Must enter one or more source names"
-            raise Exception(msg)
+            raise ValueError(msg)
 
         non_sources = set(sources_split) - set(SOURCES_LOWER_LOOKUP)
 
         if len(non_sources) != 0:
             msg = f"Not valid source(s): {non_sources}"
-            raise Exception(msg)
+            raise ValueError(msg)
 
         sources_to_update = {SourceName(SOURCES_LOWER_LOOKUP[s]) for s in sources_split}
         _update_sources(sources_to_update, db, update_merged, from_local)
