@@ -44,7 +44,7 @@ class NCIt(OWLBase):
         p106 = "http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#P106"
         neopl = self._get_by_property_value(p106, "Neoplastic Process", graph)
         dos = self._get_by_property_value(p106, "Disease or Syndrome", graph)
-        p310 = "http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#P106"
+        p310 = "http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#P310"
         retired = self._get_by_property_value(p310, "Retired_Concept", graph)
         return neopl.union(dos) - retired
 
