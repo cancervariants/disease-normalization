@@ -304,7 +304,7 @@ class QueryHandler:
 
         sources = []
         for m in disease.mappings or []:
-            ns = m.coding.id.split(":")[0]
+            ns = m.coding.id.split(":")[0].lower()
             if ns in PREFIX_LOOKUP:
                 sources.append(PREFIX_LOOKUP[ns])
 
@@ -348,7 +348,12 @@ class QueryHandler:
                     err_msg = f"Namespace prefix not supported: {source}"
                     raise ValueError(err_msg) from e
 
-            system = NAMESPACE_TO_SYSTEM_URI.get(source, source)
+            if source == NamespacePrefix.MONDO:
+                source_code = concept_id.upper()
+            elif source == NamespacePrefix.DOID:
+                source_code = concept_id
+
+            system = NAMESPACE_TO_SYSTEM_URI[source]
 
             return ConceptMapping(
                 coding=Coding(id=concept_id, code=code(source_code), system=system),

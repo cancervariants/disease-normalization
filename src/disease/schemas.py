@@ -287,20 +287,23 @@ class NormalizationService(BaseModel):
                     "mappings": [
                         {
                             "coding": {
-                                "code": "ncit:C4989",
+                                "id": "ncit:C4989",
+                                "code": "C4989",
                                 "system": "https://www.ebi.ac.uk/ols4/ontologies/ncit/classes?short_form=NCIT_",
                             },
                             "relation": "exactMatch",
                         },
                         {
                             "coding": {
-                                "code": "mondo:0004355",
+                                "id": "mondo:0004355",
+                                "code": "MONDO:0004355",
                                 "system": "http://purl.obolibrary.org/obo/mondo.owl",
                             },
                             "relation": "relatedMatch",
                         },
                         {
                             "coding": {
+                                "id": "DOID:7757",
                                 "code": "DOID:7757",
                                 "system": "https://disease-ontology.org/?id=",
                             },
@@ -308,7 +311,8 @@ class NormalizationService(BaseModel):
                         },
                         {
                             "coding": {
-                                "code": "umls:C1332977",
+                                "id": "umls:C1332977",
+                                "code": "C1332977",
                                 "system": "https://www.nlm.nih.gov/research/umls/index.html",
                             },
                             "relation": "relatedMatch",
