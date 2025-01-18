@@ -289,7 +289,7 @@ class NormalizationService(BaseModel):
                             "coding": {
                                 "id": "ncit:C4989",
                                 "code": "C4989",
-                                "system": "https://www.ebi.ac.uk/ols4/ontologies/ncit/classes?short_form=NCIT_",
+                                "system": "https://ncit.nci.nih.gov/ncitbrowser/ConceptReport.jsp?dictionary=NCI_Thesaurus&code=",
                             },
                             "relation": "exactMatch",
                         },
