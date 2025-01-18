@@ -55,71 +55,44 @@ class NamespacePrefix(Enum):
     OMIM = "MIM"
     ONCOTREE = "oncotree"
     # external sources
-    COHD = "cohd"
-    DECIPHER = "decipher"
     EFO = "efo"
     GARD = "gard"
-    HP = "HP"
-    HPO = HP
-    ICD9 = "icd9"
     ICD9CM = "icd9.cm"
     ICD10 = "icd10"
     ICD10WHO = ICD10
     ICD10CM = "icd10.cm"
-    ICD11 = "icd11"
     ICDO = "icdo"
-    IDO = "ido"
     IMDRF = "imdrf"
     KEGG = "kegg.disease"
     MEDDRA = "meddra"
     MEDGEN = "medgen"
     MESH = "mesh"
-    MF = "mf"
-    MP = "MP"
-    MPATH = "mpath"
-    NIFSTD = "nifstd"
-    OBI = "obi"
-    OGMS = "ogms"
     ORPHANET = "orphanet"
-    PATO = "pato"
-    SCDO = "scdo"
     UMLS = "umls"
-    WIKIPEDIA = "wikipedia.en"
-    WIKIDATA = "wikidata"
 
 
-# Source to URI. Will use OBO Foundry persistent URL (PURL) or source homepage
+# Source to URI. Will use  system URI prefix, OBO Foundry persistent URL (PURL), or source homepage
 NAMESPACE_TO_SYSTEM_URI: dict[NamespacePrefix, str] = {
-    NamespacePrefix.NCIT: "http://purl.obolibrary.org/obo/ncit.owl",
+    NamespacePrefix.NCIT: "https://ncit.nci.nih.gov/ncitbrowser/ConceptReport.jsp?dictionary=NCI_Thesaurus&code=",
     NamespacePrefix.MONDO: "http://purl.obolibrary.org/obo/mondo.owl",
-    NamespacePrefix.DO: "http://purl.obolibrary.org/obo/doid.owl",
-    NamespacePrefix.DOID: "http://purl.obolibrary.org/obo/doid.owl",
-    NamespacePrefix.OMIM: "https://www.omim.org",
-    NamespacePrefix.ONCOTREE: "https://oncotree.mskcc.org",
-    NamespacePrefix.COHD: "https://cohd.io",
-    NamespacePrefix.DECIPHER: "https://www.deciphergenomics.org",
-    NamespacePrefix.EFO: "https://www.ebi.ac.uk/efo/",
+    NamespacePrefix.DO: "https://disease-ontology.org/?id=",
+    NamespacePrefix.DOID: "https://disease-ontology.org/?id=",
+    NamespacePrefix.OMIM: "https://omim.org/entry/",
+    NamespacePrefix.ONCOTREE: "https://oncotree.mskcc.org/?version=oncotree_latest_stable&field=CODE&search=",
+    NamespacePrefix.EFO: "http://www.ebi.ac.uk/efo/EFO_",
     NamespacePrefix.GARD: "https://rarediseases.info.nih.gov",
-    NamespacePrefix.HP: "http://purl.obolibrary.org/obo/hp.owl",
-    NamespacePrefix.HPO: "http://purl.obolibrary.org/obo/hp.owl",
-    NamespacePrefix.ICD11: "https://icd.who.int/en/",
+    NamespacePrefix.ICD9CM: "https://archive.cdc.gov/www_cdc_gov/nchs/icd/icd9cm.htm",
+    NamespacePrefix.ICD10: "https://icd.who.int/browse10/2016/en#/",
+    NamespacePrefix.ICD10CM: "https://www.cdc.gov/nchs/icd/icd-10-cm/index.html",
+    NamespacePrefix.ICD10WHO: "https://icd.who.int/browse10/2016/en#/",
     NamespacePrefix.ICDO: "https://www.who.int/standards/classifications/other-classifications/international-classification-of-diseases-for-oncology/",
+    NamespacePrefix.IMDRF: "https://www.imdrf.org/",
     NamespacePrefix.KEGG: "https://www.genome.jp/kegg/disease/",
-    NamespacePrefix.MEDDRA: "https://www.meddra.org",
+    NamespacePrefix.MEDDRA: "https://bioportal.bioontology.org/ontologies/MEDDRA?p=classes&conceptid=",
     NamespacePrefix.MEDGEN: "https://www.ncbi.nlm.nih.gov/medgen/",
-    NamespacePrefix.MESH: "https://id.nlm.nih.gov/mesh/",
-    NamespacePrefix.MP: "http://purl.obolibrary.org/obo/mp.owl",
-    NamespacePrefix.OBI: "http://purl.obolibrary.org/obo/obi.owl",
+    NamespacePrefix.MESH: "https://meshb.nlm.nih.gov/record/ui?ui=",
     NamespacePrefix.ORPHANET: "https://www.orpha.net",
-    NamespacePrefix.PATO: "http://purl.obolibrary.org/obo/pato.owl",
     NamespacePrefix.UMLS: "https://www.nlm.nih.gov/research/umls/index.html",
-    NamespacePrefix.WIKIPEDIA: "https://en.wikipedia.org",
-    NamespacePrefix.WIKIDATA: "https://www.wikidata.org",
-}
-
-# URI to source
-SYSTEM_URI_TO_NAMESPACE = {
-    system_uri: ns.value for ns, system_uri in NAMESPACE_TO_SYSTEM_URI.items()
 }
 
 
@@ -329,7 +302,7 @@ class NormalizationService(BaseModel):
                         {
                             "coding": {
                                 "code": "DOID:7757",
-                                "system": "http://purl.obolibrary.org/obo/doid.owl",
+                                "system": "https://disease-ontology.org/?id=",
                             },
                             "relation": "relatedMatch",
                         },

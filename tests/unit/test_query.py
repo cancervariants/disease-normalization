@@ -27,7 +27,7 @@ def neuroblastoma():
             {
                 "coding": {
                     "code": "ncit:C3270",
-                    "system": "http://purl.obolibrary.org/obo/ncit.owl",
+                    "system": "https://ncit.nci.nih.gov/ncitbrowser/ConceptReport.jsp?dictionary=NCI_Thesaurus&code=",
                 },
                 "relation": "exactMatch",
             },
@@ -41,14 +41,14 @@ def neuroblastoma():
             {
                 "coding": {
                     "code": "oncotree:NBL",
-                    "system": "https://oncotree.mskcc.org",
+                    "system": "https://oncotree.mskcc.org/?version=oncotree_latest_stable&field=CODE&search=",
                 },
                 "relation": "relatedMatch",
             },
             {
                 "coding": {
                     "code": "DOID:769",
-                    "system": "http://purl.obolibrary.org/obo/doid.owl",
+                    "system": "https://disease-ontology.org/?id=",
                 },
                 "relation": "relatedMatch",
             },
@@ -69,7 +69,7 @@ def neuroblastoma():
             {
                 "coding": {
                     "code": "efo:0000621",
-                    "system": "https://www.ebi.ac.uk/efo/",
+                    "system": "http://www.ebi.ac.uk/efo/EFO_",
                 },
                 "relation": "relatedMatch",
             },
@@ -83,7 +83,7 @@ def neuroblastoma():
             {
                 "coding": {
                     "code": "mesh:D009447",
-                    "system": "https://id.nlm.nih.gov/mesh/",
+                    "system": "https://meshb.nlm.nih.gov/record/ui?ui=",
                 },
                 "relation": "relatedMatch",
             },
@@ -143,7 +143,7 @@ def skin_myo():
             {
                 "coding": {
                     "code": "ncit:C167370",
-                    "system": "http://purl.obolibrary.org/obo/ncit.owl",
+                    "system": "https://ncit.nci.nih.gov/ncitbrowser/ConceptReport.jsp?dictionary=NCI_Thesaurus&code=",
                 },
                 "relation": "exactMatch",
             },
@@ -171,13 +171,13 @@ def mafd2():
                 "relation": "exactMatch",
             },
             {
-                "coding": {"code": "MIM:309200", "system": "https://www.omim.org"},
+                "coding": {"code": "MIM:309200", "system": "https://omim.org/entry/"},
                 "relation": "relatedMatch",
             },
             {
                 "coding": {
                     "code": "mesh:C564108",
-                    "system": "https://id.nlm.nih.gov/mesh/",
+                    "system": "https://meshb.nlm.nih.gov/record/ui?ui=",
                 },
                 "relation": "relatedMatch",
             },
