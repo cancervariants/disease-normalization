@@ -31,6 +31,42 @@ from disease.schemas import (
 _logger = logging.getLogger(__name__)
 
 
+def create_concept_mapping(
+    concept_id: str, relation: Relation = Relation.RELATED_MATCH
+) -> ConceptMapping:
+    """Create concept mapping for identifier
+
+    ``system`` will use system prefix URL, OBO Foundry persistent URL (PURL), or
+    source homepage, in that order of preference.
+
+    :param concept_id: Concept identifier represented as a curie
+    :param relation: SKOS mapping relationship, default is relatedMatch
+    :return: Concept mapping for identifier
+    """
+    source, source_code = concept_id.split(":")
+
+    try:
+        source = NamespacePrefix(source)
+    except ValueError:
+        try:
+            source = NamespacePrefix(source.upper())
+        except ValueError as e:
+            err_msg = f"Namespace prefix not supported: {source}"
+            raise ValueError(err_msg) from e
+
+    if source == NamespacePrefix.MONDO:
+        source_code = concept_id.upper()
+    elif source == NamespacePrefix.DOID:
+        source_code = concept_id
+
+    system = NAMESPACE_TO_SYSTEM_URI[source]
+
+    return ConceptMapping(
+        coding=Coding(id=concept_id, code=code(source_code), system=system),
+        relation=relation,
+    )
+
+
 class InvalidParameterException(Exception):  # noqa: N818
     """Exception for invalid parameter args provided by the user."""
 
@@ -324,42 +360,6 @@ class QueryHandler:
         :param match_type: type of match achieved
         :return: completed normalized response object ready to return to user
         """
-
-        def _create_concept_mapping(
-            concept_id: str, relation: Relation = Relation.RELATED_MATCH
-        ) -> ConceptMapping:
-            """Create concept mapping for identifier
-
-            ``system`` will use system prefix URL, OBO Foundry persistent URL (PURL), or
-            source homepage, in that order of preference.
-
-            :param concept_id: Concept identifier represented as a curie
-            :param relation: SKOS mapping relationship, default is relatedMatch
-            :return: Concept mapping for identifier
-            """
-            source, source_code = concept_id.split(":")
-
-            try:
-                source = NamespacePrefix(source)
-            except ValueError:
-                try:
-                    source = NamespacePrefix(source.upper())
-                except ValueError as e:
-                    err_msg = f"Namespace prefix not supported: {source}"
-                    raise ValueError(err_msg) from e
-
-            if source == NamespacePrefix.MONDO:
-                source_code = concept_id.upper()
-            elif source == NamespacePrefix.DOID:
-                source_code = concept_id
-
-            system = NAMESPACE_TO_SYSTEM_URI[source]
-
-            return ConceptMapping(
-                coding=Coding(id=concept_id, code=code(source_code), system=system),
-                relation=relation,
-            )
-
         disease_obj = MappableConcept(
             id=f"normalize.disease.{record['concept_id']}",
             primaryCode=code(root=record["concept_id"]),
@@ -370,10 +370,10 @@ class QueryHandler:
 
         # mappings
         mappings = [
-            _create_concept_mapping(record["concept_id"], relation=Relation.EXACT_MATCH)
+            create_concept_mapping(record["concept_id"], relation=Relation.EXACT_MATCH)
         ]
         source_ids = record.get("xrefs", []) + record.get("associated_with", [])
-        mappings.extend(_create_concept_mapping(source_id) for source_id in source_ids)
+        mappings.extend(create_concept_mapping(source_id) for source_id in source_ids)
         if mappings:
             disease_obj.mappings = mappings
 
