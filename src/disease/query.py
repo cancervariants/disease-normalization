@@ -31,16 +31,17 @@ from disease.schemas import (
 _logger = logging.getLogger(__name__)
 
 
-def create_concept_mapping(
+def get_concept_mapping(
     concept_id: str, relation: Relation = Relation.RELATED_MATCH
 ) -> ConceptMapping:
-    """Create concept mapping for identifier
+    """Get concept mapping for CURIE identifier
 
     ``system`` will use system prefix URL, OBO Foundry persistent URL (PURL), or
     source homepage, in that order of preference.
 
     :param concept_id: Concept identifier represented as a curie
     :param relation: SKOS mapping relationship, default is relatedMatch
+    :raises ValueError: If source of concept ID is not a valid ``NamespacePrefix``
     :return: Concept mapping for identifier
     """
     source, source_code = concept_id.split(":")
@@ -370,10 +371,10 @@ class QueryHandler:
 
         # mappings
         mappings = [
-            create_concept_mapping(record["concept_id"], relation=Relation.EXACT_MATCH)
+            get_concept_mapping(record["concept_id"], relation=Relation.EXACT_MATCH)
         ]
         source_ids = record.get("xrefs", []) + record.get("associated_with", [])
-        mappings.extend(create_concept_mapping(source_id) for source_id in source_ids)
+        mappings.extend(get_concept_mapping(source_id) for source_id in source_ids)
         if mappings:
             disease_obj.mappings = mappings
 
