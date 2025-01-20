@@ -2,6 +2,7 @@
 
 import datetime
 from enum import Enum, IntEnum
+from types import MappingProxyType
 from typing import Literal
 
 from ga4gh.core.models import MappableConcept
@@ -72,28 +73,30 @@ class NamespacePrefix(Enum):
 
 
 # Source to URI. Will use  system URI prefix, OBO Foundry persistent URL (PURL), or source homepage
-NAMESPACE_TO_SYSTEM_URI: dict[NamespacePrefix, str] = {
-    NamespacePrefix.NCIT: "https://ncit.nci.nih.gov/ncitbrowser/ConceptReport.jsp?dictionary=NCI_Thesaurus&code=",
-    NamespacePrefix.MONDO: "http://purl.obolibrary.org/obo/mondo.owl",
-    NamespacePrefix.DO: "https://disease-ontology.org/?id=",
-    NamespacePrefix.DOID: "https://disease-ontology.org/?id=",
-    NamespacePrefix.OMIM: "https://omim.org/entry/",
-    NamespacePrefix.ONCOTREE: "https://oncotree.mskcc.org/?version=oncotree_latest_stable&field=CODE&search=",
-    NamespacePrefix.EFO: "http://www.ebi.ac.uk/efo/EFO_",
-    NamespacePrefix.GARD: "https://rarediseases.info.nih.gov",
-    NamespacePrefix.ICD9CM: "https://archive.cdc.gov/www_cdc_gov/nchs/icd/icd9cm.htm",
-    NamespacePrefix.ICD10: "https://icd.who.int/browse10/2016/en#/",
-    NamespacePrefix.ICD10CM: "https://www.cdc.gov/nchs/icd/icd-10-cm/index.html",
-    NamespacePrefix.ICD10WHO: "https://icd.who.int/browse10/2016/en#/",
-    NamespacePrefix.ICDO: "https://www.who.int/standards/classifications/other-classifications/international-classification-of-diseases-for-oncology/",
-    NamespacePrefix.IMDRF: "https://www.imdrf.org/",
-    NamespacePrefix.KEGG: "https://www.genome.jp/kegg/disease/",
-    NamespacePrefix.MEDDRA: "https://bioportal.bioontology.org/ontologies/MEDDRA?p=classes&conceptid=",
-    NamespacePrefix.MEDGEN: "https://www.ncbi.nlm.nih.gov/medgen/",
-    NamespacePrefix.MESH: "https://meshb.nlm.nih.gov/record/ui?ui=",
-    NamespacePrefix.ORPHANET: "https://www.orpha.net",
-    NamespacePrefix.UMLS: "https://www.nlm.nih.gov/research/umls/index.html",
-}
+NAMESPACE_TO_SYSTEM_URI: MappingProxyType[NamespacePrefix, str] = MappingProxyType(
+    {
+        NamespacePrefix.NCIT: "https://ncit.nci.nih.gov/ncitbrowser/ConceptReport.jsp?dictionary=NCI_Thesaurus&code=",
+        NamespacePrefix.MONDO: "http://purl.obolibrary.org/obo/mondo.owl",
+        NamespacePrefix.DO: "https://disease-ontology.org/?id=",
+        NamespacePrefix.DOID: "https://disease-ontology.org/?id=",
+        NamespacePrefix.OMIM: "https://omim.org/entry/",
+        NamespacePrefix.ONCOTREE: "https://oncotree.mskcc.org/?version=oncotree_latest_stable&field=CODE&search=",
+        NamespacePrefix.EFO: "http://www.ebi.ac.uk/efo/EFO_",
+        NamespacePrefix.GARD: "https://rarediseases.info.nih.gov",
+        NamespacePrefix.ICD9CM: "https://archive.cdc.gov/www_cdc_gov/nchs/icd/icd9cm.htm",
+        NamespacePrefix.ICD10: "https://icd.who.int/browse10/2016/en#/",
+        NamespacePrefix.ICD10CM: "https://www.cdc.gov/nchs/icd/icd-10-cm/index.html",
+        NamespacePrefix.ICD10WHO: "https://icd.who.int/browse10/2016/en#/",
+        NamespacePrefix.ICDO: "https://www.who.int/standards/classifications/other-classifications/international-classification-of-diseases-for-oncology/",
+        NamespacePrefix.IMDRF: "https://www.imdrf.org/",
+        NamespacePrefix.KEGG: "https://www.genome.jp/kegg/disease/",
+        NamespacePrefix.MEDDRA: "https://bioportal.bioontology.org/ontologies/MEDDRA?p=classes&conceptid=",
+        NamespacePrefix.MEDGEN: "https://www.ncbi.nlm.nih.gov/medgen/",
+        NamespacePrefix.MESH: "https://meshb.nlm.nih.gov/record/ui?ui=",
+        NamespacePrefix.ORPHANET: "https://www.orpha.net",
+        NamespacePrefix.UMLS: "https://www.nlm.nih.gov/research/umls/index.html",
+    }
+)
 
 
 class SourcePriority(IntEnum):

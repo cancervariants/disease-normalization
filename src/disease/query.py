@@ -60,10 +60,12 @@ def get_concept_mapping(
     elif source == NamespacePrefix.DOID:
         source_code = concept_id
 
-    system = NAMESPACE_TO_SYSTEM_URI[source]
-
     return ConceptMapping(
-        coding=Coding(id=concept_id, code=code(source_code), system=system),
+        coding=Coding(
+            id=concept_id,
+            code=code(source_code),
+            system=NAMESPACE_TO_SYSTEM_URI[source],
+        ),
         relation=relation,
     )
 
