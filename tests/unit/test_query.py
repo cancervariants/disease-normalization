@@ -188,7 +188,7 @@ def mafd2():
                 "coding": {
                     "id": "MIM:309200",
                     "code": "309200",
-                    "system": "https://omim.org/",
+                    "system": "https://omim.org/MIM:",
                 },
                 "relation": "relatedMatch",
             },
