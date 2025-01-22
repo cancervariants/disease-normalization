@@ -76,7 +76,7 @@ class NamespacePrefix(Enum):
 NAMESPACE_TO_SYSTEM_URI: MappingProxyType[NamespacePrefix, str] = MappingProxyType(
     {
         NamespacePrefix.NCIT: "https://ncit.nci.nih.gov/ncitbrowser/ConceptReport.jsp?dictionary=NCI_Thesaurus&code=",
-        NamespacePrefix.MONDO: "http://purl.obolibrary.org/obo/mondo.owl",
+        NamespacePrefix.MONDO: "https://monarchinitiative.org/",
         NamespacePrefix.DO: "https://disease-ontology.org/?id=",
         NamespacePrefix.DOID: "https://disease-ontology.org/?id=",
         NamespacePrefix.OMIM: "https://omim.org/",
@@ -300,7 +300,7 @@ class NormalizationService(BaseModel):
                             "coding": {
                                 "id": "mondo:0004355",
                                 "code": "MONDO:0004355",
-                                "system": "http://purl.obolibrary.org/obo/mondo.owl",
+                                "system": "https://monarchinitiative.org/",
                             },
                             "relation": "relatedMatch",
                         },

@@ -36,7 +36,7 @@ def neuroblastoma():
                 "coding": {
                     "id": "mondo:0005072",
                     "code": "MONDO:0005072",
-                    "system": "http://purl.obolibrary.org/obo/mondo.owl",
+                    "system": "https://monarchinitiative.org/",
                 },
                 "relation": "relatedMatch",
             },
@@ -180,7 +180,7 @@ def mafd2():
                 "coding": {
                     "id": "mondo:0010648",
                     "code": "MONDO:0010648",
-                    "system": "http://purl.obolibrary.org/obo/mondo.owl",
+                    "system": "https://monarchinitiative.org/",
                 },
                 "relation": "exactMatch",
             },
