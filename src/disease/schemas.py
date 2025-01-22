@@ -79,7 +79,7 @@ NAMESPACE_TO_SYSTEM_URI: MappingProxyType[NamespacePrefix, str] = MappingProxyTy
         NamespacePrefix.MONDO: "http://purl.obolibrary.org/obo/mondo.owl",
         NamespacePrefix.DO: "https://disease-ontology.org/?id=",
         NamespacePrefix.DOID: "https://disease-ontology.org/?id=",
-        NamespacePrefix.OMIM: "https://omim.org/entry/",
+        NamespacePrefix.OMIM: "https://omim.org/",
         NamespacePrefix.ONCOTREE: "https://oncotree.mskcc.org/?version=oncotree_latest_stable&field=CODE&search=",
         NamespacePrefix.EFO: "http://www.ebi.ac.uk/efo/EFO_",
         NamespacePrefix.GARD: "https://rarediseases.info.nih.gov",
