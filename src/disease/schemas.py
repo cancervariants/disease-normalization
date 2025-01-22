@@ -5,7 +5,13 @@ from enum import Enum, IntEnum
 from types import MappingProxyType
 from typing import Literal
 
-from ga4gh.core.models import MappableConcept
+from ga4gh.core.models import (
+    Coding,
+    ConceptMapping,
+    MappableConcept,
+    Relation,
+    code,
+)
 from pydantic import BaseModel, ConfigDict, StrictBool, StrictStr
 
 from disease import __version__
@@ -76,7 +82,7 @@ class NamespacePrefix(Enum):
 NAMESPACE_TO_SYSTEM_URI: MappingProxyType[NamespacePrefix, str] = MappingProxyType(
     {
         NamespacePrefix.NCIT: "https://ncit.nci.nih.gov/ncitbrowser/ConceptReport.jsp?dictionary=NCI_Thesaurus&code=",
-        NamespacePrefix.MONDO: "https://monarchinitiative.org/",
+        NamespacePrefix.MONDO: "https://purl.obolibrary.org/obo/",
         NamespacePrefix.DO: "https://disease-ontology.org/?id=",
         NamespacePrefix.DOID: "https://disease-ontology.org/?id=",
         NamespacePrefix.OMIM: "https://omim.org/MIM:",
@@ -97,6 +103,48 @@ NAMESPACE_TO_SYSTEM_URI: MappingProxyType[NamespacePrefix, str] = MappingProxyTy
         NamespacePrefix.UMLS: "https://www.nlm.nih.gov/research/umls/index.html",
     }
 )
+
+
+def get_concept_mapping(
+    concept_id: str, relation: Relation = Relation.RELATED_MATCH
+) -> ConceptMapping:
+    """Get concept mapping for CURIE identifier
+
+    ``system`` will use system prefix URL, OBO Foundry persistent URL (PURL), or
+    source homepage, in that order of preference.
+
+    :param concept_id: Concept identifier represented as a curie
+    :param relation: SKOS mapping relationship, default is relatedMatch
+    :raises ValueError: If source of concept ID is not a valid ``NamespacePrefix``
+    :return: Concept mapping for identifier
+    """
+    source, source_code = concept_id.split(":")
+
+    try:
+        source = NamespacePrefix(source)
+    except ValueError:
+        try:
+            source = NamespacePrefix(source.upper())
+        except ValueError as e:
+            err_msg = f"Namespace prefix not supported: {source}"
+            raise ValueError(err_msg) from e
+
+    id_ = concept_id
+
+    if source == NamespacePrefix.MONDO:
+        source_code = concept_id.upper()
+        id_ = source_code.replace(":", "_")
+    elif source == NamespacePrefix.DOID:
+        source_code = concept_id
+
+    return ConceptMapping(
+        coding=Coding(
+            id=id_,
+            code=code(source_code),
+            system=NAMESPACE_TO_SYSTEM_URI[source],
+        ),
+        relation=relation,
+    )
 
 
 class SourcePriority(IntEnum):
@@ -298,9 +346,9 @@ class NormalizationService(BaseModel):
                         },
                         {
                             "coding": {
-                                "id": "mondo:0004355",
+                                "id": "MONDO_0004355",
                                 "code": "MONDO:0004355",
-                                "system": "https://monarchinitiative.org/",
+                                "system": "https://purl.obolibrary.org/obo/",
                             },
                             "relation": "relatedMatch",
                         },

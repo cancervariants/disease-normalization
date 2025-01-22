@@ -6,8 +6,6 @@ import re
 
 from botocore.exceptions import ClientError
 from ga4gh.core.models import (
-    Coding,
-    ConceptMapping,
     Extension,
     MappableConcept,
     Relation,
@@ -17,57 +15,17 @@ from ga4gh.core.models import (
 from disease import NAMESPACE_LOOKUP, PREFIX_LOOKUP, SOURCES_LOWER_LOOKUP, __version__
 from disease.database.database import AbstractDatabase
 from disease.schemas import (
-    NAMESPACE_TO_SYSTEM_URI,
     Disease,
     MatchType,
-    NamespacePrefix,
     NormalizationService,
     RefType,
     SearchService,
     ServiceMeta,
     SourceName,
+    get_concept_mapping,
 )
 
 _logger = logging.getLogger(__name__)
-
-
-def get_concept_mapping(
-    concept_id: str, relation: Relation = Relation.RELATED_MATCH
-) -> ConceptMapping:
-    """Get concept mapping for CURIE identifier
-
-    ``system`` will use system prefix URL, OBO Foundry persistent URL (PURL), or
-    source homepage, in that order of preference.
-
-    :param concept_id: Concept identifier represented as a curie
-    :param relation: SKOS mapping relationship, default is relatedMatch
-    :raises ValueError: If source of concept ID is not a valid ``NamespacePrefix``
-    :return: Concept mapping for identifier
-    """
-    source, source_code = concept_id.split(":")
-
-    try:
-        source = NamespacePrefix(source)
-    except ValueError:
-        try:
-            source = NamespacePrefix(source.upper())
-        except ValueError as e:
-            err_msg = f"Namespace prefix not supported: {source}"
-            raise ValueError(err_msg) from e
-
-    if source == NamespacePrefix.MONDO:
-        source_code = concept_id.upper()
-    elif source == NamespacePrefix.DOID:
-        source_code = concept_id
-
-    return ConceptMapping(
-        coding=Coding(
-            id=concept_id,
-            code=code(source_code),
-            system=NAMESPACE_TO_SYSTEM_URI[source],
-        ),
-        relation=relation,
-    )
 
 
 class InvalidParameterException(Exception):  # noqa: N818
@@ -343,7 +301,7 @@ class QueryHandler:
 
         sources = []
         for m in disease.mappings or []:
-            ns = m.coding.id.split(":")[0].lower()
+            ns = re.split(r"[:_]", m.coding.id, maxsplit=1)[0].lower()
             if ns in PREFIX_LOOKUP:
                 sources.append(PREFIX_LOOKUP[ns])
 
