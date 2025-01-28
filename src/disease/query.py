@@ -364,18 +364,16 @@ class QueryHandler:
         )
 
         xrefs = [record["concept_id"], *record.get("xrefs", [])]
-        mappings = [
+        disease_obj.mappings = [
             _create_concept_mapping(xref_id, relation=Relation.EXACT_MATCH)
             for xref_id in xrefs
         ]
 
         associated_with = record.get("associated_with", [])
-        mappings.extend(
+        disease_obj.mappings.extend(
             _create_concept_mapping(associated_with_id, relation=Relation.RELATED_MATCH)
             for associated_with_id in associated_with
         )
-        if mappings:
-            disease_obj.mappings = mappings
 
         for field in ("pediatric_disease", "oncologic_disease", "aliases"):
             value = record.get(field)
