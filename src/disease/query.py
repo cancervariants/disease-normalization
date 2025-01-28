@@ -363,12 +363,17 @@ class QueryHandler:
             extensions=[],
         )
 
-        # mappings
+        xrefs = [record["concept_id"], *record.get("xrefs", [])]
         mappings = [
-            _create_concept_mapping(record["concept_id"], relation=Relation.EXACT_MATCH)
+            _create_concept_mapping(xref_id, relation=Relation.EXACT_MATCH)
+            for xref_id in xrefs
         ]
-        source_ids = record.get("xrefs", []) + record.get("associated_with", [])
-        mappings.extend(_create_concept_mapping(source_id) for source_id in source_ids)
+
+        associated_with = record.get("associated_with", [])
+        mappings.extend(
+            _create_concept_mapping(associated_with_id, relation=Relation.RELATED_MATCH)
+            for associated_with_id in associated_with
+        )
         if mappings:
             disease_obj.mappings = mappings
 

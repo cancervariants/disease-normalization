@@ -324,14 +324,14 @@ class NormalizationService(BaseModel):
                                 "code": "mondo:0004355",
                                 "system": "http://purl.obolibrary.org/obo/mondo.owl",
                             },
-                            "relation": "relatedMatch",
+                            "relation": "exactMatch",
                         },
                         {
                             "coding": {
                                 "code": "DOID:7757",
                                 "system": "http://purl.obolibrary.org/obo/doid.owl",
                             },
-                            "relation": "relatedMatch",
+                            "relation": "exactMatch",
                         },
                         {
                             "coding": {
