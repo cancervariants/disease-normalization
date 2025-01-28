@@ -350,7 +350,7 @@ class NormalizationService(BaseModel):
                                 "code": "MONDO:0004355",
                                 "system": "https://purl.obolibrary.org/obo/",
                             },
-                            "relation": "relatedMatch",
+                            "relation": "exactMatch",
                         },
                         {
                             "coding": {
@@ -358,7 +358,7 @@ class NormalizationService(BaseModel):
                                 "code": "DOID:7757",
                                 "system": "https://disease-ontology.org/?id=",
                             },
-                            "relation": "relatedMatch",
+                            "relation": "exactMatch",
                         },
                         {
                             "coding": {

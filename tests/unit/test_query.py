@@ -38,7 +38,7 @@ def neuroblastoma():
                     "code": "MONDO:0005072",
                     "system": "https://purl.obolibrary.org/obo/",
                 },
-                "relation": "relatedMatch",
+                "relation": "exactMatch",
             },
             {
                 "coding": {
@@ -46,7 +46,7 @@ def neuroblastoma():
                     "code": "NBL",
                     "system": "https://oncotree.mskcc.org/?version=oncotree_latest_stable&field=CODE&search=",
                 },
-                "relation": "relatedMatch",
+                "relation": "exactMatch",
             },
             {
                 "coding": {
@@ -54,7 +54,7 @@ def neuroblastoma():
                     "code": "DOID:769",
                     "system": "https://disease-ontology.org/?id=",
                 },
-                "relation": "relatedMatch",
+                "relation": "exactMatch",
             },
             {
                 "coding": {
@@ -190,7 +190,7 @@ def mafd2():
                     "code": "309200",
                     "system": "https://omim.org/MIM:",
                 },
-                "relation": "relatedMatch",
+                "relation": "exactMatch",
             },
             {
                 "coding": {
