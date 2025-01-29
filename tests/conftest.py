@@ -20,6 +20,7 @@ def pytest_collection_modifyitems(items):
     When creating new test modules, be sure to add them here.
     """
     module_order = [
+        "test_schemas",
         "test_mondo",
         "test_do",
         "test_ncit",

@@ -26,84 +26,96 @@ def neuroblastoma():
         mappings=[
             {
                 "coding": {
-                    "code": "ncit:C3270",
-                    "system": "http://purl.obolibrary.org/obo/ncit.owl",
+                    "id": "ncit:C3270",
+                    "code": "C3270",
+                    "system": "https://ncit.nci.nih.gov/ncitbrowser/ConceptReport.jsp?dictionary=NCI_Thesaurus&code=",
                 },
                 "relation": "exactMatch",
             },
             {
                 "coding": {
-                    "code": "mondo:0005072",
-                    "system": "http://purl.obolibrary.org/obo/mondo.owl",
+                    "id": "MONDO_0005072",
+                    "code": "MONDO:0005072",
+                    "system": "https://purl.obolibrary.org/obo/",
                 },
                 "relation": "exactMatch",
             },
             {
                 "coding": {
-                    "code": "oncotree:NBL",
-                    "system": "https://oncotree.mskcc.org",
+                    "id": "oncotree:NBL",
+                    "code": "NBL",
+                    "system": "https://oncotree.mskcc.org/?version=oncotree_latest_stable&field=CODE&search=",
                 },
                 "relation": "exactMatch",
             },
             {
                 "coding": {
+                    "id": "DOID:769",
                     "code": "DOID:769",
-                    "system": "http://purl.obolibrary.org/obo/doid.owl",
+                    "system": "https://disease-ontology.org/?id=",
                 },
                 "relation": "exactMatch",
             },
             {
                 "coding": {
-                    "code": "umls:C0027819",
+                    "id": "umls:C0027819",
+                    "code": "C0027819",
                     "system": "https://www.nlm.nih.gov/research/umls/index.html",
                 },
                 "relation": "relatedMatch",
             },
             {
                 "coding": {
-                    "code": "icdo:9500/3",
+                    "id": "icdo:9500/3",
+                    "code": "9500/3",
                     "system": "https://www.who.int/standards/classifications/other-classifications/international-classification-of-diseases-for-oncology/",
                 },
                 "relation": "relatedMatch",
             },
             {
                 "coding": {
-                    "code": "efo:0000621",
-                    "system": "https://www.ebi.ac.uk/efo/",
+                    "id": "efo:0000621",
+                    "code": "0000621",
+                    "system": "http://www.ebi.ac.uk/efo/EFO_",
                 },
                 "relation": "relatedMatch",
             },
             {
                 "coding": {
-                    "code": "gard:7185",
+                    "id": "gard:7185",
+                    "code": "7185",
                     "system": "https://rarediseases.info.nih.gov",
                 },
                 "relation": "relatedMatch",
             },
             {
                 "coding": {
-                    "code": "mesh:D009447",
-                    "system": "https://id.nlm.nih.gov/mesh/",
+                    "id": "mesh:D009447",
+                    "code": "D009447",
+                    "system": "https://meshb.nlm.nih.gov/record/ui?ui=",
                 },
                 "relation": "relatedMatch",
             },
             {
                 "coding": {
-                    "code": "orphanet:635",
+                    "id": "orphanet:635",
+                    "code": "635",
                     "system": "https://www.orpha.net",
                 },
                 "relation": "relatedMatch",
             },
             {
                 "coding": {
-                    "code": "umls:C2751421",
+                    "id": "umls:C2751421",
+                    "code": "C2751421",
                     "system": "https://www.nlm.nih.gov/research/umls/index.html",
                 },
                 "relation": "relatedMatch",
             },
             {
                 "coding": {
-                    "code": "medgen:18012",
+                    "id": "medgen:18012",
+                    "code": "18012",
                     "system": "https://www.ncbi.nlm.nih.gov/medgen/",
                 },
                 "relation": "relatedMatch",
@@ -142,8 +154,9 @@ def skin_myo():
         mappings=[
             {
                 "coding": {
-                    "code": "ncit:C167370",
-                    "system": "http://purl.obolibrary.org/obo/ncit.owl",
+                    "id": "ncit:C167370",
+                    "code": "C167370",
+                    "system": "https://ncit.nci.nih.gov/ncitbrowser/ConceptReport.jsp?dictionary=NCI_Thesaurus&code=",
                 },
                 "relation": "exactMatch",
             },
@@ -165,32 +178,40 @@ def mafd2():
         mappings=[
             {
                 "coding": {
-                    "code": "mondo:0010648",
-                    "system": "http://purl.obolibrary.org/obo/mondo.owl",
+                    "id": "MONDO_0010648",
+                    "code": "MONDO:0010648",
+                    "system": "https://purl.obolibrary.org/obo/",
                 },
                 "relation": "exactMatch",
             },
             {
-                "coding": {"code": "MIM:309200", "system": "https://www.omim.org"},
+                "coding": {
+                    "id": "MIM:309200",
+                    "code": "309200",
+                    "system": "https://omim.org/MIM:",
+                },
                 "relation": "exactMatch",
             },
             {
                 "coding": {
-                    "code": "mesh:C564108",
-                    "system": "https://id.nlm.nih.gov/mesh/",
+                    "id": "mesh:C564108",
+                    "code": "C564108",
+                    "system": "https://meshb.nlm.nih.gov/record/ui?ui=",
                 },
                 "relation": "relatedMatch",
             },
             {
                 "coding": {
-                    "code": "medgen:326975",
+                    "id": "medgen:326975",
+                    "code": "326975",
                     "system": "https://www.ncbi.nlm.nih.gov/medgen/",
                 },
                 "relation": "relatedMatch",
             },
             {
                 "coding": {
-                    "code": "umls:C1839839",
+                    "id": "umls:C1839839",
+                    "code": "C1839839",
                     "system": "https://www.nlm.nih.gov/research/umls/index.html",
                 },
                 "relation": "relatedMatch",

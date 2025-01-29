@@ -6,8 +6,6 @@ import re
 
 from botocore.exceptions import ClientError
 from ga4gh.core.models import (
-    Coding,
-    ConceptMapping,
     Extension,
     MappableConcept,
     Relation,
@@ -17,16 +15,14 @@ from ga4gh.core.models import (
 from disease import NAMESPACE_LOOKUP, PREFIX_LOOKUP, SOURCES_LOWER_LOOKUP, __version__
 from disease.database.database import AbstractDatabase
 from disease.schemas import (
-    NAMESPACE_TO_SYSTEM_URI,
-    SYSTEM_URI_TO_NAMESPACE,
     Disease,
     MatchType,
-    NamespacePrefix,
     NormalizationService,
     RefType,
     SearchService,
     ServiceMeta,
     SourceName,
+    get_concept_mapping,
 )
 
 _logger = logging.getLogger(__name__)
@@ -305,7 +301,7 @@ class QueryHandler:
 
         sources = []
         for m in disease.mappings or []:
-            ns = SYSTEM_URI_TO_NAMESPACE.get(m.coding.system, "").lower()
+            ns = re.split(r"[:_]", m.coding.id, maxsplit=1)[0].lower()
             if ns in PREFIX_LOOKUP:
                 sources.append(PREFIX_LOOKUP[ns])
 
@@ -325,36 +321,6 @@ class QueryHandler:
         :param match_type: type of match achieved
         :return: completed normalized response object ready to return to user
         """
-
-        def _create_concept_mapping(
-            concept_id: str, relation: Relation = Relation.RELATED_MATCH
-        ) -> ConceptMapping:
-            """Create concept mapping for identifier
-
-            ``system`` will use OBO Foundry persistent URL (PURL), source homepage, or
-            namespace prefix, in that order of preference, if available.
-
-            :param concept_id: Concept identifier represented as a curie
-            :param relation: SKOS mapping relationship, default is relatedMatch
-            :return: Concept mapping for identifier
-            """
-            source = concept_id.split(":")[0]
-
-            try:
-                source = NamespacePrefix(source)
-            except ValueError:
-                try:
-                    source = NamespacePrefix(source.upper())
-                except ValueError as e:
-                    err_msg = f"Namespace prefix not supported: {source}"
-                    raise ValueError(err_msg) from e
-
-            system = NAMESPACE_TO_SYSTEM_URI.get(source, source)
-
-            return ConceptMapping(
-                coding=Coding(code=code(concept_id), system=system), relation=relation
-            )
-
         disease_obj = MappableConcept(
             id=f"normalize.disease.{record['concept_id']}",
             primaryCode=code(root=record["concept_id"]),
@@ -365,13 +331,13 @@ class QueryHandler:
 
         xrefs = [record["concept_id"], *record.get("xrefs", [])]
         disease_obj.mappings = [
-            _create_concept_mapping(xref_id, relation=Relation.EXACT_MATCH)
+            get_concept_mapping(xref_id, relation=Relation.EXACT_MATCH)
             for xref_id in xrefs
         ]
 
         associated_with = record.get("associated_with", [])
         disease_obj.mappings.extend(
-            _create_concept_mapping(associated_with_id, relation=Relation.RELATED_MATCH)
+            get_concept_mapping(associated_with_id, relation=Relation.RELATED_MATCH)
             for associated_with_id in associated_with
         )
 

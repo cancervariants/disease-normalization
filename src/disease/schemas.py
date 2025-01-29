@@ -2,9 +2,16 @@
 
 import datetime
 from enum import Enum, IntEnum
+from types import MappingProxyType
 from typing import Literal
 
-from ga4gh.core.models import MappableConcept
+from ga4gh.core.models import (
+    Coding,
+    ConceptMapping,
+    MappableConcept,
+    Relation,
+    code,
+)
 from pydantic import BaseModel, ConfigDict, StrictBool, StrictStr
 
 from disease import __version__
@@ -55,72 +62,89 @@ class NamespacePrefix(Enum):
     OMIM = "MIM"
     ONCOTREE = "oncotree"
     # external sources
-    COHD = "cohd"
-    DECIPHER = "decipher"
     EFO = "efo"
     GARD = "gard"
-    HP = "HP"
-    HPO = HP
-    ICD9 = "icd9"
     ICD9CM = "icd9.cm"
     ICD10 = "icd10"
     ICD10WHO = ICD10
     ICD10CM = "icd10.cm"
-    ICD11 = "icd11"
     ICDO = "icdo"
-    IDO = "ido"
     IMDRF = "imdrf"
     KEGG = "kegg.disease"
     MEDDRA = "meddra"
     MEDGEN = "medgen"
     MESH = "mesh"
-    MF = "mf"
-    MP = "MP"
-    MPATH = "mpath"
-    NIFSTD = "nifstd"
-    OBI = "obi"
-    OGMS = "ogms"
     ORPHANET = "orphanet"
-    PATO = "pato"
-    SCDO = "scdo"
     UMLS = "umls"
-    WIKIPEDIA = "wikipedia.en"
-    WIKIDATA = "wikidata"
 
 
-# Source to URI. Will use OBO Foundry persistent URL (PURL) or source homepage
-NAMESPACE_TO_SYSTEM_URI: dict[NamespacePrefix, str] = {
-    NamespacePrefix.NCIT: "http://purl.obolibrary.org/obo/ncit.owl",
-    NamespacePrefix.MONDO: "http://purl.obolibrary.org/obo/mondo.owl",
-    NamespacePrefix.DO: "http://purl.obolibrary.org/obo/doid.owl",
-    NamespacePrefix.DOID: "http://purl.obolibrary.org/obo/doid.owl",
-    NamespacePrefix.OMIM: "https://www.omim.org",
-    NamespacePrefix.ONCOTREE: "https://oncotree.mskcc.org",
-    NamespacePrefix.COHD: "https://cohd.io",
-    NamespacePrefix.DECIPHER: "https://www.deciphergenomics.org",
-    NamespacePrefix.EFO: "https://www.ebi.ac.uk/efo/",
-    NamespacePrefix.GARD: "https://rarediseases.info.nih.gov",
-    NamespacePrefix.HP: "http://purl.obolibrary.org/obo/hp.owl",
-    NamespacePrefix.HPO: "http://purl.obolibrary.org/obo/hp.owl",
-    NamespacePrefix.ICD11: "https://icd.who.int/en/",
-    NamespacePrefix.ICDO: "https://www.who.int/standards/classifications/other-classifications/international-classification-of-diseases-for-oncology/",
-    NamespacePrefix.KEGG: "https://www.genome.jp/kegg/disease/",
-    NamespacePrefix.MEDDRA: "https://www.meddra.org",
-    NamespacePrefix.MEDGEN: "https://www.ncbi.nlm.nih.gov/medgen/",
-    NamespacePrefix.MESH: "https://id.nlm.nih.gov/mesh/",
-    NamespacePrefix.MP: "http://purl.obolibrary.org/obo/mp.owl",
-    NamespacePrefix.OBI: "http://purl.obolibrary.org/obo/obi.owl",
-    NamespacePrefix.ORPHANET: "https://www.orpha.net",
-    NamespacePrefix.PATO: "http://purl.obolibrary.org/obo/pato.owl",
-    NamespacePrefix.UMLS: "https://www.nlm.nih.gov/research/umls/index.html",
-    NamespacePrefix.WIKIPEDIA: "https://en.wikipedia.org",
-    NamespacePrefix.WIKIDATA: "https://www.wikidata.org",
-}
+# Source to URI. Will use  system URI prefix, OBO Foundry persistent URL (PURL), or source homepage
+NAMESPACE_TO_SYSTEM_URI: MappingProxyType[NamespacePrefix, str] = MappingProxyType(
+    {
+        NamespacePrefix.NCIT: "https://ncit.nci.nih.gov/ncitbrowser/ConceptReport.jsp?dictionary=NCI_Thesaurus&code=",
+        NamespacePrefix.MONDO: "https://purl.obolibrary.org/obo/",
+        NamespacePrefix.DO: "https://disease-ontology.org/?id=",
+        NamespacePrefix.DOID: "https://disease-ontology.org/?id=",
+        NamespacePrefix.OMIM: "https://omim.org/MIM:",
+        NamespacePrefix.ONCOTREE: "https://oncotree.mskcc.org/?version=oncotree_latest_stable&field=CODE&search=",
+        NamespacePrefix.EFO: "http://www.ebi.ac.uk/efo/EFO_",
+        NamespacePrefix.GARD: "https://rarediseases.info.nih.gov",
+        NamespacePrefix.ICD9CM: "https://archive.cdc.gov/www_cdc_gov/nchs/icd/icd9cm.htm",
+        NamespacePrefix.ICD10: "https://icd.who.int/browse10/2016/en#/",
+        NamespacePrefix.ICD10CM: "https://www.cdc.gov/nchs/icd/icd-10-cm/index.html",
+        NamespacePrefix.ICD10WHO: "https://icd.who.int/browse10/2016/en#/",
+        NamespacePrefix.ICDO: "https://www.who.int/standards/classifications/other-classifications/international-classification-of-diseases-for-oncology/",
+        NamespacePrefix.IMDRF: "https://www.imdrf.org/",
+        NamespacePrefix.KEGG: "https://www.genome.jp/kegg/disease/",
+        NamespacePrefix.MEDDRA: "https://bioportal.bioontology.org/ontologies/MEDDRA?p=classes&conceptid=",
+        NamespacePrefix.MEDGEN: "https://www.ncbi.nlm.nih.gov/medgen/",
+        NamespacePrefix.MESH: "https://meshb.nlm.nih.gov/record/ui?ui=",
+        NamespacePrefix.ORPHANET: "https://www.orpha.net",
+        NamespacePrefix.UMLS: "https://www.nlm.nih.gov/research/umls/index.html",
+    }
+)
 
-# URI to source
-SYSTEM_URI_TO_NAMESPACE = {
-    system_uri: ns.value for ns, system_uri in NAMESPACE_TO_SYSTEM_URI.items()
-}
+
+def get_concept_mapping(
+    concept_id: str, relation: Relation = Relation.RELATED_MATCH
+) -> ConceptMapping:
+    """Get concept mapping for CURIE identifier
+
+    ``system`` will use system prefix URL, OBO Foundry persistent URL (PURL), or
+    source homepage, in that order of preference.
+
+    :param concept_id: Concept identifier represented as a curie
+    :param relation: SKOS mapping relationship, default is relatedMatch
+    :raises ValueError: If source of concept ID is not a valid ``NamespacePrefix``
+    :return: Concept mapping for identifier
+    """
+    source, source_code = concept_id.split(":")
+
+    try:
+        source = NamespacePrefix(source)
+    except ValueError:
+        try:
+            source = NamespacePrefix(source.upper())
+        except ValueError as e:
+            err_msg = f"Namespace prefix not supported: {source}"
+            raise ValueError(err_msg) from e
+
+    id_ = concept_id
+
+    if source == NamespacePrefix.MONDO:
+        source_code = concept_id.upper()
+        id_ = source_code.replace(":", "_")
+    elif source == NamespacePrefix.DOID:
+        source_code = concept_id
+
+    return ConceptMapping(
+        coding=Coding(
+            id=id_,
+            code=code(source_code),
+            system=NAMESPACE_TO_SYSTEM_URI[source],
+        ),
+        relation=relation,
+    )
 
 
 class SourcePriority(IntEnum):
@@ -314,28 +338,32 @@ class NormalizationService(BaseModel):
                     "mappings": [
                         {
                             "coding": {
-                                "code": "ncit:C4989",
-                                "system": "https://www.ebi.ac.uk/ols4/ontologies/ncit/classes?short_form=NCIT_",
+                                "id": "ncit:C4989",
+                                "code": "C4989",
+                                "system": "https://ncit.nci.nih.gov/ncitbrowser/ConceptReport.jsp?dictionary=NCI_Thesaurus&code=",
                             },
                             "relation": "exactMatch",
                         },
                         {
                             "coding": {
-                                "code": "mondo:0004355",
-                                "system": "http://purl.obolibrary.org/obo/mondo.owl",
+                                "id": "MONDO_0004355",
+                                "code": "MONDO:0004355",
+                                "system": "https://purl.obolibrary.org/obo/",
                             },
                             "relation": "exactMatch",
                         },
                         {
                             "coding": {
+                                "id": "DOID:7757",
                                 "code": "DOID:7757",
-                                "system": "http://purl.obolibrary.org/obo/doid.owl",
+                                "system": "https://disease-ontology.org/?id=",
                             },
                             "relation": "exactMatch",
                         },
                         {
                             "coding": {
-                                "code": "umls:C1332977",
+                                "id": "umls:C1332977",
+                                "code": "C1332977",
                                 "system": "https://www.nlm.nih.gov/research/umls/index.html",
                             },
                             "relation": "relatedMatch",
