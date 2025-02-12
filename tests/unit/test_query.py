@@ -22,7 +22,7 @@ def neuroblastoma():
         conceptType="Disease",
         id="normalize.disease.ncit:C3270",
         primaryCode=code(root="ncit:C3270"),
-        label="Neuroblastoma",
+        name="Neuroblastoma",
         mappings=[
             {
                 "coding": {
@@ -150,7 +150,7 @@ def skin_myo():
         conceptType="Disease",
         id="normalize.disease.ncit:C167370",
         primaryCode=code(root="ncit:C167370"),
-        label="Skin Myoepithelioma",
+        name="Skin Myoepithelioma",
         mappings=[
             {
                 "coding": {
@@ -174,7 +174,7 @@ def mafd2():
         conceptType="Disease",
         id="normalize.disease.mondo:0010648",
         primaryCode=code(root="mondo:0010648"),
-        label="major affective disorder 2",
+        name="major affective disorder 2",
         mappings=[
             {
                 "coding": {
@@ -250,7 +250,7 @@ def compare_disease(actual, fixture):
     assert actual_keys == fixture_keys
     assert actual.id == fixture.id
     assert actual.conceptType == fixture.conceptType
-    assert actual.label == fixture.label
+    assert actual.name == fixture.name
 
     assert bool(actual.mappings) == bool(fixture.mappings)
     if actual.mappings:

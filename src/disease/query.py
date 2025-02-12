@@ -325,7 +325,7 @@ class QueryHandler:
             id=f"normalize.disease.{record['concept_id']}",
             primaryCode=code(root=record["concept_id"]),
             conceptType="Disease",
-            label=record["label"],
+            name=record["label"],
             extensions=[],
         )
 
