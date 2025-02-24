@@ -9,11 +9,11 @@ from .omim import OMIM
 from .oncotree import OncoTree
 
 __all__ = [
-    "DiseaseNormalizerEtlError",
     "DO",
+    "OMIM",
+    "DiseaseNormalizerEtlError",
     "Merge",
     "Mondo",
     "NCIt",
-    "OMIM",
     "OncoTree",
 ]
