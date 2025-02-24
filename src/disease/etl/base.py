@@ -25,6 +25,10 @@ DATA_DISPATCH = {
 _logger = logging.getLogger(__name__)
 
 
+class DiseaseNormalizerEtlError(Exception):
+    """Basic ETL exception."""
+
+
 class Base(ABC):
     """The ETL base class."""
 
