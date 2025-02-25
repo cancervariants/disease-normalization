@@ -9,9 +9,9 @@ from .oncotree import OncoTree
 
 __all__ = [
     "DO",
+    "OMIM",
     "Merge",
     "Mondo",
     "NCIt",
-    "OMIM",
     "OncoTree",
 ]
