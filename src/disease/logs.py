@@ -1,10 +1,9 @@
 """Configure application logging."""
 
 import logging
-import warnings
 
 
-def initialize_logs(log_level: int = logging.INFO, silent: bool = False) -> None:
+def initialize_logs(log_level: int = logging.INFO) -> None:
     """Configure logging.
 
     :param log_level: app log level to set
@@ -16,13 +15,3 @@ def initialize_logs(log_level: int = logging.INFO, silent: bool = False) -> None
     )
     logger = logging.getLogger(__package__)
     logger.setLevel(log_level)
-
-    logging.captureWarnings(True)
-
-    if silent:
-        for handler in logging.root.handlers[:]:
-            logging.root.removeHandler(handler)
-        logging.getLogger("py.warnings").propagate = False
-    else:
-        warnings.resetwarnings()
-        warnings.simplefilter("default")

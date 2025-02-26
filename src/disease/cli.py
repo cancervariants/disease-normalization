@@ -46,7 +46,7 @@ def check_db(db_url: str, silent: bool) -> None:
     :param db_url: URL to normalizer database
     :param silent: if true, suppress console output
     """  # noqa: D301
-    initialize_logs(silent=silent)
+    initialize_logs()
     db = create_db(db_url, False)
     if not db.check_schema_initialized():
         if not silent:
@@ -78,7 +78,7 @@ def update_from_remote(data_url: str | None, db_url: str, silent: bool) -> None:
     :param db_url: URL to normalizer database
     :param silent: if true, suppress console output
     """  # noqa: D301
-    initialize_logs(silent=silent)
+    initialize_logs()
     if not click.confirm("Are you sure you want to overwrite existing data?"):
         click.get_current_context().exit()
     if not data_url:
@@ -119,7 +119,7 @@ def dump_database(output_directory: Path, db_url: str, silent: bool) -> None:
     :param db_url: URL to normalizer database
     :param silent: if True, suppress output to console
     """  # noqa: D301
-    initialize_logs(silent=silent)
+    initialize_logs()
     if not output_directory:
         output_directory = Path()
 
@@ -196,7 +196,7 @@ def update(
     :param use_existing: if True, use most recent local data instead of fetching latest version
     :param silent: if True, suppress console output
     """  # noqa: D301
-    initialize_logs(silent=silent)
+    initialize_logs()
     if (not sources) and (not all_) and (not normalize):
         click.echo(
             "Error: must provide SOURCES or at least one of --all, --normalize\n"
