@@ -40,7 +40,7 @@ class Merge:
             try:
                 record = self._database.get_record_by_id(concept_id)
             except AttributeError:
-                _logger.error(
+                _logger.exception(
                     "`create_merged_concepts` received invalid concept ID: %s",
                     concept_id,
                 )
@@ -62,7 +62,7 @@ class Merge:
             try:
                 merged_record, merged_ids = self._generate_merged_record(group)
             except AttributeError:
-                _logger.error(
+                _logger.exception(
                     "`create_merged_concepts` received invalid group: %s for concept %s",
                     group,
                     record_id,

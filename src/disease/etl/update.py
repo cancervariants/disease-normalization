@@ -87,6 +87,7 @@ def load_source(
 
     source_class = sources_table[source](database=db)
     try:
+        breakpoint()
         processed_ids = source_class.perform_etl(use_existing)
     except DiseaseNormalizerEtlError as e:
         msg = f"Encountered error while loading {source}: {e}."
@@ -159,9 +160,11 @@ def delete_normalized(database: AbstractDatabase, silent: bool = True) -> None:
     start_delete = timer()
     try:
         database.delete_normalized_concepts()
-    except (DatabaseReadException, DatabaseWriteException) as e:
-        click.echo(f"Encountered exception during normalized data deletion: {e}")
-        raise e
+    except (DatabaseReadException, DatabaseWriteException):
+        msg = "Encountered exception during normalized data deletion"
+        _logger.exception(msg)
+        click.echo(msg)
+        raise
     end_delete = timer()
     delete_time = end_delete - start_delete
     _emit_info_msg(f"Deleted normalized records in {delete_time:.5f} seconds.", silent)
@@ -189,7 +192,7 @@ def update_normalized(
         msg = f"Encountered ModuleNotFoundError attempting to import {e.name}. {_etl_dependency_help}"
         if not silent:
             click.echo(msg)
-        _logger.error(msg)
+        _logger.exception(msg)
         click.get_current_context().exit()
 
     merge = Merge(database=db)

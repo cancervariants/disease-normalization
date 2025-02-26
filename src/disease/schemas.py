@@ -334,7 +334,7 @@ class NormalizationService(BaseModel):
                     "id": "normalize.disease.ncit:C4989",
                     "primaryCode": "ncit:C4989",
                     "conceptType": "Disease",
-                    "label": "Childhood Leukemia",
+                    "name": "Childhood Leukemia",
                     "mappings": [
                         {
                             "coding": {

@@ -78,7 +78,7 @@ The beginning of the response to a GET request to http://localhost:5000/disease/
      "disease": {
        "id": "normalize.disease.ncit:C2926",
        "primaryCode": "ncit:C2926",
-       "label": "Lung Non-Small Cell Carcinoma",
+       "name": "Lung Non-Small Cell Carcinoma",
 
        ...
      }

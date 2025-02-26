@@ -42,7 +42,7 @@ $ curl -s 'https://normalize.cancervariants.org/disease/normalize?q=liver%20canc
         "conceptType": "Disease",
         "primaryCode": "ncit:C34803",
         "id": "normalize.disease:liver%20cancer",
-        "label": "Primary Malignant Liver Neoplasm",
+        "name": "Primary Malignant Liver Neoplasm",
         # ...
     }
 }
