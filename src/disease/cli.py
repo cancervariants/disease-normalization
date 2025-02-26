@@ -6,24 +6,12 @@ from pathlib import Path
 
 import click
 
-from disease.database.database import (
-    DatabaseException,
-    create_db,
-)
+from disease.database.database import DatabaseException, create_db
 from disease.etl.update import update_all_sources, update_normalized, update_source
+from disease.logs import initialize_logs
 from disease.schemas import SourceName
 
 _logger = logging.getLogger(__name__)
-
-
-def _configure_logging() -> None:
-    """Configure logging."""
-    logging.basicConfig(
-        filename=f"{__package__}.log",
-        format="[%(asctime)s] - %(name)s - %(levelname)s : %(message)s",
-    )
-    logging.captureWarnings(True)
-    logging.getLogger(__package__).setLevel(logging.INFO)
 
 
 URL_DESCRIPTION = 'URL endpoint for the application database. Can either be a URL to a local DynamoDB server (e.g. "http://localhost:8001") or a libpq-compliant PostgreSQL connection description (e.g. "postgresql://postgres:password@localhost:5432/gene_normalizer").'
@@ -58,7 +46,7 @@ def check_db(db_url: str, silent: bool) -> None:
     :param db_url: URL to normalizer database
     :param silent: if true, suppress console output
     """  # noqa: D301
-    _configure_logging()
+    initialize_logs(silent=silent)
     db = create_db(db_url, False)
     if not db.check_schema_initialized():
         if not silent:
@@ -90,7 +78,7 @@ def update_from_remote(data_url: str | None, db_url: str, silent: bool) -> None:
     :param db_url: URL to normalizer database
     :param silent: if true, suppress console output
     """  # noqa: D301
-    _configure_logging()
+    initialize_logs(silent=silent)
     if not click.confirm("Are you sure you want to overwrite existing data?"):
         click.get_current_context().exit()
     if not data_url:
@@ -131,7 +119,7 @@ def dump_database(output_directory: Path, db_url: str, silent: bool) -> None:
     :param db_url: URL to normalizer database
     :param silent: if True, suppress output to console
     """  # noqa: D301
-    _configure_logging()
+    initialize_logs(silent=silent)
     if not output_directory:
         output_directory = Path()
 
@@ -208,7 +196,7 @@ def update(
     :param use_existing: if True, use most recent local data instead of fetching latest version
     :param silent: if True, suppress console output
     """  # noqa: D301
-    _configure_logging()
+    initialize_logs(silent=silent)
     if (not sources) and (not all_) and (not normalize):
         click.echo(
             "Error: must provide SOURCES or at least one of --all, --normalize\n"
