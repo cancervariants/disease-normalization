@@ -87,7 +87,6 @@ def load_source(
 
     source_class = sources_table[source](database=db)
     try:
-        breakpoint()
         processed_ids = source_class.perform_etl(use_existing)
     except DiseaseNormalizerEtlError as e:
         msg = f"Encountered error while loading {source}: {e}."
