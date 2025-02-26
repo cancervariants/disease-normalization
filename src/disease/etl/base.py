@@ -50,9 +50,8 @@ class Base(ABC):
             self._get_data_handler(data_path)
         )
         self._database = database
-        self._store_ids = self.__class__.__name__ in SOURCES_FOR_MERGE
-        if self._store_ids:
-            self._added_ids = []
+        self.store_ids = self.__class__.__name__ in SOURCES_FOR_MERGE
+        self._added_ids = []
 
     def _get_data_handler(self, data_path: Path | None = None) -> DataSource:
         """Construct data handler instance for source. Overwrite for edge-case sources.
@@ -75,9 +74,7 @@ class Base(ABC):
             click.echo("Transforming and loading data to DB...")
         self._transform_data()
         self._database.complete_write_transaction()
-        if self._store_ids:
-            return self._added_ids
-        return []
+        return self._added_ids
 
     def _extract_data(self, use_existing: bool = False) -> None:
         """Get source file from data directory.
@@ -123,8 +120,7 @@ class Base(ABC):
                 del disease[field]
 
         self._database.add_record(disease, self._src_name)
-        if self._store_ids:
-            self._added_ids.append(concept_id)
+        self._added_ids.append(concept_id)
 
 
 class OWLBase(Base):

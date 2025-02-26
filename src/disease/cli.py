@@ -22,7 +22,12 @@ def _configure_logging() -> None:
         filename=f"{__package__}.log",
         format="[%(asctime)s] - %(name)s - %(levelname)s : %(message)s",
     )
-    logging.getLogger(__package__).setLevel(logging.DEBUG)
+    logging.captureWarnings(True)
+    logging.getLogger(__package__).setLevel(logging.INFO)
+
+
+URL_DESCRIPTION = 'URL endpoint for the application database. Can either be a URL to a local DynamoDB server (e.g. "http://localhost:8001") or a libpq-compliant PostgreSQL connection description (e.g. "postgresql://postgres:password@localhost:5432/gene_normalizer").'
+SILENT_MODE_DESCRIPTION = "Suppress output to console."
 
 
 @click.group()
@@ -30,14 +35,9 @@ def cli() -> None:
     """Manage Disease Normalizer data."""
 
 
-url_description = 'URL endpoint for the application database. Can either be a URL to a local DynamoDB server (e.g. "http://localhost:8001") or a libpq-compliant PostgreSQL connection description (e.g. "postgresql://postgres:password@localhost:5432/gene_normalizer").'
-
-
 @cli.command()
-@click.option("--db_url", help=url_description)
-@click.option(
-    "--silent", is_flag=True, default=True, help="Print result to console if set."
-)
+@click.option("--db_url", help=URL_DESCRIPTION)
+@click.option("--silent", is_flag=True, default=False, help=SILENT_MODE_DESCRIPTION)
 def check_db(db_url: str, silent: bool) -> None:
     """Perform basic checks on DB health and population. Exits with status code 1
     if DB schema is uninitialized or if critical tables appear to be empty.
@@ -78,10 +78,8 @@ def check_db(db_url: str, silent: bool) -> None:
 
 @cli.command()
 @click.option("--data_url", help="URL to data dump")
-@click.option("--db_url", help=url_description)
-@click.option(
-    "--silent", is_flag=True, default=True, help="Print result to console if set."
-)
+@click.option("--db_url", help=URL_DESCRIPTION)
+@click.option("--silent", is_flag=True, default=False, help=SILENT_MODE_DESCRIPTION)
 def update_from_remote(data_url: str | None, db_url: str, silent: bool) -> None:
     """Update data from remotely-hosted DB dump. By default, fetches from latest
     available dump on VICC S3 bucket; specific URLs can be provided instead by
@@ -123,16 +121,15 @@ def update_from_remote(data_url: str | None, db_url: str, silent: bool) -> None:
     help="Output location to write to",
     type=click.Path(exists=True, path_type=Path),
 )
-@click.option("--db_url", help=url_description)
-@click.option(
-    "--silent", "-s", is_flag=True, default=False, help="Suppress console output."
-)
+@click.option("--db_url", help=URL_DESCRIPTION)
+@click.option("--silent", is_flag=True, default=False, help=SILENT_MODE_DESCRIPTION)
 def dump_database(output_directory: Path, db_url: str, silent: bool) -> None:
     """Dump data from database into file.
 
     \f
     :param output_directory: path to existing directory
     :param db_url: URL to normalizer database
+    :param silent: if True, suppress output to console
     """  # noqa: D301
     _configure_logging()
     if not output_directory:
@@ -163,7 +160,7 @@ def dump_database(output_directory: Path, db_url: str, silent: bool) -> None:
 @click.argument("sources", nargs=-1)
 @click.option("--all", "all_", is_flag=True, help="Update records for all sources.")
 @click.option("--normalize", is_flag=True, help="Create normalized records.")
-@click.option("--db_url", help=url_description)
+@click.option("--db_url", help=URL_DESCRIPTION)
 @click.option("--aws_instance", is_flag=True, help="Use cloud DynamodDB instance.")
 @click.option(
     "--use_existing",
@@ -171,9 +168,7 @@ def dump_database(output_directory: Path, db_url: str, silent: bool) -> None:
     default=False,
     help="Use most recent locally-available source data instead of fetching latest version",
 )
-@click.option(
-    "--silent", "-s", is_flag=True, default=False, help="Suppress console output."
-)
+@click.option("--silent", is_flag=True, default=False, help=SILENT_MODE_DESCRIPTION)
 def update(
     sources: tuple[str],
     aws_instance: bool,

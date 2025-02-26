@@ -85,7 +85,7 @@ def load_source(
         SourceName.ONCOTREE: OncoTree,
     }
 
-    source_class = sources_table[source](database=db)
+    source_class = sources_table[source](database=db, silent=silent)
     try:
         processed_ids = source_class.perform_etl(use_existing)
     except DiseaseNormalizerEtlError as e:
@@ -100,6 +100,10 @@ def load_source(
         f"Loaded {len(processed_ids)} records from {source.value} in {load_time:.5f} seconds.",
         silent,
     )
+
+    # don't forward any concept IDs that we don't want to use for group generation
+    if not source_class.store_ids:
+        processed_ids = []
 
     return (load_time, set(processed_ids))
 
