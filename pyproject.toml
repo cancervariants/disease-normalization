@@ -51,7 +51,8 @@ docs = [
     "sphinxext-opengraph==0.8.2",
     "furo==2023.3.27",
     "gravis==0.1.0",
-    "sphinx-github-changelog==1.2.1"
+    "sphinx-github-changelog==1.2.1",
+    "sphinx-click==5.0.1",
 ]
 
 [project.urls]
@@ -85,7 +86,7 @@ branch = true
 
 [tool.ruff]
 src = ["src"]
-exclude = ["docs/source/conf.py", "analysis/"]
+extend-exclude = ["docs/source/conf.py", "analysis/"]
 
 [tool.ruff.lint]
 select = [

@@ -24,18 +24,18 @@ Once created, set the environment variable ``DISEASE_NORM_DB_URL`` to a connecti
 Load from remote source
 --------------------------------
 
-The Disease Normalizer's PostgreSQL class provides the ``disease_norm_update_remote`` shell command to refresh its data directly from a remotely-stored SQL dump, instead of acquiring, transforming, and loading source data. This enables data loading on the order of seconds rather than hours. See the command description at ``disease_norm_update_remote --help`` for more information.
+The Disease Normalizer's PostgreSQL class supports a CLI command to refresh its data directly from a remotely-stored SQL dump, instead of acquiring, transforming, and loading source data. This enables data loading on the order of seconds rather than hours. See the command description at ``disease-normalizer update-from-remote --help`` for more information.
 
 By default, this command will fetch the `latest data dump <https://vicc-normalizers.s3.us-east-2.amazonaws.com/disease_normalization/postgresql/disease_norm_latest.sql.tar.gz>`_ provided by the VICC. Alternative URLs can be set with the ``--data_url`` option: ::
 
-    disease_norm_update_remote --data_url=https://vicc-normalizers.s3.us-east-2.amazonaws.com/disease_normalization/postgresql/disease_norm_20230322163523.sql.tar.gz
+    disease-normalizer update-from-remote --data_url=https://vicc-normalizers.s3.us-east-2.amazonaws.com/disease_normalization/postgresql/disease_norm_20230322163523.sql.tar.gz
 
 
 Create SQL dump from database
 -----------------------------
 
-The Disease Normalizer's PostgreSQL class also provides the ``disease_norm_dump`` shell command to create a SQL dump of current data into a file. This command will create a file named ``disease_norm_YYYYMMDDHHmmss.sql`` in the current directory; the ``-o`` option can be used to specify an alternate location, like so: ::
+The Disease Normalizer's PostgreSQL class also supports a CLI command to create a SQL dump of current data into a file. This command will create a file named ``disease_norm_YYYYMMDDHHmmss.sql`` in the current directory; the ``-o`` option can be used to specify an alternate location, like so: ::
 
-    disease_norm_dump -o ~/.disease_data/
+    disease-normalizer dump-database -o ~/.disease_data/
 
-See ``disease_norm_dump --help`` for more information.
+See ``disease-normalizer dump-database --help`` for more information.
