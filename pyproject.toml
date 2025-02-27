@@ -51,7 +51,8 @@ docs = [
     "sphinxext-opengraph==0.8.2",
     "furo==2023.3.27",
     "gravis==0.1.0",
-    "sphinx-github-changelog==1.2.1"
+    "sphinx-github-changelog==1.2.1",
+    "sphinx-click==5.0.1",
 ]
 
 [project.urls]
@@ -62,10 +63,7 @@ Source = "https://github.com/cancervariants/disease-normalization"
 "Bug Tracker" = "https://github.com/cancervariants/disease-normalization/issues"
 
 [project.scripts]
-disease_norm_update = "disease.cli:update_db"
-disease_norm_update_remote = "disease.cli:update_from_remote"
-disease_norm_dump = "disease.cli:dump_database"
-disease_norm_check_db = "disease.cli:check_db"
+disease-normalizer = "disease.cli:cli"
 
 [build-system]
 requires = ["setuptools>=64", "setuptools_scm>=8"]
@@ -88,7 +86,7 @@ branch = true
 
 [tool.ruff]
 src = ["src"]
-exclude = ["docs/source/conf.py", "analysis/"]
+extend-exclude = ["docs/source/conf.py", "analysis/"]
 
 [tool.ruff.lint]
 select = [
