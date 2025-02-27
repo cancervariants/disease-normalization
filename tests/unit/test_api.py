@@ -10,7 +10,7 @@ from datetime import datetime
 import pytest
 import pytest_asyncio
 from asgi_lifespan import LifespanManager
-from httpx import AsyncClient
+from httpx import ASGITransport, AsyncClient
 
 from disease.main import app
 from disease.schemas import ServiceEnvironment
@@ -24,7 +24,9 @@ async def async_app():
 
 @pytest_asyncio.fixture
 async def api_client(async_app):
-    async with AsyncClient(app=async_app, base_url="http://tests") as client:
+    async with AsyncClient(
+        transport=ASGITransport(async_app), base_url="http://tests"
+    ) as client:
         yield client
 
 
