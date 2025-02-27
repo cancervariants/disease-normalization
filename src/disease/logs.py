@@ -7,7 +7,6 @@ def initialize_logs(log_level: int = logging.INFO) -> None:
     """Configure logging.
 
     :param log_level: app log level to set
-    :param silent: if True, expect all console output to be suppressed.
     """
     logging.basicConfig(
         filename=f"{__package__}.log",

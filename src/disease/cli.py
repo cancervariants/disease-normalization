@@ -6,6 +6,7 @@ from pathlib import Path
 
 import click
 
+from disease.config import config
 from disease.database.database import DatabaseException, create_db
 from disease.etl.update import update_all_sources, update_normalized, update_source
 from disease.logs import initialize_logs
@@ -16,6 +17,13 @@ _logger = logging.getLogger(__name__)
 
 URL_DESCRIPTION = 'URL endpoint for the application database. Can either be a URL to a local DynamoDB server (e.g. "http://localhost:8001") or a libpq-compliant PostgreSQL connection description (e.g. "postgresql://postgres:password@localhost:5432/gene_normalizer").'
 SILENT_MODE_DESCRIPTION = "Suppress output to console."
+
+
+def _initialize_app() -> None:
+    if config.debug:
+        initialize_logs(logging.DEBUG)
+    else:
+        initialize_logs()
 
 
 @click.group()

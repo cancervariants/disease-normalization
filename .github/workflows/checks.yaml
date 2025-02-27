@@ -9,7 +9,7 @@ jobs:
       AWS_DEFAULT_REGION: us-east-2
       AWS_DEFAULT_OUTPUT: text
       DISEASE_NORM_DB_URL: ${{ matrix.db_url }}
-      DISEASE_TEST: true
+      DISEASE_NORMALIZER_ENV: test
     strategy:
       matrix:
         db_url: ["http://localhost:8002", "postgres://postgres:postgres@localhost:5432/disease_normalizer_test"]

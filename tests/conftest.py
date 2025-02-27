@@ -6,8 +6,8 @@ from pathlib import Path
 
 import pytest
 
-from disease.database import AWS_ENV_VAR_NAME, create_db
-from disease.database.database import AbstractDatabase
+from disease.config import config
+from disease.database.database import AWS_ENV_VAR_NAME, AbstractDatabase, create_db
 from disease.etl.base import Base
 from disease.query import QueryHandler
 from disease.schemas import Disease, MatchType, SourceSearchMatches
@@ -17,6 +17,7 @@ _logger = logging.getLogger(__name__)
 
 def pytest_collection_modifyitems(items):
     """Modify test items in place to ensure test modules run in a given order.
+
     When creating new test modules, be sure to add them here.
     """
     module_order = [
@@ -29,7 +30,7 @@ def pytest_collection_modifyitems(items):
         "test_merge",
         "test_database",
         "test_query",
-        "test_endpoints",
+        "test_api",
         "test_emit_warnings",
     ]
     # remember to add new test modules to the order constant:
@@ -59,12 +60,11 @@ def pytest_configure(config):
 
 TEST_ROOT = Path(__file__).resolve().parents[1]
 TEST_DATA_DIRECTORY = TEST_ROOT / "tests" / "data"
-IS_TEST_ENV = os.environ.get("DISEASE_TEST", "").lower() == "true"
 
 
 def pytest_sessionstart():
     """Wipe DB before testing if in test environment."""
-    if IS_TEST_ENV:
+    if config.test:
         if os.environ.get(AWS_ENV_VAR_NAME):
             msg = f"Cannot have both DISEASE_TEST and {AWS_ENV_VAR_NAME} set."
             raise AssertionError(msg)
@@ -80,7 +80,7 @@ def is_test_env():
 
     Provided here to be accessible directly within test modules.
     """
-    return IS_TEST_ENV
+    return config.test
 
 
 @pytest.fixture(scope="module")
@@ -103,7 +103,7 @@ def test_source(database: AbstractDatabase, is_test_env: bool):
     """
 
     def test_source_factory(EtlClass: Base):  # noqa: N803
-        if IS_TEST_ENV:
+        if is_test_env:
             _logger.debug("Reloading DB with data from %s", TEST_DATA_DIRECTORY)
             test_class = EtlClass(
                 database, TEST_DATA_DIRECTORY / EtlClass.__name__.lower()
