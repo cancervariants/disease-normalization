@@ -37,6 +37,7 @@ ETL Modules
    :template: module_summary_inh.rst
 
    disease.etl.base
+   disease.etl.update
    disease.etl.do
    disease.etl.mondo
    disease.etl.ncit

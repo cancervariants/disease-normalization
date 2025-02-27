@@ -2,67 +2,73 @@
 
 import logging
 import os
-from collections.abc import Collection
 from pathlib import Path
-from timeit import default_timer as timer
 
 import click
 
-from disease import SOURCES_FOR_MERGE, SOURCES_LOWER_LOOKUP
-from disease.database.database import (
-    AbstractDatabase,
-    DatabaseException,
-    DatabaseReadException,
-    DatabaseWriteException,
-    create_db,
-)
+from disease.database.database import DatabaseException, create_db
+from disease.etl.update import update_all_sources, update_normalized, update_source
+from disease.logs import initialize_logs
 from disease.schemas import SourceName
 
 _logger = logging.getLogger(__name__)
 
 
-def _configure_logging() -> None:
-    """Configure logging."""
-    logging.basicConfig(
-        filename=f"{__package__}.log",
-        format="[%(asctime)s] - %(name)s - %(levelname)s : %(message)s",
-    )
-    logging.getLogger(__package__).setLevel(logging.DEBUG)
+URL_DESCRIPTION = 'URL endpoint for the application database. Can either be a URL to a local DynamoDB server (e.g. "http://localhost:8001") or a libpq-compliant PostgreSQL connection description (e.g. "postgresql://postgres:password@localhost:5432/gene_normalizer").'
+SILENT_MODE_DESCRIPTION = "Suppress output to console."
 
 
-@click.command()
-@click.option("--db_url", help="URL endpoint for the application database.")
-@click.option("--verbose", "-v", is_flag=True, help="Print result to console if set.")
-def check_db(db_url: str, verbose: bool = False) -> None:
+@click.group()
+def cli() -> None:
+    """Manage Disease Normalizer data."""
+
+
+@cli.command()
+@click.option("--db_url", help=URL_DESCRIPTION)
+@click.option("--silent", is_flag=True, default=False, help=SILENT_MODE_DESCRIPTION)
+def check_db(db_url: str, silent: bool) -> None:
     """Perform basic checks on DB health and population. Exits with status code 1
     if DB schema is uninitialized or if critical tables appear to be empty.
 
+        $ disease-normalizer check-db
+        $ echo $?
+        1  # indicates failure
+
+    This command is equivalent to the combination of the database classes'
+    ``check_schema_initialized()`` and ``check_tables_populated()`` methods:
+
+    >>> from disease.database import create_db
+    >>> db = create_db()
+    >>> db.check_schema_initialized() and db.check_tables_populated()
+    True  # DB passes checks
+
     \f
     :param db_url: URL to normalizer database
-    :param verbose: if true, print result to console
+    :param silent: if true, suppress console output
     """  # noqa: D301
-    _configure_logging()
+    initialize_logs()
     db = create_db(db_url, False)
     if not db.check_schema_initialized():
-        if verbose:
+        if not silent:
             click.echo("Health check failed: DB schema uninitialized.")
         click.get_current_context().exit(1)
 
     if not db.check_tables_populated():
-        if verbose:
+        if not silent:
             click.echo("Health check failed: DB is incompletely populated.")
         click.get_current_context().exit(1)
 
     msg = "DB health check successful: tables appear complete."
-    if verbose:
+    if not silent:
         click.echo(msg)
     _logger.info(msg)
 
 
-@click.command()
+@cli.command()
 @click.option("--data_url", help="URL to data dump")
-@click.option("--db_url", help="URL endpoint for the application database.")
-def update_from_remote(data_url: str | None, db_url: str) -> None:
+@click.option("--db_url", help=URL_DESCRIPTION)
+@click.option("--silent", is_flag=True, default=False, help=SILENT_MODE_DESCRIPTION)
+def update_from_remote(data_url: str | None, db_url: str, silent: bool) -> None:
     """Update data from remotely-hosted DB dump. By default, fetches from latest
     available dump on VICC S3 bucket; specific URLs can be provided instead by
     command line option or DISEASE_NORM_REMOTE_DB_URL environment variable.
@@ -70,8 +76,9 @@ def update_from_remote(data_url: str | None, db_url: str) -> None:
     \f
     :param data_url: user-specified location to pull DB dump from
     :param db_url: URL to normalizer database
+    :param silent: if true, suppress console output
     """  # noqa: D301
-    _configure_logging()
+    initialize_logs()
     if not click.confirm("Are you sure you want to overwrite existing data?"):
         click.get_current_context().exit()
     if not data_url:
@@ -80,33 +87,39 @@ def update_from_remote(data_url: str | None, db_url: str) -> None:
     try:
         db.load_from_remote(data_url)
     except NotImplementedError:
-        click.echo(
-            "Error: Fetching remote data dump not supported for "
-            f"{db.__class__.__name__}"
-        )
+        if not silent:
+            click.echo(
+                f"Error: Fetching remote data dump not supported for {db.__class__.__name__}"
+            )
         click.get_current_context().exit(1)
     except DatabaseException as e:
-        click.echo(f"Encountered exception during update: {e!s}")
+        if not silent:
+            click.echo(f"Encountered exception during update: {e!s}")
+        _logger.exception(
+            "Encountered exception. `data_url`=%s, `db_url`=%s", data_url, db_url
+        )
         click.get_current_context().exit(1)
     _logger.info("Successfully loaded data from remote snapshot.")
 
 
-@click.command()
+@cli.command()
 @click.option(
     "--output_directory",
     "-o",
     help="Output location to write to",
     type=click.Path(exists=True, path_type=Path),
 )
-@click.option("--db_url", help="URL endpoint for the application database.")
-def dump_database(output_directory: Path, db_url: str) -> None:
+@click.option("--db_url", help=URL_DESCRIPTION)
+@click.option("--silent", is_flag=True, default=False, help=SILENT_MODE_DESCRIPTION)
+def dump_database(output_directory: Path, db_url: str, silent: bool) -> None:
     """Dump data from database into file.
 
     \f
     :param output_directory: path to existing directory
     :param db_url: URL to normalizer database
+    :param silent: if True, suppress output to console
     """  # noqa: D301
-    _configure_logging()
+    initialize_logs()
     if not output_directory:
         output_directory = Path()
 
@@ -114,214 +127,113 @@ def dump_database(output_directory: Path, db_url: str) -> None:
     try:
         db.export_db(output_directory)
     except NotImplementedError:
-        click.echo(
-            f"Error: Dumping data to file not supported for {db.__class__.__name__}"
-        )
+        msg = f"Error: Dumping data to file not supported for {db.__class__.__name__}"
+        if not silent:
+            click.echo(msg)
+        _logger.exception(msg)
         click.get_current_context().exit(1)
     except DatabaseException as e:
-        click.echo(f"Encountered exception during update: {e!s}")
+        if not silent:
+            click.echo(f"Encountered exception during update: {e!s}")
+        _logger.exception(
+            "Encountered exception. `data_url`=%s, `db_url`=%s",
+            output_directory,
+            db_url,
+        )
         click.get_current_context().exit(1)
     _logger.info("Database dump successful.")
 
 
-def _update_sources(
-    sources: Collection[SourceName],
-    db: AbstractDatabase,
-    update_merged: bool,
-    from_local: bool,
-) -> None:
-    """Update selected normalizer sources.
-
-    :param sources: names of sources to update
-    :param db: database instance
-    :param update_merged: if true, retain processed records to use in updating merged
-        records
-    :param from_local: if true, use locally available data only
-    """
-    processed_ids = []
-    for n in sources:
-        delete_time = _delete_source(n, db)
-        _load_source(n, db, delete_time, processed_ids, from_local)
-
-    if update_merged:
-        _load_merge(db, set(processed_ids))
-
-
-def _delete_source(n: SourceName, db: AbstractDatabase) -> float:
-    """Delete individual source data.
-
-    :param n: name of source to delete
-    :param db: database instance
-    :return: time taken (in seconds) to delete
-    """
-    msg = f"Deleting {n.value}..."
-    click.echo(f"\n{msg}")
-    _logger.info(msg)
-    start_delete = timer()
-    db.delete_source(n)
-    end_delete = timer()
-    delete_time = end_delete - start_delete
-    msg = f"Deleted {n.value} in {delete_time:.5f} seconds."
-    click.echo(f"{msg}\n")
-    _logger.info(msg)
-    return delete_time
-
-
-def _load_source(
-    n: SourceName,
-    db: AbstractDatabase,
-    delete_time: float,
-    processed_ids: list[str],
-    from_local: bool,
-) -> None:
-    """Load individual source data.
-
-    :param n: name of source
-    :param db: database instance
-    :param delete_time: time taken (in seconds) to run deletion
-    :param processed_ids: in-progress list of processed disease IDs
-    :param from_local: if true, use locally available data
-    """
-    msg = f"Loading {n.value}..."
-    click.echo(msg)
-    _logger.info(msg)
-    start_load = timer()
-
-    # used to get source class name from string
-    try:
-        from disease.etl import DO, OMIM, Mondo, NCIt, OncoTree  # noqa: F401
-    except ModuleNotFoundError as e:
-        click.echo(
-            f"Encountered ModuleNotFoundError attempting to import {e.name}. Are ETL dependencies installed?"
-        )
-        click.get_current_context().exit()
-    SourceClass = eval(n.value)  # noqa: N806 S307 PGH001
-
-    source = SourceClass(database=db, silent=False)
-    processed_ids += source.perform_etl(use_existing=from_local)
-    end_load = timer()
-    load_time = end_load - start_load
-    msg = f"Loaded {n.value} in {load_time:.5f} seconds."
-    click.echo(msg)
-    _logger.info(msg)
-    msg = f"Total time for {n.value}: {(delete_time + load_time):.5f} seconds."
-    click.echo(msg)
-    _logger.info(msg)
-
-
-def _delete_normalized_data(database: AbstractDatabase) -> None:
-    """Delete normalized concepts
-
-    :param database: DB instance
-    """
-    click.echo("\nDeleting normalized records...")
-    start_delete = timer()
-    try:
-        database.delete_normalized_concepts()
-    except (DatabaseReadException, DatabaseWriteException) as e:
-        click.echo(f"Encountered exception during normalized data deletion: {e}")
-        click.get_current_context().exit(1)
-    end_delete = timer()
-    delete_time = end_delete - start_delete
-    click.echo(f"Deleted normalized records in {delete_time:.5f} seconds.")
-
-
-def _load_merge(db: AbstractDatabase, processed_ids: set[str]) -> None:
-    """Load merged concepts
-
-    :param db: database instance
-    :param processed_ids: in-progress list of processed disease IDs
-    """
-    start = timer()
-    _delete_normalized_data(db)
-    if not processed_ids:
-        processed_ids = set()
-        for source in SOURCES_FOR_MERGE:
-            processed_ids |= db.get_all_concept_ids(source)
-
-    try:
-        from disease.etl.merge import Merge
-    except ModuleNotFoundError as e:
-        click.echo(
-            f"Encountered ModuleNotFoundError attempting to import {e.name}. Are ETL dependencies installed?"
-        )
-        click.get_current_context().exit()
-
-    merge = Merge(database=db)
-    click.echo("Constructing normalized records...")
-    merge.create_merged_concepts(processed_ids)
-    end = timer()
-    click.echo(
-        f"Merged concept generation completed in " f"{(end - start):.5f} seconds"
-    )
-
-
-@click.command()
-@click.option("--sources", help="The source(s) you wish to update separated by spaces.")
-@click.option("--aws_instance", is_flag=True, help="Using AWS DynamodDB instance.")
-@click.option("--db_url", help="URL endpoint for the application database.")
-@click.option("--update_all", is_flag=True, help="Update all normalizer sources.")
+@cli.command()
+@click.argument("sources", nargs=-1)
+@click.option("--all", "all_", is_flag=True, help="Update records for all sources.")
+@click.option("--normalize", is_flag=True, help="Create normalized records.")
+@click.option("--db_url", help=URL_DESCRIPTION)
+@click.option("--aws_instance", is_flag=True, help="Use cloud DynamodDB instance.")
 @click.option(
-    "--update_merged",
-    is_flag=True,
-    help="Update concepts for normalize endpoint from accepted sources.",
-)
-@click.option(
-    "--from_local",
+    "--use_existing",
     is_flag=True,
     default=False,
-    help="Use most recent local source data instead of fetching latest versions.",
+    help="Use most recent locally-available source data instead of fetching latest version",
 )
-def update_db(
-    sources: str,
+@click.option("--silent", is_flag=True, default=False, help=SILENT_MODE_DESCRIPTION)
+def update(
+    sources: tuple[str],
     aws_instance: bool,
     db_url: str,
-    update_all: bool,
-    update_merged: bool,
-    from_local: bool,
+    all_: bool,
+    normalize: bool,
+    use_existing: bool,
+    silent: bool,
 ) -> None:
-    """Update selected normalizer source(s) in the disease database.
+    """Update provided normalizer SOURCES in the gene database.
+
+    Valid SOURCES are "DO", "MONDO", "NCIt", "OMIM", and "OncoTree" (case is irrelevant).
+
+    SOURCES are optional, but if not provided, either --all or --normalize must be used.
+
+    For example, the following command will update DO and MONDO source records:
+
+        $ disease-normalizer update DO MONDO
+
+    To completely reload all source records and construct normalized concepts, use the
+    --all and --normalize options:
+
+        $ disease-normalizer update --all --normalize
+
+    The Disease Normalizer will fetch the latest available data from all sources if local
+    data is out-of-date. To suppress this and force usage of local files only, use the
+    --use_existing flag:
+
+        $ disease-normalizer update --all --use_existing
 
     \f
-    :param sources: names of sources to update, comma-separated
+    :param sources: tuple of raw names of sources to update
     :param aws_instance: if true, use cloud instance
     :param db_url: URI pointing to database
-    :param update_all: if true, update all sources (ignore `normalizer` parameter)
-    :param update_merged: if true, update normalized records
-    :param from_local: if true, use locally available data only
+    :param all_: if True, update all sources (ignore ``sources``)
+    :param normalize: if True, update normalized records
+    :param use_existing: if True, use most recent local data instead of fetching latest version
+    :param silent: if True, suppress console output
     """  # noqa: D301
-    _configure_logging()
+    initialize_logs()
+    if (not sources) and (not all_) and (not normalize):
+        click.echo(
+            "Error: must provide SOURCES or at least one of --all, --normalize\n"
+        )
+        ctx = click.get_current_context()
+        click.echo(ctx.get_help())
+        ctx.exit(1)
+
     db = create_db(db_url, aws_instance)
 
-    if update_all:
-        _update_sources(list(SourceName), db, update_merged, from_local)
-    elif not sources:
-        if update_merged:
-            _load_merge(db, set())
-        else:
-            ctx = click.get_current_context()
-            click.echo(
-                "Must either enter 1 or more sources, or use `--update_all` parameter"
+    processed_ids = None
+    if all_:
+        processed_ids = update_all_sources(db, use_existing, silent=silent)
+    elif sources:
+        parsed_sources = set()
+        failed_source_names = []
+        for source in sources:
+            try:
+                parsed_sources.add(SourceName[source.upper()])
+            except KeyError:
+                failed_source_names.append(source)
+        if len(failed_source_names) != 0:
+            click.echo(f"Error: unrecognized sources: {failed_source_names}")
+            click.echo(f"Valid source options are {list(SourceName)}")
+            click.get_current_context().exit(1)
+
+        working_processed_ids = set()
+        for source_name in parsed_sources:
+            working_processed_ids |= update_source(
+                source_name, db, use_existing=use_existing, silent=silent
             )
-            click.echo(ctx.get_help())
-            ctx.exit()
-    else:
-        sources_split = sources.lower().split()
+        if len(sources) == len(SourceName):
+            processed_ids = working_processed_ids
 
-        if len(sources_split) == 0:
-            msg = "Must enter one or more source names"
-            raise Exception(msg)
-
-        non_sources = set(sources_split) - set(SOURCES_LOWER_LOOKUP)
-
-        if len(non_sources) != 0:
-            msg = f"Not valid source(s): {non_sources}"
-            raise Exception(msg)
-
-        sources_to_update = {SourceName(SOURCES_LOWER_LOOKUP[s]) for s in sources_split}
-        _update_sources(sources_to_update, db, update_merged, from_local)
-    _logger.info("Database update successful.")
+    if normalize:
+        update_normalized(db, processed_ids, silent=silent)
 
 
 if __name__ == "__main__":
-    update_db()
+    cli()
