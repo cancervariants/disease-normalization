@@ -80,7 +80,7 @@ def _set_config() -> Config:
     try:
         env_value = ServiceEnvironment(raw_env_value.lower())
     except ValueError:
-        _logger.error(
+        _logger.warning(
             "Unrecognized value for %s: '%s'. Using default configs",
             _ENV_VARNAME,
             raw_env_value,

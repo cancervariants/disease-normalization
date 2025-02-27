@@ -1,20 +1,21 @@
 """Main application for FastAPI"""
 
 import html
+import logging
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 from enum import Enum
+from typing import Annotated
 
 from fastapi import FastAPI, HTTPException, Query, Request
 
 from disease import __version__
 from disease.config import config
 from disease.database.database import create_db
-from disease.logging import initialize_logs
+from disease.logs import initialize_logs
 from disease.query import InvalidParameterException, QueryHandler
 from disease.schemas import (
     APP_DESCRIPTION,
-    GITHUB_REPO_URL,
     LAB_EMAIL,
     LAB_WEBPAGE_URL,
     NormalizationService,
@@ -26,15 +27,21 @@ from disease.schemas import (
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI) -> AsyncGenerator:  # noqa: ARG001
+async def lifespan(app: FastAPI) -> AsyncGenerator:
     """Perform operations that interact with the lifespan of the FastAPI instance.
+
     See https://fastapi.tiangolo.com/advanced/events/#lifespan.
+
     :param app: FastAPI instance
     """
-    initialize_logs()
+    if config.debug:
+        initialize_logs(logging.DEBUG)
+    else:
+        initialize_logs(logging.INFO)
     db = create_db()
     query_handler = QueryHandler(db)
-    yield {"query_handler": query_handler}
+    app.state.query_handler = query_handler
+    yield
     db.close_connection()
 
 
@@ -49,17 +56,20 @@ app = FastAPI(
     },
     license={
         "name": "MIT",
-        "url": f"{GITHUB_REPO_URL}/blob/main/LICENSE",
+        "url": "https://github.com/cancervariants/disease_normalization/blob/main/LICENSE",
     },
     docs_url="/disease",
     openapi_url="/disease/openapi.json",
     swagger_ui_parameters={"tryItOutEnabled": True},
+    lifespan=lifespan,
 )
 
 
 class _Tag(str, Enum):
     """Define tag names for endpoints."""
 
+    SEARCH = "Search"
+    NORMALIZE = "Normalize"
     META = "Meta"
 
 
@@ -91,14 +101,14 @@ normalize_description = (
     description=search_descr,
     operation_id="getQueryResponse",
     response_description=response_descr,
-    response_model=SearchService,
     response_model_exclude_none=True,
+    tags=[_Tag.SEARCH],
 )
 def search(
     request: Request,
-    q: str = Query(..., description=q_descr),
-    incl: str | None = Query("", description=incl_descr),
-    excl: str | None = Query("", description=excl_descr),
+    q: Annotated[str, Query(description=q_descr)],
+    incl: Annotated[str | None, Query(description=incl_descr)] = "",
+    excl: Annotated[str | None, Query(description=excl_descr)] = "",
 ) -> SearchService:
     """For each source, return strongest-match concepts for query string
     provided by user.
@@ -108,7 +118,7 @@ def search(
     :param excl: sources to excl
     :return: search results
     """
-    query_handler = request.state.query_handler
+    query_handler = request.app.state.query_handler
     try:
         response = query_handler.search(html.unescape(q), incl=incl, excl=excl)
     except InvalidParameterException as e:
@@ -126,19 +136,20 @@ merged_q_descr = "Disease to normalize."
     summary=merged_matches_summary,
     operation_id="getQuerymergedResponse",
     response_description=merged_response_descr,
-    response_model=NormalizationService,
     description=normalize_description,
     response_model_exclude_none=True,
+    tags=[_Tag.NORMALIZE],
 )
 def normalize(
-    request: Request, q: str = Query(..., description=merged_q_descr)
+    request: Request,
+    q: Annotated[str, Query(description=merged_q_descr)],
 ) -> NormalizationService:
     """Return strongest-match normalized concept for query string provided by
     user.
 
     :param q: disease search term
     """
-    query_handler = request.state.query_handler
+    query_handler = request.app.state.query_handler
     try:
         response = query_handler.normalize(q)
     except InvalidParameterException as e:

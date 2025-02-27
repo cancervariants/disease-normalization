@@ -508,15 +508,15 @@ class SearchService(BaseModel):
 class ServiceEnvironment(str, Enum):
     """Define current runtime environment."""
 
-    DEV = "dev"
-    PROD = "prod"
-    TEST = "test"
-    STAGING = "staging"
+    DEV = "dev"  # local dev
+    TEST = "test"  # local/CI testing
+    PROD = "prod"  # main production env on cloud
+    STAGING = "staging"  # staging env on cloud
 
 
 LAB_EMAIL = "Alex.Wagner@nationwidechildrens.org"
 LAB_WEBPAGE_URL = "https://www.nationwidechildrens.org/specialties/institute-for-genomic-medicine/research-labs/wagner-lab"
-GITHUB_REPO_URL = "https://github.com/cancervariants/disease-normalization"
+DOCS_URL = "https://disease-normalizer.readthedocs.io/"
 APP_DESCRIPTION = "Resolve ambiguous references and descriptions of human diseases to consistently-structured, normalized terms"
 
 
@@ -548,7 +548,7 @@ class ServiceInfo(BaseModel):
     description: Literal[APP_DESCRIPTION] = APP_DESCRIPTION
     organization: ServiceOrganization
     contactUrl: Literal[LAB_EMAIL] = LAB_EMAIL  # noqa: N815
-    documentationUrl: Literal[GITHUB_REPO_URL] = GITHUB_REPO_URL  # noqa: N815
+    documentationUrl: Literal[DOCS_URL] = DOCS_URL  # noqa: N815
     createdAt: Literal["2021-01-01T00:00:00+00:00"] = "2021-01-01T00:00:00+00:00"  # noqa: N815
     updatedAt: str | None = None  # noqa: N815
     environment: ServiceEnvironment
