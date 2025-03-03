@@ -54,7 +54,7 @@ def check_db(db_url: str, silent: bool) -> None:
     :param db_url: URL to normalizer database
     :param silent: if true, suppress console output
     """  # noqa: D301
-    initialize_logs()
+    _initialize_app()
     db = create_db(db_url, False)
     if not db.check_schema_initialized():
         if not silent:
@@ -86,7 +86,7 @@ def update_from_remote(data_url: str | None, db_url: str, silent: bool) -> None:
     :param db_url: URL to normalizer database
     :param silent: if true, suppress console output
     """  # noqa: D301
-    initialize_logs()
+    _initialize_app()
     if not click.confirm("Are you sure you want to overwrite existing data?"):
         click.get_current_context().exit()
     if not data_url:
@@ -127,7 +127,7 @@ def dump_database(output_directory: Path, db_url: str, silent: bool) -> None:
     :param db_url: URL to normalizer database
     :param silent: if True, suppress output to console
     """  # noqa: D301
-    initialize_logs()
+    _initialize_app()
     if not output_directory:
         output_directory = Path()
 
@@ -166,7 +166,7 @@ def dump_database(output_directory: Path, db_url: str, silent: bool) -> None:
 )
 @click.option("--silent", is_flag=True, default=False, help=SILENT_MODE_DESCRIPTION)
 def update(
-    sources: tuple[str],
+    sources: tuple[str, ...],
     aws_instance: bool,
     db_url: str,
     all_: bool,
@@ -204,8 +204,8 @@ def update(
     :param use_existing: if True, use most recent local data instead of fetching latest version
     :param silent: if True, suppress console output
     """  # noqa: D301
-    initialize_logs()
-    if (not sources) and (not all_) and (not normalize):
+    _initialize_app()
+    if len(sources) == 0 and (not all_) and (not normalize):
         click.echo(
             "Error: must provide SOURCES or at least one of --all, --normalize\n"
         )
