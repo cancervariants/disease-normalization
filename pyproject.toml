@@ -39,7 +39,7 @@ etl = ["owlready2==0.40", "rdflib", "wags-tails>=0.1.2", "fastobo", "tqdm"]
 tests = [
     "pytest>=6.0",
     "pytest-cov",
-    "httpx",
+    "httpx>=0.27.0",
     "asgi_lifespan",
     "pytest_asyncio",
 ]
