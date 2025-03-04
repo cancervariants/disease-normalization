@@ -49,6 +49,7 @@ The Disease Normalizer was created to support the `Knowledgebase Integration Pro
    :maxdepth: 2
 
     Installation<install>
+    Usage<usage>
     Managing data<managing_data/index>
     API<reference/index>
     Changelog<changelog>
