@@ -7,7 +7,7 @@ Once installed, start an instance of the Disease Normalizer API on port 5000: ::
 
 Point your browser to http://localhost:5000/disease/. You should see the SwaggerUI page demonstrating available REST endpoints.
 
-The beginning of the response to a GET request to http://localhost:5000/disease/normalize?q=braf should look something like this:
+The beginning of the response to a GET request to http://localhost:5000/disease/normalize?q=nsclc should look something like this:
 
 .. code-block::
 
