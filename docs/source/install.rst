@@ -59,31 +59,6 @@ Use the ``disease_norm_update_remote`` shell command to load data from the most 
 
     disease_norm_update_remote
 
-Start service
-+++++++++++++
-
-Finally, start an instance of the Disease Normalizer API on port 5000: ::
-
-    uvicorn disease.main:app --port=5000
-
-Point your browser to http://localhost:5000/disease/. You should see the SwaggerUI page demonstrating available REST endpoints.
-
-The beginning of the response to a GET request to http://localhost:5000/disease/normalize?q=braf should look something like this:
-
-.. code-block::
-
-   {
-     "query": "nsclc",
-     "match_type": 60,
-     "disease": {
-       "id": "normalize.disease.ncit:C2926",
-       "primaryCode": "ncit:C2926",
-       "name": "Lung Non-Small Cell Carcinoma",
-
-       ...
-     }
-   }
-
 .. _full-install:
 
 Full Installation

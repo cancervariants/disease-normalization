@@ -1,18 +1,41 @@
 Usage
 =====
 
+Once installed, start an instance of the Disease Normalizer API on port 5000: ::
+
+    uvicorn disease.main:app --port=5000
+
+Point your browser to http://localhost:5000/disease/. You should see the SwaggerUI page demonstrating available REST endpoints.
+
+The beginning of the response to a GET request to http://localhost:5000/disease/normalize?q=braf should look something like this:
+
+.. code-block::
+
+   {
+     "query": "nsclc",
+     "match_type": 60,
+     "disease": {
+       "id": "normalize.disease.ncit:C2926",
+       "primaryCode": "ncit:C2926",
+       "name": "Lung Non-Small Cell Carcinoma",
+
+       ...
+     }
+   }
+
+
 Overview
 --------
 
 The Disease Normalizer provides two different search modes:
 
-* **search**: for each :ref:`source <sources>`, find the record or records that best match the given search string. Returns :ref:`disease records <disease-record-object>`.
-* **normalize**: find the normalized concept that best matches the given search string. Return a merged record that incorporates data from all associated records from each source. Returns :ref:`a normalized disease object <normalized-disease-object>`. See :ref:`build_normalization` for more information.
+* **search**: for each source, find the record or records that best match the given search string. Returns :py:class:`disease records <disease.schemas.Disease>`.
+* **normalize**: find the normalized concept that best matches the given search string. Return a merged record that incorporates data from all associated records from each source. Returns a normalized disease object.
 
 REST endpoints
 --------------
 
-Once :ref:`HTTP service is activated<starting-service>`, OpenAPI documentation for the REST endpoints is available under the ``/disease`` path (e.g., with default service parameters, at ``http://localhost:8000/disease``), describing endpoint parameters and response objects, and providing some minimal example queries. A live instance is available at `https://normalize.cancervariants.org/disease <https://normalize.cancervariants.org/disease>`_.
+OpenAPI documentation for the REST endpoints is available under the ``/disease`` path (e.g., with default service parameters, at ``http://localhost:8000/disease``), describing endpoint parameters and response objects, and providing some minimal example queries. A live instance is available at `https://normalize.cancervariants.org/disease <https://normalize.cancervariants.org/disease>`_.
 
 The individual endpoints are:
 
@@ -77,3 +100,14 @@ The **best match** for a search string is determined by which fields in a diseas
 .. note::
 
     The `FUZZY_MATCH` Match Type is not currently used by the Disease Normalizer.
+
+.. _configuration:
+
+Configuration
+-------------
+
+Use the ``DISEASE_NORMALIZER_ENV`` environment variable to set the application environment (e.g. for establishing logging settings). The effects of this are currently limited, pending finalization of our internal production infrastructure.
+
+.. code-block:: shell
+
+    export DISEASE_NORMALIZER_ENV=prod
