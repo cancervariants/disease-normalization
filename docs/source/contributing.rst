@@ -43,6 +43,12 @@ Tests are executed with `pytest <https://docs.pytest.org/en/7.1.x/getting-starte
 
     pytest
 
+To employ testing data (e.g. in CI), first define the :ref:`app configuration<configuration>` to utilize the test environment: ::
+
+    export DISEASE_NORM_ENV=test
+    pytest
+
+
 Documentation
 -------------
 
