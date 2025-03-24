@@ -79,7 +79,7 @@ Source = "https://github.com/cancervariants/disease-normalization"
 disease-normalizer = "disease.cli:cli"
 
 [build-system]
-requires = ["setuptools>=64", "setuptools_scm>=8"]
+requires = ["setuptools>=64,<=78.0.0", "setuptools_scm>=8"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools_scm]
