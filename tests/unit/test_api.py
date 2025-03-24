@@ -63,7 +63,7 @@ async def test_service_info(api_client: AsyncClient):
     response = await api_client.get("/service_info")
     assert response.status_code == 200
     expected_version_pattern = (
-        r"\d+\.\d+\."  # at minimum, should be something like "0.1"
+        r"\d+\.\d+\.\d+"  # at minimum, should be something like "0.1.0"
     )
     response_json = response.json()
     assert response_json["id"] == "org.genomicmedlab.disease_normalizer"
