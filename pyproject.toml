@@ -36,7 +36,6 @@ dynamic = ["version"]
 [project.optional-dependencies]
 pg = ["psycopg[binary]", "requests"]
 etl = [
-    "cython",  # for optimized owlready
     "owlready2",
     "rdflib",
     "wags-tails~=0.3.2",
