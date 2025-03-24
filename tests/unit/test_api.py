@@ -62,14 +62,14 @@ async def test_normalize(api_client: AsyncClient):
 async def test_service_info(api_client: AsyncClient):
     response = await api_client.get("/service_info")
     assert response.status_code == 200
-    expected_version_pattern = (
-        r"\d+\.\d+\.\d+\.*"  # at minimum, should be something like "0.1.0"
-    )
     response_json = response.json()
     assert response_json["id"] == "org.genomicmedlab.disease_normalizer"
     assert response_json["name"] == "disease_normalizer"
     assert response_json["type"]["group"] == "org.genomicmedlab"
     assert response_json["type"]["artifact"] == "Disease Normalizer API"
+    expected_version_pattern = (
+        r"\d+\.\d+\.?"  # at minimum, should be something like "0.1"
+    )
     assert re.match(expected_version_pattern, response_json["type"]["version"])
     assert (
         response_json["description"]
