@@ -6,6 +6,7 @@ from pathlib import Path
 
 import click
 
+from disease import __version__
 from disease.config import config
 from disease.database.database import DatabaseException, create_db
 from disease.etl.update import update_all_sources, update_normalized, update_source
@@ -27,6 +28,7 @@ def _initialize_app() -> None:
 
 
 @click.group()
+@click.version_option(__version__)
 def cli() -> None:
     """Manage Disease Normalizer data."""
 
