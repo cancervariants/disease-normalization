@@ -9,7 +9,6 @@ from ga4gh.core.models import (
     Extension,
     MappableConcept,
     Relation,
-    code,
 )
 
 from disease import NAMESPACE_LOOKUP, PREFIX_LOOKUP, SOURCES_LOWER_LOOKUP, __version__
@@ -22,6 +21,7 @@ from disease.schemas import (
     SearchService,
     ServiceMeta,
     SourceName,
+    get_coding_object,
     get_concept_mapping,
 )
 
@@ -296,14 +296,24 @@ class QueryHandler:
         :param Dict response: in-progress response object
         :return: completed response object.
         """
+
+        def _get_src_prefix(identifier: str) -> str | None:
+            """Get source name prefix for an identifier
+
+            :param identifier: Identifier for a given system
+            :return: Source name prefix, if it's a source we ingest (in `PREFIX_LOOKUP`)
+            """
+            ns = re.split(r"[:_]", identifier, maxsplit=1)[0].lower()
+            return PREFIX_LOOKUP.get(ns)
+
         sources_meta = {}
         disease = response["disease"]
 
-        sources = []
+        sources = [_get_src_prefix(disease.primaryCoding.id)]
         for m in disease.mappings or []:
-            ns = re.split(r"[:_]", m.coding.id, maxsplit=1)[0].lower()
-            if ns in PREFIX_LOOKUP:
-                sources.append(PREFIX_LOOKUP[ns])
+            m_src = _get_src_prefix(m.coding.id)
+            if m_src:
+                sources.append(m_src)
 
         for src in sources:
             if src not in sources_meta:
@@ -323,23 +333,25 @@ class QueryHandler:
         """
         disease_obj = MappableConcept(
             id=f"normalize.disease.{record['concept_id']}",
-            primaryCode=code(root=record["concept_id"]),
+            primaryCoding=get_coding_object(record["concept_id"]),
             conceptType="Disease",
             name=record["label"],
             extensions=[],
         )
 
-        xrefs = [record["concept_id"], *record.get("xrefs", [])]
-        disease_obj.mappings = [
+        xrefs = record.get("xrefs", [])
+        mappings = [
             get_concept_mapping(xref_id, relation=Relation.EXACT_MATCH)
             for xref_id in xrefs
         ]
 
         associated_with = record.get("associated_with", [])
-        disease_obj.mappings.extend(
+        mappings.extend(
             get_concept_mapping(associated_with_id, relation=Relation.RELATED_MATCH)
             for associated_with_id in associated_with
         )
+
+        disease_obj.mappings = mappings or None
 
         for field in ("pediatric_disease", "oncologic_disease", "aliases"):
             value = record.get(field)
@@ -401,7 +413,7 @@ class QueryHandler:
         >>> from disease.database import create_db
         >>> q = QueryHandler(create_db())
         >>> result = q.normalize("NSCLC")
-        >>> result.disease.primaryCode.root
+        >>> result.disease.primaryCoding.id
         'ncit:C2926'
 
         :param query: String to find normalized concept for

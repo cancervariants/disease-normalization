@@ -105,18 +105,15 @@ NAMESPACE_TO_SYSTEM_URI: MappingProxyType[NamespacePrefix, str] = MappingProxyTy
 )
 
 
-def get_concept_mapping(
-    concept_id: str, relation: Relation = Relation.RELATED_MATCH
-) -> ConceptMapping:
-    """Get concept mapping for CURIE identifier
+def get_coding_object(concept_id: str) -> Coding:
+    """Get coding object for CURIE identifier
 
     ``system`` will use system prefix URL, OBO Foundry persistent URL (PURL), or
     source homepage, in that order of preference.
 
-    :param concept_id: Concept identifier represented as a curie
-    :param relation: SKOS mapping relationship, default is relatedMatch
+    :param concept_id: A lowercase concept identifier represented as a curie
     :raises ValueError: If source of concept ID is not a valid ``NamespacePrefix``
-    :return: Concept mapping for identifier
+    :return: Coding object for identifier
     """
     source, source_code = concept_id.split(":")
 
@@ -137,12 +134,24 @@ def get_concept_mapping(
     elif source == NamespacePrefix.DOID:
         source_code = concept_id
 
+    return Coding(
+        id=id_,
+        code=code(source_code),
+        system=NAMESPACE_TO_SYSTEM_URI[source],
+    )
+
+
+def get_concept_mapping(
+    concept_id: str, relation: Relation = Relation.RELATED_MATCH
+) -> ConceptMapping:
+    """Get concept mapping for CURIE identifier
+
+    :param concept_id: A lowercase concept identifier represented as a curie
+    :param relation: SKOS mapping relationship, default is relatedMatch
+    :return: Concept mapping for identifier
+    """
     return ConceptMapping(
-        coding=Coding(
-            id=id_,
-            code=code(source_code),
-            system=NAMESPACE_TO_SYSTEM_URI[source],
-        ),
+        coding=get_coding_object(concept_id),
         relation=relation,
     )
 
@@ -332,18 +341,14 @@ class NormalizationService(BaseModel):
                 "match_type": 80,
                 "disease": {
                     "id": "normalize.disease.ncit:C4989",
-                    "primaryCode": "ncit:C4989",
+                    "primaryCoding": {
+                        "id": "ncit:C4989",
+                        "code": "C4989",
+                        "system": "https://ncit.nci.nih.gov/ncitbrowser/ConceptReport.jsp?dictionary=NCI_Thesaurus&code=",
+                    },
                     "conceptType": "Disease",
                     "name": "Childhood Leukemia",
                     "mappings": [
-                        {
-                            "coding": {
-                                "id": "ncit:C4989",
-                                "code": "C4989",
-                                "system": "https://ncit.nci.nih.gov/ncitbrowser/ConceptReport.jsp?dictionary=NCI_Thesaurus&code=",
-                            },
-                            "relation": "exactMatch",
-                        },
                         {
                             "coding": {
                                 "id": "MONDO_0004355",

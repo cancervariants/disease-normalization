@@ -3,7 +3,8 @@
 from datetime import datetime
 
 import pytest
-from ga4gh.core.models import Extension, MappableConcept, code
+from deepdiff import DeepDiff
+from ga4gh.core.models import Extension, MappableConcept
 
 from disease.query import InvalidParameterException, QueryHandler
 from disease.schemas import MatchType, SourceName
@@ -21,17 +22,13 @@ def neuroblastoma():
     return MappableConcept(
         conceptType="Disease",
         id="normalize.disease.ncit:C3270",
-        primaryCode=code(root="ncit:C3270"),
+        primaryCoding={
+            "id": "ncit:C3270",
+            "code": "C3270",
+            "system": "https://ncit.nci.nih.gov/ncitbrowser/ConceptReport.jsp?dictionary=NCI_Thesaurus&code=",
+        },
         name="Neuroblastoma",
         mappings=[
-            {
-                "coding": {
-                    "id": "ncit:C3270",
-                    "code": "C3270",
-                    "system": "https://ncit.nci.nih.gov/ncitbrowser/ConceptReport.jsp?dictionary=NCI_Thesaurus&code=",
-                },
-                "relation": "exactMatch",
-            },
             {
                 "coding": {
                     "id": "MONDO_0005072",
@@ -149,18 +146,12 @@ def skin_myo():
     return MappableConcept(
         conceptType="Disease",
         id="normalize.disease.ncit:C167370",
-        primaryCode=code(root="ncit:C167370"),
+        primaryCoding={
+            "id": "ncit:C167370",
+            "code": "C167370",
+            "system": "https://ncit.nci.nih.gov/ncitbrowser/ConceptReport.jsp?dictionary=NCI_Thesaurus&code=",
+        },
         name="Skin Myoepithelioma",
-        mappings=[
-            {
-                "coding": {
-                    "id": "ncit:C167370",
-                    "code": "C167370",
-                    "system": "https://ncit.nci.nih.gov/ncitbrowser/ConceptReport.jsp?dictionary=NCI_Thesaurus&code=",
-                },
-                "relation": "exactMatch",
-            },
-        ],
         extensions=[Extension(name="aliases", value=["Cutaneous Myoepithelioma"])],
     )
 
@@ -173,17 +164,13 @@ def mafd2():
     return MappableConcept(
         conceptType="Disease",
         id="normalize.disease.mondo:0010648",
-        primaryCode=code(root="mondo:0010648"),
+        primaryCoding={
+            "id": "MONDO_0010648",
+            "code": "MONDO:0010648",
+            "system": "https://purl.obolibrary.org/obo/",
+        },
         name="major affective disorder 2",
         mappings=[
-            {
-                "coding": {
-                    "id": "MONDO_0010648",
-                    "code": "MONDO:0010648",
-                    "system": "https://purl.obolibrary.org/obo/",
-                },
-                "relation": "exactMatch",
-            },
             {
                 "coding": {
                     "id": "MIM:309200",
@@ -243,55 +230,9 @@ def mafd2():
 
 def compare_disease(actual, fixture):
     """Verify correctness of returned Disease core object against test fixture."""
-    assert actual.disease.primaryCode.root == fixture.id.split("normalize.disease.")[-1]
     actual = actual.disease
-    actual_keys = actual.model_dump(exclude_none=True).keys()
-    fixture_keys = fixture.model_dump(exclude_none=True).keys()
-    assert actual_keys == fixture_keys
-    assert actual.id == fixture.id
-    assert actual.conceptType == fixture.conceptType
-    assert actual.name == fixture.name
-
-    assert bool(actual.mappings) == bool(fixture.mappings)
-    if actual.mappings:
-        no_matches = []
-        for actual_mapping in actual.mappings:
-            match = None
-            for fixture_mapping in fixture.mappings:
-                if actual_mapping == fixture_mapping:
-                    match = actual_mapping
-                    break
-            if not match:
-                no_matches.append(actual_mapping)
-        assert no_matches == [], no_matches
-        assert len(actual.mappings) == len(fixture.mappings)
-
-    def get_extension(extensions, name):
-        matches = [e for e in extensions if e.name == name]
-        if len(matches) > 1:
-            raise AssertionError
-        if len(matches) == 1:
-            return matches[0]
-        return None
-
-    assert bool(actual.extensions) == bool(fixture.extensions)
-    if actual.extensions:
-        ext_actual = actual.extensions
-        ext_fixture = fixture.extensions
-
-        ped_actual = get_extension(ext_actual, "pediatric_disease")
-        ped_fixture = get_extension(ext_fixture, "pediatric_disease")
-        assert (ped_actual is None) == (ped_fixture is None)
-        if ped_actual and ped_fixture:
-            assert ped_actual.value == ped_fixture.value
-            assert ped_actual.value
-
-        onco_actual = get_extension(ext_actual, "oncologic_disease")
-        onco_fixture = get_extension(ext_fixture, "oncologic_disease")
-        assert (onco_actual is None) == (onco_fixture is None)
-        if onco_actual and onco_fixture:
-            assert onco_actual.value == onco_fixture.value
-            assert onco_actual.value
+    diff = DeepDiff(fixture, actual, ignore_order=True)
+    assert diff == {}, fixture.id
 
 
 def test_query(query_handler):

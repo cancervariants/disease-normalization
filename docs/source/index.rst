@@ -24,7 +24,7 @@ A `public REST instance of the service <https://normalize.cancervariants.org/dis
 
    >>> import requests
    >>> result = requests.get("https://normalize.cancervariants.org/disease/normalize?q=nsclc").json()
-   >>> result["disease"]["primaryCode"]
+   >>> result["disease"]["primaryCoding"]["id"]
    'ncit:C2926'
    >>> next(ext for ext in result["disease"]["extensions"] if ext["name"] == "aliases")["value"][:5]
    ['Non-Small Cell Carcinoma of Lung', 'NSCLC - non-small cell lung cancer', 'Non-small cell lung cancer', 'Non-Small Cell Carcinoma of the Lung', 'non-small cell cancer of the lung']
@@ -37,7 +37,7 @@ The Disease Normalizer can also be installed locally as a Python package for fas
     >>> from disease.database import create_db
     >>> q = QueryHandler(create_db())
     >>> result = q.normalize("nsclc")
-    >>> result.disease.primaryCode.root
+    >>> result.disease.primaryCoding.id
     'ncit:C2926'
     >>> next(ext for ext in result.disease.extensions if ext.name == "aliases").value[:5]
     ['Non-Small Cell Carcinoma of Lung', 'NSCLC - non-small cell lung cancer', 'Non-small cell lung cancer', 'Non-Small Cell Carcinoma of the Lung', 'non-small cell cancer of the lung']
