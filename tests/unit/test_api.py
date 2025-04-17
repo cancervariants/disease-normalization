@@ -52,7 +52,11 @@ async def test_normalize(api_client: AsyncClient):
     """Test /normalize endpoint."""
     response = await api_client.get("/disease/normalize?q=neuroblastoma")
     assert response.status_code == 200
-    assert response.json()["disease"]["primaryCode"] == "ncit:C3270"
+    assert response.json()["disease"]["primaryCoding"] == {
+        "id": "ncit:C3270",
+        "code": "C3270",
+        "system": "https://ncit.nci.nih.gov/ncitbrowser/ConceptReport.jsp?dictionary=NCI_Thesaurus&code=",
+    }
 
     response = await api_client.get("/disease/normalize")
     assert response.status_code == 422
