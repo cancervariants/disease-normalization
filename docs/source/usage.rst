@@ -16,7 +16,11 @@ The beginning of the response to a GET request to http://localhost:5000/disease/
      "match_type": 60,
      "disease": {
        "id": "normalize.disease.ncit:C2926",
-       "primaryCode": "ncit:C2926",
+       "primaryCoding": {
+          "id": "ncit:C2926",
+          "code": "C2926",
+          "system": "https://ncit.nci.nih.gov/ncitbrowser/ConceptReport.jsp?dictionary=NCI_Thesaurus&code=",
+       },
        "name": "Lung Non-Small Cell Carcinoma",
 
        ...
