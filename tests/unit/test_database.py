@@ -30,7 +30,7 @@ def test_tables_created(database):
 @pytest.mark.skipif(not IS_DDB, reason="only applies to DynamoDB in test env")
 def test_item_type(database):
     """Check that objects are tagged with item_type attribute."""
-    from boto3.dynamodb.conditions import Key
+    from boto3.dynamodb.conditions import Key  # noqa: PLC0415
 
     filter_exp = Key("label_and_type").eq("ncit:c2926##identity")
     item = database.diseases.query(KeyConditionExpression=filter_exp)["Items"][0]

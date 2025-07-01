@@ -74,7 +74,7 @@ class _Tag(str, Enum):
 
 
 # endpoint description text
-get_matches_summary = "Given query, provide highest matches from " "each source."
+get_matches_summary = "Given query, provide highest matches from each source."
 search_descr = "Search for disease term."
 response_descr = "A response to a validly-formed query."
 q_descr = "Disease term to search for."
@@ -91,7 +91,7 @@ excl_descr = (
     "'excl' parameters are given."
 )
 normalize_description = (
-    "Return merged strongest-match concept for query " "string provided by user."
+    "Return merged strongest-match concept for query string provided by user."
 )
 
 
