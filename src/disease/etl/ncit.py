@@ -65,19 +65,19 @@ class NCIt(OWLBase):
             associated_with = []
             if disease_class.P207:
                 associated_with.append(
-                    f"{NamespacePrefix.UMLS.value}:" f"{disease_class.P207.first()}"
+                    f"{NamespacePrefix.UMLS.value}:{disease_class.P207.first()}"
                 )
             maps_to = disease_class.P375
             if maps_to:
                 icdo_list = list(filter(lambda s: icdo_re.match(s), maps_to))
                 if len(icdo_list) == 1:
                     associated_with.append(
-                        f"{NamespacePrefix.ICDO.value}:" f"{icdo_list[0]}"
+                        f"{NamespacePrefix.ICDO.value}:{icdo_list[0]}"
                     )
             imdrf = disease_class.hasDbXref
             if imdrf:
                 associated_with.append(
-                    f"{NamespacePrefix.IMDRF.value}:" f"{imdrf[0].split(':')[1]}"
+                    f"{NamespacePrefix.IMDRF.value}:{imdrf[0].split(':')[1]}"
                 )
 
             disease = {

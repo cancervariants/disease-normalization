@@ -81,10 +81,7 @@ class OMIM(Base):
                 aliases |= {t for t in row[3].split(";") if t}
             if len(row) > 4:
                 aliases |= {t for t in row[4].split(";") if t}
-            aliases = {
-                alias[:-10] if alias.endswith(", INCLUDED") else alias
-                for alias in aliases
-            }
+            aliases = {alias.removesuffix(", INCLUDED") for alias in aliases}
             disease["aliases"] = [a.lstrip() for a in aliases]
 
             self._load_disease(disease)
