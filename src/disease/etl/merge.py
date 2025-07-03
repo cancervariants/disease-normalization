@@ -31,6 +31,9 @@ class Merge:
         Our normalization protocols only generate record ID sets that include Mondo
         terms, meaning only Mondo IDs should be submitted to this method.
 
+        Rather than a DFS of all record xrefs as with the other normalizers, here we just
+        work from the xrefs provided by the Mondo record.
+
         :param record_ids: concept identifiers from which groups should be generated.
         """
         # build groups
@@ -80,11 +83,15 @@ class Merge:
 
     def _generate_merged_record(self, record_id_set: set[str]) -> tuple[dict, list]:
         """Generate merged record from provided concept ID group.
-        Where attributes are sets, they should be merged, and where they are
-        scalars, assign from the highest-priority source where that attribute
-        is non-null.
 
-        Priority is NCIt > Mondo > OMIM > OncoTree> DO.
+        Misc notes
+        * Where attributes are sets, they should be merged, and where they are
+        scalars, assign from the highest-priority source where that attribute
+        is non-null. Value priority is NCIt > Mondo > OMIM > OncoTree> DO.
+        * The exception is with xrefs, which (for all groups of n > 1) is constructed by
+        taking the `record_id_set` value, dropping all records which (for whatever reason)
+        weren't able to be found in the DB, and dropping the ID that will be used as the
+        primary coding for the record
 
         :param Set record_id_set: group of concept IDs
         :return: completed merged drug object to be stored in DB, as well as

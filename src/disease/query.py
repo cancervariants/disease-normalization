@@ -440,7 +440,7 @@ class QueryHandler:
 
         non_merged_match = None
 
-        # check concept ID match
+        # check for concept ID match against record that has a ref to a merged record
         record = self.db.get_record_by_id(query_str, case_sensitive=False)
         if record:
             if "merge_ref" in record:
@@ -457,13 +457,14 @@ class QueryHandler:
             # get matches list for match tier
             matching_refs = self.db.get_refs_by_type(query_str, match_type)
             matching_records = [
-                self.db.get_record_by_id(ref, False) for ref in matching_refs
+                self.db.get_record_by_id(ref, case_sensitive=False)
+                for ref in matching_refs
             ]
             matching_records.sort(key=self._record_order)
 
             # attempt merge ref resolution until successful
             for match in matching_records:
-                record = self.db.get_record_by_id(match["concept_id"], False)
+                record = self.db.get_record_by_id(match["concept_id"], merge=False)
                 if record:
                     if "merge_ref" in record:
                         merge = self.db.get_record_by_id(
@@ -479,7 +480,7 @@ class QueryHandler:
                     if not non_merged_match:
                         non_merged_match = (record, match_type)
 
-        # if no successful match, try available non-merged match
+        # if no successful match, try best available non-merged match
         if non_merged_match:
             match_type = MatchType[non_merged_match[1].upper()]
             return self._add_disease(response, non_merged_match[0], match_type)
