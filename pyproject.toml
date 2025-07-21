@@ -38,7 +38,7 @@ pg = ["psycopg[binary]", "requests"]
 etl = [
     "owlready2",
     "rdflib",
-    "wags-tails~=0.3.2",
+    "wags-tails~=0.4.0",
     "fastobo",
     "tqdm"
 ]
