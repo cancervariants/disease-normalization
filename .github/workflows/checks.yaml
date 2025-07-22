@@ -111,4 +111,4 @@ jobs:
 
       - name: Attempt docs build
         working-directory: ./docs
-        run: source .venv/bin/activate && make html
+        run: source ../.venv/bin/activate && make html
