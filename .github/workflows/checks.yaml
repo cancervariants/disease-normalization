@@ -107,8 +107,8 @@ jobs:
         uses: astral-sh/setup-uv@v6
 
       - name: Install dependencies
-        run: uv sync --extra docs --extra etl --extra pg --no-managed-python
+        run: uv sync --extra docs --extra etl --extra pg
 
       - name: Attempt docs build
         working-directory: ./docs
-        run: make html
+        run: source .venv/bin/activate && make html
