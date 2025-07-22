@@ -103,10 +103,11 @@ jobs:
         with:
           python-version: 3.11
 
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+
       - name: Install dependencies
-        run: |
-          python3 -m pip install --upgrade pip
-          python3 -m pip install '.[docs,etl,pg]'
+        run: uv sync --extra docs --extra etl --extra pg
 
       - name: Attempt docs build
         working-directory: ./docs
