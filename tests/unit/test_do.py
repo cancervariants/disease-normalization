@@ -123,6 +123,9 @@ def test_xref_match(
     response = do.search("ncit:C39947")
     compare_response(response, MatchType.XREF, juvenile_testicular_granulosa_cell)
 
+    response = do.search("ncit:C4207")  # blocked by blocklist
+    assert response.match_type == MatchType.NO_MATCH
+
 
 def test_associated_with_match(
     do, neuroblastoma, pediatric_liposarcoma, richter, compare_response
