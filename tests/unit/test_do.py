@@ -74,6 +74,7 @@ def juvenile_testicular_granulosa_cell():
         ],
         xrefs=["ncit:C39947"],
         associated_with=["umls:C1515285", "umls:C0334403"],
+        oncologic_disease=True,
     )
 
 
