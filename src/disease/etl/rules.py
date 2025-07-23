@@ -41,8 +41,8 @@ class Rules:
         """Apply all rules to a disease. First find relevant rules, then call the
         apply method.
 
-        :param therapy: therapy object from ETL base
-        :return: processed therapy object
+        :param disease: disease object from ETL base
+        :return: processed disease object
         """
         relevant_rules = self.rules.get(disease["concept_id"], [])
         for rule in relevant_rules:
