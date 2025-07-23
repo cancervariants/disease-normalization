@@ -28,6 +28,7 @@ def neuroblastoma():
             "umls:C0027819",
         ],
         aliases=[],
+        oncologic_disease=True,
     )
 
 
@@ -40,6 +41,7 @@ def pediatric_liposarcoma():
         xrefs=["ncit:C8091"],
         associated_with=["umls:C0279984"],
         aliases=["pediatric liposarcoma"],
+        oncologic_disease=True,
     )
 
 
@@ -52,6 +54,7 @@ def richter():
         aliases=["Richter syndrome"],
         xrefs=["ncit:C35424"],
         associated_with=["umls:C0349631", "gard:7578", "icd10.cm:C91.1"],
+        oncologic_disease=True,
     )
 
 

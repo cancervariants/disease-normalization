@@ -49,6 +49,10 @@ class DO(OWLBase):
         diseases = self._get_subclasses(
             disease_uri, owl.default_world.as_rdflib_graph()
         )
+        # use "disease of cellular proliferation" to capture related non- or pre-malignant
+        # disease terms
+        cancers_uri = "http://purl.obolibrary.org/obo/DOID_14566"
+        cancers = self._get_subclasses(cancers_uri, owl.default_world.as_rdflib_graph())
         for uri in tqdm(diseases, ncols=80, disable=self._silent):
             disease_class = do.search(iri=uri)[0]
             if disease_class.deprecated:
@@ -85,4 +89,7 @@ class DO(OWLBase):
                 "xrefs": xrefs,
                 "associated_with": associated_with,
             }
+
+            if uri in cancers:
+                disease["oncologic_disease"] = True
             self._load_disease(disease)
