@@ -13,6 +13,7 @@ from wags_tails import CustomData, DataSource, DoData, MondoData, NcitData, Onco
 
 from disease import ITEM_TYPES, SOURCES_FOR_MERGE
 from disease.database import AbstractDatabase
+from disease.etl.rules import Rules
 from disease.schemas import Disease, SourceName
 
 DATA_DISPATCH = {
@@ -51,6 +52,7 @@ class Base(ABC):
         )
         self._database = database
         self.store_ids = self.__class__.__name__ in SOURCES_FOR_MERGE
+        self._rules = Rules(self._src_name)
         self._added_ids = []
 
     def _get_data_handler(self, data_path: Path | None = None) -> DataSource:
@@ -119,6 +121,7 @@ class Base(ABC):
             if field in disease and disease[field] is None:
                 del disease[field]
 
+        disease = self._rules.apply_rules_to_disease(disease)
         self._database.add_record(disease, self._src_name)
         self._added_ids.append(concept_id)
 
