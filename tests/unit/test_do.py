@@ -55,6 +55,25 @@ def richter():
     )
 
 
+@pytest.fixture(scope="module")
+def juvenile_testicular_granulosa_cell():
+    """Fixture for testing blocklist function"""
+    return Disease(
+        concept_id="DOID:6032",
+        label="juvenile type testicular granulosa cell tumor",
+        aliases=[
+            "Juvenile granulosa cell tumor",
+            "Juvenile granulosa cell tumour",
+            "Juvenile type Granulosa cell tumor",
+            "Juvenile type Granulosa cell tumour",
+            "juvenile type granulosa cell neoplasm",
+            "juvenile type testicular granulosa cell tumour",
+        ],
+        xrefs=["ncit:C39947"],
+        associated_with=["umls:C1515285", "umls:C0334403"],
+    )
+
+
 def test_concept_id_match(
     do, neuroblastoma, pediatric_liposarcoma, richter, compare_response
 ):
@@ -87,13 +106,25 @@ def test_alias_match(do, richter, compare_response):
     compare_response(response, MatchType.ALIAS, richter)
 
 
-def test_xref_match(do, neuroblastoma, pediatric_liposarcoma, compare_response):
+def test_xref_match(
+    do,
+    neuroblastoma: Disease,
+    pediatric_liposarcoma: Disease,
+    juvenile_testicular_granulosa_cell: Disease,
+    compare_response,
+):
     """Test that xref search resolves to correct records."""
     response = do.search("ncit:C3270")
     compare_response(response, MatchType.XREF, neuroblastoma)
 
     response = do.search("NCIT:C8091")
     compare_response(response, MatchType.XREF, pediatric_liposarcoma)
+
+    response = do.search("ncit:C39947")
+    compare_response(response, MatchType.XREF, juvenile_testicular_granulosa_cell)
+
+    response = do.search("ncit:C4207")  # blocked by blocklist
+    assert response.match_type == MatchType.NO_MATCH
 
 
 def test_associated_with_match(

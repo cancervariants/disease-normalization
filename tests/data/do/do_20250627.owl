@@ -136,6 +136,14 @@
 
 
 
+    <!-- http://purl.obolibrary.org/obo/RO_0002488 -->
+
+    <owl:ObjectProperty rdf:about="http://purl.obolibrary.org/obo/RO_0002488">
+        <rdfs:label>existence starts during</rdfs:label>
+    </owl:ObjectProperty>
+
+
+
     <!-- http://purl.obolibrary.org/obo/RO_0004026 -->
 
     <owl:ObjectProperty rdf:about="http://purl.obolibrary.org/obo/RO_0004026">
@@ -176,7 +184,7 @@
     <!-- http://purl.obolibrary.org/obo/CL_0000066 -->
 
     <owl:Class rdf:about="http://purl.obolibrary.org/obo/CL_0000066">
-        <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/CL_0000000"/>
+        <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/CL_0000255"/>
         <rdfs:label>epithelial cell</rdfs:label>
     </owl:Class>
 
@@ -195,6 +203,7 @@
 
     <owl:Class rdf:about="http://purl.obolibrary.org/obo/CL_0000226">
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/CL_0000000"/>
+        <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/CL_0000255"/>
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/CL_0002242"/>
         <rdfs:label>single nucleate cell</rdfs:label>
     </owl:Class>
@@ -246,7 +255,7 @@
     <owl:Class rdf:about="http://purl.obolibrary.org/obo/CL_0000842">
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/CL_0000226"/>
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/CL_0000738"/>
-        <rdfs:label>mononuclear cell</rdfs:label>
+        <rdfs:label>mononuclear leukocyte</rdfs:label>
     </owl:Class>
 
 
@@ -383,6 +392,37 @@
 
 
 
+    <!-- http://purl.obolibrary.org/obo/DOID_0050622 -->
+
+    <owl:Class rdf:about="http://purl.obolibrary.org/obo/DOID_0050622">
+        <owl:equivalentClass>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://purl.obolibrary.org/obo/DOID_0060072"/>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="http://purl.obolibrary.org/obo/RO_0004026"/>
+                        <owl:someValuesFrom rdf:resource="http://purl.obolibrary.org/obo/UBERON_0000990"/>
+                    </owl:Restriction>
+                </owl:intersectionOf>
+            </owl:Class>
+        </owl:equivalentClass>
+        <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/DOID_0060085"/>
+        <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/DOID_15"/>
+        <obo:IAO_0000115 xml:lang="en">An organ system benign neoplasm that is located_in reproductive system organs.</obo:IAO_0000115>
+        <oboInOwl:hasOBONamespace>disease_ontology</oboInOwl:hasOBONamespace>
+        <oboInOwl:id>DOID:0050622</oboInOwl:id>
+        <rdfs:label xml:lang="en">reproductive organ benign neoplasm</rdfs:label>
+    </owl:Class>
+    <owl:Axiom>
+        <owl:annotatedSource rdf:resource="http://purl.obolibrary.org/obo/DOID_0050622"/>
+        <owl:annotatedProperty rdf:resource="http://purl.obolibrary.org/obo/IAO_0000115"/>
+        <owl:annotatedTarget xml:lang="en">An organ system benign neoplasm that is located_in reproductive system organs.</owl:annotatedTarget>
+        <dc:type rdf:resource="http://purl.obolibrary.org/obo/ECO_0007638"/>
+        <oboInOwl:hasDbXref>url:http://en.wikipedia.org/wiki/Reproductive_system</oboInOwl:hasDbXref>
+    </owl:Axiom>
+
+
+
     <!-- http://purl.obolibrary.org/obo/DOID_0050686 -->
 
     <owl:Class rdf:about="http://purl.obolibrary.org/obo/DOID_0050686">
@@ -393,6 +433,7 @@
         <oboInOwl:hasDbXref>MESH:D009371</oboInOwl:hasDbXref>
         <oboInOwl:hasOBONamespace>disease_ontology</oboInOwl:hasOBONamespace>
         <oboInOwl:id>DOID:0050686</oboInOwl:id>
+        <oboInOwl:inSubset rdf:resource="http://purl.obolibrary.org/obo/doid#DO_MGI_slim"/>
         <rdfs:label xml:lang="en">organ system cancer</rdfs:label>
     </owl:Class>
     <owl:Axiom>
@@ -628,9 +669,11 @@
         <obo:IAO_0000115 xml:lang="en">A benign neoplasm that is classified by the organ system from which it is arising from.</obo:IAO_0000115>
         <oboInOwl:created_by>lschriml</oboInOwl:created_by>
         <oboInOwl:creation_date>2011-07-14T12:12:23Z</oboInOwl:creation_date>
+        <oboInOwl:hasDbXref>NCI:C3677</oboInOwl:hasDbXref>
         <oboInOwl:hasOBONamespace>disease_ontology</oboInOwl:hasOBONamespace>
         <oboInOwl:id>DOID:0060085</oboInOwl:id>
         <oboInOwl:inSubset rdf:resource="http://purl.obolibrary.org/obo/doid#DO_FlyBase_slim"/>
+        <oboInOwl:inSubset rdf:resource="http://purl.obolibrary.org/obo/doid#NCIthesaurus"/>
         <rdfs:label xml:lang="en">organ system benign neoplasm</rdfs:label>
     </owl:Class>
     <owl:Axiom>
@@ -638,7 +681,7 @@
         <owl:annotatedProperty rdf:resource="http://purl.obolibrary.org/obo/IAO_0000115"/>
         <owl:annotatedTarget xml:lang="en">A benign neoplasm that is classified by the organ system from which it is arising from.</owl:annotatedTarget>
         <dc:type rdf:resource="http://purl.obolibrary.org/obo/ECO_0007636"/>
-        <oboInOwl:hasDbXref>url:http://ncit.nci.nih.gov/ncitbrowser/ConceptReport.jsp?dictionary=NCI_Thesaurus&amp;version=14.07d&amp;code=C367</oboInOwl:hasDbXref>
+        <oboInOwl:hasDbXref>url:https://ncit.nci.nih.gov/ncitbrowser/ConceptReport.jsp?dictionary=NCI_Thesaurus&amp;ns=ncit&amp;code=C3677</oboInOwl:hasDbXref>
     </owl:Axiom>
 
 
@@ -1154,6 +1197,45 @@
 
 
 
+    <!-- http://purl.obolibrary.org/obo/DOID_15 -->
+
+    <owl:Class rdf:about="http://purl.obolibrary.org/obo/DOID_15">
+        <owl:equivalentClass>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://purl.obolibrary.org/obo/DOID_4"/>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="http://purl.obolibrary.org/obo/RO_0004026"/>
+                        <owl:someValuesFrom rdf:resource="http://purl.obolibrary.org/obo/UBERON_0000990"/>
+                    </owl:Restriction>
+                </owl:intersectionOf>
+            </owl:Class>
+        </owl:equivalentClass>
+        <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/DOID_7"/>
+        <obo:IAO_0000115 xml:lang="en">A disease of anatomical entity that is located_in reproductive system organs.</obo:IAO_0000115>
+        <oboInOwl:hasAlternativeId>DOID:6309</oboInOwl:hasAlternativeId>
+        <oboInOwl:hasDbXref>NCI:C27613</oboInOwl:hasDbXref>
+        <oboInOwl:hasDbXref>UMLS_CUI:C1335037</oboInOwl:hasDbXref>
+        <oboInOwl:hasExactSynonym xml:lang="en">genital system disease</oboInOwl:hasExactSynonym>
+        <oboInOwl:hasOBONamespace>disease_ontology</oboInOwl:hasOBONamespace>
+        <oboInOwl:id>DOID:15</oboInOwl:id>
+        <oboInOwl:inSubset rdf:resource="http://purl.obolibrary.org/obo/doid#DO_AGR_slim"/>
+        <oboInOwl:inSubset rdf:resource="http://purl.obolibrary.org/obo/doid#DO_CFDE_slim"/>
+        <oboInOwl:inSubset rdf:resource="http://purl.obolibrary.org/obo/doid#DO_GXD_slim"/>
+        <oboInOwl:inSubset rdf:resource="http://purl.obolibrary.org/obo/doid#DO_MGI_slim"/>
+        <oboInOwl:inSubset rdf:resource="http://purl.obolibrary.org/obo/doid#NCIthesaurus"/>
+        <rdfs:label xml:lang="en">reproductive system disease</rdfs:label>
+    </owl:Class>
+    <owl:Axiom>
+        <owl:annotatedSource rdf:resource="http://purl.obolibrary.org/obo/DOID_15"/>
+        <owl:annotatedProperty rdf:resource="http://purl.obolibrary.org/obo/IAO_0000115"/>
+        <owl:annotatedTarget xml:lang="en">A disease of anatomical entity that is located_in reproductive system organs.</owl:annotatedTarget>
+        <dc:type rdf:resource="http://purl.obolibrary.org/obo/ECO_0007638"/>
+        <oboInOwl:hasDbXref>url:http://en.wikipedia.org/wiki/Reproductive_system</oboInOwl:hasDbXref>
+    </owl:Axiom>
+
+
+
     <!-- http://purl.obolibrary.org/obo/DOID_1579 -->
 
     <owl:Class rdf:about="http://purl.obolibrary.org/obo/DOID_1579">
@@ -1191,7 +1273,7 @@
         <dc:type rdf:resource="http://purl.obolibrary.org/obo/ECO_0007638"/>
         <dc:type rdf:resource="http://purl.obolibrary.org/obo/ECO_0007643"/>
         <oboInOwl:hasDbXref>url:http://en.wikipedia.org/wiki/File:Respiratory_system_complete_en.svg</oboInOwl:hasDbXref>
-        <oboInOwl:hasDbXref>url:http://www2.merriam-webster.com/cgi-bin/mwmednlm?book=Medical&amp;va=respiratory%20system</oboInOwl:hasDbXref>
+        <oboInOwl:hasDbXref>url:https://www.merriam-webster.com/dictionary/respiratory%20system#medicalDictionary</oboInOwl:hasDbXref>
     </owl:Axiom>
 
 
@@ -1230,7 +1312,7 @@
         <dc:type rdf:resource="http://purl.obolibrary.org/obo/ECO_0007638"/>
         <dc:type rdf:resource="http://purl.obolibrary.org/obo/ECO_0007643"/>
         <oboInOwl:hasDbXref>url:http://en.wikipedia.org/wiki/cancer</oboInOwl:hasDbXref>
-        <oboInOwl:hasDbXref>url:http://www2.merriam-webster.com/cgi-bin/mwmednlm?book=Medical&amp;va=cancer</oboInOwl:hasDbXref>
+        <oboInOwl:hasDbXref>url:https://www.merriam-webster.com/dictionary/cancer#medicalDictionary</oboInOwl:hasDbXref>
     </owl:Axiom>
 
 
@@ -1290,6 +1372,76 @@
         <oboInOwl:inSubset rdf:resource="http://purl.obolibrary.org/obo/doid#NCIthesaurus"/>
         <rdfs:label xml:lang="en">Richter&apos;s syndrome</rdfs:label>
     </owl:Class>
+
+
+
+    <!-- http://purl.obolibrary.org/obo/DOID_192 -->
+
+    <owl:Class rdf:about="http://purl.obolibrary.org/obo/DOID_192">
+        <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/DOID_193"/>
+        <obo:IAO_0000115 xml:lang="en">A reproductive organ cancer that is located_in the sex cord-derived tissues of the ovary or testis and derives_from granulosa cells, Leydig cells, Sertoli cells, and fibroblasts.</obo:IAO_0000115>
+        <oboInOwl:hasAlternativeId>DOID:12293</oboInOwl:hasAlternativeId>
+        <oboInOwl:hasDbXref>ICDO:8590/1</oboInOwl:hasDbXref>
+        <oboInOwl:hasDbXref>MESH:D018312</oboInOwl:hasDbXref>
+        <oboInOwl:hasDbXref>NCI:C3794</oboInOwl:hasDbXref>
+        <oboInOwl:hasDbXref>SNOMEDCT_US_2023_03_01:253028001</oboInOwl:hasDbXref>
+        <oboInOwl:hasDbXref>UMLS_CUI:C0206724</oboInOwl:hasDbXref>
+        <oboInOwl:hasExactSynonym xml:lang="en">Sex Cord-Stromal neoplasm</oboInOwl:hasExactSynonym>
+        <oboInOwl:hasExactSynonym xml:lang="en">Sex cord stromal tumour</oboInOwl:hasExactSynonym>
+        <oboInOwl:hasExactSynonym xml:lang="en">Specialized gonadal neoplasm</oboInOwl:hasExactSynonym>
+        <oboInOwl:hasExactSynonym xml:lang="en">Specialized gonadal tumor</oboInOwl:hasExactSynonym>
+        <oboInOwl:hasExactSynonym xml:lang="en">Specialized gonadal tumour</oboInOwl:hasExactSynonym>
+        <oboInOwl:hasExactSynonym xml:lang="en">sex cord-gonadal stromal tumour</oboInOwl:hasExactSynonym>
+        <oboInOwl:hasOBONamespace>disease_ontology</oboInOwl:hasOBONamespace>
+        <oboInOwl:id>DOID:192</oboInOwl:id>
+        <oboInOwl:inSubset rdf:resource="http://purl.obolibrary.org/obo/doid#NCIthesaurus"/>
+        <rdfs:label xml:lang="en">sex cord-gonadal stromal tumor</rdfs:label>
+    </owl:Class>
+    <owl:Axiom>
+        <owl:annotatedSource rdf:resource="http://purl.obolibrary.org/obo/DOID_192"/>
+        <owl:annotatedProperty rdf:resource="http://purl.obolibrary.org/obo/IAO_0000115"/>
+        <owl:annotatedTarget xml:lang="en">A reproductive organ cancer that is located_in the sex cord-derived tissues of the ovary or testis and derives_from granulosa cells, Leydig cells, Sertoli cells, and fibroblasts.</owl:annotatedTarget>
+        <dc:type rdf:resource="http://purl.obolibrary.org/obo/ECO_0007638"/>
+        <oboInOwl:hasDbXref>url:http://en.wikipedia.org/wiki/Sex_cord-gonadal_stromal_tumour</oboInOwl:hasDbXref>
+    </owl:Axiom>
+
+
+
+    <!-- http://purl.obolibrary.org/obo/DOID_193 -->
+
+    <owl:Class rdf:about="http://purl.obolibrary.org/obo/DOID_193">
+        <owl:equivalentClass>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://purl.obolibrary.org/obo/DOID_162"/>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="http://purl.obolibrary.org/obo/RO_0004026"/>
+                        <owl:someValuesFrom rdf:resource="http://purl.obolibrary.org/obo/UBERON_0000990"/>
+                    </owl:Restriction>
+                </owl:intersectionOf>
+            </owl:Class>
+        </owl:equivalentClass>
+        <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/DOID_0050686"/>
+        <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/DOID_15"/>
+        <obo:IAO_0000115 xml:lang="en">An organ system cancer that is manifested in the reproductive organs.</obo:IAO_0000115>
+        <oboInOwl:hasAlternativeId>DOID:1900</oboInOwl:hasAlternativeId>
+        <oboInOwl:hasDbXref>NCI:C3674</oboInOwl:hasDbXref>
+        <oboInOwl:hasDbXref>UMLS_CUI:C0178830</oboInOwl:hasDbXref>
+        <oboInOwl:hasExactSynonym xml:lang="en">Reproductive tumor</oboInOwl:hasExactSynonym>
+        <oboInOwl:hasExactSynonym xml:lang="en">malignant reproductive system neoplasm</oboInOwl:hasExactSynonym>
+        <oboInOwl:hasOBONamespace>disease_ontology</oboInOwl:hasOBONamespace>
+        <oboInOwl:hasRelatedSynonym xml:lang="en">cancer of reproductive system</oboInOwl:hasRelatedSynonym>
+        <oboInOwl:id>DOID:193</oboInOwl:id>
+        <oboInOwl:inSubset rdf:resource="http://purl.obolibrary.org/obo/doid#NCIthesaurus"/>
+        <rdfs:label xml:lang="en">reproductive organ cancer</rdfs:label>
+    </owl:Class>
+    <owl:Axiom>
+        <owl:annotatedSource rdf:resource="http://purl.obolibrary.org/obo/DOID_193"/>
+        <owl:annotatedProperty rdf:resource="http://purl.obolibrary.org/obo/IAO_0000115"/>
+        <owl:annotatedTarget xml:lang="en">An organ system cancer that is manifested in the reproductive organs.</owl:annotatedTarget>
+        <dc:type rdf:resource="http://purl.obolibrary.org/obo/ECO_0007638"/>
+        <oboInOwl:hasDbXref>url:http://en.wikipedia.org/wiki/Reproductive_system#Examples_of_cancers</oboInOwl:hasDbXref>
+    </owl:Axiom>
 
 
 
@@ -1509,6 +1661,39 @@
         <owl:annotatedTarget xml:lang="en">A cell type cancer that has_material_basis_in abnormally proliferating cells derives_from germ cells.</owl:annotatedTarget>
         <dc:type rdf:resource="http://purl.obolibrary.org/obo/ECO_0007638"/>
         <oboInOwl:hasDbXref>url:http://en.wikipedia.org/wiki/Germ_cell_tumor</oboInOwl:hasDbXref>
+    </owl:Axiom>
+
+
+
+    <!-- http://purl.obolibrary.org/obo/DOID_2999 -->
+
+    <owl:Class rdf:about="http://purl.obolibrary.org/obo/DOID_2999">
+        <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/DOID_192"/>
+        <obo:IAO_0000115 xml:lang="en">A sex cord-gonadal stromal tumor that has_material_basis_in granulosa cells and arises from the sex cord stroma.</obo:IAO_0000115>
+        <oboInOwl:hasAlternativeId>DOID:5333</oboInOwl:hasAlternativeId>
+        <oboInOwl:hasDbXref>MESH:D006106</oboInOwl:hasDbXref>
+        <oboInOwl:hasDbXref>NCI:C3070</oboInOwl:hasDbXref>
+        <oboInOwl:hasDbXref>NCI:C4205</oboInOwl:hasDbXref>
+        <oboInOwl:hasDbXref>SNOMEDCT_US_2023_03_01:18861007</oboInOwl:hasDbXref>
+        <oboInOwl:hasDbXref>SNOMEDCT_US_2023_03_01:46585005</oboInOwl:hasDbXref>
+        <oboInOwl:hasDbXref>UMLS_CUI:C0018206</oboInOwl:hasDbXref>
+        <oboInOwl:hasDbXref>UMLS_CUI:C0334401</oboInOwl:hasDbXref>
+        <oboInOwl:hasExactSynonym xml:lang="en">Granulosa cell neoplasm</oboInOwl:hasExactSynonym>
+        <oboInOwl:hasExactSynonym xml:lang="en">Granulosa cell tumor, adult type</oboInOwl:hasExactSynonym>
+        <oboInOwl:hasExactSynonym xml:lang="en">Granulosa cell tumour, sarcomatoid</oboInOwl:hasExactSynonym>
+        <oboInOwl:hasExactSynonym xml:lang="en">malignant granulosa cell neoplasm</oboInOwl:hasExactSynonym>
+        <oboInOwl:hasOBONamespace>disease_ontology</oboInOwl:hasOBONamespace>
+        <oboInOwl:id>DOID:2999</oboInOwl:id>
+        <oboInOwl:inSubset rdf:resource="http://purl.obolibrary.org/obo/doid#DO_cancer_slim"/>
+        <oboInOwl:inSubset rdf:resource="http://purl.obolibrary.org/obo/doid#NCIthesaurus"/>
+        <rdfs:label xml:lang="en">granulosa cell tumor</rdfs:label>
+    </owl:Class>
+    <owl:Axiom>
+        <owl:annotatedSource rdf:resource="http://purl.obolibrary.org/obo/DOID_2999"/>
+        <owl:annotatedProperty rdf:resource="http://purl.obolibrary.org/obo/IAO_0000115"/>
+        <owl:annotatedTarget xml:lang="en">A sex cord-gonadal stromal tumor that has_material_basis_in granulosa cells and arises from the sex cord stroma.</owl:annotatedTarget>
+        <dc:type rdf:resource="http://purl.obolibrary.org/obo/ECO_0007638"/>
+        <oboInOwl:hasDbXref>url:https://en.wikipedia.org/wiki/Granulosa_cell_tumour</oboInOwl:hasDbXref>
     </owl:Axiom>
 
 
@@ -1978,16 +2163,40 @@
 
 
 
+    <!-- http://purl.obolibrary.org/obo/DOID_5331 -->
+
+    <owl:Class rdf:about="http://purl.obolibrary.org/obo/DOID_5331">
+        <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/DOID_2999"/>
+        <oboInOwl:hasDbXref>NCI:C6357</oboInOwl:hasDbXref>
+        <oboInOwl:hasDbXref>UMLS_CUI:C1336709</oboInOwl:hasDbXref>
+        <oboInOwl:hasExactSynonym xml:lang="en">Granulosa cell tumor of testis</oboInOwl:hasExactSynonym>
+        <oboInOwl:hasExactSynonym xml:lang="en">Granulosa cell tumour of testis</oboInOwl:hasExactSynonym>
+        <oboInOwl:hasExactSynonym xml:lang="en">testicular granulosa cell tumour</oboInOwl:hasExactSynonym>
+        <oboInOwl:hasOBONamespace>disease_ontology</oboInOwl:hasOBONamespace>
+        <oboInOwl:id>DOID:5331</oboInOwl:id>
+        <oboInOwl:inSubset rdf:resource="http://purl.obolibrary.org/obo/doid#NCIthesaurus"/>
+        <rdfs:label xml:lang="en">testicular granulosa cell tumor</rdfs:label>
+    </owl:Class>
+
+
+
     <!-- http://purl.obolibrary.org/obo/DOID_5695 -->
 
     <owl:Class rdf:about="http://purl.obolibrary.org/obo/DOID_5695">
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/DOID_3382"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://purl.obolibrary.org/obo/RO_0002488"/>
+                <owl:someValuesFrom rdf:resource="http://purl.obolibrary.org/obo/HP_0011463"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
         <oboInOwl:hasDbXref>NCI:C8091</oboInOwl:hasDbXref>
         <oboInOwl:hasDbXref>UMLS_CUI:C0279984</oboInOwl:hasDbXref>
         <oboInOwl:hasExactSynonym xml:lang="en">pediatric liposarcoma</oboInOwl:hasExactSynonym>
         <oboInOwl:hasOBONamespace>disease_ontology</oboInOwl:hasOBONamespace>
         <oboInOwl:id>DOID:5695</oboInOwl:id>
         <oboInOwl:inSubset rdf:resource="http://purl.obolibrary.org/obo/doid#DO_cancer_slim"/>
+        <oboInOwl:inSubset rdf:resource="http://purl.obolibrary.org/obo/doid#DO_childhood_cancer_slim"/>
         <oboInOwl:inSubset rdf:resource="http://purl.obolibrary.org/obo/doid#NCIthesaurus"/>
         <rdfs:label xml:lang="en">childhood liposarcoma</rdfs:label>
     </owl:Class>
@@ -2032,6 +2241,36 @@
         <dc:type rdf:resource="http://purl.obolibrary.org/obo/ECO_0007638"/>
         <oboInOwl:hasDbXref>url:http://en.wikipedia.org/w/index.php?title=Peripheral_neuropathy&amp;redirect=no</oboInOwl:hasDbXref>
     </owl:Axiom>
+
+
+
+    <!-- http://purl.obolibrary.org/obo/DOID_6032 -->
+
+    <owl:Class rdf:about="http://purl.obolibrary.org/obo/DOID_6032">
+        <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/DOID_5331"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://purl.obolibrary.org/obo/RO_0002488"/>
+                <owl:someValuesFrom rdf:resource="http://purl.obolibrary.org/obo/HP_0011462"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <oboInOwl:hasAlternativeId>DOID:5332</oboInOwl:hasAlternativeId>
+        <oboInOwl:hasDbXref>NCI:C39947</oboInOwl:hasDbXref>
+        <oboInOwl:hasDbXref>NCI:C4207</oboInOwl:hasDbXref>
+        <oboInOwl:hasDbXref>SNOMEDCT_US_2023_03_01:189735004</oboInOwl:hasDbXref>
+        <oboInOwl:hasDbXref>UMLS_CUI:C0334403</oboInOwl:hasDbXref>
+        <oboInOwl:hasDbXref>UMLS_CUI:C1515285</oboInOwl:hasDbXref>
+        <oboInOwl:hasExactSynonym xml:lang="en">Juvenile granulosa cell tumor</oboInOwl:hasExactSynonym>
+        <oboInOwl:hasExactSynonym xml:lang="en">Juvenile granulosa cell tumour</oboInOwl:hasExactSynonym>
+        <oboInOwl:hasExactSynonym xml:lang="en">Juvenile type Granulosa cell tumor</oboInOwl:hasExactSynonym>
+        <oboInOwl:hasExactSynonym xml:lang="en">Juvenile type Granulosa cell tumour</oboInOwl:hasExactSynonym>
+        <oboInOwl:hasExactSynonym xml:lang="en">juvenile type granulosa cell neoplasm</oboInOwl:hasExactSynonym>
+        <oboInOwl:hasExactSynonym xml:lang="en">juvenile type testicular granulosa cell tumour</oboInOwl:hasExactSynonym>
+        <oboInOwl:hasOBONamespace>disease_ontology</oboInOwl:hasOBONamespace>
+        <oboInOwl:id>DOID:6032</oboInOwl:id>
+        <oboInOwl:inSubset rdf:resource="http://purl.obolibrary.org/obo/doid#NCIthesaurus"/>
+        <rdfs:label xml:lang="en">juvenile type testicular granulosa cell tumor</rdfs:label>
+    </owl:Class>
 
 
 
@@ -2119,7 +2358,7 @@
         <owl:annotatedProperty rdf:resource="http://purl.obolibrary.org/obo/IAO_0000115"/>
         <owl:annotatedTarget xml:lang="en">A disease that manifests in a defined anatomical structure.</owl:annotatedTarget>
         <dc:type rdf:resource="http://purl.obolibrary.org/obo/ECO_0007643"/>
-        <oboInOwl:hasDbXref>url:http://www2.merriam-webster.com/cgi-bin/mwmednlm?book=Medical&amp;va=anatomic</oboInOwl:hasDbXref>
+        <oboInOwl:hasDbXref>url:https://www.merriam-webster.com/medical/anatomic</oboInOwl:hasDbXref>
     </owl:Axiom>
 
 
@@ -2128,6 +2367,12 @@
 
     <owl:Class rdf:about="http://purl.obolibrary.org/obo/DOID_7079">
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/DOID_2660"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://purl.obolibrary.org/obo/RO_0002488"/>
+                <owl:someValuesFrom rdf:resource="http://purl.obolibrary.org/obo/HP_0003581"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
         <obo:IAO_0000115 xml:lang="en">A cystic teratoma that is present in an adult.</obo:IAO_0000115>
         <oboInOwl:hasDbXref>NCI:C9012</oboInOwl:hasDbXref>
         <oboInOwl:hasDbXref>SNOMEDCT_US_2023_03_01:42717009</oboInOwl:hasDbXref>
@@ -2254,6 +2499,12 @@
 
     <owl:Class rdf:about="http://purl.obolibrary.org/obo/DOID_769">
         <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/DOID_2621"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://purl.obolibrary.org/obo/RO_0002488"/>
+                <owl:someValuesFrom rdf:resource="http://purl.obolibrary.org/obo/HP_0011463"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
         <obo:IAO_0000115 xml:lang="en">An autonomic nervous system neoplasm that derives_from immature nerve cells.</obo:IAO_0000115>
         <oboInOwl:hasDbXref>EFO:0000621</oboInOwl:hasDbXref>
         <oboInOwl:hasDbXref>GARD:7185</oboInOwl:hasDbXref>
@@ -2266,10 +2517,10 @@
         <oboInOwl:hasOBONamespace>disease_ontology</oboInOwl:hasOBONamespace>
         <oboInOwl:id>DOID:769</oboInOwl:id>
         <oboInOwl:inSubset rdf:resource="http://purl.obolibrary.org/obo/doid#DO_cancer_slim"/>
+        <oboInOwl:inSubset rdf:resource="http://purl.obolibrary.org/obo/doid#DO_childhood_cancer_slim"/>
         <oboInOwl:inSubset rdf:resource="http://purl.obolibrary.org/obo/doid#DO_rare_slim"/>
         <oboInOwl:inSubset rdf:resource="http://purl.obolibrary.org/obo/doid#NCIthesaurus"/>
-        <rdfs:comment xml:lang="en">Xref MGI.
-OMIM mapping confirmed by DO. [SN].</rdfs:comment>
+        <rdfs:comment xml:lang="en">Xref MGI. OMIM mapping confirmed by DO. [SN].</rdfs:comment>
         <rdfs:label xml:lang="en">neuroblastoma</rdfs:label>
     </owl:Class>
     <owl:Axiom>
@@ -2278,6 +2529,42 @@ OMIM mapping confirmed by DO. [SN].</rdfs:comment>
         <owl:annotatedTarget xml:lang="en">An autonomic nervous system neoplasm that derives_from immature nerve cells.</owl:annotatedTarget>
         <dc:type rdf:resource="http://purl.obolibrary.org/obo/ECO_0007637"/>
         <oboInOwl:hasDbXref>url:http://www.cancer.gov/cancertopics/types/neuroblastoma</oboInOwl:hasDbXref>
+    </owl:Axiom>
+
+
+
+    <!-- http://purl.obolibrary.org/obo/DOID_7757 -->
+
+    <owl:Class rdf:about="http://purl.obolibrary.org/obo/DOID_7757">
+        <owl:equivalentClass>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://purl.obolibrary.org/obo/DOID_1240"/>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="http://purl.obolibrary.org/obo/RO_0002488"/>
+                        <owl:someValuesFrom rdf:resource="http://purl.obolibrary.org/obo/HP_0011463"/>
+                    </owl:Restriction>
+                </owl:intersectionOf>
+            </owl:Class>
+        </owl:equivalentClass>
+        <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/DOID_1240"/>
+        <obo:IAO_0000115 xml:lang="en">A leukemia that occurs in children.</obo:IAO_0000115>
+        <oboInOwl:hasDbXref>NCI:C4989</oboInOwl:hasDbXref>
+        <oboInOwl:hasDbXref>UMLS_CUI:C1332977</oboInOwl:hasDbXref>
+        <oboInOwl:hasOBONamespace>disease_ontology</oboInOwl:hasOBONamespace>
+        <oboInOwl:id>DOID:7757</oboInOwl:id>
+        <oboInOwl:inSubset rdf:resource="http://purl.obolibrary.org/obo/doid#DO_RAD_slim"/>
+        <oboInOwl:inSubset rdf:resource="http://purl.obolibrary.org/obo/doid#DO_cancer_slim"/>
+        <oboInOwl:inSubset rdf:resource="http://purl.obolibrary.org/obo/doid#DO_childhood_cancer_slim"/>
+        <oboInOwl:inSubset rdf:resource="http://purl.obolibrary.org/obo/doid#NCIthesaurus"/>
+        <rdfs:label xml:lang="en">childhood leukemia</rdfs:label>
+    </owl:Class>
+    <owl:Axiom>
+        <owl:annotatedSource rdf:resource="http://purl.obolibrary.org/obo/DOID_7757"/>
+        <owl:annotatedProperty rdf:resource="http://purl.obolibrary.org/obo/IAO_0000115"/>
+        <owl:annotatedTarget xml:lang="en">A leukemia that occurs in children.</owl:annotatedTarget>
+        <dc:type rdf:resource="http://purl.obolibrary.org/obo/ECO_0007644"/>
+        <oboInOwl:hasDbXref>url:http://www.nlm.nih.gov/medlineplus/leukemiachildhood.html</oboInOwl:hasDbXref>
     </owl:Axiom>
 
 
@@ -2401,6 +2688,37 @@ OMIM mapping confirmed by DO. [SN].</rdfs:comment>
 
 
 
+    <!-- http://purl.obolibrary.org/obo/HP_0003581 -->
+
+    <owl:Class rdf:about="http://purl.obolibrary.org/obo/HP_0003581">
+        <obo:IAO_0000115>Onset of disease manifestations in adulthood, defined here as at the age of 16 years or later.</obo:IAO_0000115>
+        <oboInOwl:id>HP:0003581</oboInOwl:id>
+        <rdfs:label>Adult onset</rdfs:label>
+    </owl:Class>
+
+
+
+    <!-- http://purl.obolibrary.org/obo/HP_0011462 -->
+
+    <owl:Class rdf:about="http://purl.obolibrary.org/obo/HP_0011462">
+        <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/HP_0003581"/>
+        <obo:IAO_0000115>Onset of disease at the age of between 16 and 40 years.</obo:IAO_0000115>
+        <oboInOwl:id>HP:0011462</oboInOwl:id>
+        <rdfs:label>Young adult onset</rdfs:label>
+    </owl:Class>
+
+
+
+    <!-- http://purl.obolibrary.org/obo/HP_0011463 -->
+
+    <owl:Class rdf:about="http://purl.obolibrary.org/obo/HP_0011463">
+        <obo:IAO_0000115>Onset of disease at the age of between 1 and 5 years.</obo:IAO_0000115>
+        <oboInOwl:id>HP:0011463</oboInOwl:id>
+        <rdfs:label>Childhood onset</rdfs:label>
+    </owl:Class>
+
+
+
     <!-- http://purl.obolibrary.org/obo/UBERON_0000010 -->
 
     <owl:Class rdf:about="http://purl.obolibrary.org/obo/UBERON_0000010">
@@ -2433,6 +2751,15 @@ OMIM mapping confirmed by DO. [SN].</rdfs:comment>
     <owl:Class rdf:about="http://purl.obolibrary.org/obo/UBERON_0000926">
         <oboInOwl:id>UBERON:0000926</oboInOwl:id>
         <rdfs:label>mesoderm</rdfs:label>
+    </owl:Class>
+
+
+
+    <!-- http://purl.obolibrary.org/obo/UBERON_0000990 -->
+
+    <owl:Class rdf:about="http://purl.obolibrary.org/obo/UBERON_0000990">
+        <oboInOwl:id>UBERON:0000990</oboInOwl:id>
+        <rdfs:label>reproductive system</rdfs:label>
     </owl:Class>
 
 

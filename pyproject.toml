@@ -89,6 +89,7 @@ where = ["src"]
 
 [tool.setuptools.package-data]
 "disease.database.postgresql" = ["*.sql"]
+"disease.etl" = ["*.csv"]
 
 [tool.pytest.ini_options]
 addopts = "--cov=src --cov-report term-missing"
