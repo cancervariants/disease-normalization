@@ -9,14 +9,13 @@ import click
 from disease import __version__
 from disease.config import config
 from disease.database.database import DatabaseException, create_db
-from disease.etl.update import update_all_sources, update_normalized, update_source
 from disease.logs import initialize_logs
 from disease.schemas import SourceName
 
 _logger = logging.getLogger(__name__)
 
 
-URL_DESCRIPTION = 'URL endpoint for the application database. Can either be a URL to a local DynamoDB server (e.g. "http://localhost:8001") or a libpq-compliant PostgreSQL connection description (e.g. "postgresql://postgres:password@localhost:5432/gene_normalizer").'
+URL_DESCRIPTION = 'URL endpoint for the application database. Can either be a URL to a local DynamoDB server (e.g. "http://localhost:8001") or a libpq-compliant PostgreSQL connection description (e.g. "postgresql://postgres:password@localhost:5432/disease_normalizer").'
 SILENT_MODE_DESCRIPTION = "Suppress output to console."
 
 
@@ -176,7 +175,7 @@ def update(
     use_existing: bool,
     silent: bool,
 ) -> None:
-    """Update provided normalizer SOURCES in the gene database.
+    """Update provided normalizer SOURCES in the disease database.
 
     Valid SOURCES are "DO", "MONDO", "NCIt", "OMIM", and "OncoTree" (case is irrelevant).
 
@@ -218,6 +217,17 @@ def update(
     db = create_db(db_url, aws_instance)
 
     processed_ids = None
+    try:
+        from disease.etl.update import (  # noqa: PLC0415
+            update_all_sources,
+            update_normalized,
+            update_source,
+        )
+    except ImportError as e:
+        click.echo(
+            f"Encountered ImportError: {e.msg}. Updating source data requires the optional [etl] dependency group. See the 'Full Installation' instructions in the documentation."
+        )
+        click.get_current_context().exit(1)
     if all_:
         processed_ids = update_all_sources(db, use_existing, silent=silent)
     elif sources:
