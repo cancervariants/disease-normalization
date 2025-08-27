@@ -1,4 +1,6 @@
-"""idk."""
+"""Provide miscellaneous utilities related to disease term normalization."""
+
+from collections.abc import Generator
 
 from disease.database import AbstractDatabase
 from disease.schemas import RecordType, SourceName
@@ -6,14 +8,14 @@ from disease.schemas import RecordType, SourceName
 
 def get_term_mappings(
     database: AbstractDatabase, scope: RecordType | SourceName
-) -> list[dict]:
-    """Tlisdlfkjo
+) -> Generator[dict, None, None]:
+    """Produce dict objects for known concepts (name + ID) plus other possible referents
 
-    Columns
-    * concept ID
-    * name
-    * aliases
-    * xrefs
+    Use in downstream applications such as autocompletion.
+
+    :param database: instance of DB connection to get records from
+    :param scope: constrain record scope, either to a kind of record or to a specific source
+    :return: Generator yielding mapping objects
     """
     if isinstance(scope, SourceName):
         record_type = RecordType.IDENTITY
@@ -22,17 +24,13 @@ def get_term_mappings(
         record_type = RecordType.MERGER
         src_name = None
 
-    results = []
     for record in database.get_all_records(record_type=record_type):
         if src_name and record["src_name"] != src_name:
             continue
 
-        results.append(
-            {
-                "concept_id": record["concept_id"],
-                "label": record["label"],
-                "aliases": record.get("aliases", []),
-                "xrefs": record.get("xrefs", []) + record.get("associated_with", []),
-            }
-        )
-    return results
+        yield {
+            "concept_id": record["concept_id"],
+            "label": record["label"],
+            "aliases": record.get("aliases", []),
+            "xrefs": record.get("xrefs", []) + record.get("associated_with", []),
+        }
