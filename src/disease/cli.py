@@ -274,7 +274,7 @@ def update(
 def dump_mappings(
     db_url: str, scope: RecordType | SourceName, outfile: Path | None
 ) -> None:
-    """Produce file dump of concept referents (e.g. name/label, alias, xrefs) and
+    """Produce JSON Lines file dump of concept referents (e.g. name/label, alias, xrefs) and
     the associated concept.
 
     By default, produces output for all known referents to a normalized ID. The --scope
