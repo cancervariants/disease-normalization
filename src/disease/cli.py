@@ -264,6 +264,7 @@ def update(
     type=click.Choice(list(RecordType) + list(SourceName), case_sensitive=False),
     nargs=1,
     default=RecordType.MERGER,
+    help="Scope of mappings -- either an item type (merged/normalized vs base source records), or base records of an individaul source",
 )
 @click.option(
     "--outfile",
