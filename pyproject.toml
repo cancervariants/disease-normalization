@@ -46,7 +46,7 @@ tests = [
     "pytest>=6.0",
     "pytest-cov",
     "httpx>=0.27.0",
-    "jsonschema",
+    "jsonschema~=4.24",  # pin to avoid deprecation of ref resolver
     "pyyaml",
     "asgi_lifespan",
     "pytest_asyncio",
