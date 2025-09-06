@@ -46,6 +46,8 @@ tests = [
     "pytest>=6.0",
     "pytest-cov",
     "httpx>=0.27.0",
+    "jsonschema",
+    "pyyaml",
     "asgi_lifespan",
     "pytest_asyncio",
     "deepdiff"
@@ -55,6 +57,7 @@ dev = [
     "ruff==0.12.1",
     "lxml",
     "xmlformatter",
+    "fastapi[standard]",
 ]
 docs = [
     "sphinx==6.1.3",
