@@ -33,6 +33,8 @@ jobs:
 
     - name: Install uv
       uses: astral-sh/setup-uv@v6
+      with:
+        enable-cache: true
 
     - name: Build local DynamoDB
       if: ${{ env.DISEASE_NORM_DB_URL == 'http://localhost:8002' }}
@@ -105,6 +107,8 @@ jobs:
 
       - name: Install uv
         uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
 
       - name: Install dependencies
         run: uv sync --extra docs --extra etl --extra pg
