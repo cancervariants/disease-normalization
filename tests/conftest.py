@@ -79,7 +79,7 @@ def pytest_sessionstart():
     """Wipe DB before testing if in test environment."""
     if get_config().test:
         if os.environ.get(AWS_ENV_VAR_NAME):
-            msg = f"Cannot have both DISEASE_TEST and {AWS_ENV_VAR_NAME} set."
+            msg = f"Cannot have both DISEASE_NORM_TEST and {AWS_ENV_VAR_NAME} set."
             raise AssertionError(msg)
         db = create_db()
         db.drop_db()
@@ -106,7 +106,7 @@ def database():
 
 @pytest.fixture(scope="module")
 def test_source(database: AbstractDatabase, is_test_env: bool, test_data_dir: Path):
-    """Provide query endpoint for testing sources. If DISEASE_TEST is set, will try to
+    """Provide query endpoint for testing sources. If DISEASE_NORM_TEST is set, will try to
     load DB from test data.
 
     :param database: test database instance
