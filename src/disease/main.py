@@ -10,9 +10,8 @@ from typing import Annotated
 from fastapi import FastAPI, HTTPException, Query, Request
 
 from disease import __version__
-from disease.config import config
+from disease.config import get_config
 from disease.database.database import create_db
-from disease.logs import initialize_logs
 from disease.query import InvalidParameterException, QueryHandler
 from disease.schemas import (
     APP_DESCRIPTION,
@@ -24,6 +23,7 @@ from disease.schemas import (
     ServiceOrganization,
     ServiceType,
 )
+from disease.utils import initialize_logs
 
 
 @asynccontextmanager
@@ -34,7 +34,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator:
 
     :param app: FastAPI instance
     """
-    if config.debug:
+    if get_config().debug:
         initialize_logs(logging.DEBUG)
     else:
         initialize_logs(logging.INFO)
@@ -158,7 +158,7 @@ def normalize(
 
 
 @app.get(
-    "/service_info",
+    "/disease/service-info",
     summary="Get basic service information",
     description="Retrieve service metadata, such as versioning and contact info. Structured in conformance with the [GA4GH service info API specification](https://www.ga4gh.org/product/service-info/)",
     tags=[_Tag.META],
@@ -168,5 +168,7 @@ def service_info() -> ServiceInfo:
     :return: conformant service info description
     """
     return ServiceInfo(
-        organization=ServiceOrganization(), type=ServiceType(), environment=config.env
+        organization=ServiceOrganization(),
+        type=ServiceType(),
+        environment=get_config().env,
     )

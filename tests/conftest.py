@@ -8,7 +8,7 @@ from typing import Any
 
 import pytest
 
-from disease.config import config
+from disease.config import get_config
 from disease.database.database import AWS_ENV_VAR_NAME, AbstractDatabase, create_db
 from disease.etl.base import Base
 from disease.query import QueryHandler
@@ -69,15 +69,17 @@ def pytest_configure(config):
         logging.getLogger("urllib3.connectionpool").setLevel(logging.ERROR)
 
 
-TEST_ROOT = Path(__file__).resolve().parents[1]
-TEST_DATA_DIRECTORY = TEST_ROOT / "tests" / "data"
+@pytest.fixture(scope="session")
+def test_data_dir() -> Path:
+    """Provide Path instance pointing to test data directory"""
+    return Path(__file__).parent / "data"
 
 
 def pytest_sessionstart():
     """Wipe DB before testing if in test environment."""
-    if config.test:
+    if get_config().test:
         if os.environ.get(AWS_ENV_VAR_NAME):
-            msg = f"Cannot have both DISEASE_TEST and {AWS_ENV_VAR_NAME} set."
+            msg = f"Cannot have both DISEASE_NORM_TEST and {AWS_ENV_VAR_NAME} set."
             raise AssertionError(msg)
         db = create_db()
         db.drop_db()
@@ -91,7 +93,7 @@ def is_test_env():
 
     Provided here to be accessible directly within test modules.
     """
-    return config.test
+    return get_config().test
 
 
 @pytest.fixture(scope="module")
@@ -103,8 +105,8 @@ def database():
 
 
 @pytest.fixture(scope="module")
-def test_source(database: AbstractDatabase, is_test_env: bool):
-    """Provide query endpoint for testing sources. If DISEASE_TEST is set, will try to
+def test_source(database: AbstractDatabase, is_test_env: bool, test_data_dir: Path):
+    """Provide query endpoint for testing sources. If DISEASE_NORM_TEST is set, will try to
     load DB from test data.
 
     :param database: test database instance
@@ -115,10 +117,8 @@ def test_source(database: AbstractDatabase, is_test_env: bool):
 
     def test_source_factory(EtlClass: Base):  # noqa: N803
         if is_test_env:
-            _logger.debug("Reloading DB with data from %s", TEST_DATA_DIRECTORY)
-            test_class = EtlClass(
-                database, TEST_DATA_DIRECTORY / EtlClass.__name__.lower()
-            )
+            _logger.debug("Reloading DB with data from %s", test_data_dir)
+            test_class = EtlClass(database, test_data_dir / EtlClass.__name__.lower())
             test_class.perform_etl(use_existing=True)
 
         class QueryGetter:

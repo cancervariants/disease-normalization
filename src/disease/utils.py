@@ -1,5 +1,6 @@
 """Provide miscellaneous utilities related to disease term normalization."""
 
+import logging
 from collections.abc import Generator
 
 from disease.database import AbstractDatabase
@@ -34,3 +35,16 @@ def get_term_mappings(
             "aliases": record.get("aliases", []),
             "xrefs": record.get("xrefs", []) + record.get("associated_with", []),
         }
+
+
+def initialize_logs(log_level: int = logging.INFO) -> None:
+    """Configure logging.
+
+    :param log_level: app log level to set
+    """
+    logging.basicConfig(
+        filename=f"{__package__}.log",
+        format="[%(asctime)s] - %(name)s - %(levelname)s : %(message)s",
+    )
+    logger = logging.getLogger(__package__)
+    logger.setLevel(log_level)

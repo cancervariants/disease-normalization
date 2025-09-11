@@ -51,8 +51,8 @@ class DynamoDbDatabase(AbstractDatabase):
         region_name = db_args.get("region_name", "us-east-2")
 
         if AWS_ENV_VAR_NAME in environ:
-            if "DISEASE_TEST" in environ:
-                msg = f"Cannot have both DISEASE_TEST and {AWS_ENV_VAR_NAME} set."
+            if "DISEASE_NORM_TEST" in environ:
+                msg = f"Cannot have both DISEASE_NORM_TEST and {AWS_ENV_VAR_NAME} set."
                 raise DatabaseException(msg)
 
             aws_env = environ[AWS_ENV_VAR_NAME]
@@ -86,7 +86,7 @@ class DynamoDbDatabase(AbstractDatabase):
         self.dynamodb_client = boto3.client("dynamodb", **boto_params)
 
         # Only create tables for local instance
-        envs_do_not_create_tables = {AWS_ENV_VAR_NAME, "DISEASE_TEST"}
+        envs_do_not_create_tables = {AWS_ENV_VAR_NAME, "DISEASE_NORM_TEST"}
         if not set(envs_do_not_create_tables) & set(environ):
             self.initialize_db()
 
