@@ -8,11 +8,10 @@ from pathlib import Path
 import click
 
 from disease import __version__
-from disease.config import config
+from disease.config import get_config
 from disease.database.database import DatabaseException, create_db
-from disease.logs import initialize_logs
 from disease.schemas import RecordType, SourceName
-from disease.utils import get_term_mappings
+from disease.utils import get_term_mappings, initialize_logs
 
 _logger = logging.getLogger(__name__)
 
@@ -22,7 +21,7 @@ SILENT_MODE_DESCRIPTION = "Suppress output to console."
 
 
 def _initialize_app() -> None:
-    if config.debug:
+    if get_config().debug:
         initialize_logs(logging.DEBUG)
     else:
         initialize_logs()
