@@ -46,7 +46,9 @@ class NCIt(OWLBase):
         dos = self._get_by_property_value(p106, "Disease or Syndrome", graph)
         p310 = "http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#P310"
         retired = self._get_by_property_value(p310, "Retired_Concept", graph)
-        return neopl.union(dos) - retired
+        c22187 = "http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C22187"
+        nonhuman = self._get_subclasses(c22187, graph)
+        return neopl.union(dos) - retired - nonhuman
 
     def _transform_data(self) -> None:
         """Get data from file and construct object for loading."""
