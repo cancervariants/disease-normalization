@@ -128,7 +128,7 @@ def test_associated_with_match(ncit, neuroblastoma, nsclc, compare_response):
 
 def test_no_animals(ncit):
     response = ncit.search("Rat Neuroblastoma")
-    assert response.match_type == MatchType.NO_MATCH
+    assert response.match_type == MatchType.NO_MATCH, "Some rats snuck in!"
 
 
 def test_meta(ncit):
