@@ -8,7 +8,9 @@ from disease.schemas import RecordType, SourceName
 
 
 def get_term_mappings(
-    database: AbstractDatabase, scope: RecordType | SourceName
+    database: AbstractDatabase,
+    scope: RecordType | SourceName,
+    cancer_only: bool = False,
 ) -> Generator[dict, None, None]:
     """Produce dict objects for known concepts (name + ID) plus other possible referents
 
@@ -16,17 +18,20 @@ def get_term_mappings(
 
     :param database: instance of DB connection to get records from
     :param scope: constrain record scope, either to a kind of record or to a specific source
+    :param cancer_only: whether to just include cancer terms (not supported by all sources)
     :return: Generator yielding mapping objects
     """
     if isinstance(scope, SourceName):
         record_type = RecordType.IDENTITY
         src_name = scope
     else:
-        record_type = RecordType.MERGER
+        record_type = scope
         src_name = None
 
     for record in database.get_all_records(record_type=record_type):
         if src_name and record["src_name"] != src_name:
+            continue
+        if cancer_only and record.get("oncologic_disease") is not True:
             continue
 
         yield {

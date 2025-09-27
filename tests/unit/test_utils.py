@@ -206,3 +206,10 @@ def test_get_term_mappings_merger(test_db: AbstractDatabase):
     ]
     diff = DeepDiff(fixture, results, ignore_order=True)
     assert diff == {}
+
+
+def test_get_term_mappings_cancer(test_db: AbstractDatabase):
+    results = list(
+        get_term_mappings(test_db, scope=RecordType.IDENTITY, cancer_only=True)
+    )
+    assert len(results) == 1
