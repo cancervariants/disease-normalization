@@ -1,5 +1,6 @@
 """Provides a CLI util to make updates to normalizer database."""
 
+import datetime
 import json
 import logging
 import os
@@ -271,8 +272,16 @@ def update(
     help="Output location to write to",
     type=click.Path(path_type=Path),
 )
+@click.option(
+    "--cancer-only",
+    help="Whether to constrain mappings to just include cancers. Note: not supported by all sources.",
+    is_flag=True,
+)
 def dump_mappings(
-    db_url: str, scope: RecordType | SourceName, outfile: Path | None
+    db_url: str,
+    scope: RecordType | SourceName,
+    outfile: Path | None,
+    cancer_only: bool,
 ) -> None:
     """Produce JSON Lines file dump of concept referents (e.g. name/label, alias, xrefs) and
     the associated concept.
@@ -286,16 +295,21 @@ def dump_mappings(
 
         $ disease-normalizer dump-mappings --scope ncit
 
-    \f
-    :param db_url: connection string for DB
-    :param scope: either record type or source name, to constrain results
-    :param outfile: location to save output at
-    """  # noqa: D301
+    The first object in the .jsonl file will include metadata about the parameters used to
+    create the document.
+    """
     db = create_db(db_url, False)
     if outfile is None:
         outfile = Path() / "disease_normalizer_mappings.jsonl"
     with outfile.open("w") as f:
-        for mapping in get_term_mappings(db, scope):
+        meta = {
+            "type": "meta",
+            "created_at": datetime.datetime.now(tz=datetime.UTC).isoformat(),
+            "scope": scope,
+            "cancer_only": cancer_only,
+        }
+        f.write(json.dumps(meta))
+        for mapping in get_term_mappings(db, scope, cancer_only=cancer_only):
             f.write(json.dumps(mapping))
             f.write("\n")
 
