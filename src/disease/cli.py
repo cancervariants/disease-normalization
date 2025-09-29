@@ -309,6 +309,7 @@ def dump_mappings(
             "cancer_only": cancer_only,
         }
         f.write(json.dumps(meta))
+        f.write("\n")
         for mapping in get_term_mappings(db, scope, cancer_only=cancer_only):
             f.write(json.dumps(mapping))
             f.write("\n")
