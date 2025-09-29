@@ -274,7 +274,7 @@ def update(
 )
 @click.option(
     "--cancer-only",
-    help="Whether to constrain mappings to just include cancers. Note: not supported by all sources.",
+    help="Whether to constrain mappings to just include cancers. Note: only supported by DO and MONDO records.",
     is_flag=True,
 )
 def dump_mappings(
