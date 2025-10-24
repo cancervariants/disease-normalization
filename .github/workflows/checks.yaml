@@ -95,21 +95,8 @@ jobs:
         env:
           UV_SYSTEM_PYTHON: 1
 
-      - id: precommit_tw
-        run: pre-commit run end-of-file-fixer --all-files
-        if: ${{ always() }}
-
-      - id: pre-commit_mle
-        run: pre-commit run trailing-whitespace --all-files
-        if: ${{ always() }}
-
-      - id: pre-commit_eof
-        run: pre-commit run mixed-line-ending --all-files
-        if: ${{ always() }}
-
-      - name: Check precommit failures
-        if: ${{ always() }} || steps.precommit_tw.outcome == 'failure' || steps.precommit_mle.outcome == 'failure' || steps.precommit_eof.outcome == 'failure'
-        run: exit 1
+      - name: Pre-commit checks
+        run: pre-commit run end-of-file-fixer trailing-whitespace mixed-line-ending --all-files
 
   docs:
     runs-on: ubuntu-latest
