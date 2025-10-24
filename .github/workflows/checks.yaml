@@ -103,17 +103,8 @@ jobs:
         continue-on-error: true
 
       - name: Check precommit failures
-        if: ${{ always () }}
-        run: |
-          failed=0
-          for s in precommit_tw precommit_mle precommit_eof; do
-            if [ "${{ steps[s].outcome }}" = "failure" ]; then
-              echo "::error title=${s}::${s} failed"
-              failed=1
-            fi
-          done
-          exit $failed
-        shell: bash
+        if: steps.precommit_tw.outcome == 'failure' || steps.precommit_mle.outcome == 'failure' || step.precommit_eof.outcome == 'failure'
+        run: exit 1
 
   docs:
     runs-on: ubuntu-latest
