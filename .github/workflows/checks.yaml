@@ -96,7 +96,13 @@ jobs:
           UV_SYSTEM_PYTHON: 1
 
       - name: Pre-commit checks
-        run: pre-commit run end-of-file-fixer trailing-whitespace mixed-line-ending --all-files
+        run: |
+          status=0
+          pre-commit run end-of-file-fixer  --all-files || status=1
+          pre-commit run mixed-line-ending --all-files || status=1
+          pre-commit run trailing-whitespace --all-files || status=1
+          exit $status
+
 
   docs:
     runs-on: ubuntu-latest
