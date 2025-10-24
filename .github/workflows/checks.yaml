@@ -103,7 +103,7 @@ jobs:
         continue-on-error: true
 
       - name: Check precommit failures
-        if: steps.precommit_tw.outcome == 'failure' || steps.precommit_mle.outcome == 'failure' || step.precommit_eof.outcome == 'failure'
+        if: steps.precommit_tw.outcome == 'failure' || steps.precommit_mle.outcome == 'failure' || steps.precommit_eof.outcome == 'failure'
         run: exit 1
 
   docs:
