@@ -91,7 +91,7 @@ jobs:
           enable-cache: true
 
       - name: Add precommit
-        run: uv pip install precommit
+        run: uv pip install pre-commit
         env:
           UV_SYSTEM_PYTHON: 1
 
