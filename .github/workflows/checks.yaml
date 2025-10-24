@@ -76,12 +76,6 @@ jobs:
 
   precommit_hooks:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        cmd:
-          - "end-of-file-fixer"
-          - "trailing-whitespace"
-          - "mixed-line-ending"
     steps:
       - uses: actions/checkout@v4
 
@@ -113,7 +107,7 @@ jobs:
         run: |
           failed=0
           for s in precommit_tw precommit_mle precommit_eof; do
-            if [ "${{ step[s].outcome }}" = "failure" ]; then
+            if [ "${{ steps[s].outcome }}" = "failure" ]; then
               echo "::error title=${s}::${s} failed"
               failed=1
             fi
