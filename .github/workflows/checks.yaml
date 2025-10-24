@@ -98,9 +98,9 @@ jobs:
       - name: Pre-commit checks
         run: |
           status=0
-          pre-commit run end-of-file-fixer  --all-files || status=1
-          pre-commit run mixed-line-ending --all-files || status=1
-          pre-commit run trailing-whitespace --all-files || status=1
+          pre-commit run end-of-file-fixer -v --all-files --show-diff-on-failure || status=1
+          pre-commit run mixed-line-ending -v --all-files --show-diff-on-failure || status=1
+          pre-commit run trailing-whitespace -v --all-files --show-diff-on-failure || status=1
           exit $status
 
 
