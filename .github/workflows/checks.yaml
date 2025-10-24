@@ -92,6 +92,8 @@ jobs:
 
       - name: Add precommit
         run: uv pip install precommit
+        env:
+          UV_SYSTEM_PYTHON: 1
 
       - id: precommit_tw
         run: precommit end-of-file-fixer --all-files
