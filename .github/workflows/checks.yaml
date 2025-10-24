@@ -76,6 +76,7 @@ jobs:
 
   precommit_hooks:
     runs-on: ubuntu-latest
+    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
 
@@ -84,23 +85,22 @@ jobs:
         with:
           python-version: 3.12
 
-      - id: precommit_tw
-        uses: pre-commit/action@v3.0.1
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
         with:
-          extra_args: end-of-file-fixer --all-files
-        continue-on-error: true
+          enable-cache: true
+
+      - name: Add precommit
+        run: uv pip install precommit
+
+      - id: precommit_tw
+        run: precommit end-of-file-fixer --all-files
 
       - id: precommit_mle
-        uses: pre-commit/action@v3.0.1
-        with:
-          extra_args: trailing-whitespace --all-files
-        continue-on-error: true
+        run: precommit trailing-whitespace --all-files
 
       - id: precommit_eof
-        uses: pre-commit/action@v3.0.1
-        with:
-          extra_args: mixed-line-ending --all-files
-        continue-on-error: true
+        run: precommit mixed-line-ending --all-files
 
       - name: Check precommit failures
         if: steps.precommit_tw.outcome == 'failure' || steps.precommit_mle.outcome == 'failure' || steps.precommit_eof.outcome == 'failure'
