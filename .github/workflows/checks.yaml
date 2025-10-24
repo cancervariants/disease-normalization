@@ -96,13 +96,13 @@ jobs:
           UV_SYSTEM_PYTHON: 1
 
       - id: precommit_tw
-        run: pre-commit end-of-file-fixer --all-files
+        run: pre-commit run end-of-file-fixer --all-files
 
       - id: pre-commit_mle
-        run: pre-commit trailing-whitespace --all-files
+        run: pre-commit run trailing-whitespace --all-files
 
       - id: pre-commit_eof
-        run: pre-commit mixed-line-ending --all-files
+        run: pre-commit run mixed-line-ending --all-files
 
       - name: Check precommit failures
         if: steps.precommit_tw.outcome == 'failure' || steps.precommit_mle.outcome == 'failure' || steps.precommit_eof.outcome == 'failure'
