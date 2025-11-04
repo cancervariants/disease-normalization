@@ -15,7 +15,13 @@ from typing import Any
 
 import click
 
-from disease.schemas import RecordType, RefType, SourceMeta, SourceName
+from disease.schemas import (
+    RecordType,
+    RefType,
+    ServiceEnvironment,
+    SourceMeta,
+    SourceName,
+)
 
 
 class DatabaseException(Exception):  # noqa: N818
@@ -256,9 +262,9 @@ SKIP_AWS_DB_ENV_NAME = "SKIP_AWS_CONFIRMATION"
 class AwsEnvName(str, Enum):
     """AWS environment name that is being used"""
 
-    DEVELOPMENT = "Dev"
-    STAGING = "Staging"
-    PRODUCTION = "Prod"
+    DEVELOPMENT = ServiceEnvironment.DEV.value
+    STAGING = ServiceEnvironment.STAGING.value
+    PRODUCTION = ServiceEnvironment.PROD.value
 
 
 VALID_AWS_ENV_NAMES = {v.value for v in AwsEnvName.__members__.values()}
