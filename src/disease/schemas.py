@@ -513,11 +513,10 @@ class SearchService(BaseModel):
 class ServiceEnvironment(str, Enum):
     """Define current runtime environment."""
 
-    LOCAL = "local"  # local dev
+    DEV = "dev"  # local dev
     TEST = "test"  # local/CI testing
-    DEV = "dev"
-    STAGING = "staging"
-    PROD = "prod"
+    PROD = "prod"  # main production env on cloud
+    STAGING = "staging"  # staging env on cloud
 
 
 LAB_EMAIL = "Alex.Wagner@nationwidechildrens.org"
