@@ -76,8 +76,11 @@ class Mondo(Base):
         _logger.warning("Unrecognized URL for xref: %s", url)
         return None
 
-    @staticmethod
+    # xref sources that we get from OBO `xref` clauses
+    _xref_clause_sources: ClassVar[set[str]] = {"ONCOTREE", "EFO"}
+
     def _get_xref_from_xref_clause(
+        self,
         clause: fastobo.term.XrefClause,
     ) -> tuple[NamespacePrefix, str] | None:
         """Get dbXref from xref clause.
@@ -89,7 +92,7 @@ class Mondo(Base):
         :return: prefix and local ID if available
         """
         raw_prefix = clause.xref.id.prefix
-        if raw_prefix not in ("ONCOTREE", "EFO"):
+        if raw_prefix not in self._xref_clause_sources:
             return None
         try:
             prefix = NamespacePrefix[clause.xref.id.prefix.upper()]
@@ -105,7 +108,7 @@ class Mondo(Base):
         """Get dbXref from property value clause.
 
         These are a bit more semantically rich than the Mondo xref clauses, so for now,
-        we prefer to fetch most references from here.
+        we prefer to fetch most references from here if possible.
 
         :param clause: property value clause
         :return: prefix and local ID if available
@@ -125,8 +128,16 @@ class Mondo(Base):
                 return None
             prefix, local_id = xref_result
         elif isinstance(property_value.value, fastobo.id.PrefixedIdent):
-            prefix = NamespacePrefix[property_value.value.prefix.upper()]
             local_id = property_value.value.local
+            try:
+                prefix = NamespacePrefix[property_value.value.prefix.upper()]
+            except KeyError:
+                _logger.error(  # noqa: TRY400
+                    "Unrecognized prefix encountered: `%s` with local id `%s`",
+                    property_value.value.prefix,
+                    local_id,
+                )
+                return None
         else:
             _logger.warning(
                 "Unrecognized property value type: %s", type(property_value.value)
