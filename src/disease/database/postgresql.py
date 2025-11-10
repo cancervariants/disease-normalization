@@ -19,6 +19,7 @@ from psycopg.errors import (
     UniqueViolation,
 )
 
+from disease.config import get_config
 from disease.database import AbstractDatabase, DatabaseException, DatabaseWriteException
 from disease.schemas import (
     DataLicenseAttributes,
@@ -58,8 +59,9 @@ class PostgresDatabase(AbstractDatabase):
         """
         if db_url:
             conninfo = db_url
-        elif "DISEASE_NORM_DB_URL" in os.environ:
-            conninfo = os.environ["DISEASE_NORM_DB_URL"]
+        # only use config value if it's nondefault
+        elif "db_url" in get_config().model_fields_set:
+            conninfo = get_config().db_url
         else:
             user = db_args.get("user", "postgres")
             password = db_args.get("password", "")
