@@ -1,5 +1,5 @@
 format-version: 1.2
-data-version: releases/2024-12-03
+data-version: releases/2025-11-04
 subsetdef: clingen "Disease classes available in the ClinGen resource"
 subsetdef: disease_grouping "disease_grouping"
 subsetdef: do_inheritance_inconsistent "classes where the corresponding DO term is both AR and AD https://github.com/monarch-initiative/monarch-disease-ontology/issues/406"
@@ -17,6 +17,7 @@ subsetdef: nord_rare "nord rare"
 subsetdef: not_a_disease "classes that do not represent diseases"
 subsetdef: obsoletion_candidate "obsoletion candidate"
 subsetdef: obsoletion_protected "obsoletion_protected"
+subsetdef: omim_susceptibility "OMIM entry with braces, e.g. {}, which indicate mutations that contribute to susceptibility to multifactorial disorders (e.g., diabetes, asthma) or to susceptibility to infection (e.g., malaria)."
 subsetdef: ordo_biological_anomaly "biological anomaly"
 subsetdef: ordo_clinical_situation "particular clinical situation in a disease or syndrome"
 subsetdef: ordo_clinical_subtype "clinical subtype"
@@ -40,23 +41,47 @@ subsetdef: rare_grouping "rare grouping"
 subsetdef: speculative "A hypothesized disease whose existence is speculative"
 synonymtypedef: ABBREVIATION "abbreviation"
 synonymtypedef: AMBIGUOUS "ambiguous"
-synonymtypedef: CLINGEN_LABEL "ClinGen label"
 synonymtypedef: DEPRECATED "A synonym that is historic and discouraged"
 synonymtypedef: DUBIOUS "dubious synonym"
 synonymtypedef: EXCLUDE "Synonym to be removed from public release but maintained in edit version as record of external usage"
 synonymtypedef: MISSPELLING "A synonym that is recorded for consistency with another source but is a misspelling"
 synonymtypedef: NON_HUMAN "A synonym that is used for non-human animal variants of a disease"
 synonymtypedef: OMO:0003005 "UK spelling synonym"
+idspace: BAO http://www.bioassayontology.org/bao#BAO_
+idspace: CoVIC https://cvdb.ontodev.com/antibody/
 idspace: dc http://purl.org/dc/elements/1.1/
 idspace: doap http://usefulinc.com/ns/doap#
+idspace: EFO http://www.ebi.ac.uk/efo/EFO_
+idspace: ENM http://purl.enanomapper.org/onto/ENM_
+idspace: faldo http://biohackathon.org/resource/faldo#
 idspace: foaf http://xmlns.com/foaf/0.1/
+idspace: gocam http://model.geneontology.org/
+idspace: ICD10CM http://purl.bioontology.org/ontology/ICD10CM/
+idspace: icd10cm http://purl.bioontology.org/ontology/ICD10CM/
+idspace: ICD10WHO https://icd.who.int/browse10/2019/en#/
+idspace: ICD11 http://id.who.int/icd/entity/
+idspace: icd11.foundation http://id.who.int/icd/entity/
+idspace: IEDB http://iedb.org/
+idspace: iedb-protein http://iedb.org/taxon-protein/
+idspace: MEDDRA http://identifiers.org/meddra/
+idspace: MEDGEN http://identifiers.org/medgen/
+idspace: MESH http://identifiers.org/mesh/
+idspace: NPO http://purl.bioontology.org/ontology/npo#NPO_
 idspace: oboInOwl http://www.geneontology.org/formats/oboInOwl#
+idspace: OMIM https://omim.org/entry/
+idspace: OMIMPS https://omim.org/phenotypicSeries/PS
+idspace: ONTIE https://ontology.iedb.org/ontology/ONTIE_
+idspace: Orphanet http://www.orpha.net/ORDO/Orphanet_
+idspace: PRO http://www.uniprot.org/annotation/PRO_
 idspace: protege http://protege.stanford.edu/plugins/owl/protege#
+idspace: SCTID http://identifiers.org/snomedct/
 idspace: skos http://www.w3.org/2004/02/skos/core#
 idspace: sssom https://w3id.org/sssom/
 idspace: terms http://purl.org/dc/terms/
+idspace: UC http://purl.uniprot.org/core/
+idspace: UMLS http://linkedlifedata.com/resource/umls/id/
+idspace: UP http://purl.uniprot.org/uniprot/
 idspace: vocab https://w3id.org/semapv/vocab/
-remark: Includes Ontology(OntologyID(Anonymous-11)) [Axioms: 107542 Logical Axioms: 0]
 ontology: mondo
 property_value: dc:description "A semi-automatically constructed ontology that merges in multiple disease resources to yield a coherent merged ontology." xsd:string
 property_value: dc:title "Mondo Disease Ontology" xsd:string
@@ -89,6 +114,7 @@ id: BFO:0000002
 name: continuant
 is_a: BFO:0000001
 disjoint_from: BFO:0000003
+relationship: BFO:0000050 BFO:0000002
 property_value: IAO:0000116 "BFO 2 Reference: Continuant entities are entities which can be sliced to yield parts only along the spatial dimension, yielding for example the parts of your table which we call its legs, its top, its nails. ‘My desk stretches from the window to the door. It has spatial parts, and can be sliced (in space) in two. With respect to time, however, a thing is a continuant.’ [60, p. 240" xsd:string
 
 [Term]
@@ -103,12 +129,14 @@ id: BFO:0000017
 name: realizable entity
 is_a: BFO:0000020
 disjoint_from: BFO:0000019
+relationship: BFO:0000050 BFO:0000017
 
 [Term]
 id: BFO:0000020
 name: specifically dependent continuant
 is_a: BFO:0000002
 disjoint_from: BFO:0000031
+relationship: BFO:0000050 BFO:0000020
 
 [Term]
 id: MONDO:0000001
@@ -136,12 +164,24 @@ xref: SCTID:64572001
 xref: UMLS:C0012634
 is_a: BFO:0000016
 property_value: skos:exactMatch DOID:4
-property_value: skos:exactMatch http://identifiers.org/medgen/4347
-property_value: skos:exactMatch http://identifiers.org/mesh/D004194
-property_value: skos:exactMatch http://identifiers.org/snomedct/64572001
-property_value: skos:exactMatch http://linkedlifedata.com/resource/umls/id/C0012634
+property_value: skos:exactMatch MEDGEN:4347
+property_value: skos:exactMatch MESH:D004194
 property_value: skos:exactMatch NCIT:C2991
 property_value: skos:exactMatch Orphanet:377788
+property_value: skos:exactMatch SCTID:64572001
+property_value: skos:exactMatch UMLS:C0012634
+
+[Term]
+id: MONDO:0000005
+name: alopecia, isolated
+subset: gard_rare
+subset: rare
+xref: OMIMPS:203655
+is_a: MONDO:0004907
+is_a: MONDO:0100118
+relationship: should_conform_to http://purl.obolibrary.org/obo/mondo/patterns/OMIM_phenotypic_series.yaml
+property_value: IAO:0000233 "https://github.com/monarch-initiative/mondo/issues/6877" xsd:anyURI
+property_value: skos:exactMatch OMIMPS:203655
 
 [Term]
 id: MONDO:0000270
@@ -166,9 +206,9 @@ intersection_of: disease_has_location UBERON:0001558
 relationship: disease_has_location UBERON:0001558
 property_value: skos:exactMatch DOID:0050161
 property_value: skos:exactMatch EFO:0009433
-property_value: skos:exactMatch http://identifiers.org/medgen/712703
-property_value: skos:exactMatch http://identifiers.org/snomedct/128272009
-property_value: skos:exactMatch http://linkedlifedata.com/resource/umls/id/C1290325
+property_value: skos:exactMatch MEDGEN:712703
+property_value: skos:exactMatch SCTID:128272009
+property_value: skos:exactMatch UMLS:C1290325
 property_value: terms:conformsTo http://purl.obolibrary.org/obo/mondo/patterns/location.yaml
 property_value: terms:conformsTo location:top.yaml
 
@@ -185,16 +225,20 @@ xref: DOID:0050615
 xref: ICD9:165.8
 xref: ICD9:165.9
 xref: MEDGEN:756863
+xref: NCIT:C4571
 xref: SCTID:449096009
 xref: UMLS:C3164456
 is_a: MONDO:0004992
 is_a: MONDO:0005087
 intersection_of: MONDO:0004992
 intersection_of: disease_has_location UBERON:0001004
+property_value: curated_content_resource "https://www.malacards.org/card/respiratory_system_cancer" xsd:anyURI
+property_value: IAO:0000233 "https://github.com/monarch-initiative/mondo/issues/8567" xsd:anyURI
 property_value: skos:exactMatch DOID:0050615
-property_value: skos:exactMatch http://identifiers.org/medgen/756863
-property_value: skos:exactMatch http://identifiers.org/snomedct/449096009
-property_value: skos:exactMatch http://linkedlifedata.com/resource/umls/id/C3164456
+property_value: skos:exactMatch MEDGEN:756863
+property_value: skos:exactMatch NCIT:C4571
+property_value: skos:exactMatch SCTID:449096009
+property_value: skos:exactMatch UMLS:C3164456
 property_value: terms:conformsTo http://purl.obolibrary.org/obo/mondo/patterns/cancer.yaml
 
 [Term]
@@ -205,20 +249,25 @@ synonym: "bipolar 2 disorder" RELATED []
 synonym: "bipolar II disorder" EXACT []
 synonym: "bipolar ll disorder" RELATED []
 xref: DOID:0060166
+xref: ICD10CM:F31.81
 xref: ICD9:296.89
 xref: MEDGEN:536634
 xref: SCTID:83225003
 xref: UMLS:C0236788
 is_a: MONDO:0004985
+property_value: curated_content_resource "https://www.malacards.org/card/bipolar_ll_disorder" xsd:anyURI
+property_value: IAO:0000233 "https://github.com/monarch-initiative/mondo/issues/9097" xsd:anyURI
 property_value: skos:exactMatch DOID:0060166
-property_value: skos:exactMatch http://identifiers.org/medgen/536634
-property_value: skos:exactMatch http://identifiers.org/snomedct/83225003
-property_value: skos:exactMatch http://linkedlifedata.com/resource/umls/id/C0236788
+property_value: skos:exactMatch icd10cm:F31.81
+property_value: skos:exactMatch MEDGEN:536634
+property_value: skos:exactMatch SCTID:83225003
+property_value: skos:exactMatch UMLS:C0236788
 
 [Term]
 id: MONDO:0002025
 name: psychiatric disorder
 def: "A disorder characterized by behavioral and/or psychological abnormalities, often accompanied by physical symptoms. The symptoms may cause clinically significant distress or impairment in social and occupational areas of functioning. Representative examples include anxiety disorders, cognitive disorders, mood disorders and schizophrenia." [NCIT:C2893]
+subset: harrisons_view
 subset: otar
 subset: rare_grouping
 synonym: "disease of mental health" NARROW []
@@ -233,14 +282,45 @@ xref: MFOMD:0000004
 xref: NCIT:C2893
 xref: SCTID:74732009
 is_a: MONDO:0700096
-intersection_of: MONDO:0700096
-intersection_of: disease_disrupts MF:0000020
-relationship: disease_disrupts MF:0000020
 relationship: excluded_subClassOf MONDO:0005071
+property_value: curated_content_resource "https://www.malacards.org/card/disease_of_mental_health" xsd:anyURI
+property_value: IAO:0000233 "https://github.com/monarch-initiative/mondo/issues/9301" xsd:anyURI
 property_value: skos:exactMatch DOID:150
-property_value: skos:exactMatch http://identifiers.org/mesh/D001523
+property_value: skos:exactMatch MESH:D001523
 property_value: skos:exactMatch NCIT:C2893
 property_value: terms:conformsTo http://purl.obolibrary.org/obo/mondo/patterns/specific_disease_by_disrupted_process.yaml
+
+[Term]
+id: MONDO:0002051
+name: integumentary system disorder
+alt_id: MONDO:0045027
+def: "A disease involving the integumental system." [https://orcid.org/0000-0002-6601-2165]
+subset: harrisons_view
+subset: otar
+subset: rare_grouping
+synonym: "disease of integumental system" EXACT [MONDO:patterns/location_top]
+synonym: "disease or disorder of integumental system" EXACT []
+synonym: "disorder of integument" RELATED []
+synonym: "disorder of integumental system" EXACT [MONDO:patterns/location_top]
+synonym: "integumental system disease" EXACT [MONDO:patterns/location]
+synonym: "integumental system disease or disorder" EXACT [MONDO:design_pattern, MONDO:patterns/location]
+synonym: "integumentary disease" EXACT []
+xref: DOID:16
+xref: EFO:0010285
+xref: MEDGEN:712400
+xref: SCTID:128598002
+xref: UMLS:C1290011
+is_a: MONDO:0700096
+intersection_of: MONDO:0700096
+intersection_of: disease_has_location UBERON:0002416
+relationship: disease_has_location UBERON:0002416
+property_value: curated_content_resource "https://www.malacards.org/card/integumentary_system_disease" xsd:anyURI
+property_value: skos:exactMatch DOID:16
+property_value: skos:exactMatch EFO:0010285
+property_value: skos:exactMatch MEDGEN:712400
+property_value: skos:exactMatch SCTID:128598002
+property_value: skos:exactMatch UMLS:C1290011
+property_value: terms:conformsTo http://purl.obolibrary.org/obo/mondo/patterns/location.yaml
 
 [Term]
 id: MONDO:0002083
@@ -252,7 +332,7 @@ subset: otar
 subset: rare
 synonym: "Richter syndrome" EXACT [DOID:1703, icd11.foundation:1736108343, NCIT:C35424]
 synonym: "Richter transformation" EXACT []
-synonym: "Richter's syndrome" EXACT [doi:10.1093/jama/9780195176339.003.0016, DOID:1703, MONDO:LexicalVariant, NCIT:C35424]
+synonym: "Richter's syndrome" EXACT [doi:10.1093/jama/9780195176339.003.0016, DOID:1703, NCIT:C35424]
 synonym: "Richter's transformation" EXACT [NCIT:C35424]
 xref: DOID:1703
 xref: GARD:7578
@@ -265,12 +345,13 @@ is_a: MONDO:0021058
 is_a: MONDO:0024882
 relationship: disease_arises_from_feature MONDO:0004948
 relationship: excluded_subClassOf MONDO:0004948
+property_value: curated_content_resource "https://www.malacards.org/card/richters_syndrome" xsd:anyURI
 property_value: skos:exactMatch DOID:1703
-property_value: skos:exactMatch http://identifiers.org/medgen/91159
-property_value: skos:exactMatch http://identifiers.org/snomedct/277550009
-property_value: skos:exactMatch http://linkedlifedata.com/resource/umls/id/C0349631
-property_value: skos:exactMatch http://purl.obolibrary.org/obo/mondo/sources/icd11foundation/1736108343
+property_value: skos:exactMatch icd11.foundation:1736108343
+property_value: skos:exactMatch MEDGEN:91159
 property_value: skos:exactMatch NCIT:C35424
+property_value: skos:exactMatch SCTID:277550009
+property_value: skos:exactMatch UMLS:C0349631
 
 [Term]
 id: MONDO:0002254
@@ -300,10 +381,10 @@ disjoint_from: MONDO:0011348
 disjoint_from: MONDO:0019530
 relationship: has_characteristic MONDO:0021127
 property_value: skos:exactMatch DOID:225
-property_value: skos:exactMatch http://identifiers.org/medgen/11688
-property_value: skos:exactMatch http://identifiers.org/mesh/D013577
-property_value: skos:exactMatch http://linkedlifedata.com/resource/umls/id/C0039082
+property_value: skos:exactMatch MEDGEN:11688
+property_value: skos:exactMatch MESH:D013577
 property_value: skos:exactMatch NCIT:C28193
+property_value: skos:exactMatch UMLS:C0039082
 property_value: terms:conformsTo http://purl.obolibrary.org/obo/mondo/patterns/syndromic.yaml
 
 [Term]
@@ -357,12 +438,13 @@ is_a: MONDO:0005070
 is_a: MONDO:0005570
 intersection_of: MONDO:0005070
 intersection_of: disease_has_location UBERON:0002390
+property_value: curated_content_resource "https://www.malacards.org/card/hematologic_cancer" xsd:anyURI
 property_value: skos:exactMatch DOID:2531
-property_value: skos:exactMatch http://identifiers.org/medgen/268180
-property_value: skos:exactMatch http://identifiers.org/mesh/D019337
-property_value: skos:exactMatch http://identifiers.org/snomedct/129154003
-property_value: skos:exactMatch http://linkedlifedata.com/resource/umls/id/C1512393
+property_value: skos:exactMatch MEDGEN:268180
+property_value: skos:exactMatch MESH:D019337
 property_value: skos:exactMatch NCIT:C35813
+property_value: skos:exactMatch SCTID:129154003
+property_value: skos:exactMatch UMLS:C1512393
 property_value: terms:conformsTo http://purl.obolibrary.org/obo/mondo/patterns/neoplasm.yaml
 
 [Term]
@@ -380,11 +462,12 @@ is_a: MONDO:0002601
 intersection_of: MONDO:0002601
 intersection_of: has_characteristic PATO:0001673
 relationship: has_characteristic PATO:0001673
+property_value: curated_content_resource "https://www.malacards.org/card/cystic_teratoma" xsd:anyURI
 property_value: skos:exactMatch DOID:2660
-property_value: skos:exactMatch http://identifiers.org/medgen/234578
-property_value: skos:exactMatch http://linkedlifedata.com/resource/umls/id/C1368903
-property_value: skos:exactMatch http://purl.obolibrary.org/obo/mondo/sources/icd11foundation/882254343
+property_value: skos:exactMatch icd11.foundation:882254343
+property_value: skos:exactMatch MEDGEN:234578
 property_value: skos:exactMatch NCIT:C9014
+property_value: skos:exactMatch UMLS:C1368903
 
 [Term]
 id: MONDO:0002601
@@ -404,12 +487,13 @@ xref: SCTID:36591000119102
 xref: UMLS:C0039538
 is_a: MONDO:0021656
 relationship: excluded_subClassOf MONDO:0002510
+property_value: curated_content_resource "https://www.malacards.org/card/teratoma" xsd:anyURI
 property_value: skos:exactMatch DOID:3307
-property_value: skos:exactMatch http://identifiers.org/medgen/21097
-property_value: skos:exactMatch http://identifiers.org/mesh/D013724
-property_value: skos:exactMatch http://identifiers.org/snomedct/36591000119102
-property_value: skos:exactMatch http://linkedlifedata.com/resource/umls/id/C0039538
+property_value: skos:exactMatch MEDGEN:21097
+property_value: skos:exactMatch MESH:D013724
 property_value: skos:exactMatch NCIT:C3403
+property_value: skos:exactMatch SCTID:36591000119102
+property_value: skos:exactMatch UMLS:C0039538
 
 [Term]
 id: MONDO:0002602
@@ -437,13 +521,14 @@ is_a: MONDO:0005071
 intersection_of: MONDO:0000001
 intersection_of: disease_has_location UBERON:0001017
 relationship: disease_has_location UBERON:0001017
+property_value: curated_content_resource "https://www.malacards.org/card/central_nervous_system_disease" xsd:anyURI
 property_value: skos:exactMatch DOID:331
 property_value: skos:exactMatch EFO:0009386
-property_value: skos:exactMatch http://identifiers.org/medgen/892343
-property_value: skos:exactMatch http://identifiers.org/mesh/D002493
-property_value: skos:exactMatch http://identifiers.org/snomedct/23853001
-property_value: skos:exactMatch http://linkedlifedata.com/resource/umls/id/C4021765
+property_value: skos:exactMatch MEDGEN:892343
+property_value: skos:exactMatch MESH:D002493
 property_value: skos:exactMatch NCIT:C2934
+property_value: skos:exactMatch SCTID:23853001
+property_value: skos:exactMatch UMLS:C4021765
 property_value: terms:conformsTo http://purl.obolibrary.org/obo/mondo/patterns/location.yaml
 property_value: terms:conformsTo location:top.yaml
 
@@ -468,10 +553,11 @@ is_a: MONDO:0005070
 intersection_of: MONDO:0005070
 intersection_of: disease_arises_from_structure CL:0008019
 relationship: disease_arises_from_structure CL:0008019
+property_value: curated_content_resource "https://www.malacards.org/card/mesenchymal_cell_neoplasm" xsd:anyURI
 property_value: skos:exactMatch DOID:3350
-property_value: skos:exactMatch http://identifiers.org/medgen/277359
-property_value: skos:exactMatch http://linkedlifedata.com/resource/umls/id/C1334699
+property_value: skos:exactMatch MEDGEN:277359
 property_value: skos:exactMatch NCIT:C7059
+property_value: skos:exactMatch UMLS:C1334699
 
 [Term]
 id: MONDO:0002813
@@ -500,8 +586,44 @@ is_a: MONDO:0004992
 is_a: MONDO:0021354
 intersection_of: MONDO:0004992
 intersection_of: disease_has_location UBERON:0001013
-property_value: skos:exactMatch http://identifiers.org/snomedct/254828009
+property_value: skos:exactMatch SCTID:254828009
 property_value: terms:conformsTo http://purl.obolibrary.org/obo/mondo/patterns/cancer.yaml
+
+[Term]
+id: MONDO:0002917
+name: disorder of pilosebaceous unit
+def: "A disease that involves the pilosebaceous unit." [MONDO:patterns/location]
+subset: otar
+synonym: "disease of pilosebaceous unit" EXACT [MONDO:patterns/location_top]
+synonym: "disease or disorder of pilosebaceous unit" EXACT []
+synonym: "disorder of pilosebaceous unit" EXACT [MONDO:patterns/location_top]
+synonym: "hair and hair follicle diseases" EXACT [https://orcid.org/0000-0002-6601-2165]
+synonym: "hair disease" NARROW [MESH:D006201]
+synonym: "hair disorder" EXACT [NCIT:C34656]
+synonym: "hair/hair follicle diseases" EXACT [https://orcid.org/0000-0002-6601-2165]
+synonym: "pilosebaceous unit disease" EXACT [MONDO:patterns/location]
+synonym: "pilosebaceous unit disease or disorder" EXACT [MONDO:design_pattern, MONDO:patterns/location]
+xref: DOID:421
+xref: ICD9:704.8
+xref: ICD9:704.9
+xref: MEDGEN:640417
+xref: MESH:D006201
+xref: NCIT:C34656
+xref: SCTID:201128002
+xref: UMLS:C0554472
+is_a: MONDO:0002051
+intersection_of: MONDO:0000001
+intersection_of: disease_has_location UBERON:0011932
+relationship: disease_has_location UBERON:0011932
+property_value: curated_content_resource "https://www.malacards.org/card/hair_disease" xsd:anyURI
+property_value: skos:exactMatch DOID:421
+property_value: skos:exactMatch MEDGEN:640417
+property_value: skos:exactMatch MESH:D006201
+property_value: skos:exactMatch NCIT:C34656
+property_value: skos:exactMatch SCTID:201128002
+property_value: skos:exactMatch UMLS:C0554472
+property_value: terms:conformsTo http://purl.obolibrary.org/obo/mondo/patterns/location.yaml
+property_value: terms:conformsTo location:top.yaml
 
 [Term]
 id: MONDO:0003274
@@ -528,6 +650,7 @@ synonym: "thorax neoplasm" BROAD []
 synonym: "tumor of thorax" BROAD []
 synonym: "tumour of thorax" BROAD OMO:0003005 []
 xref: DOID:5093
+xref: ICD10CM:C76.1
 xref: ICD9:195.1
 xref: MEDGEN:56320
 xref: NCIT:C3576
@@ -537,11 +660,14 @@ is_a: MONDO:0004992
 is_a: MONDO:0021350
 intersection_of: MONDO:0004992
 intersection_of: disease_has_location UBERON:0000915
+property_value: curated_content_resource "https://www.malacards.org/card/thoracic_cancer" xsd:anyURI
+property_value: IAO:0000233 "https://github.com/monarch-initiative/mondo/issues/9097" xsd:anyURI
 property_value: skos:exactMatch DOID:5093
-property_value: skos:exactMatch http://identifiers.org/medgen/56320
-property_value: skos:exactMatch http://identifiers.org/snomedct/188361007
-property_value: skos:exactMatch http://linkedlifedata.com/resource/umls/id/C0153661
+property_value: skos:exactMatch icd10cm:C76.1
+property_value: skos:exactMatch MEDGEN:56320
 property_value: skos:exactMatch NCIT:C3576
+property_value: skos:exactMatch SCTID:188361007
+property_value: skos:exactMatch UMLS:C0153661
 property_value: terms:conformsTo http://purl.obolibrary.org/obo/mondo/patterns/cancer.yaml
 
 [Term]
@@ -561,10 +687,11 @@ is_a: MONDO:0002601
 is_a: MONDO:0044878
 intersection_of: MONDO:0002601
 intersection_of: has_characteristic HP:0003581
+property_value: curated_content_resource "https://www.malacards.org/card/adult_teratoma" xsd:anyURI
 property_value: skos:exactMatch DOID:5565
-property_value: skos:exactMatch http://identifiers.org/medgen/277966
-property_value: skos:exactMatch http://linkedlifedata.com/resource/umls/id/C1368898
+property_value: skos:exactMatch MEDGEN:277966
 property_value: skos:exactMatch NCIT:C9013
+property_value: skos:exactMatch UMLS:C1368898
 
 [Term]
 id: MONDO:0003538
@@ -580,9 +707,9 @@ xref: MEDGEN:235492
 xref: NCIT:C7055
 xref: UMLS:C1335469
 is_a: MONDO:0005157
-property_value: skos:exactMatch http://identifiers.org/medgen/235492
-property_value: skos:exactMatch http://linkedlifedata.com/resource/umls/id/C1335469
+property_value: skos:exactMatch MEDGEN:235492
 property_value: skos:exactMatch NCIT:C7055
+property_value: skos:exactMatch UMLS:C1335469
 
 [Term]
 id: MONDO:0003587
@@ -602,10 +729,11 @@ is_a: MONDO:0005060
 is_a: MONDO:0006517
 intersection_of: MONDO:0005060
 intersection_of: has_characteristic HP:0011463
+property_value: curated_content_resource "https://www.malacards.org/card/childhood_liposarcoma" xsd:anyURI
 property_value: skos:exactMatch DOID:5695
-property_value: skos:exactMatch http://identifiers.org/medgen/83580
-property_value: skos:exactMatch http://linkedlifedata.com/resource/umls/id/C0279984
+property_value: skos:exactMatch MEDGEN:83580
 property_value: skos:exactMatch NCIT:C8091
+property_value: skos:exactMatch UMLS:C0279984
 
 [Term]
 id: MONDO:0003847
@@ -641,11 +769,11 @@ intersection_of: has_characteristic MONDO:0021152
 relationship: has_characteristic MONDO:0021152
 property_value: skos:exactMatch DOID:630
 property_value: skos:exactMatch EFO:0000508
-property_value: skos:exactMatch http://identifiers.org/medgen/5527
-property_value: skos:exactMatch http://identifiers.org/mesh/D030342
-property_value: skos:exactMatch http://identifiers.org/snomedct/32895009
-property_value: skos:exactMatch http://linkedlifedata.com/resource/umls/id/C0019247
+property_value: skos:exactMatch MEDGEN:5527
+property_value: skos:exactMatch MESH:D030342
 property_value: skos:exactMatch NCIT:C3101
+property_value: skos:exactMatch SCTID:32895009
+property_value: skos:exactMatch UMLS:C0019247
 property_value: terms:conformsTo http://purl.obolibrary.org/obo/mondo/patterns/hereditary.yaml
 
 [Term]
@@ -653,6 +781,7 @@ id: MONDO:0003900
 name: connective tissue disorder
 def: "A disease involving the connective tissue." [https://orcid.org/0000-0002-6601-2165]
 comment: Following clinical usage of the term 'connective tissue disorder' this grouping excludes some diseases affecting tissues classically considered to be connective tissue, such as bone.
+subset: harrisons_view
 subset: otar
 subset: rare_grouping
 synonym: "connective tissue disease" EXACT [DOID:65, MONDO:patterns/location, NCIT:C26729]
@@ -676,14 +805,15 @@ xref: SCTID:105969002
 xref: UMLS:C0009782
 is_a: MONDO:0700096
 relationship: excluded_subClassOf MONDO:0002081
+property_value: curated_content_resource "https://www.malacards.org/card/connective_tissue_disease" xsd:anyURI
 property_value: IAO:0000233 "https://github.com/monarch-initiative/mondo/issues/3570" xsd:anyURI
 property_value: skos:exactMatch DOID:65
 property_value: skos:exactMatch EFO:1001986
-property_value: skos:exactMatch http://identifiers.org/medgen/1098
-property_value: skos:exactMatch http://identifiers.org/mesh/D003240
-property_value: skos:exactMatch http://identifiers.org/snomedct/105969002
-property_value: skos:exactMatch http://linkedlifedata.com/resource/umls/id/C0009782
+property_value: skos:exactMatch MEDGEN:1098
+property_value: skos:exactMatch MESH:D003240
 property_value: skos:exactMatch NCIT:C26729
+property_value: skos:exactMatch SCTID:105969002
+property_value: skos:exactMatch UMLS:C0009782
 
 [Term]
 id: MONDO:0004099
@@ -701,15 +831,17 @@ is_a: MONDO:0002379
 is_a: MONDO:0003516
 intersection_of: MONDO:0002379
 intersection_of: has_characteristic HP:0003581
+property_value: curated_content_resource "https://www.malacards.org/card/adult_cystic_teratoma" xsd:anyURI
 property_value: skos:exactMatch DOID:7079
-property_value: skos:exactMatch http://identifiers.org/medgen/235084
-property_value: skos:exactMatch http://linkedlifedata.com/resource/umls/id/C1368888
+property_value: skos:exactMatch MEDGEN:235084
 property_value: skos:exactMatch NCIT:C9012
+property_value: skos:exactMatch UMLS:C1368888
 
 [Term]
 id: MONDO:0004335
 name: digestive system disorder
 def: "A disease or disorder that involves the digestive system." [MONDO:design_pattern]
+subset: harrisons_view
 subset: rare_grouping
 synonym: "alimentary system disease" EXACT [DOID:77]
 synonym: "digestive disease" EXACT [NCIT:C2990]
@@ -730,7 +862,8 @@ synonym: "git disease" EXACT [DOID:77]
 synonym: "stomach or intestinal disorder" EXACT [NCIT:C2990]
 xref: DOID:77
 xref: ICD10CM:K00-K95
-xref: ICD9:520-579.99
+xref: icd11.foundation:1256772020
+xref: ICD9:520-579
 xref: ICD9:V47.3
 xref: MEDGEN:892790
 xref: MESH:D005767
@@ -742,14 +875,50 @@ is_a: MONDO:0700096
 intersection_of: MONDO:0700096
 intersection_of: disease_has_location UBERON:0005409
 relationship: disease_has_location UBERON:0005409
+property_value: curated_content_resource "https://www.malacards.org/card/gastrointestinal_system_disease" xsd:anyURI
 property_value: skos:exactMatch DOID:77
-property_value: skos:exactMatch http://identifiers.org/medgen/892790
-property_value: skos:exactMatch http://identifiers.org/mesh/D005767
-property_value: skos:exactMatch http://identifiers.org/snomedct/53619000
-property_value: skos:exactMatch http://linkedlifedata.com/resource/umls/id/C4023588
-property_value: skos:exactMatch http://purl.bioontology.org/ontology/ICD10CM/K00-K95
+property_value: skos:exactMatch icd10cm:K00-K95
+property_value: skos:exactMatch icd11.foundation:1256772020
+property_value: skos:exactMatch MEDGEN:892790
+property_value: skos:exactMatch MESH:D005767
 property_value: skos:exactMatch NCIT:C2990
+property_value: skos:exactMatch SCTID:53619000
+property_value: skos:exactMatch UMLS:C4023588
 property_value: terms:conformsTo http://purl.obolibrary.org/obo/mondo/patterns/location.yaml
+
+[Term]
+id: MONDO:0004907
+name: alopecia
+def: "Hair loss usually from the scalp. It may result in bald spots or spread to the entire scalp or the entire epidermis. It may be androgenetic or caused by chemotherapeutic agents, compulsive hair pulling, autoimmune disorders or congenital conditions." [NCIT:C50575]
+subset: disease_grouping
+subset: ordo_group_of_disorders
+subset: otar
+synonym: "alopecia" EXACT [DOID:987, MONDO:0019279, NCIT:C50575, Orphanet:79364]
+synonym: "alopecia areata" NARROW []
+synonym: "hair loss" EXACT [NCIT:C50575]
+synonym: "loss Of hair" EXACT []
+xref: DOID:987
+xref: icd11.foundation:1313926062
+xref: ICD9:704.0
+xref: ICD9:704.00
+xref: ICD9:704.09
+xref: MEDGEN:7982
+xref: MESH:D000505
+xref: NCIT:C50575
+xref: Orphanet:79364
+xref: SCTID:56317004
+xref: UMLS:C0002170
+is_a: MONDO:0019278
+relationship: excluded_subClassOf MONDO:0003037
+property_value: curated_content_resource "https://www.malacards.org/card/alopecia" xsd:anyURI
+property_value: skos:exactMatch DOID:987
+property_value: skos:exactMatch icd11.foundation:1313926062
+property_value: skos:exactMatch MEDGEN:7982
+property_value: skos:exactMatch MESH:D000505
+property_value: skos:exactMatch NCIT:C50575
+property_value: skos:exactMatch Orphanet:79364
+property_value: skos:exactMatch SCTID:56317004
+property_value: skos:exactMatch UMLS:C0002170
 
 [Term]
 id: MONDO:0004967
@@ -791,6 +960,7 @@ xref: DOID:9952
 xref: EFO:0000220
 xref: GARD:522
 xref: HP:0006721
+xref: ICD10CM:C91.0
 xref: ICD9:204
 xref: ICD9:204.0
 xref: ICD9:204.00
@@ -809,15 +979,18 @@ is_a: MONDO:0018908
 intersection_of: MONDO:0005402
 intersection_of: has_characteristic PATO:0000389
 relationship: disease_has_feature HP:0002027
+property_value: curated_content_resource "https://www.malacards.org/card/leukemia_acute_lymphoblastic" xsd:anyURI
 property_value: excluded_from_qc_check http://purl.obolibrary.org/obo/mondo/sparql/qc/general/qc-single-child.sparql
+property_value: IAO:0000233 "https://github.com/monarch-initiative/mondo/issues/9097" xsd:anyURI
 property_value: IAO:0000589 "acute lymphoblastic leukemia (disease)" xsd:string
 property_value: skos:exactMatch DOID:9952
 property_value: skos:exactMatch EFO:0000220
-property_value: skos:exactMatch http://identifiers.org/medgen/7317
-property_value: skos:exactMatch http://identifiers.org/snomedct/91857003
-property_value: skos:exactMatch http://linkedlifedata.com/resource/umls/id/C0023449
+property_value: skos:exactMatch icd10cm:C91.0
+property_value: skos:exactMatch MEDGEN:7317
 property_value: skos:exactMatch NCIT:C3167
 property_value: skos:exactMatch Orphanet:513
+property_value: skos:exactMatch SCTID:91857003
+property_value: skos:exactMatch UMLS:C0023449
 
 [Term]
 id: MONDO:0004985
@@ -841,6 +1014,7 @@ synonym: "manic-depression" EXACT [NCIT:C34423]
 synonym: "manic-depressive illness" RELATED []
 synonym: "manic-depressive psychosis" RELATED []
 synonym: "mixed bipolar disorder" NARROW []
+xref: birnlex:12754
 xref: DOID:3312
 xref: ICD10CM:F31
 xref: ICD10WHO:F31
@@ -851,19 +1025,19 @@ xref: ICD9:296.89
 xref: MEDGEN:2649
 xref: MESH:D001714
 xref: NCIT:C34423
-xref: NIFSTD:birnlex_12754
 xref: SCTID:13746004
 xref: UMLS:C0005586
 is_a: MONDO:0005371
 relationship: disease_has_feature MONDO:0004617
+property_value: curated_content_resource "https://www.malacards.org/card/bipolar_disorder" xsd:anyURI
 property_value: skos:exactMatch DOID:3312
-property_value: skos:exactMatch http://identifiers.org/medgen/2649
-property_value: skos:exactMatch http://identifiers.org/mesh/D001714
-property_value: skos:exactMatch http://identifiers.org/snomedct/13746004
-property_value: skos:exactMatch http://linkedlifedata.com/resource/umls/id/C0005586
-property_value: skos:exactMatch http://purl.bioontology.org/ontology/ICD10CM/F31
-property_value: skos:exactMatch https://icd.who.int/browse10/2019/en#/F31
+property_value: skos:exactMatch icd10cm:F31
+property_value: skos:exactMatch ICD10WHO:F31
+property_value: skos:exactMatch MEDGEN:2649
+property_value: skos:exactMatch MESH:D001714
 property_value: skos:exactMatch NCIT:C34423
+property_value: skos:exactMatch SCTID:13746004
+property_value: skos:exactMatch UMLS:C0005586
 
 [Term]
 id: MONDO:0004992
@@ -884,6 +1058,7 @@ synonym: "MT" RELATED ABBREVIATION [ONCOTREE:MT]
 synonym: "neoplasm (disease), malignant" EXACT [MONDO:patterns/malignant]
 synonym: "neoplasm, malignant" EXACT [NCIT:C9305]
 synonym: "primary cancer" EXACT [DOID:162]
+xref: birnlex:406
 xref: DOID:0050686
 xref: DOID:0050687
 xref: DOID:162
@@ -893,7 +1068,6 @@ xref: ICD9:199.1
 xref: ICDO:8000/3
 xref: MEDGEN:14297
 xref: NCIT:C9305
-xref: NIFSTD:birnlex_406
 xref: ONCOTREE:MT
 xref: SCTID:363346000
 xref: UMLS:C0006826
@@ -902,13 +1076,14 @@ intersection_of: MONDO:0005070
 intersection_of: has_characteristic PATO:0002097
 disjoint_from: MONDO:0005165
 relationship: has_characteristic PATO:0002097
+property_value: curated_content_resource "https://www.malacards.org/card/cell_type_cancer" xsd:anyURI
 property_value: skos:exactMatch DOID:0050686
 property_value: skos:exactMatch DOID:0050687
 property_value: skos:exactMatch DOID:162
-property_value: skos:exactMatch http://identifiers.org/medgen/14297
-property_value: skos:exactMatch http://identifiers.org/snomedct/363346000
-property_value: skos:exactMatch http://linkedlifedata.com/resource/umls/id/C0006826
+property_value: skos:exactMatch MEDGEN:14297
 property_value: skos:exactMatch NCIT:C9305
+property_value: skos:exactMatch SCTID:363346000
+property_value: skos:exactMatch UMLS:C0006826
 property_value: terms:conformsTo http://purl.obolibrary.org/obo/mondo/patterns/malignant.yaml
 
 [Term]
@@ -943,11 +1118,11 @@ intersection_of: disease_arises_from_structure CL:0000066
 relationship: disease_has_location CL:0000066
 property_value: skos:exactMatch DOID:305
 property_value: skos:exactMatch EFO:0000313
-property_value: skos:exactMatch http://identifiers.org/medgen/2867
-property_value: skos:exactMatch http://identifiers.org/mesh/D002277
-property_value: skos:exactMatch http://identifiers.org/snomedct/722688002
-property_value: skos:exactMatch http://linkedlifedata.com/resource/umls/id/C0007097
+property_value: skos:exactMatch MEDGEN:2867
+property_value: skos:exactMatch MESH:D002277
 property_value: skos:exactMatch NCIT:C2916
+property_value: skos:exactMatch SCTID:722688002
+property_value: skos:exactMatch UMLS:C0007097
 
 [Term]
 id: MONDO:0005020
@@ -966,8 +1141,8 @@ synonym: "intestine disease" EXACT [MONDO:patterns/location]
 synonym: "intestine disease or disorder" EXACT [MONDO:design_pattern, MONDO:patterns/location]
 xref: DOID:5295
 xref: EFO:0009431
-xref: ICD9:520-579.99
-xref: ICD9:560-569.99
+xref: ICD9:520-579
+xref: ICD9:560-569
 xref: ICD9:564
 xref: ICD9:564.4
 xref: ICD9:569
@@ -975,7 +1150,7 @@ xref: ICD9:569.4
 xref: ICD9:569.49
 xref: ICD9:569.89
 xref: ICD9:569.9
-xref: ICD9:570-579.99
+xref: ICD9:570-579
 xref: ICD9:575
 xref: MEDGEN:7130
 xref: MESH:D007410
@@ -986,13 +1161,14 @@ is_a: MONDO:0004335
 intersection_of: MONDO:0000001
 intersection_of: disease_has_location UBERON:0000160
 relationship: disease_has_location UBERON:0000160
+property_value: curated_content_resource "https://www.malacards.org/card/intestinal_disease" xsd:anyURI
 property_value: skos:exactMatch DOID:5295
 property_value: skos:exactMatch EFO:0009431
-property_value: skos:exactMatch http://identifiers.org/medgen/7130
-property_value: skos:exactMatch http://identifiers.org/mesh/D007410
-property_value: skos:exactMatch http://identifiers.org/snomedct/85919009
-property_value: skos:exactMatch http://linkedlifedata.com/resource/umls/id/C0021831
+property_value: skos:exactMatch MEDGEN:7130
+property_value: skos:exactMatch MESH:D007410
 property_value: skos:exactMatch NCIT:C26801
+property_value: skos:exactMatch SCTID:85919009
+property_value: skos:exactMatch UMLS:C0021831
 property_value: terms:conformsTo http://purl.obolibrary.org/obo/mondo/patterns/location.yaml
 property_value: terms:conformsTo location:top.yaml
 
@@ -1025,11 +1201,12 @@ is_a: MONDO:0005070
 intersection_of: MONDO:0005070
 intersection_of: disease_arises_from_structure CL:0000586
 relationship: disease_arises_from_structure CL:0000586
+property_value: curated_content_resource "https://www.malacards.org/card/germ_cell_cancer" xsd:anyURI
 property_value: skos:exactMatch DOID:2994
 property_value: skos:exactMatch EFO:0000514
-property_value: skos:exactMatch http://identifiers.org/medgen/60030
-property_value: skos:exactMatch http://linkedlifedata.com/resource/umls/id/C0205851
+property_value: skos:exactMatch MEDGEN:60030
 property_value: skos:exactMatch NCIT:C3708
+property_value: skos:exactMatch UMLS:C0205851
 
 [Term]
 id: MONDO:0005059
@@ -1068,14 +1245,15 @@ xref: UMLS:C0023418
 is_a: MONDO:0044881
 relationship: disease_has_feature HP:0002321
 relationship: excluded_subClassOf MONDO:0005157
+property_value: curated_content_resource "https://www.malacards.org/card/leukemia" xsd:anyURI
 property_value: IAO:0000589 "leukemia (disease)" xsd:string
 property_value: skos:exactMatch DOID:1240
 property_value: skos:exactMatch EFO:0000565
-property_value: skos:exactMatch http://identifiers.org/medgen/9725
-property_value: skos:exactMatch http://identifiers.org/mesh/D007938
-property_value: skos:exactMatch http://identifiers.org/snomedct/93143009
-property_value: skos:exactMatch http://linkedlifedata.com/resource/umls/id/C0023418
+property_value: skos:exactMatch MEDGEN:9725
+property_value: skos:exactMatch MESH:D007938
 property_value: skos:exactMatch NCIT:C3161
+property_value: skos:exactMatch SCTID:93143009
+property_value: skos:exactMatch UMLS:C0023418
 
 [Term]
 id: MONDO:0005060
@@ -1111,17 +1289,18 @@ is_a: MONDO:0018078
 intersection_of: MONDO:0005089
 intersection_of: disease_arises_from_structure UBERON:0001013
 relationship: disease_arises_from_structure UBERON:0001013
+property_value: curated_content_resource "https://www.malacards.org/card/liposarcoma" xsd:anyURI
 property_value: excluded_from_qc_check http://purl.obolibrary.org/obo/mondo/sparql/qc/general/qc-single-child.sparql
 property_value: seeAlso "https://rarediseases.info.nih.gov/diseases/6913/liposarcoma" xsd:anyURI
-property_value: skos:closeMatch http://identifiers.org/meddra/10024627
+property_value: skos:closeMatch MEDDRA:10024627
 property_value: skos:exactMatch DOID:3382
 property_value: skos:exactMatch EFO:0000569
-property_value: skos:exactMatch http://identifiers.org/medgen/44177
-property_value: skos:exactMatch http://identifiers.org/mesh/D008080
-property_value: skos:exactMatch http://identifiers.org/snomedct/254829001
-property_value: skos:exactMatch http://linkedlifedata.com/resource/umls/id/C0023827
+property_value: skos:exactMatch MEDGEN:44177
+property_value: skos:exactMatch MESH:D008080
 property_value: skos:exactMatch NCIT:C3194
 property_value: skos:exactMatch Orphanet:69078
+property_value: skos:exactMatch SCTID:254829001
+property_value: skos:exactMatch UMLS:C0023827
 
 [Term]
 id: MONDO:0005062
@@ -1159,15 +1338,16 @@ xref: SCTID:373168002
 xref: UMLS:C0024299
 is_a: MONDO:0005157
 is_a: MONDO:0015757
-property_value: skos:closeMatch http://identifiers.org/meddra/10025310
+property_value: curated_content_resource "https://www.malacards.org/card/lymphoma" xsd:anyURI
+property_value: skos:closeMatch MEDDRA:10025310
 property_value: skos:exactMatch DOID:0060058
 property_value: skos:exactMatch EFO:0000574
-property_value: skos:exactMatch http://identifiers.org/medgen/44223
-property_value: skos:exactMatch http://identifiers.org/mesh/D008223
-property_value: skos:exactMatch http://identifiers.org/snomedct/118600007
-property_value: skos:exactMatch http://linkedlifedata.com/resource/umls/id/C0024299
+property_value: skos:exactMatch MEDGEN:44223
+property_value: skos:exactMatch MESH:D008223
 property_value: skos:exactMatch NCIT:C3208
 property_value: skos:exactMatch Orphanet:223735
+property_value: skos:exactMatch SCTID:118600007
+property_value: skos:exactMatch UMLS:C0024299
 
 [Term]
 id: MONDO:0005070
@@ -1192,7 +1372,7 @@ xref: HP:0002664
 xref: ICD10CM:C00-D49
 xref: ICD10CM:C7A-C7A
 xref: ICD10CM:C7B-C7B
-xref: ICD9:140-239.99
+xref: ICD9:140-239
 xref: ICD9:239.8
 xref: ICD9:239.9
 xref: MEDGEN:10294
@@ -1206,20 +1386,21 @@ disjoint_from: MONDO:0024291
 property_value: IAO:0000589 "neoplasm (disease)" xsd:string
 property_value: skos:exactMatch DOID:14566
 property_value: skos:exactMatch EFO:0000616
-property_value: skos:exactMatch http://identifiers.org/medgen/10294
-property_value: skos:exactMatch http://identifiers.org/mesh/D009369
-property_value: skos:exactMatch http://identifiers.org/snomedct/55342001
-property_value: skos:exactMatch http://linkedlifedata.com/resource/umls/id/C0027651
-property_value: skos:exactMatch http://purl.bioontology.org/ontology/ICD10CM/C00-D49
+property_value: skos:exactMatch icd10cm:C00-D49
+property_value: skos:exactMatch MEDGEN:10294
+property_value: skos:exactMatch MESH:D009369
 property_value: skos:exactMatch NCIT:C3262
-property_value: skos:narrowMatch http://purl.bioontology.org/ontology/ICD10CM/C7A-C7A
-property_value: skos:narrowMatch http://purl.bioontology.org/ontology/ICD10CM/C7B-C7B
+property_value: skos:exactMatch SCTID:55342001
+property_value: skos:exactMatch UMLS:C0027651
+property_value: skos:narrowMatch icd10cm:C7A-C7A
+property_value: skos:narrowMatch icd10cm:C7B-C7B
 
 [Term]
 id: MONDO:0005071
 name: nervous system disorder
 def: "A non-neoplastic or neoplastic disorder that affects the brain, spinal cord, or peripheral nerves." [NCIT:C26835]
 comment: 'psychiatric disorder' is not classified as a 'nervous system disorder' in Mondo (though it is often as such): the hallmarks of psychiatric disorders are based in behavior and emotional state, and the relation with nervous system malfunction or damage is not always clearly determined.
+subset: harrisons_view
 subset: otar
 subset: rare_grouping
 synonym: "disease of nervous system" EXACT [MONDO:patterns/location_top]
@@ -1247,14 +1428,15 @@ is_a: MONDO:0700096
 intersection_of: MONDO:0700096
 intersection_of: disease_has_location UBERON:0001016
 relationship: disease_has_location UBERON:0001016
+property_value: curated_content_resource "https://www.malacards.org/card/nervous_system_disease" xsd:anyURI
 property_value: skos:exactMatch DOID:863
 property_value: skos:exactMatch EFO:0000618
-property_value: skos:exactMatch http://identifiers.org/medgen/14336
-property_value: skos:exactMatch http://identifiers.org/mesh/D009422
-property_value: skos:exactMatch http://identifiers.org/snomedct/118940003
-property_value: skos:exactMatch http://linkedlifedata.com/resource/umls/id/C0027765
-property_value: skos:exactMatch http://purl.bioontology.org/ontology/ICD10CM/G00-G99
+property_value: skos:exactMatch icd10cm:G00-G99
+property_value: skos:exactMatch MEDGEN:14336
+property_value: skos:exactMatch MESH:D009422
 property_value: skos:exactMatch NCIT:C26835
+property_value: skos:exactMatch SCTID:118940003
+property_value: skos:exactMatch UMLS:C0027765
 property_value: terms:conformsTo http://purl.obolibrary.org/obo/mondo/patterns/location.yaml
 
 [Term]
@@ -1273,6 +1455,7 @@ synonym: "neural Crest tumor, malignant" EXACT [NCIT:C3270]
 synonym: "neuroblastoma" EXACT [DOID:769, NCIT:C3270, Orphanet:635]
 synonym: "neuroblastoma (Schwannian Stroma-poor)" EXACT [NCIT:C3270]
 synonym: "neuroblastoma, malignant" EXACT [NCIT:C3270]
+xref: birnlex:12631
 xref: DOID:769
 xref: EFO:0000621
 xref: GARD:7185
@@ -1282,7 +1465,6 @@ xref: MEDGEN:18012
 xref: MESH:D009447
 xref: NANDO:2200040
 xref: NCIT:C3270
-xref: NIFSTD:birnlex_12631
 xref: ONCOTREE:NBL
 xref: Orphanet:635
 xref: SCTID:432328008
@@ -1292,16 +1474,17 @@ is_a: MONDO:0021635
 relationship: disease_arises_from_structure CL:0000031
 relationship: excluded_subClassOf MONDO:0002366
 relationship: excluded_subClassOf MONDO:0016713
+property_value: curated_content_resource "https://www.malacards.org/card/neuroblastoma" xsd:anyURI
 property_value: seeAlso "https://rarediseases.info.nih.gov/diseases/7185/neuroblastoma" xsd:anyURI
-property_value: skos:closeMatch http://identifiers.org/meddra/10029260
+property_value: skos:closeMatch MEDDRA:10029260
 property_value: skos:exactMatch DOID:769
 property_value: skos:exactMatch EFO:0000621
-property_value: skos:exactMatch http://identifiers.org/medgen/18012
-property_value: skos:exactMatch http://identifiers.org/mesh/D009447
-property_value: skos:exactMatch http://identifiers.org/snomedct/432328008
-property_value: skos:exactMatch http://linkedlifedata.com/resource/umls/id/C0027819
+property_value: skos:exactMatch MEDGEN:18012
+property_value: skos:exactMatch MESH:D009447
 property_value: skos:exactMatch NCIT:C3270
 property_value: skos:exactMatch Orphanet:635
+property_value: skos:exactMatch SCTID:432328008
+property_value: skos:exactMatch UMLS:C0027819
 
 [Term]
 id: MONDO:0005084
@@ -1312,14 +1495,14 @@ synonym: "disorder of mental process" EXACT [MONDO:patterns/basis_in_disruption_
 synonym: "mental or behavioral disorder" EXACT []
 synonym: "mental or behavioural disorder" EXACT OMO:0003005 []
 synonym: "mental process disease" EXACT [MONDO:design_pattern]
+xref: birnlex:12669
 xref: EFO:0000677
-xref: ICD9:290-299.99
+xref: ICD9:290-299
 xref: ICD9:298.8
 xref: ICD9:V11.9
 xref: MEDGEN:14047
 xref: MESH:D001523
 xref: NCIT:C2893
-xref: NIFSTD:birnlex_12669
 xref: SCTID:74732009
 xref: UMLS:C0004936
 is_a: MONDO:0002025
@@ -1329,9 +1512,9 @@ intersection_of: disease_has_basis_in_disruption_of MF:0000020
 disjoint_from: MONDO:0005404
 relationship: disease_has_basis_in_disruption_of MF:0000020
 property_value: skos:exactMatch EFO:0000677
-property_value: skos:exactMatch http://identifiers.org/medgen/14047
-property_value: skos:exactMatch http://identifiers.org/snomedct/74732009
-property_value: skos:exactMatch http://linkedlifedata.com/resource/umls/id/C0004936
+property_value: skos:exactMatch MEDGEN:14047
+property_value: skos:exactMatch SCTID:74732009
+property_value: skos:exactMatch UMLS:C0004936
 property_value: terms:conformsTo disrupts:process.yaml
 property_value: terms:conformsTo http://purl.obolibrary.org/obo/mondo/patterns/basis_in_disruption_of_process.yaml
 
@@ -1339,6 +1522,7 @@ property_value: terms:conformsTo http://purl.obolibrary.org/obo/mondo/patterns/b
 id: MONDO:0005087
 name: respiratory system disorder
 def: "A non-neoplastic or neoplastic disorder that affects the respiratory system. Representative examples include pneumonia, chronic obstructive pulmonary disease, pulmonary failure, lung adenoma, lung carcinoma, and tracheal carcinoma." [NCIT:C26871]
+subset: harrisons_view
 subset: otar
 subset: rare_grouping
 synonym: "disease of respiratory system" EXACT [MONDO:patterns/location_top]
@@ -1352,14 +1536,14 @@ synonym: "respiratory system disorder" EXACT [NCIT:C26871]
 xref: DOID:1579
 xref: EFO:0000684
 xref: ICD10CM:J00-J99
-xref: ICD9:460-519.99
-xref: ICD9:500-508.99
+xref: ICD9:460-519
+xref: ICD9:500-508
 xref: ICD9:503
 xref: ICD9:508
 xref: ICD9:508.1
 xref: ICD9:508.8
 xref: ICD9:508.9
-xref: ICD9:510-519.99
+xref: ICD9:510-519
 xref: ICD9:516
 xref: ICD9:516.8
 xref: ICD9:516.9
@@ -1382,14 +1566,15 @@ is_a: MONDO:0700096
 intersection_of: MONDO:0700096
 intersection_of: disease_has_location UBERON:0001004
 relationship: disease_has_location UBERON:0001004
+property_value: curated_content_resource "https://www.malacards.org/card/respiratory_system_disease" xsd:anyURI
 property_value: skos:exactMatch DOID:1579
 property_value: skos:exactMatch EFO:0000684
-property_value: skos:exactMatch http://identifiers.org/medgen/48421
-property_value: skos:exactMatch http://identifiers.org/mesh/D012140
-property_value: skos:exactMatch http://identifiers.org/snomedct/50043002
-property_value: skos:exactMatch http://linkedlifedata.com/resource/umls/id/C0035204
-property_value: skos:exactMatch http://purl.bioontology.org/ontology/ICD10CM/J00-J99
+property_value: skos:exactMatch icd10cm:J00-J99
+property_value: skos:exactMatch MEDGEN:48421
+property_value: skos:exactMatch MESH:D012140
 property_value: skos:exactMatch NCIT:C26871
+property_value: skos:exactMatch SCTID:50043002
+property_value: skos:exactMatch UMLS:C0035204
 property_value: terms:conformsTo http://purl.obolibrary.org/obo/mondo/patterns/location.yaml
 
 [Term]
@@ -1423,13 +1608,58 @@ xref: NCIT:C9118
 xref: SCTID:424413001
 xref: UMLS:C1261473
 is_a: MONDO:0004992
+property_value: curated_content_resource "https://www.malacards.org/card/sarcoma" xsd:anyURI
 property_value: skos:exactMatch DOID:1115
 property_value: skos:exactMatch EFO:0000691
-property_value: skos:exactMatch http://identifiers.org/medgen/224714
-property_value: skos:exactMatch http://identifiers.org/mesh/D012509
-property_value: skos:exactMatch http://identifiers.org/snomedct/424413001
-property_value: skos:exactMatch http://linkedlifedata.com/resource/umls/id/C1261473
+property_value: skos:exactMatch MEDGEN:224714
+property_value: skos:exactMatch MESH:D012509
 property_value: skos:exactMatch NCIT:C9118
+property_value: skos:exactMatch SCTID:424413001
+property_value: skos:exactMatch UMLS:C1261473
+
+[Term]
+id: MONDO:0005093
+name: skin disorder
+def: "Any deviation from the normal structure or function of the skin or subcutaneous tissue that is manifested by a characteristic set of symptoms and signs." [NCIT:C3371]
+subset: otar
+subset: rare_grouping
+synonym: "cutaneous disorder" EXACT [NCIT:C3371]
+synonym: "dermatosis" NARROW [https://medical-dictionary.thefreedictionary.com/dermatosis]
+synonym: "disease of zone of skin" EXACT [MONDO:patterns/location_top]
+synonym: "disease or disorder of zone of skin" EXACT []
+synonym: "disorder of skin" EXACT [NCIT:C3371]
+synonym: "disorder of zone of skin" EXACT [MONDO:patterns/location_top]
+synonym: "genodermatosis" NARROW []
+synonym: "skin and subcutaneous tissue disease" EXACT [DOID:37]
+synonym: "skin diseases and manifestations" EXACT [NCIT:C3371]
+synonym: "skin disorder" EXACT [NCIT:C3371]
+synonym: "zone of skin disease" EXACT [MONDO:patterns/location]
+synonym: "zone of skin disease or disorder" EXACT [MONDO:design_pattern, MONDO:patterns/location]
+xref: DOID:37
+xref: EFO:0000701
+xref: ICD9:702
+xref: ICD9:702.8
+xref: ICD9:709.8
+xref: MEDGEN:20777
+xref: MESH:D012871
+xref: NANDO:2100281
+xref: NCIT:C3371
+xref: SCTID:95320005
+xref: UMLS:C0037274
+is_a: MONDO:0002051
+intersection_of: MONDO:0000001
+intersection_of: disease_has_location UBERON:0000014
+relationship: disease_has_location UBERON:0000014
+property_value: curated_content_resource "https://www.malacards.org/card/skin_disease" xsd:anyURI
+property_value: skos:exactMatch DOID:37
+property_value: skos:exactMatch EFO:0000701
+property_value: skos:exactMatch MEDGEN:20777
+property_value: skos:exactMatch MESH:D012871
+property_value: skos:exactMatch NCIT:C3371
+property_value: skos:exactMatch SCTID:95320005
+property_value: skos:exactMatch UMLS:C0037274
+property_value: terms:conformsTo http://purl.obolibrary.org/obo/mondo/patterns/location.yaml
+property_value: terms:conformsTo location:top.yaml
 
 [Term]
 id: MONDO:0005138
@@ -1455,12 +1685,13 @@ intersection_of: MONDO:0004993
 intersection_of: disease_has_location UBERON:0002048
 relationship: disease_has_feature HP:0001824
 relationship: disease_has_feature HP:0002105
+property_value: curated_content_resource "https://www.malacards.org/card/lung_cancer" xsd:anyURI
 property_value: skos:exactMatch DOID:3905
 property_value: skos:exactMatch EFO:0001071
-property_value: skos:exactMatch http://identifiers.org/medgen/195765
-property_value: skos:exactMatch http://linkedlifedata.com/resource/umls/id/C0684249
-property_value: skos:exactMatch http://purl.obolibrary.org/obo/mondo/sources/icd11foundation/947165291
+property_value: skos:exactMatch icd11.foundation:947165291
+property_value: skos:exactMatch MEDGEN:195765
 property_value: skos:exactMatch NCIT:C4878
+property_value: skos:exactMatch UMLS:C0684249
 property_value: terms:conformsTo http://purl.obolibrary.org/obo/mondo/patterns/carcinoma.yaml
 
 [Term]
@@ -1493,9 +1724,9 @@ xref: ONCOTREE:LYMPH
 xref: UMLS:C0598798
 is_a: MONDO:0044881
 property_value: skos:exactMatch EFO:0001642
-property_value: skos:exactMatch http://identifiers.org/medgen/108626
-property_value: skos:exactMatch http://linkedlifedata.com/resource/umls/id/C0598798
+property_value: skos:exactMatch MEDGEN:108626
 property_value: skos:exactMatch NCIT:C7065
+property_value: skos:exactMatch UMLS:C0598798
 
 [Term]
 id: MONDO:0005168
@@ -1520,7 +1751,7 @@ synonym: "non-small cell cancer of the lung" EXACT [NCIT:C2926]
 synonym: "non-small cell carcinoma of lung" EXACT [NCIT:C2926]
 synonym: "non-small cell carcinoma of the lung" EXACT [NCIT:C2926]
 synonym: "non-small cell lung cancer" EXACT [DOID:3908, NCIT:C2926]
-synonym: "non-small cell lung carcinoma" EXACT CLINGEN_LABEL [DOID:3908, MONDO:ambiguous, NCIT:C2926]
+synonym: "non-small cell lung carcinoma" EXACT [DOID:3908, MONDO:ambiguous, NCIT:C2926]
 synonym: "non-small cell lung carcinoma (disease)" EXACT [https://orcid.org/0000-0002-6601-2165]
 synonym: "NSCLC" EXACT ABBREVIATION [DOID:3908, NCIT:C2926]
 synonym: "NSCLC - non-small cell lung cancer" EXACT [NCIT:C2926]
@@ -1536,14 +1767,15 @@ xref: SCTID:254637007
 xref: UMLS:C0007131
 is_a: MONDO:0005138
 relationship: curated_content_resource https://search.clinicalgenome.org/kb/conditions/MONDO:0005233
+property_value: curated_content_resource "https://www.malacards.org/card/lung_non_small_cell_carcinoma" xsd:anyURI
 property_value: IAO:0000589 "non-small cell lung carcinoma (disease)" xsd:string
 property_value: skos:exactMatch DOID:3908
 property_value: skos:exactMatch EFO:0003060
-property_value: skos:exactMatch http://identifiers.org/medgen/40104
-property_value: skos:exactMatch http://identifiers.org/mesh/D002289
-property_value: skos:exactMatch http://identifiers.org/snomedct/254637007
-property_value: skos:exactMatch http://linkedlifedata.com/resource/umls/id/C0007131
+property_value: skos:exactMatch MEDGEN:40104
+property_value: skos:exactMatch MESH:D002289
 property_value: skos:exactMatch NCIT:C2926
+property_value: skos:exactMatch SCTID:254637007
+property_value: skos:exactMatch UMLS:C0007131
 
 [Term]
 id: MONDO:0005275
@@ -1573,13 +1805,14 @@ is_a: MONDO:0000270
 intersection_of: MONDO:0000001
 intersection_of: disease_has_location UBERON:0002048
 relationship: disease_has_location UBERON:0002048
+property_value: curated_content_resource "https://www.malacards.org/card/lung_disease" xsd:anyURI
 property_value: skos:exactMatch DOID:850
 property_value: skos:exactMatch EFO:0003818
-property_value: skos:exactMatch http://identifiers.org/medgen/7399
-property_value: skos:exactMatch http://identifiers.org/mesh/D008171
-property_value: skos:exactMatch http://identifiers.org/snomedct/19829001
-property_value: skos:exactMatch http://linkedlifedata.com/resource/umls/id/C0024115
+property_value: skos:exactMatch MEDGEN:7399
+property_value: skos:exactMatch MESH:D008171
 property_value: skos:exactMatch NCIT:C3198
+property_value: skos:exactMatch SCTID:19829001
+property_value: skos:exactMatch UMLS:C0024115
 property_value: terms:conformsTo http://purl.obolibrary.org/obo/mondo/patterns/location.yaml
 property_value: terms:conformsTo location:top.yaml
 
@@ -1599,14 +1832,15 @@ xref: NCIT:C92200
 xref: SCTID:46206005
 xref: UMLS:C0525045
 is_a: MONDO:0005084
+property_value: curated_content_resource "https://www.malacards.org/card/mood_disorder" xsd:anyURI
 property_value: skos:exactMatch DOID:3324
 property_value: skos:exactMatch EFO:0004247
-property_value: skos:exactMatch http://identifiers.org/medgen/99866
-property_value: skos:exactMatch http://identifiers.org/mesh/D019964
-property_value: skos:exactMatch http://identifiers.org/snomedct/46206005
-property_value: skos:exactMatch http://linkedlifedata.com/resource/umls/id/C0525045
-property_value: skos:exactMatch http://purl.bioontology.org/ontology/ICD10CM/F30-F39
+property_value: skos:exactMatch icd10cm:F30-F39
+property_value: skos:exactMatch MEDGEN:99866
+property_value: skos:exactMatch MESH:D019964
 property_value: skos:exactMatch NCIT:C92200
+property_value: skos:exactMatch SCTID:46206005
+property_value: skos:exactMatch UMLS:C0525045
 
 [Term]
 id: MONDO:0005402
@@ -1629,6 +1863,7 @@ xref: DOID:1037
 xref: DOID:10747
 xref: EFO:0004289
 xref: HP:0005526
+xref: ICD10CM:C91
 xref: ICD9:204
 xref: ICD9:204.2
 xref: ICD9:204.20
@@ -1642,14 +1877,16 @@ xref: UMLS:C0023448
 is_a: MONDO:0005059
 is_a: MONDO:0005157
 relationship: disease_arises_from_structure CL:0000542
+property_value: IAO:0000233 "https://github.com/monarch-initiative/mondo/issues/9097" xsd:anyURI
 property_value: IAO:0000589 "lymphoid leukemia (disease)" xsd:string
 property_value: skos:exactMatch DOID:1037
 property_value: skos:exactMatch EFO:0004289
-property_value: skos:exactMatch http://identifiers.org/medgen/9728
-property_value: skos:exactMatch http://identifiers.org/mesh/D007945
-property_value: skos:exactMatch http://identifiers.org/snomedct/188726003
-property_value: skos:exactMatch http://linkedlifedata.com/resource/umls/id/C0023448
+property_value: skos:exactMatch icd10cm:C91
+property_value: skos:exactMatch MEDGEN:9728
+property_value: skos:exactMatch MESH:D007945
 property_value: skos:exactMatch NCIT:C7539
+property_value: skos:exactMatch SCTID:188726003
+property_value: skos:exactMatch UMLS:C0023448
 
 [Term]
 id: MONDO:0005462
@@ -1682,10 +1919,10 @@ relationship: excluded_subClassOf MONDO:0002510
 relationship: excluded_subClassOf MONDO:0005872
 property_value: skos:exactMatch DOID:171
 property_value: skos:exactMatch EFO:0005235
-property_value: skos:exactMatch http://identifiers.org/medgen/64627
-property_value: skos:exactMatch http://identifiers.org/mesh/D017599
-property_value: skos:exactMatch http://linkedlifedata.com/resource/umls/id/C0206663
+property_value: skos:exactMatch MEDGEN:64627
+property_value: skos:exactMatch MESH:D017599
 property_value: skos:exactMatch NCIT:C3716
+property_value: skos:exactMatch UMLS:C0206663
 
 [Term]
 id: MONDO:0005560
@@ -1716,11 +1953,11 @@ intersection_of: disease_has_location UBERON:0000955
 relationship: disease_has_location UBERON:0000955
 property_value: skos:exactMatch DOID:936
 property_value: skos:exactMatch EFO:0005774
-property_value: skos:exactMatch http://identifiers.org/medgen/14214
-property_value: skos:exactMatch http://identifiers.org/mesh/D001927
-property_value: skos:exactMatch http://identifiers.org/snomedct/81308009
-property_value: skos:exactMatch http://linkedlifedata.com/resource/umls/id/C0006111
+property_value: skos:exactMatch MEDGEN:14214
+property_value: skos:exactMatch MESH:D001927
 property_value: skos:exactMatch NCIT:C96413
+property_value: skos:exactMatch SCTID:81308009
+property_value: skos:exactMatch UMLS:C0006111
 property_value: terms:conformsTo http://purl.obolibrary.org/obo/mondo/patterns/location.yaml
 property_value: terms:conformsTo location:top.yaml
 
@@ -1745,9 +1982,9 @@ xref: UMLS:C0027654
 is_a: MONDO:0005070
 property_value: skos:exactMatch DOID:688
 property_value: skos:exactMatch EFO:0005784
-property_value: skos:exactMatch http://identifiers.org/medgen/45034
-property_value: skos:exactMatch http://linkedlifedata.com/resource/umls/id/C0027654
+property_value: skos:exactMatch MEDGEN:45034
 property_value: skos:exactMatch NCIT:C3264
+property_value: skos:exactMatch UMLS:C0027654
 
 [Term]
 id: MONDO:0005570
@@ -1755,6 +1992,7 @@ name: hematologic disorder
 def: "A disease involving the hematopoietic system." [https://orcid.org/0000-0002-6601-2165]
 comment: placeholder for lymphoid disease
 subset: disease_grouping
+subset: harrisons_view
 subset: ordo_group_of_disorders
 subset: otar
 subset: rare_grouping
@@ -1763,7 +2001,7 @@ synonym: "blood disorder" EXACT [DOID:74, NCIT:C26323]
 synonym: "blood dyscrasia" EXACT [DOID:74]
 synonym: "disease of haematopoietic system" EXACT OMO:0003005 [DOID:74]
 synonym: "disease of hematopoietic system" EXACT [DOID:74, MONDO:patterns/location_top]
-synonym: "disease of the blood and blood-forming organs" EXACT [DOID:74, ICD9CM:280-289.99]
+synonym: "disease of the blood and blood-forming organs" EXACT [DOID:74, ICD9CM:280-289]
 synonym: "disease or disorder of haematopoietic system" EXACT OMO:0003005 []
 synonym: "disease or disorder of hematopoietic system" EXACT []
 synonym: "disorder of haematopoietic system" EXACT OMO:0003005 []
@@ -1789,7 +2027,7 @@ xref: DOID:74
 xref: EFO:0005803
 xref: GTR:AN1320635
 xref: ICD10CM:D50-D89
-xref: ICD9:280-289.99
+xref: ICD9:280-289
 xref: ICD9:289.8
 xref: ICD9:289.9
 xref: MEDGEN:5483
@@ -1807,13 +2045,13 @@ relationship: disease_has_location UBERON:0002390
 property_value: IAO:0000233 "https://github.com/monarch-initiative/mondo/issues/254" xsd:anyURI
 property_value: skos:exactMatch DOID:74
 property_value: skos:exactMatch EFO:0005803
-property_value: skos:exactMatch http://identifiers.org/medgen/5483
-property_value: skos:exactMatch http://identifiers.org/mesh/D006402
-property_value: skos:exactMatch http://identifiers.org/snomedct/414022008
-property_value: skos:exactMatch http://linkedlifedata.com/resource/umls/id/C0018939
-property_value: skos:exactMatch http://purl.bioontology.org/ontology/ICD10CM/D50-D89
+property_value: skos:exactMatch icd10cm:D50-D89
+property_value: skos:exactMatch MEDGEN:5483
+property_value: skos:exactMatch MESH:D006402
 property_value: skos:exactMatch NCIT:C26323
 property_value: skos:exactMatch Orphanet:97992
+property_value: skos:exactMatch SCTID:414022008
+property_value: skos:exactMatch UMLS:C0018939
 property_value: terms:conformsTo http://purl.obolibrary.org/obo/mondo/patterns/location.yaml
 
 [Term]
@@ -1834,11 +2072,11 @@ intersection_of: MONDO:0005070
 intersection_of: disease_arises_from_structure CL:0000066
 relationship: disease_arises_from_structure CL:0000066
 property_value: skos:exactMatch EFO:0006858
-property_value: skos:exactMatch http://identifiers.org/medgen/277963
-property_value: skos:exactMatch http://identifiers.org/mesh/D009375
-property_value: skos:exactMatch http://identifiers.org/snomedct/118285006
-property_value: skos:exactMatch http://linkedlifedata.com/resource/umls/id/C1368683
+property_value: skos:exactMatch MEDGEN:277963
+property_value: skos:exactMatch MESH:D009375
 property_value: skos:exactMatch NCIT:C3709
+property_value: skos:exactMatch SCTID:118285006
+property_value: skos:exactMatch UMLS:C1368683
 
 [Term]
 id: MONDO:0006316
@@ -1852,9 +2090,9 @@ xref: NCIT:C6963
 xref: UMLS:C1334953
 is_a: MONDO:0005462
 property_value: skos:exactMatch EFO:1000393
-property_value: skos:exactMatch http://identifiers.org/medgen/233228
-property_value: skos:exactMatch http://linkedlifedata.com/resource/umls/id/C1334953
+property_value: skos:exactMatch MEDGEN:233228
 property_value: skos:exactMatch NCIT:C6963
+property_value: skos:exactMatch UMLS:C1334953
 
 [Term]
 id: MONDO:0006424
@@ -1868,7 +2106,7 @@ synonym: "soft tissue tumor" EXACT [NCIT:C3377]
 synonym: "soft tissue tumors" EXACT [NCIT:C3377]
 synonym: "soft tissue tumour" EXACT OMO:0003005 []
 synonym: "soft tissue tumours" EXACT OMO:0003005 []
-synonym: "SOFTTISSUE" RELATED ABBREVIATION [ONCOTREE:SOFTTISSUE]
+synonym: "SOFT_TISSUE" RELATED ABBREVIATION [ONCOTREE:SOFT_TISSUE]
 synonym: "tumor of soft tissue" EXACT [NCIT:C3377]
 synonym: "tumor of the soft tissue" EXACT [NCIT:C3377]
 synonym: "tumour of soft tissue" EXACT OMO:0003005 []
@@ -1876,15 +2114,15 @@ synonym: "tumour of the soft tissue" EXACT OMO:0003005 []
 xref: EFO:1000541
 xref: MEDGEN:11495
 xref: NCIT:C3377
-xref: ONCOTREE:SOFTTISSUE
+xref: ONCOTREE:SOFT_TISSUE
 xref: SCTID:387837005
 xref: UMLS:C0037579
 is_a: MONDO:0044334
 property_value: skos:exactMatch EFO:1000541
-property_value: skos:exactMatch http://identifiers.org/medgen/11495
-property_value: skos:exactMatch http://identifiers.org/snomedct/387837005
-property_value: skos:exactMatch http://linkedlifedata.com/resource/umls/id/C0037579
+property_value: skos:exactMatch MEDGEN:11495
 property_value: skos:exactMatch NCIT:C3377
+property_value: skos:exactMatch SCTID:387837005
+property_value: skos:exactMatch UMLS:C0037579
 
 [Term]
 id: MONDO:0006517
@@ -1913,14 +2151,15 @@ is_a: MONDO:0021079
 intersection_of: MONDO:0004992
 intersection_of: has_characteristic HP:0011463
 property_value: skos:exactMatch EFO:1000654
-property_value: skos:exactMatch http://identifiers.org/medgen/82962
-property_value: skos:exactMatch http://linkedlifedata.com/resource/umls/id/C0278704
+property_value: skos:exactMatch MEDGEN:82962
 property_value: skos:exactMatch NCIT:C4005
+property_value: skos:exactMatch UMLS:C0278704
 
 [Term]
 id: MONDO:0008903
 name: lung cancer
 def: "A malignant neoplasm involving the lung." [https://orcid.org/0000-0002-6601-2165]
+subset: omim_susceptibility
 subset: otar
 synonym: "adenocarcinoma of lung, response to tyrosine kinase inhibitor in, autosomal dominant, somatic mutation" EXACT []
 synonym: "adenocarcinoma of lung, somatic" EXACT []
@@ -1966,11 +2205,11 @@ relationship: disease_has_feature HP:0012735
 relationship: disease_has_feature HP:0030828
 property_value: IAO:0000233 "https://github.com/monarch-initiative/mondo/issues/4521" xsd:anyURI
 property_value: skos:exactMatch DOID:1324
-property_value: skos:exactMatch http://identifiers.org/medgen/66885
-property_value: skos:exactMatch http://identifiers.org/snomedct/363358000
-property_value: skos:exactMatch http://linkedlifedata.com/resource/umls/id/C0242379
-property_value: skos:exactMatch https://omim.org/entry/211980
+property_value: skos:exactMatch MEDGEN:66885
 property_value: skos:exactMatch NCIT:C7377
+property_value: skos:exactMatch OMIM:211980
+property_value: skos:exactMatch SCTID:363358000
+property_value: skos:exactMatch UMLS:C0242379
 property_value: terms:conformsTo http://purl.obolibrary.org/obo/mondo/patterns/cancer.yaml
 
 [Term]
@@ -1988,11 +2227,12 @@ xref: MESH:C565429
 xref: OMIM:247640
 xref: UMLS:C1855472
 is_a: MONDO:0004967
+property_value: curated_content_resource "https://www.malacards.org/card/lymphoblastic_leukemia_acute_with_lymphomatous_features" xsd:anyURI
 property_value: IAO:0000233 "https://github.com/monarch-initiative/mondo/issues/4521" xsd:anyURI
-property_value: skos:exactMatch http://identifiers.org/medgen/340879
-property_value: skos:exactMatch http://identifiers.org/mesh/C565429
-property_value: skos:exactMatch http://linkedlifedata.com/resource/umls/id/C1855472
-property_value: skos:exactMatch https://omim.org/entry/247640
+property_value: skos:exactMatch MEDGEN:340879
+property_value: skos:exactMatch MESH:C565429
+property_value: skos:exactMatch OMIM:247640
+property_value: skos:exactMatch UMLS:C1855472
 
 [Term]
 id: MONDO:0010643
@@ -2026,13 +2266,14 @@ is_a: MONDO:0005059
 is_a: MONDO:0020683
 intersection_of: MONDO:0005059
 intersection_of: has_characteristic PATO:0000389
+property_value: curated_content_resource "https://www.malacards.org/card/acute_leukemia" xsd:anyURI
 property_value: skos:exactMatch DOID:12603
 property_value: skos:exactMatch EFO:1000068
-property_value: skos:exactMatch http://identifiers.org/medgen/43225
-property_value: skos:exactMatch http://identifiers.org/mesh/C564112
-property_value: skos:exactMatch http://identifiers.org/snomedct/91855006
-property_value: skos:exactMatch http://linkedlifedata.com/resource/umls/id/C0085669
+property_value: skos:exactMatch MEDGEN:43225
+property_value: skos:exactMatch MESH:C564112
 property_value: skos:exactMatch NCIT:C9300
+property_value: skos:exactMatch SCTID:91855006
+property_value: skos:exactMatch UMLS:C0085669
 
 [Term]
 id: MONDO:0010648
@@ -2051,12 +2292,13 @@ xref: OMIM:309200
 xref: UMLS:C1839839
 is_a: MONDO:0000693
 is_a: MONDO:0100545
+property_value: curated_content_resource "https://www.malacards.org/card/major_affective_disorder_2" xsd:anyURI
 property_value: excluded_from_qc_check http://purl.obolibrary.org/obo/mondo/sparql/qc/general/qc-single-child.sparql
 property_value: IAO:0000233 "https://github.com/monarch-initiative/mondo/issues/4521" xsd:anyURI
-property_value: skos:exactMatch http://identifiers.org/medgen/326975
-property_value: skos:exactMatch http://identifiers.org/mesh/C564108
-property_value: skos:exactMatch http://linkedlifedata.com/resource/umls/id/C1839839
-property_value: skos:exactMatch https://omim.org/entry/309200
+property_value: skos:exactMatch MEDGEN:326975
+property_value: skos:exactMatch MESH:C564108
+property_value: skos:exactMatch OMIM:309200
+property_value: skos:exactMatch UMLS:C1839839
 
 [Term]
 id: MONDO:0013082
@@ -2079,11 +2321,12 @@ xref: Orphanet:2151
 xref: UMLS:C5191058
 is_a: MONDO:0002254
 is_a: MONDO:0021189
+property_value: curated_content_resource "https://www.malacards.org/card/hirschsprung_disease_ganglioneuroblastoma_syndrome" xsd:anyURI
 property_value: IAO:0000233 "https://github.com/monarch-initiative/mondo/issues/6878" xsd:anyURI
-property_value: skos:exactMatch http://identifiers.org/medgen/1683967
-property_value: skos:exactMatch http://identifiers.org/mesh/C538119
-property_value: skos:exactMatch http://linkedlifedata.com/resource/umls/id/C5191058
+property_value: skos:exactMatch MEDGEN:1683967
+property_value: skos:exactMatch MESH:C538119
 property_value: skos:exactMatch Orphanet:2151
+property_value: skos:exactMatch UMLS:C5191058
 
 [Term]
 id: MONDO:0013108
@@ -2113,9 +2356,9 @@ relationship: excluded_subClassOf MONDO:0004967
 relationship: predisposes_towards MONDO:0004967
 property_value: IAO:0000233 "https://github.com/monarch-initiative/mondo/issues/4521" xsd:anyURI
 property_value: IAO:0000233 "https://github.com/monarch-initiative/mondo/issues/4882" xsd:anyURI
-property_value: skos:exactMatch http://identifiers.org/medgen/442767
-property_value: skos:exactMatch http://linkedlifedata.com/resource/umls/id/C2751595
-property_value: skos:exactMatch https://omim.org/entry/613065
+property_value: skos:exactMatch MEDGEN:442767
+property_value: skos:exactMatch OMIM:613065
+property_value: skos:exactMatch UMLS:C2751595
 
 [Term]
 id: MONDO:0015356
@@ -2158,13 +2401,14 @@ is_a: MONDO:0021058
 intersection_of: MONDO:0020573
 intersection_of: predisposes_towards MONDO:0005070
 relationship: predisposes_towards MONDO:0005070
+property_value: curated_content_resource "https://www.malacards.org/card/inherited_cancer_predisposing_syndrome" xsd:anyURI
 property_value: IAO:0000233 "https://github.com/monarch-initiative/mondo/issues/5046" xsd:anyURI
-property_value: skos:exactMatch http://identifiers.org/medgen/14326
-property_value: skos:exactMatch http://identifiers.org/mesh/D009386
-property_value: skos:exactMatch http://identifiers.org/snomedct/699346009
-property_value: skos:exactMatch http://linkedlifedata.com/resource/umls/id/C0027672
+property_value: skos:exactMatch MEDGEN:14326
+property_value: skos:exactMatch MESH:D009386
 property_value: skos:exactMatch NCIT:C3266
 property_value: skos:exactMatch Orphanet:140162
+property_value: skos:exactMatch SCTID:699346009
+property_value: skos:exactMatch UMLS:C0027672
 
 [Term]
 id: MONDO:0015757
@@ -2178,11 +2422,12 @@ xref: MEDGEN:1842533
 xref: Orphanet:171898
 xref: UMLS:C5680515
 is_a: MONDO:0002334
+property_value: curated_content_resource "https://www.malacards.org/card/lymphoid_hemopathy" xsd:anyURI
 property_value: IAO:0000233 "https://github.com/monarch-initiative/mondo/issues/6739" xsd:anyURI
 property_value: IAO:0000233 "https://github.com/monarch-initiative/mondo/issues/6746" xsd:anyURI
-property_value: skos:exactMatch http://identifiers.org/medgen/1842533
-property_value: skos:exactMatch http://linkedlifedata.com/resource/umls/id/C5680515
+property_value: skos:exactMatch MEDGEN:1842533
 property_value: skos:exactMatch Orphanet:171898
+property_value: skos:exactMatch UMLS:C5680515
 
 [Term]
 id: MONDO:0018078
@@ -2214,12 +2459,13 @@ xref: SCTID:424952003
 xref: UMLS:C4551687
 is_a: MONDO:0005089
 is_a: MONDO:0024637
+property_value: curated_content_resource "https://www.malacards.org/card/soft_tissue_sarcoma" xsd:anyURI
 property_value: skos:exactMatch EFO:1001968
-property_value: skos:exactMatch http://identifiers.org/medgen/1642116
-property_value: skos:exactMatch http://identifiers.org/snomedct/424952003
-property_value: skos:exactMatch http://linkedlifedata.com/resource/umls/id/C4551687
+property_value: skos:exactMatch MEDGEN:1642116
 property_value: skos:exactMatch NCIT:C9306
 property_value: skos:exactMatch Orphanet:3394
+property_value: skos:exactMatch SCTID:424952003
+property_value: skos:exactMatch UMLS:C4551687
 
 [Term]
 id: MONDO:0018908
@@ -2246,14 +2492,29 @@ xref: ONCOTREE:NHL
 xref: Orphanet:547
 xref: UMLS:C0024305
 is_a: MONDO:0005062
-property_value: skos:closeMatch http://identifiers.org/meddra/10029547
+property_value: skos:closeMatch MEDDRA:10029547
 property_value: skos:exactMatch DOID:0060060
 property_value: skos:exactMatch EFO:0005952
-property_value: skos:exactMatch http://identifiers.org/medgen/6160
-property_value: skos:exactMatch http://identifiers.org/mesh/D008228
-property_value: skos:exactMatch http://linkedlifedata.com/resource/umls/id/C0024305
+property_value: skos:exactMatch MEDGEN:6160
+property_value: skos:exactMatch MESH:D008228
 property_value: skos:exactMatch NCIT:C3211
 property_value: skos:exactMatch Orphanet:547
+property_value: skos:exactMatch UMLS:C0024305
+
+[Term]
+id: MONDO:0019278
+name: hair anomaly
+subset: disease_grouping
+subset: ordo_group_of_disorders
+xref: MEDGEN:539624
+xref: Orphanet:79363
+xref: UMLS:C0265991
+is_a: MONDO:0002917
+is_a: MONDO:0024481
+relationship: disease_has_location UBERON:0002074
+property_value: skos:exactMatch MEDGEN:539624
+property_value: skos:exactMatch Orphanet:79363
+property_value: skos:exactMatch UMLS:C0265991
 
 [Term]
 id: MONDO:0020573
@@ -2278,10 +2539,10 @@ is_a: MONDO:0042489
 intersection_of: MONDO:0042489
 intersection_of: has_characteristic MONDO:0021152
 relationship: has_characteristic MONDO:0021152
-property_value: skos:exactMatch http://identifiers.org/medgen/137259
-property_value: skos:exactMatch http://identifiers.org/mesh/D020022
-property_value: skos:exactMatch http://linkedlifedata.com/resource/umls/id/C0314657
-property_value: skos:exactMatch http://purl.bioontology.org/ontology/ICD10CM/Z15
+property_value: skos:exactMatch icd10cm:Z15
+property_value: skos:exactMatch MEDGEN:137259
+property_value: skos:exactMatch MESH:D020022
+property_value: skos:exactMatch UMLS:C0314657
 property_value: terms:creator https://orcid.org/0000-0002-6601-2165
 creation_date: 2017-09-30T12:01:25Z
 
@@ -2317,12 +2578,12 @@ intersection_of: MONDO:0005070
 intersection_of: disease_has_location UBERON:0000065
 relationship: disease_has_location UBERON:0000065
 property_value: skos:exactMatch EFO:0003853
-property_value: skos:exactMatch http://identifiers.org/medgen/11200
-property_value: skos:exactMatch http://identifiers.org/mesh/D012142
-property_value: skos:exactMatch http://identifiers.org/snomedct/126667002
-property_value: skos:exactMatch http://linkedlifedata.com/resource/umls/id/C0035244
+property_value: skos:exactMatch MEDGEN:11200
+property_value: skos:exactMatch MESH:D012142
 property_value: skos:exactMatch NCIT:C3355
-property_value: skos:relatedMatch http://purl.bioontology.org/ontology/ICD10CM/C30-C39
+property_value: skos:exactMatch SCTID:126667002
+property_value: skos:exactMatch UMLS:C0035244
+property_value: skos:relatedMatch icd10cm:C30-C39
 property_value: terms:conformsTo http://purl.obolibrary.org/obo/mondo/patterns/neoplasm.yaml
 
 [Term]
@@ -2341,10 +2602,10 @@ is_a: MONDO:0700096
 intersection_of: MONDO:0700096
 intersection_of: has_characteristic PATO:0000389
 relationship: has_characteristic PATO:0000389
-property_value: skos:exactMatch http://identifiers.org/medgen/1738
-property_value: skos:exactMatch http://identifiers.org/mesh/D000208
-property_value: skos:exactMatch http://identifiers.org/snomedct/2704003
-property_value: skos:exactMatch http://linkedlifedata.com/resource/umls/id/C0001314
+property_value: skos:exactMatch MEDGEN:1738
+property_value: skos:exactMatch MESH:D000208
+property_value: skos:exactMatch SCTID:2704003
+property_value: skos:exactMatch UMLS:C0001314
 property_value: terms:conformsTo http://purl.obolibrary.org/obo/mondo/patterns/acute.yaml
 
 [Term]
@@ -2364,9 +2625,9 @@ is_a: MONDO:0023370
 intersection_of: MONDO:0002254
 intersection_of: disease_has_major_feature MONDO:0005070
 relationship: disease_has_major_feature MONDO:0005070
-property_value: skos:exactMatch http://identifiers.org/medgen/362147
-property_value: skos:exactMatch http://linkedlifedata.com/resource/umls/id/C1882062
+property_value: skos:exactMatch MEDGEN:362147
 property_value: skos:exactMatch NCIT:C54705
+property_value: skos:exactMatch UMLS:C1882062
 
 [Term]
 id: MONDO:0021079
@@ -2391,9 +2652,9 @@ is_a: MONDO:0005070
 intersection_of: MONDO:0005070
 intersection_of: has_characteristic HP:0011463
 relationship: has_characteristic HP:0011463
-property_value: skos:exactMatch http://identifiers.org/medgen/237153
-property_value: skos:exactMatch http://linkedlifedata.com/resource/umls/id/C1368871
+property_value: skos:exactMatch MEDGEN:237153
 property_value: skos:exactMatch NCIT:C6283
+property_value: skos:exactMatch UMLS:C1368871
 
 [Term]
 id: MONDO:0021117
@@ -2426,10 +2687,10 @@ is_a: MONDO:0020641
 is_a: MONDO:0021350
 intersection_of: MONDO:0005070
 intersection_of: disease_has_location UBERON:0002048
-property_value: skos:exactMatch http://identifiers.org/medgen/7400
-property_value: skos:exactMatch http://identifiers.org/mesh/D008175
-property_value: skos:exactMatch http://linkedlifedata.com/resource/umls/id/C0024121
+property_value: skos:exactMatch MEDGEN:7400
+property_value: skos:exactMatch MESH:D008175
 property_value: skos:exactMatch NCIT:C3200
+property_value: skos:exactMatch UMLS:C0024121
 property_value: terms:conformsTo http://purl.obolibrary.org/obo/mondo/patterns/neoplasm.yaml
 
 [Term]
@@ -2445,9 +2706,9 @@ is_a: MONDO:0700096
 intersection_of: MONDO:0700096
 intersection_of: disease_disrupts GO:0032502
 relationship: disease_disrupts GO:0032502
-property_value: skos:exactMatch http://identifiers.org/medgen/1843482
-property_value: skos:exactMatch http://linkedlifedata.com/resource/umls/id/C0694457
-property_value: skos:exactMatch http://purl.bioontology.org/ontology/ICD10CM/Q00-Q99
+property_value: skos:exactMatch icd10cm:Q00-Q99
+property_value: skos:exactMatch MEDGEN:1843482
+property_value: skos:exactMatch UMLS:C0694457
 property_value: terms:conformsTo http://purl.obolibrary.org/obo/mondo/patterns/specific_disease_by_disrupted_process.yaml
 
 [Term]
@@ -2462,8 +2723,8 @@ is_a: MONDO:0005020
 intersection_of: MONDO:0000001
 intersection_of: disease_has_basis_in_disruption_of GO:0120054
 relationship: disease_has_basis_in_disruption_of GO:0120054
-property_value: skos:exactMatch http://identifiers.org/medgen/586448
-property_value: skos:exactMatch http://linkedlifedata.com/resource/umls/id/C0400865
+property_value: skos:exactMatch MEDGEN:586448
+property_value: skos:exactMatch UMLS:C0400865
 property_value: terms:conformsTo disrupts:process.yaml
 property_value: terms:conformsTo http://purl.obolibrary.org/obo/mondo/patterns/basis_in_disruption_of_process.yaml
 
@@ -2502,10 +2763,10 @@ is_a: MONDO:0021248
 intersection_of: MONDO:0005070
 intersection_of: disease_arises_from_structure UBERON:0034705
 relationship: disease_arises_from_structure UBERON:0034705
-property_value: skos:exactMatch http://identifiers.org/medgen/60215
-property_value: skos:exactMatch http://identifiers.org/mesh/D018302
-property_value: skos:exactMatch http://linkedlifedata.com/resource/umls/id/C0206715
+property_value: skos:exactMatch MEDGEN:60215
+property_value: skos:exactMatch MESH:D018302
 property_value: skos:exactMatch NCIT:C3787
+property_value: skos:exactMatch UMLS:C0206715
 
 [Term]
 id: MONDO:0021248
@@ -2529,9 +2790,9 @@ is_a: MONDO:0005070
 is_a: MONDO:0005071
 intersection_of: MONDO:0005070
 intersection_of: disease_has_location UBERON:0001016
-property_value: skos:exactMatch http://identifiers.org/medgen/45046
-property_value: skos:exactMatch http://linkedlifedata.com/resource/umls/id/C0027766
+property_value: skos:exactMatch MEDGEN:45046
 property_value: skos:exactMatch NCIT:C3268
+property_value: skos:exactMatch UMLS:C0027766
 property_value: terms:conformsTo http://purl.obolibrary.org/obo/mondo/patterns/neoplasm.yaml
 
 [Term]
@@ -2564,11 +2825,11 @@ is_a: MONDO:0005070
 intersection_of: MONDO:0005070
 intersection_of: disease_has_location UBERON:0000915
 relationship: disease_has_location UBERON:0000915
-property_value: skos:exactMatch http://identifiers.org/medgen/11793
-property_value: skos:exactMatch http://identifiers.org/snomedct/255058005
-property_value: skos:exactMatch http://linkedlifedata.com/resource/umls/id/C0039981
+property_value: skos:exactMatch MEDGEN:11793
 property_value: skos:exactMatch NCIT:C3406
-property_value: skos:relatedMatch http://purl.bioontology.org/ontology/ICD10CM/C30-C39
+property_value: skos:exactMatch SCTID:255058005
+property_value: skos:exactMatch UMLS:C0039981
+property_value: skos:relatedMatch icd10cm:C30-C39
 property_value: terms:conformsTo http://purl.obolibrary.org/obo/mondo/patterns/neoplasm.yaml
 
 [Term]
@@ -2598,10 +2859,10 @@ is_a: MONDO:0021581
 intersection_of: MONDO:0005070
 intersection_of: disease_has_location UBERON:0001013
 relationship: disease_has_location UBERON:0001013
-property_value: skos:exactMatch http://identifiers.org/medgen/61646
-property_value: skos:exactMatch http://identifiers.org/snomedct/254831005
-property_value: skos:exactMatch http://linkedlifedata.com/resource/umls/id/C0206631
+property_value: skos:exactMatch MEDGEN:61646
 property_value: skos:exactMatch NCIT:C4248
+property_value: skos:exactMatch SCTID:254831005
+property_value: skos:exactMatch UMLS:C0206631
 property_value: terms:conformsTo http://purl.obolibrary.org/obo/mondo/patterns/neoplasm.yaml
 
 [Term]
@@ -2629,10 +2890,10 @@ is_a: MONDO:0005070
 intersection_of: MONDO:0005070
 intersection_of: disease_has_location UBERON:0002384
 relationship: disease_has_location UBERON:0002384
-property_value: skos:exactMatch http://identifiers.org/medgen/45035
-property_value: skos:exactMatch http://identifiers.org/mesh/D009372
-property_value: skos:exactMatch http://identifiers.org/snomedct/126598008
-property_value: skos:exactMatch http://linkedlifedata.com/resource/umls/id/C0027656
+property_value: skos:exactMatch MEDGEN:45035
+property_value: skos:exactMatch MESH:D009372
+property_value: skos:exactMatch SCTID:126598008
+property_value: skos:exactMatch UMLS:C0027656
 property_value: terms:conformsTo http://purl.obolibrary.org/obo/mondo/patterns/neoplasm.yaml
 
 [Term]
@@ -2674,9 +2935,9 @@ xref: NCIT:C121619
 xref: ONCOTREE:NSGCT
 xref: UMLS:C1266158
 is_a: MONDO:0005040
-property_value: skos:exactMatch http://identifiers.org/medgen/220426
-property_value: skos:exactMatch http://linkedlifedata.com/resource/umls/id/C1266158
+property_value: skos:exactMatch MEDGEN:220426
 property_value: skos:exactMatch NCIT:C121619
+property_value: skos:exactMatch UMLS:C1266158
 
 [Term]
 id: MONDO:0023370
@@ -2688,6 +2949,33 @@ synonym: "neoplastic disorder" RELATED []
 is_a: MONDO:0045024
 union_of: MONDO:0005070
 union_of: MONDO:0021058
+
+[Term]
+id: MONDO:0024481
+name: skin appendage disorder
+def: "A disease that involves the cutaneous appendage." [MONDO:patterns/location]
+subset: otar
+synonym: "cutaneous appendage disease" EXACT [MONDO:patterns/location]
+synonym: "cutaneous appendage disease or disorder" EXACT [MONDO:patterns/location]
+synonym: "disease of cutaneous appendage" EXACT [MONDO:patterns/location_top]
+synonym: "disease of epidermal appendage" RELATED []
+synonym: "disease of epidermal appendages" RELATED []
+synonym: "disease or disorder of cutaneous appendage" EXACT []
+synonym: "disorder of cutaneous appendage" EXACT [MONDO:patterns/location_top]
+synonym: "disorder of skin appendage" EXACT []
+xref: ICD10CM:L60-L75
+xref: MEDGEN:508145
+xref: SCTID:238714008
+xref: UMLS:C0037272
+is_a: MONDO:0002051
+intersection_of: MONDO:0700096
+intersection_of: disease_has_location UBERON:0000021
+relationship: disease_has_location UBERON:0000021
+property_value: skos:exactMatch icd10cm:L60-L75
+property_value: skos:exactMatch MEDGEN:508145
+property_value: skos:exactMatch SCTID:238714008
+property_value: skos:exactMatch UMLS:C0037272
+property_value: terms:conformsTo http://purl.obolibrary.org/obo/mondo/patterns/location.yaml
 
 [Term]
 id: MONDO:0024637
@@ -2709,10 +2997,10 @@ xref: SCTID:269469005
 xref: UMLS:C4551686
 is_a: MONDO:0004992
 is_a: MONDO:0006424
-property_value: skos:exactMatch http://identifiers.org/medgen/1632429
-property_value: skos:exactMatch http://identifiers.org/snomedct/269469005
-property_value: skos:exactMatch http://linkedlifedata.com/resource/umls/id/C4551686
+property_value: skos:exactMatch MEDGEN:1632429
 property_value: skos:exactMatch NCIT:C4867
+property_value: skos:exactMatch SCTID:269469005
+property_value: skos:exactMatch UMLS:C4551686
 
 [Term]
 id: MONDO:0024882
@@ -2730,9 +3018,9 @@ is_a: MONDO:0023370
 intersection_of: MONDO:0023370
 intersection_of: disease_arises_from_feature MONDO:0005070
 relationship: disease_arises_from_feature MONDO:0005070
-property_value: skos:exactMatch http://identifiers.org/medgen/1851572
-property_value: skos:exactMatch http://linkedlifedata.com/resource/umls/id/C5848363
+property_value: skos:exactMatch MEDGEN:1851572
 property_value: skos:exactMatch NCIT:C36255
+property_value: skos:exactMatch UMLS:C5848363
 
 [Term]
 id: MONDO:0042489
@@ -2748,9 +3036,9 @@ xref: MEDGEN:41610
 xref: MESH:D004198
 xref: UMLS:C0012655
 is_a: BFO:0000016
-property_value: skos:exactMatch http://identifiers.org/medgen/41610
-property_value: skos:exactMatch http://identifiers.org/mesh/D004198
-property_value: skos:exactMatch http://linkedlifedata.com/resource/umls/id/C0012655
+property_value: skos:exactMatch MEDGEN:41610
+property_value: skos:exactMatch MESH:D004198
+property_value: skos:exactMatch UMLS:C0012655
 
 [Term]
 id: MONDO:0044334
@@ -2783,9 +3071,9 @@ xref: MEDGEN:60224
 xref: NCIT:C3810
 xref: UMLS:C0206765
 is_a: MONDO:0005070
-property_value: skos:exactMatch http://identifiers.org/medgen/60224
-property_value: skos:exactMatch http://linkedlifedata.com/resource/umls/id/C0206765
+property_value: skos:exactMatch MEDGEN:60224
 property_value: skos:exactMatch NCIT:C3810
+property_value: skos:exactMatch UMLS:C0206765
 
 [Term]
 id: MONDO:0044878
@@ -2806,9 +3094,9 @@ is_a: MONDO:0005040
 intersection_of: MONDO:0005040
 intersection_of: has_characteristic HP:0003581
 relationship: has_characteristic HP:0003581
-property_value: skos:exactMatch http://identifiers.org/medgen/859695
-property_value: skos:exactMatch http://linkedlifedata.com/resource/umls/id/C3900101
+property_value: skos:exactMatch MEDGEN:859695
 property_value: skos:exactMatch NCIT:C114777
+property_value: skos:exactMatch UMLS:C3900101
 
 [Term]
 id: MONDO:0044881
@@ -2851,9 +3139,9 @@ is_a: MONDO:0002334
 intersection_of: MONDO:0005070
 intersection_of: disease_arises_from_structure CL:0000988
 relationship: disease_arises_from_structure CL:0000988
-property_value: skos:exactMatch http://identifiers.org/medgen/91264
-property_value: skos:exactMatch http://linkedlifedata.com/resource/umls/id/C0376544
+property_value: skos:exactMatch MEDGEN:91264
 property_value: skos:exactMatch NCIT:C27134
+property_value: skos:exactMatch UMLS:C0376544
 
 [Term]
 id: MONDO:0045024
@@ -2873,6 +3161,28 @@ union_of: MONDO:0023370
 union_of: MONDO:0045054
 relationship: disease_disrupts GO:0008283
 property_value: terms:conformsTo http://purl.obolibrary.org/obo/mondo/patterns/specific_disease_by_disrupted_process.yaml
+
+[Term]
+id: MONDO:0100118
+name: hereditary skin disorder
+def: "An instance of skin disease that is caused by a modification of the individual's genome." [MONDO:patterns/genetic]
+subset: otar
+synonym: "disease, genetic skin" EXACT [MESH:D012873]
+synonym: "diseases, genetic skin" EXACT [MESH:D012873]
+synonym: "genetic skin disease" EXACT [MESH:D012873, MONDO:patterns/genetic]
+synonym: "genetic skin diseases" EXACT [MESH:D012873]
+synonym: "genodermatosis" EXACT []
+synonym: "skin disease, genetic" EXACT [MESH:D012873]
+xref: MESH:D012873
+xref: SCTID:239001006
+is_a: MONDO:0003847
+is_a: MONDO:0005093
+intersection_of: MONDO:0005093
+intersection_of: has_characteristic MONDO:0021152
+property_value: IAO:0000233 "https://github.com/monarch-initiative/mondo/issues/5682" xsd:anyURI
+property_value: skos:exactMatch MESH:D012873
+property_value: skos:exactMatch SCTID:239001006
+property_value: terms:creator https://orcid.org/0000-0001-5208-3432
 
 [Term]
 id: MONDO:0100545
@@ -2923,6 +3233,7 @@ is_a: RO:0002131
 [Typedef]
 id: BFO:0000055
 name: realizes
+def: "Paraphrase of elucidation: a relation between a process and a realizable entity, where there is some material entity that is bearer of the realizable entity and participates in the process, and the realizable entity comes to be realized in the course of the process" []
 domain: BFO:0000015
 range: BFO:0000017
 
@@ -3097,21 +3408,6 @@ range: BFO:0000002
 holds_over_chain: BFO:0000051 RO:0000057
 
 [Typedef]
-id: RO:0000058
-name: is concretized as
-def: "A relationship between a generically dependent continuant and a specifically dependent continuant, in which the generically dependent continuant depends on some independent continuant in virtue of the fact that the specifically dependent continuant also depends on that same independent continuant. A generically dependent continuant may be concretized as multiple specifically dependent continuants." []
-domain: BFO:0000031
-range: BFO:0000020
-inverse_of: RO:0000059
-
-[Typedef]
-id: RO:0000059
-name: concretizes
-def: "A relationship between a specifically dependent continuant and a generically dependent continuant, in which the generically dependent continuant depends on some independent continuant in virtue of the fact that the specifically dependent continuant also depends on that same independent continuant. Multiple specifically dependent continuants can concretize the same generically dependent continuant." []
-domain: BFO:0000020
-range: BFO:0000031
-
-[Typedef]
 id: RO:0000080
 name: quality of
 def: "a relation between a quality and an independent continuant (the bearer), in which the quality specifically depends on the bearer for its existence" []
@@ -3181,11 +3477,6 @@ is_transitive: true
 inverse_of: RO:0001025
 
 [Typedef]
-id: RO:0001019
-name: obsolete contains
-is_obsolete: true
-
-[Typedef]
 id: RO:0001025
 name: located in
 def: "a relation between two independent continuants, the target and the location, in which the target is entirely within the location" []
@@ -3217,10 +3508,18 @@ is_a: RO:0002323
 
 [Typedef]
 id: RO:0002005
-name: innervated_by
+name: innervated by
+def: "relation between an anatomical structure and a neuron projection bundle that has synaptic terminals in the structure." []
 domain: UBERON:0000061
 range: UBERON:0000122
 inverse_of: RO:0002134
+transitive_over: RO:0002380
+
+[Typedef]
+id: RO:0002006
+name: has synaptic terminal of
+is_a: RO:0002131
+inverse_of: RO:0002130
 
 [Typedef]
 id: RO:0002007
@@ -3298,10 +3597,35 @@ range: UBERON:0000465
 is_a: BFO:0000051
 
 [Typedef]
+id: RO:0002110
+name: has postsynaptic terminal in
+def: "Relation between a neuron and some structure (e.g.- a brain region) in which it receives (chemical) synaptic input. " []
+domain: CL:0000540
+is_a: RO:0002130
+inverse_of: RO:0002113
+transitive_over: BFO:0000050
+
+[Typedef]
+id: RO:0002113
+name: has presynaptic terminal in
+def: "Relation between a neuron and some structure (e.g.- a brain region) in which it receives (chemical) synaptic input." []
+domain: CL:0000540
+is_a: RO:0002130
+transitive_over: BFO:0000050
+
+[Typedef]
 id: RO:0002120
 name: synapsed to
 def: " Relation between a neuron and an anatomical structure (including cells) that it chemically synapses to.\n        " []
 is_a: RO:0002486
+
+[Typedef]
+id: RO:0002130
+name: has synaptic terminal in
+def: "A general relation between a neuron and some structure in which it either chemically synapses to some target or in which it receives (chemical) synaptic input." []
+domain: CL:0000540
+is_a: RO:0002131
+transitive_over: BFO:0000050
 
 [Typedef]
 id: RO:0002131
@@ -3359,13 +3683,6 @@ name: serially homologous to
 is_symmetric: true
 is_transitive: true
 is_a: RO:0002320
-
-[Typedef]
-id: RO:0002160
-name: only in taxon
-def: "x only in taxon y if and only if x is in taxon y, and there is no other organism z such that y!=z a and x is in taxon z." []
-property_value: IAO:0000116 "The original intent was to treat this as a macro that expands to 'in taxon' only ?Y - however, this is not necessary if we instead have supplemental axioms that state that each pair of sibling tax have a disjointness axiom using the 'in taxon' property - e.g.\n\n 'in taxon' some Eukaryota DisjointWith 'in taxon' some Eubacteria" xsd:string
-is_a: in_taxon
 
 [Typedef]
 id: RO:0002163
@@ -3510,13 +3827,6 @@ is_a: RO:0002328
 is_a: RO:0002500
 
 [Typedef]
-id: RO:0002218
-name: obsolete has active participant
-def: "OBSOLETE x has participant y if and only if x realizes some active role that inheres in y" []
-is_obsolete: true
-replaced_by: RO:0002500
-
-[Typedef]
 id: RO:0002219
 name: surrounded by
 def: "x surrounded_by y if and only if (1) x is adjacent to y and for every region r that is adjacent to x, r overlaps y (2) the shared boundary between x and y occupies the majority of the outermost boundary of x" []
@@ -3652,7 +3962,7 @@ name: has developmental contribution from
 def: "x has developmental contribution from y iff x has some part z such that z develops from y" []
 domain: UBERON:0001062
 range: UBERON:0001062
-holds_over_chain: BFO:0000051 RO:0002202
+holds_over_chain: BFO:0000051 RO:0002254
 is_a: RO:0002258
 inverse_of: RO:0002255
 
@@ -3884,6 +4194,11 @@ name: formed as result of
 is_a: RO:0002353
 
 [Typedef]
+id: RO:0002360
+name: has dendrite location
+is_a: RO:0002131
+
+[Typedef]
 id: RO:0002371
 name: attached to
 def: "a is attached to b if and only if a and b are discrete objects or object parts, and there are physical connections between a and b such that a force pulling a will move b, or a force pulling b will move a" []
@@ -3982,6 +4297,13 @@ is_a: RO:0002427
 inverse_of: RO:0002411
 
 [Typedef]
+id: RO:0002405
+name: immediately causally downstream of
+is_a: RO:0002087
+is_a: RO:0002404
+inverse_of: RO:0002412
+
+[Typedef]
 id: RO:0002410
 name: causally related to
 property_value: IAO:0000116 "This branch of the ontology deals with causal relations between entities. It is divided into two branches: causal relations between occurrents/processes, and causal relations between material entities. We take an 'activity flow-centric approach', with the former as primary, and define causal relations between material entities in terms of causal relations between occurrents.\n\nTo define causal relations in an activity-flow type network, we make use of 3 primitives:\n\n * Temporal: how do the intervals of the two occurrents relate? \n * Is the causal relation regulatory?\n * Is the influence positive or negative?\n\nThe first of these can be formalized in terms of the Allen Interval Algebra. Informally, the 3 bins we care about are 'direct', 'indirect' or overlapping. Note that all causal relations should be classified under a RO temporal relation (see the branch under 'temporally related to'). Note that all causal relations are temporal, but not all temporal relations are causal. Two occurrents can be related in time without being causally connected. We take causal influence to be primitive, elucidated as being such that has the upstream changed, some qualities of the donwstream would necessarily be modified.\n\nFor the second, we consider a relationship to be regulatory if the system in which the activities occur is capable of altering the relationship to achieve some objective. This could include changing the rate of production of a molecule.\n\nFor the third, we consider the effect of the upstream process on the output(s) of the downstream process. If the level of output is increased, or the rate of production of the output is increased, then the direction is increased. Direction can be positive, negative or neutral or capable of either direction. Two positives in succession yield a positive, two negatives in succession yield a positive, otherwise the default assumption is that the net effect is canceled and the influence is neutral.\n\nEach of these 3 primitives can be composed to yield a cross-product of different relation types." xsd:string
@@ -3995,6 +4317,30 @@ is_a: BFO:0000063
 is_a: RO:0002418
 
 [Typedef]
+id: RO:0002412
+name: immediately causally upstream of
+def: "p is immediately causally upstream of q iff p is causally upstream of q, and the end of p is coincident with the beginning of q." []
+is_a: RO:0002090
+is_a: RO:0002411
+
+[Typedef]
+id: RO:0002413
+name: provides input for
+def: "p provides input for q iff p is immediately causally upstream of q, and there exists some c such that p has_output c and q has_input c." []
+holds_over_chain: RO:0002234 RO:0002233
+is_a: RO:0002412
+is_a: RO:0002414
+
+[Typedef]
+id: RO:0002414
+name: transitively provides input for
+def: "transitive form of directly_provides_input_for" []
+domain: BFO:0000015
+range: BFO:0000015
+is_transitive: true
+is_a: RO:0004047
+
+[Typedef]
 id: RO:0002418
 name: causally upstream of or within
 def: "p is 'causally upstream or within' q iff p is causally related to q, and the end of p precedes, or is coincident with, the end of q." []
@@ -4002,6 +4348,7 @@ property_value: IAO:0000116 "We would like to make this disjoint with 'preceded 
 is_transitive: true
 is_a: RO:0002501
 inverse_of: RO:0002427
+transitive_over: BFO:0000050
 
 [Typedef]
 id: RO:0002427
@@ -4437,14 +4784,12 @@ is_a: RO:0002410
 [Typedef]
 id: RO:0004019
 name: disease has basis in
-domain: OGMS:0000031
 is_a: RO:0004017
 is_a: RO:0004023
 
 [Typedef]
 id: RO:0004023
 name: causal relationship with disease as subject
-domain: OGMS:0000031
 is_a: RO:0002410
 is_a: RO:0040035
 
@@ -4467,21 +4812,11 @@ domain: BFO:0000040
 range: BFO:0000040
 
 [Typedef]
-id: RO:0010001
-name: generically depends on
-def: "A generically dependent continuant *b* generically depends on an independent continuant *c* at time *t* means: there inheres in *c* a specifically deendent continuant which concretizes *b* at *t*." []
-domain: BFO:0000031
-range: BFO:0000004
-holds_over_chain: RO:0000052 RO:0000058
-inverse_of: RO:0010002
-
-[Typedef]
-id: RO:0010002
-name: is carrier of
-def: "*b* is carrier of *c* at time *t* if and only if *c* *g-depends on* *b* at *t*" []
-domain: BFO:0000004
-range: BFO:0000031
-holds_over_chain: RO:0000059 has_characteristic
+id: RO:0015004
+name: has characterizing marker set
+def: "A relation that applies between a cell type and a set of markers that can be used to uniquely identify that cell type." []
+property_value: IAO:0000116 "C has_characterizing_marker_set y iff: C is a cell type and y is a collection of genes or proteins whose expression is sufficient to distinguish cell type C from most or all other cell types." xsd:string
+domain: CL:0000000
 
 [Typedef]
 id: RO:0015006
@@ -4534,6 +4869,22 @@ def: "X device utilizes material Y means X and Y are material entities, and X is
 holds_over_chain: RO:0002215 RO:0002233
 
 [Typedef]
+id: RO:0020101
+name: vessel supplies blood to
+def: "x vessel supplies blood to y if and only if x is a vessel that supplies blood directly or indirectly to an anatomical structure y." []
+domain: UBERON:0001981
+range: UBERON:0000061
+is_a: RO:0002178
+
+[Typedef]
+id: RO:0020102
+name: vessel drains blood from
+def: "x vessel drains blood from y if and only if x is a vessel that drains blood directly or indirectly from an anatomical structure y." []
+domain: UBERON:0001981
+range: UBERON:0000061
+is_a: RO:0002179
+
+[Typedef]
 id: RO:0040035
 name: disease relationship
 def: "This relation groups  relations between diseases and any other kind of entity." []
@@ -4552,7 +4903,6 @@ name: disease arises from feature
 name: disease has basis in feature
 def: "A relation that holds between the disease and a feature (a phenotype or other disease) where the physical basis of the disease is the feature." []
 xref: RO:0004022
-domain: OGMS:0000031
 is_a: RO:0002200
 is_a: RO:0004019
 
@@ -4569,7 +4919,6 @@ is_a: RO:0004019
 id: disease_causes_dysfunction_of
 name: disease causes dysfunction of
 xref: RO:0004025
-domain: OGMS:0000031
 range: UBERON:0000465
 is_a: RO:0004023
 transitive_over: BFO:0000050
@@ -4580,7 +4929,6 @@ name: disease causes disruption of
 name: disease disrupts
 def: "A relationship between a disease and a process where the disease process disrupts the execution of the process." []
 xref: RO:0004024
-domain: OGMS:0000031
 range: BFO:0000015
 holds_over_chain: disease_causes_dysfunction_of RO:0002215
 is_a: RO:0004023
@@ -4619,7 +4967,6 @@ id: disease_has_feature
 name: disease has feature
 def: "A relationship between a disease and some feature of that disease, where the feature is either a phenotype or an isolated disease." []
 xref: RO:0004029
-domain: OGMS:0000031
 is_a: RO:0040035
 transitive_over: BFO:0000051
 
@@ -4635,7 +4982,6 @@ id: disease_has_inflammation_site
 name: disease has inflammation site
 def: "A relationship between a disease and an anatomical entity where the disease is triggered by an inflammatory response to stimuli occurring in the anatomical entity" []
 xref: RO:0004027
-domain: OGMS:0000031
 range: BFO:0000004
 is_a: disease_has_location
 transitive_over: BFO:0000050
@@ -4646,7 +4992,6 @@ name: disease has location
 def: "A relationship between a disease and an anatomical entity where the disease has one or more features that are located in that entity." []
 xref: RO:0004026
 property_value: IAO:0000116 "TODO: complete range axiom once more of CARO has been mireoted in to this ontology" xsd:string
-domain: OGMS:0000031
 range: BFO:0000004
 is_a: RO:0040035
 transitive_over: BFO:0000050
@@ -4693,6 +5038,7 @@ is_metadata_tag: true
 id: has_material_basis_in_germline_mutation_in
 name: has material basis in germline mutation in
 xref: RO:0004003
+is_transitive: true
 is_a: RO:0004000
 inverse_of: RO:0004013
 
@@ -4713,13 +5059,21 @@ id: in_taxon
 name: in taxon
 def: "x is in taxon y if an only if y is an organism, and the relationship between x and y is one of: part of (reflexive), developmentally preceded by, derives from, secreted by, expressed." []
 xref: RO:0002162
-holds_over_chain: BFO:0000050 in_taxon
-holds_over_chain: BFO:0000051 in_taxon
-holds_over_chain: RO:0002202 in_taxon
+holds_over_chain: RO:0002005 in_taxon
+holds_over_chain: RO:0002131 in_taxon
+holds_over_chain: RO:0002134 in_taxon
+holds_over_chain: RO:0002150 in_taxon
+holds_over_chain: RO:0002170 in_taxon
+holds_over_chain: RO:0002176 in_taxon
+holds_over_chain: RO:0002211 in_taxon
 holds_over_chain: RO:0002215 in_taxon
-holds_over_chain: RO:0002225 in_taxon
 holds_over_chain: RO:0002254 in_taxon
+holds_over_chain: RO:0002256 in_taxon
 holds_over_chain: RO:0002295 in_taxon
+holds_over_chain: RO:0002387 in_taxon
+holds_over_chain: RO:0002490 in_taxon
+holds_over_chain: RO:0003000 in_taxon
+holds_over_chain: RO:0003001 in_taxon
 is_a: RO:0002320
 
 [Typedef]
@@ -4748,6 +5102,12 @@ name: part of progression of disease
 [Typedef]
 id: predisposes_towards
 name: predisposes towards
+
+[Typedef]
+id: preferred_label_for_community
+name: preferred_label_for_community
+xref: OMO:0002001
+is_metadata_tag: true
 
 [Typedef]
 id: realized_in
