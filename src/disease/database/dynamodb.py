@@ -14,6 +14,7 @@ from boto3.dynamodb.conditions import Attr, Equals, Key
 from botocore.exceptions import ClientError
 
 from disease import ITEM_TYPES, PREFIX_LOOKUP
+from disease.config import get_config
 from disease.database.database import (
     AWS_ENV_VAR_NAME,
     SKIP_AWS_DB_ENV_NAME,
@@ -73,12 +74,7 @@ class DynamoDbDatabase(AbstractDatabase):
                     "DISEASE_DYNAMO_TABLE", "disease_normalizer_nonprod"
                 )
         else:
-            if db_url:
-                endpoint_url = db_url
-            elif "DISEASE_NORM_DB_URL" in environ:
-                endpoint_url = environ["DISEASE_NORM_DB_URL"]
-            else:
-                endpoint_url = "http://localhost:8000"
+            endpoint_url = db_url if db_url else get_config().db_url
             click.echo(f"***Using Disease Database Endpoint: {endpoint_url}***")
             boto_params = {"region_name": region_name, "endpoint_url": endpoint_url}
 

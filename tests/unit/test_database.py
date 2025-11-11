@@ -1,13 +1,12 @@
 """Test database classes."""
 
-import os
-
 import pytest
 
+from disease.config import get_config
 from disease.schemas import RecordType
 
-IS_DDB = not os.environ.get("DISEASE_NORM_DB_URL", "").lower().startswith("postgres")
-IS_TEST_ENV = os.environ.get("DISEASE_NORM_TEST", "").lower() == "true"
+IS_DDB = not get_config().db_url.lower().startswith("postgres")
+IS_TEST_ENV = get_config().test
 
 
 def test_tables_created(database):

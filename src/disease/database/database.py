@@ -15,6 +15,7 @@ from typing import Any
 
 import click
 
+from disease.config import get_config
 from disease.schemas import (
     RecordType,
     RefType,
@@ -301,12 +302,7 @@ def create_db(
 
         db = DynamoDbDatabase()
     else:
-        if db_url:
-            endpoint_url = db_url
-        elif "DISEASE_NORM_DB_URL" in environ:
-            endpoint_url = environ["DISEASE_NORM_DB_URL"]
-        else:
-            endpoint_url = "http://localhost:8000"
+        endpoint_url = db_url if db_url else get_config().db_url
 
         # prefer DynamoDB unless connection explicitly reads like a libpq URI
         if endpoint_url.startswith("postgres"):
