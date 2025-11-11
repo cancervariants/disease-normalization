@@ -39,6 +39,7 @@ def construct_inheritance_set(dag: defaultdict, child: str) -> set[str]:
 
 relevant_terms = set()
 for term in (
+    "MONDO:0000005",
     "MONDO:0005072",
     "MONDO:0002083",
     "MONDO:0003587",
