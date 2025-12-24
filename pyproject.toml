@@ -164,7 +164,6 @@ ignore = [
 # N805 - invalid-first-argument-name-for-method
 # S101 - assert
 # D100 - undocumented-public-module
-# D102 - undocumented-public-class
 # D103 - undocumented-public-function
 # I001 - unsorted-imports
 # B011 - assert-false
@@ -175,9 +174,7 @@ ignore = [
 "tests/*" = [
     "ANN001",
     "ANN2",
-    "D100",
-    "D102",
-    "D103",
+    "D",
     "S101",
     "B011",
     "INP001",
