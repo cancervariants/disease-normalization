@@ -13,9 +13,6 @@ def test_emit_warnings(database):
     assert actual_warnings is None
 
     # Test emit warnings
-    actual_warnings = query_handler._emit_warnings("CIS PLATIN")
-    assert actual_warnings == actual_warnings
-
     actual_warnings = query_handler._emit_warnings("CIS\u00a0platin")
     assert expected_warnings == actual_warnings
 

@@ -88,11 +88,11 @@ class Base(ABC):
         )
 
     @abstractmethod
-    def _transform_data(self, *args, **kwargs) -> None:  # noqa: ANN002
+    def _transform_data(self, *args, **kwargs) -> None:
         raise NotImplementedError
 
     @abstractmethod
-    def _load_meta(self, *args, **kwargs) -> None:  # noqa: ANN002
+    def _load_meta(self, *args, **kwargs) -> None:
         raise NotImplementedError
 
     def _load_disease(self, disease: dict) -> None:
@@ -109,7 +109,7 @@ class Base(ABC):
                     else:
                         disease[attr_type] = list(set(value))
                         items = {item.lower() for item in value}
-                        if (attr_type == "aliases") and (len(items) > 20):
+                        if (attr_type == "aliases") and (len(items) > 20):  # noqa: PLR2004
                             _logger.debug("%s has > 20 aliases.", concept_id)
                             del disease[attr_type]
                             continue
