@@ -2,7 +2,7 @@ name: checks
 on: [push, pull_request]
 jobs:
   test:
-    name: test py${{ matrix.python-version }}${{ matrix.db_url == 'http://localhost:8002' && '' || ' postgres' }}
+    name: ${{ matrix.db_url == 'http://localhost:8002' && 'test py${{ matrix.python-version }}' || 'test py${{ matrix.python-version }} postgres' }}
     runs-on: ubuntu-latest
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.DUMMY_AWS_ACCESS_KEY_ID }}
