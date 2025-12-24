@@ -1,4 +1,4 @@
-﻿disease.etl.base
+disease.etl.base
 ================
 
 .. automodule:: disease.etl.base

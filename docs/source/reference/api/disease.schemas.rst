@@ -1,4 +1,4 @@
-﻿disease.schemas
+disease.schemas
 ===============
 
 .. automodule:: disease.schemas

@@ -1,4 +1,4 @@
-﻿disease.etl.ncit
+disease.etl.ncit
 ================
 
 .. automodule:: disease.etl.ncit

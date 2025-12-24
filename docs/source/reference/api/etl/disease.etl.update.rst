@@ -1,4 +1,4 @@
-﻿disease.etl.update
+disease.etl.update
 ==================
 
 .. automodule:: disease.etl.update
