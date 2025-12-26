@@ -14,6 +14,8 @@ _logger = logging.getLogger(__name__)
 class OncoTree(Base):
     """Gather and load data from OncoTree."""
 
+    min_level = 2
+
     def _load_meta(self) -> None:
         """Load metadata"""
         metadata = SourceMeta(
@@ -35,7 +37,7 @@ class OncoTree(Base):
 
         :param disease_node: node in tree containing info for individual disease.
         """
-        if disease_node["level"] >= 2:
+        if disease_node["level"] >= self.min_level:
             self._nodes.append(
                 {
                     "code": disease_node["code"],

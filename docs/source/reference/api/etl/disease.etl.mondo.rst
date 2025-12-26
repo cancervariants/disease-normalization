@@ -1,4 +1,4 @@
-﻿disease.etl.mondo
+disease.etl.mondo
 =================
 
 .. automodule:: disease.etl.mondo

@@ -77,9 +77,9 @@ class OMIM(Base):
             else:
                 disease["label"] = row[2]
 
-            if len(row) > 3:
+            if len(row) > 3:  # noqa: PLR2004
                 aliases |= {t for t in row[3].split(";") if t}
-            if len(row) > 4:
+            if len(row) > 4:  # noqa: PLR2004
                 aliases |= {t for t in row[4].split(";") if t}
             aliases = {alias.removesuffix(", INCLUDED") for alias in aliases}
             disease["aliases"] = [a.lstrip() for a in aliases]

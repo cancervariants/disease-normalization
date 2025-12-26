@@ -1,4 +1,4 @@
-﻿disease.etl.merge
+disease.etl.merge
 =================
 
 .. automodule:: disease.etl.merge

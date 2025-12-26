@@ -62,4 +62,4 @@ outfile = test_data_dir / do._data_file.name
 outfile.parent.mkdir(exist_ok=True)
 cmd_str = f"{robot_file} extract --method star --input {infile} --term-file {terms_file} --output {outfile}"
 
-subprocess.run(cmd_str, shell=True)  # noqa: S602
+subprocess.run(cmd_str, check=False, shell=True)  # noqa: S602
