@@ -146,7 +146,7 @@ To archive ``disease_norm_ddb_vol`` into ``./disease_norm_ddb.tar.gz``: ::
 Build and publish DynamoDB images
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-To tag and push the DynamoDB images, from the root of the repository: ::
+To tag and push the DynamoDB images: ::
 
     docker build -f Dockerfile.ddb -t $DOCKERHUB_ORG/disease-normalizer-ddb:$DATE -t $DOCKERHUB_ORG/disease-normalizer-ddb:latest .
     docker push $DOCKERHUB_ORG/disease-normalizer-ddb:$DATE
