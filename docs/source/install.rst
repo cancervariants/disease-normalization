@@ -23,7 +23,6 @@ The Disease Normalizer can be installed from `PyPI <https://pypi.org/project/dis
 
    Source data files are stored using the `wags-tails <https://wags-tails.readthedocs.io>`_ library within source-specific subdirectories of a designated WagsTails data directory. By default, this location is ``~/.local/share/wags_tails/``, but it can be configured by passing a Path directly to a data class on initialization, via the ``WAGS_TAILS_DIR`` environment variable, or via `XDG data environment variables <https://specifications.freedesktop.org/basedir-spec/basedir-spec-0.6.html>`_.
 
-
 Docker Installation (Preferred)
 -------------------------------
 
