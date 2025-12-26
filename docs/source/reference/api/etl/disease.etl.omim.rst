@@ -1,4 +1,4 @@
-﻿disease.etl.omim
+disease.etl.omim
 ================
 
 .. automodule:: disease.etl.omim

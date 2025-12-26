@@ -1,4 +1,4 @@
-﻿disease.database.postgresql
+disease.database.postgresql
 ===========================
 
 .. automodule:: disease.database.postgresql

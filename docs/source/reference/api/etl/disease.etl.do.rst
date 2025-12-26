@@ -1,4 +1,4 @@
-﻿disease.etl.do
+disease.etl.do
 ==============
 
 .. automodule:: disease.etl.do

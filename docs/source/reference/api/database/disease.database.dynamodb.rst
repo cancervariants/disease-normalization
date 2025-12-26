@@ -1,4 +1,4 @@
-﻿disease.database.dynamodb
+disease.database.dynamodb
 =========================
 
 .. automodule:: disease.database.dynamodb

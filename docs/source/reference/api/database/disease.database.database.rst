@@ -1,4 +1,4 @@
-﻿disease.database.database
+disease.database.database
 =========================
 
 .. automodule:: disease.database.database
