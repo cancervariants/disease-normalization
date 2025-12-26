@@ -58,3 +58,96 @@ The documentation is built with Sphinx, which is included as part of the ``docs`
     make html
 
 See the `Sphinx documentation <https://www.sphinx-doc.org/en/master/>`_ for more information.
+
+Creating and Publishing Docker images
+-------------------------------------
+
+.. note::
+
+    This section assumes you have push permissions for the DockerHub organization.
+
+    It also assumes you have OMIM data located at ``$WAGS_TAILS_DIR/omim``, see
+    :ref:`Wags-TAILS <wags-tails-dir>` for more details.
+
+.. important::
+
+    All commands in this section must be run from the **root of the repository**.
+
+    These instructions assume a **fresh local DynamoDB setup**. The local DynamoDB
+    data is stored in a bind-mounted Docker volume and **must be reset** before
+    loading new data. Reusing an existing local DynamoDB volume is not supported.
+
+Configure environment
+^^^^^^^^^^^^^^^^^^^^^
+
+Set your DockerHub organization. ::
+
+    export DOCKERHUB_ORG=your-org
+
+Set the ``WAGS_TAILS_DIR`` environment variable to your location. ::
+
+    export WAGS_TAILS_DIR="$HOME/.local/share/wags_tails"
+
+Set the image version from the most recent Git tag (used for API image). ::
+
+    export VERSION=$(git describe --tags --abbrev=0)
+
+Set the image date tag (used for DynamoDB image). ::
+
+    export DATE=$(date +%F)
+
+Reset local DynamoDB data
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The local DynamoDB volume (``disease_norm_ddb_vol``) is configured as a *bind-mounted*
+Docker volume that maps to the local ``dynamodb_local_latest`` directory. Because of
+this, both the Docker volume **and** the local directory must be removed to ensure a
+completely clean database state.
+
+Remove the existing Docker volume. ::
+
+    docker volume rm disease_norm_ddb_vol
+
+Remove the local DynamoDB data directory. ::
+
+    rm -rf dynamodb_local_latest
+
+Recreate the Docker volume (bind-mounted to a local directory). ::
+
+    docker volume create --driver local --opt type=none --opt device="$(pwd)/dynamodb_local_latest" --opt o=bind disease_norm_ddb_vol
+
+Build and run services locally
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+To start the services and load DynamoDB: ::
+
+    docker compose -f compose-dev.yaml up --build
+
+Build and publish API images
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+To tag and push the API images: ::
+
+    docker build --build-arg VERSION=$VERSION -t $DOCKERHUB_ORG/disease-normalizer-api:$VERSION -t $DOCKERHUB_ORG/disease-normalizer-api:latest .
+    docker push $DOCKERHUB_ORG/disease-normalizer-api:$VERSION
+    docker push $DOCKERHUB_ORG/disease-normalizer-api:latest
+
+Archive local DynamoDB data
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+To archive ``disease_norm_ddb_vol`` into ``./disease_norm_ddb.tar.gz``: ::
+
+    docker run --rm \
+        -v disease_norm_ddb_vol:/volume \
+        -v "$(pwd)":/backup \
+        alpine \
+        sh -c "cd /volume && tar czf /backup/disease_norm_ddb.tar.gz ."
+
+Build and publish DynamoDB images
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+To tag and push the DynamoDB images, from the root of the repository: ::
+
+    docker build -f Dockerfile.ddb -t $DOCKERHUB_ORG/disease-normalizer-ddb:$DATE -t $DOCKERHUB_ORG/disease-normalizer-ddb:latest .
+    docker push $DOCKERHUB_ORG/disease-normalizer-ddb:$DATE
+    docker push $DOCKERHUB_ORG/disease-normalizer-ddb:latest

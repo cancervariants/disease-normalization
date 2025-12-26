@@ -17,6 +17,8 @@ The Disease Normalizer can be installed from `PyPI <https://pypi.org/project/dis
     * ``test`` provides dependencies for running tests. As with ``dev``, it's mostly relevant for contributors.
     * ``docs`` provides dependencies for documentation generation. It's only relevant for contributors.
 
+.. _wags-tails-dir:
+
 .. note::
 
    Source data files are stored using the `wags-tails <https://wags-tails.readthedocs.io>`_ library within source-specific subdirectories of a designated WagsTails data directory. By default, this location is ``~/.local/share/wags_tails/``, but it can be configured by passing a Path directly to a data class on initialization, via the ``WAGS_TAILS_DIR`` environment variable, or via `XDG data environment variables <https://specifications.freedesktop.org/basedir-spec/basedir-spec-0.6.html>`_.
@@ -60,6 +62,23 @@ Use the ``disease_norm_update_remote`` shell command to load data from the most 
     disease_norm_update_remote
 
 .. _full-install:
+
+Docker Installation (Preferred)
+-------------------------------
+
+We recommend installing the Disease Normalizer using Docker.
+
+Requirements
+++++++++++++
+
+* `Docker <https://docs.docker.com/get-started/get-docker/>`_
+
+Build, (re)create, and start containers
++++++++++++++++++++++++++++++++++++++++
+
+    docker compose up
+
+Point your browser to http://localhost:8001/disease/.
 
 Full Installation
 -----------------

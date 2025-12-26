@@ -1,0 +1,20 @@
+services:
+  api:
+    image: cancervariants/disease-normalizer-api:latest
+    environment:
+      AWS_ACCESS_KEY_ID: 'DUMMYIDEXAMPLE'
+      AWS_SECRET_ACCESS_KEY: 'DUMMYEXAMPLEKEY'
+      AWS_DEFAULT_REGION: 'us-east-2'
+      DISEASE_NORM_DB_URL: http://disease-dynamodb-local:8000
+
+    ports:
+      - "8001:80"
+
+    depends_on:
+      disease-dynamodb-local:
+        condition: service_started
+
+  disease-dynamodb-local:
+    image: cancervariants/disease-normalizer-ddb:latest
+    ports:
+     - "8000:8000"
