@@ -118,12 +118,16 @@ def update_from_remote(data_url: str | None, db_url: str, silent: bool) -> None:
     "--output_directory",
     "-o",
     help="Output location to write to",
-    type=click.Path(exists=True, path_type=Path),
+    type=click.Path(exists=True, file_okay=False, dir_okay=True, path_type=Path),
 )
 @click.option("--db_url", help=URL_DESCRIPTION)
 @click.option("--silent", is_flag=True, default=False, help=SILENT_MODE_DESCRIPTION)
 def dump_database(output_directory: Path, db_url: str, silent: bool) -> None:
     """Dump data from database into file.
+
+    DynamoDB export to existing `dynamodb_local_latest` directory:
+
+        $ disease-normalizer dump-database -o dynamodb_local_latest --db_url http://localhost:8001
 
     \f
     :param output_directory: path to existing directory
