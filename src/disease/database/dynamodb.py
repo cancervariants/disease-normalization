@@ -38,7 +38,7 @@ from disease.schemas import (
     SourceName,
 )
 
-_logger = logging.getLogger()
+_logger = logging.getLogger(__name__)
 
 
 class DynamoDbDatabase(AbstractDatabase):

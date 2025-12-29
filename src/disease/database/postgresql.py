@@ -29,7 +29,7 @@ from disease.schemas import (
     SourceName,
 )
 
-_logger = logging.getLogger()
+_logger = logging.getLogger(__name__)
 
 
 SCRIPTS_DIR = Path(__file__).parent / "postgresql"
