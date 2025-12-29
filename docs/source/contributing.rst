@@ -144,7 +144,7 @@ To archive ``disease_norm_ddb_vol`` into ``./disease_norm_ddb.tar.gz``: ::
     docker run --rm \
         -v disease_norm_ddb_vol:/volume \
         -v "$(pwd)":/backup \
-        alpine \
+        alpine:3.23 \
         sh -c "cd /volume && tar czf /backup/disease_norm_ddb.tar.gz ."
 
 Build and publish DynamoDB images
