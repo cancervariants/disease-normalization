@@ -1,4 +1,4 @@
-﻿disease.etl.oncotree
+disease.etl.oncotree
 ====================
 
 .. automodule:: disease.etl.oncotree

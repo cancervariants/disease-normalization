@@ -1,4 +1,4 @@
-﻿disease.query
+disease.query
 =============
 
 .. automodule:: disease.query
