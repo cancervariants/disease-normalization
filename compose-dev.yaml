@@ -1,0 +1,41 @@
+services:
+  api:
+    build:
+      context: .
+      args:
+        VERSION: ${VERSION}
+        IS_DEV_ENV: "true"
+    environment:
+      # Dummy AWS credentials, don't need to use real ones
+      AWS_ACCESS_KEY_ID: dummy
+      AWS_SECRET_ACCESS_KEY: dummy
+      AWS_DEFAULT_REGION: us-east-2
+      DISEASE_NORM_DB_URL: http://disease-dynamodb-local:8000
+      WAGS_TAILS_DIR: /wags_tails
+
+    ports:
+      - 127.0.0.1:8001:80
+
+    volumes:
+      - ${WAGS_TAILS_DIR:?set WAGS_TAILS_DIR}/ncit:/wags_tails/ncit
+      - ${WAGS_TAILS_DIR:?set WAGS_TAILS_DIR}/mondo:/wags_tails/mondo
+      - ${WAGS_TAILS_DIR:?set WAGS_TAILS_DIR}/do:/wags_tails/do
+      - ${WAGS_TAILS_DIR:?set WAGS_TAILS_DIR}/oncotree:/wags_tails/oncotree
+      - ${WAGS_TAILS_DIR:?set WAGS_TAILS_DIR}/omim:/wags_tails/omim
+    depends_on:
+      disease-dynamodb-local:
+        condition: service_started
+    command: ["/bin/bash", "/app/disease-norm-update.sh"]
+
+  disease-dynamodb-local:
+    command: -jar DynamoDBLocal.jar -sharedDb -dbPath /home/dynamodblocal/dynamodb_local_latest
+    image: amazon/dynamodb-local:3.1.0
+    ports:
+     - 127.0.0.1:8000:8000
+    volumes:
+      - disease_norm_ddb_vol:/home/dynamodblocal/dynamodb_local_latest
+    working_dir: /home/dynamodblocal
+
+volumes:
+  disease_norm_ddb_vol:
+    external: true
