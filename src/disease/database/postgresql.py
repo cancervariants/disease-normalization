@@ -29,7 +29,7 @@ from disease.schemas import (
     SourceName,
 )
 
-_logger = logging.getLogger()
+_logger = logging.getLogger(__name__)
 
 
 SCRIPTS_DIR = Path(__file__).parent / "postgresql"
@@ -772,7 +772,7 @@ class PostgresDatabase(AbstractDatabase):
     def export_db(self, output_directory: Path) -> None:
         """Dump DB to specified location.
 
-        :param export_location: path to directory to save DB dump in
+        :param output_directory: path to directory to save DB dump in
         :return: Nothing, but saves results of pg_dump to file named
             ``disease_norm_<date and time>.sql``
         :raise ValueError: if output directory isn't a directory or doesn't exist
