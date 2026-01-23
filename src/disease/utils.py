@@ -4,7 +4,33 @@ import logging
 from collections.abc import Generator
 
 from disease.database import AbstractDatabase
-from disease.schemas import RecordType, SourceName
+from disease.schemas import RecordType, SourceMeta, SourceName
+
+
+def get_source_meta(
+    database: AbstractDatabase,
+    scope: RecordType | SourceName,
+) -> list[SourceMeta]:
+    """Get source metadata (e.g. version info etc) for given sources
+
+    Use in downstream applications such as datadumps.
+
+    :param database: instance of DB connection to get records from
+    :param scope: constrain record scope, either to a kind of record or to a specific source
+    :return: list of source metadata descriptions
+    :raise KeyError: if unrecognized source
+    """
+
+    def _lookup_meta(database: AbstractDatabase, source_name: SourceName) -> SourceMeta:
+        meta = database.get_source_metadata(source_name)
+        if not meta:
+            msg = f"Unrecognized source: {source_name}"
+            raise KeyError(msg)
+        return meta
+
+    if isinstance(scope, SourceName):
+        return [_lookup_meta(database, scope)]
+    return [_lookup_meta(database, source_name) for source_name in SourceName]
 
 
 def get_term_mappings(

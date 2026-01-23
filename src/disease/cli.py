@@ -1,9 +1,9 @@
 """Provides a CLI util to make updates to normalizer database."""
 
-import datetime
 import json
 import logging
 import os
+from datetime import UTC, datetime
 from pathlib import Path
 
 import click
@@ -12,7 +12,7 @@ from disease import __version__
 from disease.config import get_config
 from disease.database.database import DatabaseException, create_db
 from disease.schemas import RecordType, SourceName
-from disease.utils import get_term_mappings, initialize_logs
+from disease.utils import get_source_meta, get_term_mappings, initialize_logs
 
 _logger = logging.getLogger(__name__)
 
@@ -303,14 +303,19 @@ def dump_mappings(
     create the document.
     """
     db = create_db(db_url, False)
+    now = datetime.now(tz=UTC)
     if outfile is None:
-        outfile = Path() / "disease_normalizer_mappings.jsonl"
+        outfile = (
+            Path()
+            / f"disease_normalizer_mappings_{now.strftime('%Y%m%d_%H%M%S')}.jsonl"
+        )
     with outfile.open("w") as f:
         meta = {
             "type": "meta",
-            "created_at": datetime.datetime.now(tz=datetime.UTC).isoformat(),
+            "created_at": now.isoformat(),
             "scope": scope,
             "cancer_only": cancer_only,
+            "source_metadata": [m.model_dump() for m in get_source_meta(db, scope)],
         }
         f.write(json.dumps(meta))
         f.write("\n")
