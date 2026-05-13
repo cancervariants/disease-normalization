@@ -1,0 +1,24 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "Disease Normalizer"
+type: software
+authors:
+  - given-names: James
+    family-names: Stevenson
+    affiliation: Nationwide Children's Hospital
+    orcid: "https://orcid.org/0000-0002-2568-6163"
+  - given-names: Kori
+    family-names: Kuzma
+    affiliation: Nationwide Children's Hospital
+    orcid: "https://orcid.org/0000-0002-9954-7449"
+  - given-names: Kathryn
+    family-names: Perry
+    affiliation: Nationwide Children's Hospital
+    orcid: "https://orcid.org/0000-0002-7220-5991"
+  - given-names: Alex
+    family-names: Wagner
+    affiliation: Nationwide Children's Hospital
+    orcid: "https://orcid.org/0000-0002-2502-8961"
+license: MIT
+repository-code: "https://github.com/cancervariants/disease-normalization"
+url: "https://github.com/cancervariants/disease-normalization"
