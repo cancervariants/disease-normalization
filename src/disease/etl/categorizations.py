@@ -1,7 +1,6 @@
 """Load disease categorizations (within OncoTree) for NCIt and MONDO terms."""
 
 from collections import defaultdict, deque
-from functools import cache
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -77,9 +76,9 @@ class CategoryInputMismatchError(Exception):
 #         raise CategoryInputMismatchError
 #
 #     ncit_etl = NCIt(storage, data_path, silent=silent)
-#     ncit_etl._extract_data()  # noqa: SLF001
+#     ncit_etl._extract_data()
 #     stored_ncit_metadata = storage.get_source_metadata(SourceName.NCIT)
-#     if not stored_ncit_metadata or ncit_etl._version != stored_ncit_metadata.version:  # noqa: SLF001
+#     if not stored_ncit_metadata or ncit_etl._version != stored_ncit_metadata.version:
 #         raise CategoryInputMismatchError
 #
 #     # create ncit -> oncotree mappings
@@ -125,6 +124,7 @@ def closest_oncotree_mappings(
     The values are the MONDO terms that directly assert the mapping.
     Traversal does not continue above a mapped ancestor, because mappings
     farther up that same lineage are less specific.
+
     """
     mappings: dict[str, set[str]] = defaultdict(set)
     visited: set[str] = set()
