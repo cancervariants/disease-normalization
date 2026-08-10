@@ -17,6 +17,7 @@ import click
 
 from disease.config import get_config
 from disease.schemas import (
+    DiseaseCategorization,
     RecordType,
     RefType,
     ServiceEnvironment,
@@ -225,6 +226,32 @@ class AbstractDatabase(abc.ABC):
             encounters a failure in the process
         :raise DatabaseWriteException: if deletion call fails
         """
+
+    @abc.abstractmethod
+    def load_disease_categorization(
+        self, categorization: DiseaseCategorization
+    ) -> None:
+        """Add a disease categorization record to the DB.
+
+        :param categorization: individual categorization record pointing from a disease
+            concept to a broader disease category
+        """
+
+    @abc.abstractmethod
+    def get_disease_categorization(
+        self, concept_id: str
+    ) -> DiseaseCategorization | None:
+        """Retrieve a disease categorization for the given term.
+
+        Performs lookup based on exact-matching.
+
+        :param concept_id: concept ID to perform lookup on
+        :return: full disease categorization description, if available
+        """
+
+    @abc.abstractmethod
+    def delete_disease_categorizations(self) -> None:
+        """Delete all disease categorization records"""
 
     @abc.abstractmethod
     def complete_write_transaction(self) -> None:
