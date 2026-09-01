@@ -1,218 +1,219 @@
-"""Load disease categorizations (within OncoTree) for NCIt and MONDO terms."""
+"""Load disease categorizations (within OncoTree) for NCIt and MONDO terms.
 
-from collections import defaultdict, deque
-from dataclasses import dataclass, field
+Current plan:
+    * Generate SSSOM mapping artifact for MONDO->OncoTree using skos:broadMatch
+    * load each mapping into DB
+
+MONDO mapping algorithm
+* Given a mondo term, construct ancestral set of all oncotree mappings by walking up
+  inheritance tree and stopping when an oncotree xref is found
+* If set consists of multiple distinct oncotree mappings: (TODO)
+    * if one is a more specific form of the other, choose the more specific term
+    * if both have a common parent, take the parent term
+"""
+
+import json
+import logging
+from dataclasses import dataclass
+from enum import StrEnum
 from pathlib import Path
 
 import fastobo
 from wags_tails import MondoData, OncoTreeData
 
-from disease.database import AbstractDatabase
+from disease.database.database import AbstractDatabase
 from disease.schemas import DiseaseCategorization, SourceName
 
+_logger = logging.getLogger(__name__)
 
-class CategoryInputMismatchError(Exception):
+
+class CategorizationError(Exception):
+    """Encompass category generation errors"""
+
+
+class MissingMondoTermError(CategorizationError):
+    """Raise for inability to recover referenced MONDO term
+
+    Possibly indicates mismatch in MONDO versions/systems
+    """
+
+
+class CategoryInputMismatchError(CategorizationError):
     """Raise for conflict between version of a categorization input file and the existing stored disease data"""
 
 
-# def _get_mondo_path(silent: bool) -> Path:
-#     getter = MondoData(silent=silent)
-#     path, _ = getter.get_latest()
-#     return path
-#
-#
-# @dataclass(frozen=True)
-# class _OncoTreeCategoryTerm:
-#     """Provide basic structure for oncotree-based categories"""
-#
-#     name: str
-#     concept_id: str
-#
-#
-# def _collect_ncit_oncotree_mappings_for_node(
-#     node: dict, mappings: dict[str, _OncoTreeCategoryTerm]
-# ) -> dict[str, _OncoTreeCategoryTerm]:
-#     # need to skip oncotree:TISSUE because we don't import it as a disease
-#     if node.get("externalReferences", {}).get("NCI") and node["level"] > 1:
-#         key = f"{NamespacePrefix.NCIT.value}:{node['externalReferences']['NCI']}"
-#         value = _OncoTreeCategoryTerm(
-#             name=node["name"],
-#             concept_id=f"{NamespacePrefix.ONCOTREE.value}:{node['code']}",
-#         )
-#         mappings[key] = value
-#     for child in node["children"].values():
-#         mappings = _collect_ncit_oncotree_mappings_for_node(child, mappings)
-#     return mappings
-#
-#
-# def _get_ncit_oncotree_mappings(
-#     oncotree_path: Path,
-# ) -> dict[str, _OncoTreeCategoryTerm]:
-#     with oncotree_path.open() as fp:
-#         data = json.load(fp)
-#     return _collect_ncit_oncotree_mappings_for_node(data["TISSUE"], {})
-#
-#
-# def load_ncit_categorizations(
-#     storage: AbstractDatabase, data_path: Path | None, silent: bool
-# ) -> None:
-#     """Load OncoTree-based tumor categorizations for NCIt cancer terms
-#
-#     Requirements:
-#     * Both OncoTree and NCIt terms must already be loaded into the DB
-#     * The release versions for OncoTree and NCIt used for categorization must
-#       match what's already in the database
-#     """
-#     # before anything else:
-#     # 1) acquire input files
-#     # 2) validate that they match stored versions
-#     oncotree_getter = OncoTreeData(data_path, silent=silent)
-#     oncotree_path, oncotree_version = oncotree_getter.get_latest()
-#     stored_oncotree_metadata = storage.get_source_metadata(SourceName.ONCOTREE)
-#     if (
-#         not stored_oncotree_metadata
-#         or oncotree_version != stored_oncotree_metadata.version
-#     ):
-#         raise CategoryInputMismatchError
-#
-#     ncit_etl = NCIt(storage, data_path, silent=silent)
-#     ncit_etl._extract_data()
-#     stored_ncit_metadata = storage.get_source_metadata(SourceName.NCIT)
-#     if not stored_ncit_metadata or ncit_etl._version != stored_ncit_metadata.version:
-#         raise CategoryInputMismatchError
-#
-#     # create ncit -> oncotree mappings
-#     oncotree_mappings: dict = _get_ncit_oncotree_mappings(oncotree_path)
-#
-#     # get ncit disease terms of interest
-#     ncit_disease_classes = ncit_etl.get_disease_classes()
-#     for disease_class in ncit_disease_classes:
-#         # create set of oncotree-mapped ncit parent terms
-#         # for each disease class, walk up ancestry lineages until you find something w/ a mapping
-#         # get the set of all categorizations, reduce as needed
-#         pass
+def _get_frame_for_term(
+    mondo: fastobo.doc.OboDoc, term_id: str
+) -> fastobo.term.TermFrame:
+    try:
+        term_frame = next(t for t in mondo if str(t.id) == term_id)
+    except StopIteration as e:
+        msg = f"Unable to retrieve {term_id} from local MONDO ontology"
+        raise MissingMondoTermError(msg) from e
+    return term_frame
 
 
-@dataclass
-class _MondoTerm:
-    concept_id: str
-    name: str | None = None
-    parents: set[str] = field(default_factory=set)
-    oncotree_xrefs: set[str] = field(default_factory=set)
+def _get_parents_from_frame(frame: fastobo.term.TermFrame) -> set[str]:
+    """Get term parents from a fastobo `frame`
 
-
-def normalize_oncotree_xref(xref: str) -> str | None:
-    """Return the OncoTree code from an ONCOTREE-prefixed xref."""
-    prefix, separator, code = xref.partition(":")
-    if not separator or prefix.upper() != "ONCOTREE":
-        return None
-    return code
-
-
-def closest_oncotree_mappings(
-    term_id: str,
-    terms: dict[str, _MondoTerm],
-) -> dict[str, set[str]]:
-    """Find the closest OncoTree mappings on every upward MONDO lineage.
-
-    Returns:
-        {
-            "LUAD": {"MONDO:0008903"},
-            "LUSC": {"MONDO:0012345"},
-        }
-
-    The values are the MONDO terms that directly assert the mapping.
-    Traversal does not continue above a mapped ancestor, because mappings
-    farther up that same lineage are less specific.
-
+    Exclude overly-broad or non-MONDO terms
     """
-    mappings: dict[str, set[str]] = defaultdict(set)
-    visited: set[str] = set()
-    queue: deque[str] = deque([term_id])
+    parent_term_ids = set()
+    for clause in frame:
+        if clause.raw_tag() == "is_a":
+            if clause.term.prefix != "MONDO" or clause.raw_value() == "MONDO:0005070":
+                continue
+            parent_term_ids.add(clause.raw_value())
+    return parent_term_ids
 
-    while queue:
-        current_id = queue.popleft()
 
-        if current_id in visited:
+def _get_oncotree_xref_from_frame(term_frame: fastobo.term.TermFrame) -> str | None:
+    for clause in term_frame:
+        if (
+            isinstance(clause, fastobo.term.XrefClause)
+            and clause.xref.id.prefix == "ONCOTREE"
+            and clause.xref.id.local not in {"MT", "OTHER"}
+        ):
+            return str(clause.xref.id)
+    return None
+
+
+def _get_parent_oncotree_xrefs(
+    mondo: fastobo.doc.OboDoc,
+    term_frame: fastobo.term.TermFrame,
+) -> list[tuple[str, str]]:
+    if oncotree_xref := _get_oncotree_xref_from_frame(term_frame):
+        return [(oncotree_xref, str(term_frame.id))]
+
+    xrefs = []
+    for parent_id in _get_parents_from_frame(term_frame):
+        parent_term_frame = _get_frame_for_term(mondo, parent_id)
+        xrefs += _get_parent_oncotree_xrefs(mondo, parent_term_frame)
+
+    return xrefs
+
+
+def _get_best_oncotree_mapping(
+    mondo: fastobo.doc.OboDoc, term_id: str
+) -> tuple[str, str] | None:
+    """Recursive function for fetching parental oncotree mappings + filtering to the best one"""
+    term_frame = _get_frame_for_term(mondo, term_id)
+    parent_xref_mappings = list(set(_get_parent_oncotree_xrefs(mondo, term_frame)))
+
+    if len(parent_xref_mappings) != 1:
+        # temporary -- insert conflict resolution later
+        return None
+    return parent_xref_mappings[0]
+
+
+class MappingPredicate(StrEnum):
+    """Constrain supported types of mapping predicates"""
+
+    BROAD_MATCH = "skos:broadMatch"
+
+
+class MappingJustification(StrEnum):
+    """Constrain supported types of mapping justifications"""
+
+    MAPPING_CHAINING = "semapv:MappingChaining"
+
+
+@dataclass(frozen=True)
+class SssomCategorizationMapping:
+    """Individual SSSOM-based mapping from query terms to categorization terms"""
+
+    subject_id: str
+    subject_label: str
+    object_id: str
+    object_label: str
+    subject_source_version: str
+    object_source_version: str
+    comment: str
+    predicate_id: str = MappingPredicate.BROAD_MATCH
+    mapping_justification: str = MappingJustification.MAPPING_CHAINING
+
+
+def generate_mondo_category_sssom(
+    term_id: str,
+    mondo: fastobo.doc.OboDoc,
+    oncotree_flatmap: dict,
+    mondo_version: str,
+    oncotree_version: str,
+) -> SssomCategorizationMapping | None:
+    """Create SSSOM categorization SSSOM mapping"""
+    term_frame = _get_frame_for_term(mondo, term_id)
+
+    try:
+        mapping_result = _get_best_oncotree_mapping(mondo, term_frame)
+    except MissingMondoTermError:
+        _logger.exception(
+            "Encountered missing MONDO term while looking up categorization of %s, mondo version %s",
+            term_id,
+            mondo_version,
+        )
+        return None
+    if not mapping_result:
+        return None
+    oncotree_mapping, mondo_derived_via = mapping_result
+    try:
+        oncotree_entry = oncotree_flatmap[oncotree_mapping]
+        oncotree_label = oncotree_entry["name"]
+    except KeyError:
+        return None
+
+    return SssomCategorizationMapping(
+        subject_id=str(term_frame.id),
+        subject_label=next(c.raw_value() for c in term_frame if c.raw_tag() == "name"),
+        object_id=oncotree_mapping,
+        object_label=oncotree_label,
+        subject_source_version=mondo_version,
+        object_source_version=oncotree_version,
+        comment=f"Derived via xref from {mondo_derived_via}",
+    )
+
+
+def _recursively_build_oncotree_flatmap(node: dict, flatmap: dict) -> dict:
+    for child_key, child_node in node.get("children", {}).items():
+        if child_key in flatmap:
             continue
+        flatmap = _recursively_build_oncotree_flatmap(child_node, flatmap)
 
-        visited.add(current_id)
-        current = terms.get(current_id)
+    node["children"] = list(node["children"].keys())
 
-        if current is None:
-            continue
-
-        if current.oncotree_xrefs:
-            for xref in current.oncotree_xrefs:
-                mappings[xref].add(current_id)
-
-            # This is the closest mapped term on this lineage, so do not
-            # continue to broader ancestors.
-            continue
-
-        queue.extend(current.parents)
-
-    return dict(mappings)
+    flatmap[f"ONCOTREE:{node['code']}"] = node
+    return flatmap
 
 
-def load_mondo_categorizations(
-    storage: AbstractDatabase, data_path: Path | None, silent: bool
+def _build_oncotree_flatmap(oncotree_file_path: Path) -> dict:
+    with oncotree_file_path.open() as fp:
+        data = json.load(fp)
+
+    return _recursively_build_oncotree_flatmap(data["TISSUE"], {})
+
+
+def load_mondo_categories(
+    storage: AbstractDatabase, data_dir: Path | None = None
 ) -> None:
-    """Load OncoTree-based tumor categorizations for mondo cancer terms"""
-    # before anything else: acquire input files, validate that they match stored versions
-    oncotree_getter = OncoTreeData(data_path, silent=silent)
-    oncotree_path, oncotree_version = oncotree_getter.get_latest()
-    stored_oncotree_metadata = storage.get_source_metadata(SourceName.ONCOTREE)
-    if (
-        not stored_oncotree_metadata
-        or oncotree_version != stored_oncotree_metadata.version
-    ):
-        raise CategoryInputMismatchError
+    oncotree_getter = OncoTreeData(data_dir=data_dir)
+    oncotree_file_path, oncotree_version = oncotree_getter.get_latest()
+    oncotree = _build_oncotree_flatmap(oncotree_file_path)
+    mondo_getter = MondoData(data_dir=data_dir)
+    mondo_file_path, mondo_version = mondo_getter.get_latest()
+    mondo = fastobo.load(mondo_file_path)
 
-    mondo_getter = MondoData(data_path, silent=silent)
-    mondo_path, mondo_version = mondo_getter.get_latest()
-    stored_mondo_metadata = storage.get_source_metadata(SourceName.MONDO)
-    if not stored_mondo_metadata or mondo_version != stored_mondo_metadata.version:
-        raise CategoryInputMismatchError
+    sssom_mappings: list[SssomCategorizationMapping] = []
+    for term in storage.get_all_concept_ids(SourceName.MONDO):
+        if mapping := generate_mondo_category_sssom(
+            term, mondo, oncotree, mondo_version, oncotree_version
+        ):
+            sssom_mappings.append(mapping)  # noqa: PERF401
 
-    terms: dict[str, _MondoTerm] = {}
-    mondo = fastobo.load(mondo_path)
-
-    for frame in mondo:
-        if not isinstance(frame, fastobo.term.TermFrame):
-            continue
-
-        term = _MondoTerm(concept_id=str(frame.id))
-
-        for clause in frame:
-            if isinstance(clause, fastobo.term.NameClause):
-                term.name = str(clause.name)
-
-            elif isinstance(clause, fastobo.term.IsAClause):
-                term.parents.add(str(clause.term))
-
-            elif isinstance(clause, fastobo.term.XrefClause):
-                code = normalize_oncotree_xref(str(clause.xref.id))
-
-                if code is not None:
-                    term.oncotree_xrefs.add(code)
-
-        terms[term.concept_id] = term
-
-    storage.delete_disease_categorizations()
-
-    for term in terms.values():
-        mappings = closest_oncotree_mappings(term.concept_id, terms)
-
-        if not mappings:
-            continue
-
-        for oncotree_code, asserting_terms in mappings.items():
-            storage.load_disease_categorization(
-                DiseaseCategorization(
-                    category_schema_version=oncotree_version,
-                    category_concept_id=oncotree_code,
-                    category_name="todo",
-                    concept_id=term.concept_id,
-                )
+    for mapping in sssom_mappings:
+        storage.load_disease_categorization(
+            DiseaseCategorization(
+                category_schema_version=mapping.object_source_version,
+                category_concept_id=mapping.object_id,
+                category_name=mapping.object_label,
+                concept_id=mapping.subject_id,
             )
+        )
