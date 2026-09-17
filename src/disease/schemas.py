@@ -1,13 +1,14 @@
 """Contains data models for representing VICC normalized disease records."""
 
 import datetime
-from enum import Enum, IntEnum
+from enum import Enum, IntEnum, StrEnum
 from types import MappingProxyType
 from typing import Literal
 
 from ga4gh.core.models import (
     Coding,
     ConceptMapping,
+    Extension,
     MappableConcept,
     Relation,
     code,
@@ -510,7 +511,7 @@ class SearchService(BaseModel):
     )
 
 
-class ServiceEnvironment(str, Enum):
+class ServiceEnvironment(StrEnum):
     """Define current runtime environment."""
 
     DEV = "dev"  # local dev
@@ -558,3 +559,19 @@ class ServiceInfo(BaseModel):
     updatedAt: Literal["2021-01-01T00:00:00+00:00"] = "2021-01-01T00:00:00+00:00"  # noqa: N815
     environment: ServiceEnvironment
     version: Literal[__version__] = __version__
+
+
+class DiseaseCategorization(BaseModel):
+    """Describe stored data for a disease categorization"""
+
+    category_schema_version: str
+    category_concept_id: str
+    category_name: str
+    concept_id: str
+
+
+class DiseaseCategoryExtensionResponse(BaseModel):
+    """Define response model for GET /categorize"""
+
+    concept_id: str
+    extension: Extension

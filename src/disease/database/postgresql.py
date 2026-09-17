@@ -23,6 +23,7 @@ from disease.config import get_config
 from disease.database import AbstractDatabase, DatabaseException, DatabaseWriteException
 from disease.schemas import (
     DataLicenseAttributes,
+    DiseaseCategorization,
     RecordType,
     RefType,
     SourceMeta,
@@ -632,6 +633,75 @@ class PostgresDatabase(AbstractDatabase):
             msg = f"No such record exists for primary key {concept_id}"
             raise DatabaseWriteException(msg)
 
+    _load_disease_categorization_query = b"""
+    INSERT INTO disease_categorizations(
+        disease_concept_id,
+        category_concept_id,
+        source_name
+    )
+    VALUES (%s, %s, %s);
+    """
+
+    def load_disease_categorization(
+        self, categorization: DiseaseCategorization
+    ) -> None:
+        """Add a disease categorization record to the DB.
+
+        :param categorization: individual categorization record pointing from a disease
+            concept to a broader disease category
+        """
+        with self.conn.cursor() as cur:
+            cur.execute(
+                self._load_disease_categorization_query,
+                {
+                    "disease_concept_id": categorization.concept_id,
+                    "category_concept_id": categorization.category_concept_id,
+                    "source_name": SourceName.ONCOTREE,
+                },
+            )
+            self.conn.commit()
+
+    _get_disease_categorization_query = b"""
+    SELECT
+        s.version AS category_schema_version,
+        dc.category_concept_id,
+        c.label AS category_name,
+        dc.disease_concept_id AS concept_id
+    FROM disease_categorizations AS dc
+    JOIN disease_concepts AS c
+        ON c.concept_id = dc.category_concept_id
+    JOIN sources AS s
+        ON s.name = dc.source_name
+    WHERE dc.disease_concept_id = $1;
+    """
+
+    def get_disease_categorization(
+        self, concept_id: str
+    ) -> DiseaseCategorization | None:
+        """Retrieve a disease categorization for the given term.
+
+        Performs lookup based on exact-matching.
+
+        :param concept_id: concept ID to perform lookup on
+        :return: full disease categorization description, if available
+        """
+        with self.conn.cursor() as cur:
+            result = cur.execute(self._get_disease_categorization_query, (concept_id,))
+            row = result.fetchone()
+            if not row:
+                return None
+            return DiseaseCategorization(
+                category_schema_version=row[0],
+                category_concept_id=row[1],
+                category_name=row[2],
+                concept_id=row[3],
+            )
+
+    def delete_disease_categorizations(self) -> None:
+        """Delete all disease categorization records"""
+        with self.conn.cursor() as cur:
+            cur.execute(b"TRUNCATE TABLE disease_categorizations;")
+
     def delete_normalized_concepts(self) -> None:
         """Remove merged records from the database. Use when performing a new update
         of normalized data.
@@ -727,7 +797,7 @@ class PostgresDatabase(AbstractDatabase):
             self.conn.commit()
             self.conn.close()
 
-    def load_from_remote(self, url: str | None) -> None:
+    def load_from_remote(self, url: str | None = None) -> None:
         """Load DB from remote dump. Warning: Deletes all existing data. If not
         passed as an argument, will try to grab latest release from VICC S3 bucket.
 

@@ -44,5 +44,19 @@ CREATE TABLE disease_xrefs (
 CREATE TABLE disease_associations (
     id SERIAL PRIMARY KEY,
     associated_with TEXT NOT NULL,
-    concept_ID VARCHAR(127) NOT NULL REFERENCES disease_concepts (concept_id)
+    concept_id VARCHAR(127) NOT NULL REFERENCES disease_concepts (concept_id)
+);
+CREATE TABLE disease_categorizations (
+    disease_concept_id TEXT PRIMARY KEY,
+    category_concept_id TEXT NOT NULL,
+    source_name TEXT NOT NULL,
+
+    FOREIGN KEY (disease_concept_id)
+        REFERENCES disease_concepts (concept_id),
+
+    FOREIGN KEY (category_concept_id)
+        REFERENCES disease_concepts (concept_id),
+
+    FOREIGN KEY (source_name)
+        REFERENCES disease_sources (name)
 );

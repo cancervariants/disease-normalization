@@ -32,6 +32,7 @@ from disease.database.database import (
 )
 from disease.schemas import (
     DataLicenseAttributes,
+    DiseaseCategorization,
     RecordType,
     RefType,
     SourceMeta,
@@ -39,6 +40,8 @@ from disease.schemas import (
 )
 
 _logger = logging.getLogger(__name__)
+
+_DISEASE_CATEGORY_KEY = "disease_category"
 
 
 class DynamoDbDatabase(AbstractDatabase):
@@ -527,6 +530,85 @@ class DynamoDbDatabase(AbstractDatabase):
                             "concept_id": record["concept_id"],
                         }
                     )
+
+    def load_disease_categorization(
+        self, categorization: DiseaseCategorization
+    ) -> None:
+        """Add a disease categorization record to the DB.
+
+        :param categorization: individual categorization record pointing from a disease
+            concept to a broader disease category
+        """
+        try:
+            self.batch.put_item(
+                {
+                    "label_and_type": _DISEASE_CATEGORY_KEY,
+                    "concept_id": categorization.concept_id.lower(),
+                    "category_name": categorization.category_name,
+                    "category_concept_id": categorization.category_concept_id,
+                }
+            )
+        except ClientError as e:
+            raise DatabaseWriteException(e) from e
+
+    def get_disease_categorization(
+        self, concept_id: str
+    ) -> DiseaseCategorization | None:
+        """Retrieve a disease categorization for the given term.
+
+        Performs lookup based on exact-matching.
+
+        :param concept_id: concept ID to perform lookup on
+        :return: full disease categorization description, if available
+        """
+        record = self.diseases.get_item(
+            Key={"label_and_type": _DISEASE_CATEGORY_KEY, "concept_id": concept_id}
+        ).get("Item")
+        if not record:
+            return None
+
+        if record["category_concept_id"].startswith("oncotree"):
+            oncotree_metadata = self.get_source_metadata(SourceName.ONCOTREE)
+            if not oncotree_metadata:
+                _logger.error(
+                    "Metadata missing for disease categorization source. Concept ID=%s, category code=%s",
+                    concept_id,
+                    record["category_concept_id"],
+                )
+                raise ValueError
+            return DiseaseCategorization(
+                category_schema_version=oncotree_metadata.version,
+                category_name=record["category_name"],
+                category_concept_id=record["category_concept_id"],
+                concept_id=concept_id,
+            )
+        raise ValueError
+
+    def delete_disease_categorizations(self) -> None:
+        """Delete all disease categorization records"""
+        response = self.diseases.query(
+            KeyConditionExpression=Key("label_and_type").eq("disease_category"),
+        )
+
+        with self.diseases.batch_writer() as batch:
+            while True:
+                for item in response["Items"]:
+                    batch.delete_item(
+                        Key={
+                            "label_and_type": item["label_and_type"],
+                            "concept_id": item[
+                                "concept_id"
+                            ],  # replace with your sort key
+                        }
+                    )
+
+                if "LastEvaluatedKey" not in response:
+                    break
+
+                response = self.diseases.query(
+                    KeyConditionExpression=Key("label_and_type").eq("disease_category"),
+                    ExclusiveStartKey=response["LastEvaluatedKey"],
+                )
 
     def delete_source(self, src_name: SourceName) -> None:
         """Delete all data for a source. Use when updating source data.
