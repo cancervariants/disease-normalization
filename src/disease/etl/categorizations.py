@@ -22,7 +22,7 @@ import fastobo
 from wags_tails import MondoData, OncoTreeData
 
 from disease.database.database import AbstractDatabase
-from disease.schemas import DiseaseCategorization, SourceName
+from disease.schemas import SourceName
 
 _logger = logging.getLogger(__name__)
 
@@ -206,7 +206,7 @@ def load_mondo_categories(
             term, mondo, oncotree, mondo_version, oncotree_version
         ):
             print(mapping)
-            sssom_mappings.append(mapping)  # noqa: PERF401
+            sssom_mappings.append(mapping)
         else:
             print(f"ope: {term}")
 
