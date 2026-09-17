@@ -202,10 +202,17 @@ class Mondo(Base):
         cancer_root = "MONDO:0045024"
         cancers = self._construct_dependency_set(dag, cancer_root)
 
+        non_human_animal_root = "MONDO:0005583"
+        non_human_animal_diseases = self._construct_dependency_set(
+            dag, non_human_animal_root
+        )
+
         reader = fastobo.iter(str(self._data_file.absolute()))
         for item in tqdm(reader, ncols=80, disable=self._silent):
             concept_id = str(item.id).lower()
             if concept_id.upper() not in diseases:
+                continue
+            if concept_id.upper() in non_human_animal_diseases:
                 continue
 
             params = self._process_term_frame(item)
