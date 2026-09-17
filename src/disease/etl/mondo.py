@@ -195,8 +195,8 @@ class Mondo(Base):
                 if clause.raw_tag() == "is_a":
                     dag[clause.raw_value()].append(item_id)
 
-        disease_root = "MONDO:0000001"
-        diseases = self._construct_dependency_set(dag, disease_root)
+        human_disease_root = "MONDO:070009"
+        diseases = self._construct_dependency_set(dag, human_disease_root)
         peds_neoplasm_root = "MONDO:0006517"
         pediatric_diseases = self._construct_dependency_set(dag, peds_neoplasm_root)
         cancer_root = "MONDO:0045024"
