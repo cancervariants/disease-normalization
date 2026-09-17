@@ -58,5 +58,5 @@ CREATE TABLE disease_categorizations (
         REFERENCES disease_concepts (concept_id),
 
     FOREIGN KEY (source_name)
-        REFERENCES sources (name)
+        REFERENCES disease_sources (name)
 );

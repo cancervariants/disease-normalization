@@ -46,7 +46,7 @@ def _get_frame_for_term(
     mondo: fastobo.doc.OboDoc, term_id: str
 ) -> fastobo.term.TermFrame:
     try:
-        term_frame = next(t for t in mondo if str(t.id) == term_id)
+        term_frame = next(t for t in mondo if str(t.id) == term_id.upper())
     except StopIteration as e:
         msg = f"Unable to retrieve {term_id} from local MONDO ontology"
         raise MissingMondoTermError(msg) from e
@@ -94,10 +94,9 @@ def _get_parent_oncotree_xrefs(
 
 
 def _get_best_oncotree_mapping(
-    mondo: fastobo.doc.OboDoc, term_id: str
+    mondo: fastobo.doc.OboDoc, term_frame: fastobo.term.TermFrame
 ) -> tuple[str, str] | None:
     """Recursive function for fetching parental oncotree mappings + filtering to the best one"""
-    term_frame = _get_frame_for_term(mondo, term_id)
     parent_xref_mappings = list(set(_get_parent_oncotree_xrefs(mondo, term_frame)))
 
     if len(parent_xref_mappings) != 1:
@@ -120,13 +119,13 @@ class MappingJustification(StrEnum):
 
 @dataclass(frozen=True)
 class SssomCategorizationMapping:
-    """Individual SSSOM-based mapping from query terms to categorization terms"""
+    """Individual SSSOM-based mapping from query terms (subject) to categorization terms (object)"""
 
     subject_id: str
     subject_label: str
+    subject_source_version: str
     object_id: str
     object_label: str
-    subject_source_version: str
     object_source_version: str
     comment: str
     predicate_id: str = MappingPredicate.BROAD_MATCH
@@ -206,14 +205,17 @@ def load_mondo_categories(
         if mapping := generate_mondo_category_sssom(
             term, mondo, oncotree, mondo_version, oncotree_version
         ):
+            print(mapping)
             sssom_mappings.append(mapping)  # noqa: PERF401
+        else:
+            print(f"ope: {term}")
 
-    for mapping in sssom_mappings:
-        storage.load_disease_categorization(
-            DiseaseCategorization(
-                category_schema_version=mapping.object_source_version,
-                category_concept_id=mapping.object_id,
-                category_name=mapping.object_label,
-                concept_id=mapping.subject_id,
-            )
-        )
+    # for mapping in sssom_mappings:
+    #     storage.load_disease_categorization(
+    #         DiseaseCategorization(
+    #             category_schema_version=mapping.object_source_version,
+    #             category_concept_id=mapping.object_id,
+    #             category_name=mapping.object_label,
+    #             concept_id=mapping.subject_id,
+    #         )
+    #     )
