@@ -195,24 +195,17 @@ class Mondo(Base):
                 if clause.raw_tag() == "is_a":
                     dag[clause.raw_value()].append(item_id)
 
-        disease_root = "MONDO:0000001"
-        diseases = self._construct_dependency_set(dag, disease_root)
+        human_disease_root = "MONDO:070009"
+        diseases = self._construct_dependency_set(dag, human_disease_root)
         peds_neoplasm_root = "MONDO:0006517"
         pediatric_diseases = self._construct_dependency_set(dag, peds_neoplasm_root)
         cancer_root = "MONDO:0045024"
         cancers = self._construct_dependency_set(dag, cancer_root)
 
-        non_human_animal_root = "MONDO:0005583"
-        non_human_animal_diseases = self._construct_dependency_set(
-            dag, non_human_animal_root
-        )
-
         reader = fastobo.iter(str(self._data_file.absolute()))
         for item in tqdm(reader, ncols=80, disable=self._silent):
             concept_id = str(item.id).lower()
             if concept_id.upper() not in diseases:
-                continue
-            if concept_id.upper() in non_human_animal_diseases:
                 continue
 
             params = self._process_term_frame(item)
