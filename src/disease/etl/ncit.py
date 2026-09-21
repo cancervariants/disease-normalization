@@ -33,12 +33,11 @@ class NCIt(OWLBase):
         )
         self._database.add_source_metadata(self._src_name, metadata)
 
-    def _get_disease_classes(self) -> set[str]:
+    def get_disease_classes(self) -> set[str]:
         """Get all nodes with semantic_type 'Neoplastic Process' or 'Disease
         or Syndrome'.
 
         :return: uq_nodes with additions from above types added
-        :rtype: Set[str]
         """
         graph = owl.default_world.as_rdflib_graph()
         p106 = "http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#P106"
@@ -53,7 +52,7 @@ class NCIt(OWLBase):
     def _transform_data(self) -> None:
         """Get data from file and construct object for loading."""
         ncit = owl.get_ontology(self._data_file.absolute().as_uri()).load()
-        disease_uris = self._get_disease_classes()
+        disease_uris = self.get_disease_classes()
         for uri in tqdm(disease_uris, ncols=80, disable=self._silent):
             disease_class = ncit.search(iri=uri)[0]
             concept_id = f"{NamespacePrefix.NCIT.value}:{disease_class.name}"
