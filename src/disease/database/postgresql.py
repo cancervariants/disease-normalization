@@ -12,6 +12,7 @@ from typing import Any, ClassVar
 
 import psycopg
 import requests
+from ga4gh.va_spec.base import DataSet
 from psycopg.errors import (
     DuplicateObject,
     DuplicateTable,
@@ -25,6 +26,7 @@ from disease.schemas import (
     DataLicenseAttributes,
     RecordType,
     RefType,
+    SourceDataSet,
     SourceMeta,
     SourceName,
 )
@@ -285,20 +287,21 @@ class PostgresDatabase(AbstractDatabase):
             return self._cached_sources[src_name]
 
         with self.conn.cursor() as cur:
-            cur.execute(self._source_metadata_query, [src_name])
+            cur.execute(self._source_metadata_query, (src_name,))
             metadata_result = cur.fetchone()
             if not metadata_result:
                 return None
+            dataset = SourceDataSet(**metadata_result[1])
+
+            # transform into old data structure for now
             metadata = SourceMeta(
-                data_license=metadata_result[1],
-                data_license_url=metadata_result[2],
-                version=metadata_result[3],
-                data_url=metadata_result[4],
-                rdp_url=metadata_result[5],
+                data_license=dataset.license.name,
+                data_license_url=dataset.get_data_license_url(),
+                version=dataset.version,
+                data_url=dataset.get_data_url(),
+                rdp_url=dataset.get_rdp_url(),
                 data_license_attributes=DataLicenseAttributes(
-                    non_commercial=metadata_result[6],
-                    attribution=metadata_result[7],
-                    share_alike=metadata_result[8],
+                    **dataset.get_license_attributes()
                 ),
             )
             self._cached_sources[src_name] = metadata
@@ -504,34 +507,19 @@ class PostgresDatabase(AbstractDatabase):
                         yield self._format_source_record(result)
                     fetched = results.fetchmany(batch_size)
 
-    _add_source_metadata_query = b"""
-    INSERT INTO disease_sources(
-        name, data_license, data_license_url, version, data_url, rdp_url,
-        data_license_nc, data_license_attr, data_license_sa
-    )
-    VALUES ( %s, %s, %s, %s, %s, %s, %s, %s, %s );
-    """
-
-    def add_source_metadata(self, src_name: SourceName, meta: SourceMeta) -> None:
+    def add_source_metadata(self, source_name: SourceName, source: DataSet) -> None:
         """Add new source metadata entry.
 
-        :param src_name: name of source
-        :param meta: known source attributes
+        :param source_name: name of source
+        :param source: source dataset description
         :raise DatabaseWriteException: if write fails
         """
         with self.conn.cursor() as cur:
             cur.execute(
-                self._add_source_metadata_query,
+                "INSERT INTO disease_sources(name, data) VALUES (%s, %s);",
                 [
-                    src_name.value,
-                    meta.data_license,
-                    meta.data_license_url,
-                    meta.version,
-                    meta.data_url,
-                    meta.rdp_url,
-                    meta.data_license_attributes.non_commercial,
-                    meta.data_license_attributes.attribution,
-                    meta.data_license_attributes.share_alike,
+                    source_name.value,
+                    source.model_dump_json(exclude_unset=True, exclude_none=True),
                 ],
             )
         self.conn.commit()

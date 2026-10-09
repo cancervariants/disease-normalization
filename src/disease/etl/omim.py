@@ -2,11 +2,13 @@
 
 from pathlib import Path
 
+from ga4gh.core.models import Coding, Extension, MappableConcept, code, iriReference
+from ga4gh.va_spec.base import DataSet
 from tqdm import tqdm
 from wags_tails import CustomData, DataSource
 
 from disease.etl.base import Base
-from disease.schemas import NamespacePrefix, SourceMeta
+from disease.schemas import NamespacePrefix
 
 
 class OMIM(Base):
@@ -42,17 +44,34 @@ class OMIM(Base):
 
     def _load_meta(self) -> None:
         """Load source metadata."""
-        metadata = SourceMeta(
-            data_license="custom",
-            data_license_url="https://omim.org/help/agreement",
-            version=self._data_file.stem.split("_", 1)[1],
-            data_url="https://www.omim.org/downloads",
-            rdp_url="http://reusabledata.org/omim.html",
-            data_license_attributes={
-                "non_commercial": False,
-                "share_alike": True,
-                "attribution": True,
-            },
+        metadata = DataSet(
+            name=self._src_name,
+            version=self._version,
+            license=MappableConcept(
+                name="custom",
+                primaryCoding=Coding(
+                    code=code(root="OMIM-use-agreement"),
+                    system="https://omim.org",
+                    iris=[iriReference(root="https://omim.org/help/agreement")],
+                ),
+                extensions=[
+                    Extension(
+                        name="license_attributes",
+                        value={
+                            "non_commercial": False,
+                            "share_alike": True,
+                            "attribution": True,
+                        },
+                    ),
+                ],
+            ),
+            extensions=[
+                Extension(
+                    name="data_url",
+                    value="https://www.omim.org/downloads",
+                ),
+                Extension(name="rdp_url", value="http://reusabledata.org/omim.html"),
+            ],
         )
         self._database.add_source_metadata(self._src_name, metadata)
 
