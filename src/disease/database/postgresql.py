@@ -19,6 +19,7 @@ from psycopg.errors import (
     UndefinedTable,
     UniqueViolation,
 )
+from psycopg2.extras import Json
 
 from disease.config import get_config
 from disease.database import AbstractDatabase, DatabaseException, DatabaseWriteException
@@ -519,7 +520,7 @@ class PostgresDatabase(AbstractDatabase):
                 "INSERT INTO disease_sources(name, data) VALUES (%s, %s);",
                 [
                     source_name.value,
-                    source.model_dump_json(exclude_unset=True, exclude_none=True),
+                    Json(source.model_dump(exclude_unset=True, exclude_none=True)),
                 ],
             )
         self.conn.commit()

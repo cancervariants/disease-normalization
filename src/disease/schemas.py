@@ -607,13 +607,16 @@ class SourceDataSet(DataSet):
         """
         return self._get_str_extension("data_url")
 
-    def get_rdp_url(self) -> str:
+    def get_rdp_url(self) -> str | None:
         """Return the source's RDP URL.
 
-        :return: The value of the ``rdp_url`` extension.
+        :return: The value of the ``rdp_url`` extension if available
         :raises SourceMetadataError: If the extension is missing.
         """
-        return self._get_str_extension("rdp_url")
+        try:
+            return self._get_str_extension("rdp_url")
+        except SourceMetadataError:
+            return None  # RDP isn't always available
 
     def get_license_attributes(self) -> dict:
         """Return the source's structured data license attributes.
