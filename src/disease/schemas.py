@@ -592,7 +592,7 @@ class SourceDataSet(DataSet):
         """
         try:
             matching_ext = next(
-                e for e in getattr(self.extensions, "extensions", []) if e.name == name
+                e for e in getattr(self, "extensions", []) if e.name == name
             )
         except StopIteration as e:
             msg = f"Source {self.name}: Extension {name} is missing"
