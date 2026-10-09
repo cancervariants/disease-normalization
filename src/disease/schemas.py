@@ -12,6 +12,7 @@ from ga4gh.core.models import (
     Relation,
     code,
 )
+from ga4gh.va_spec.base import DataSet
 from pydantic import BaseModel, ConfigDict, StrictBool, StrictStr
 
 from disease import __version__
@@ -558,3 +559,79 @@ class ServiceInfo(BaseModel):
     updatedAt: Literal["2021-01-01T00:00:00+00:00"] = "2021-01-01T00:00:00+00:00"  # noqa: N815
     environment: ServiceEnvironment
     version: Literal[__version__] = __version__
+
+
+class SourceMetadataError(Exception):
+    """Raise for missing source metadata properties"""
+
+
+class SourceDataSet(DataSet):
+    """VA-Spec DataSet with helper methods added for extracting source metadata"""
+
+    def get_data_license_url(self) -> str:
+        """Return the URL describing the source's data license.
+
+        :return: The first IRI in the license's primary coding.
+        :raises SourceMetadataError: If no data license URL is available.
+        """
+        if (
+            not self.license
+            or not self.license.primaryCoding
+            or not self.license.primaryCoding.iris
+        ):
+            msg = f"Source {self.name}: Data license URL is missing"
+            raise SourceMetadataError(msg)
+        return self.license.primaryCoding.iris[0].root
+
+    def _get_str_extension(self, name: str) -> str:
+        """Return the value of the first extension with the given name.
+
+        :param name: Extension name to look up.
+        :return: The extension value, expected to be a string.
+        :raises SourceMetadataError: If no matching extension exists.
+        """
+        try:
+            matching_ext = next(
+                e for e in getattr(self, "extensions", []) if e.name == name
+            )
+        except StopIteration as e:
+            msg = f"Source {self.name}: Extension {name} is missing"
+            raise SourceMetadataError(msg) from e
+        return matching_ext.value
+
+    def get_data_url(self) -> str:
+        """Return the source's data URL.
+
+        :return: The value of the ``data_url`` extension.
+        :raises SourceMetadataError: If the extension is missing.
+        """
+        return self._get_str_extension("data_url")
+
+    def get_rdp_url(self) -> str | None:
+        """Return the source's RDP URL.
+
+        :return: The value of the ``rdp_url`` extension if available
+        :raises SourceMetadataError: If the extension is missing.
+        """
+        try:
+            return self._get_str_extension("rdp_url")
+        except SourceMetadataError:
+            return None  # RDP isn't always available
+
+    def get_license_attributes(self) -> dict:
+        """Return the source's structured data license attributes.
+
+        :return: The value of the license's ``license_attributes`` extension.
+        :raises SourceMetadataError: If license attributes are missing.
+        """
+        if not self.license or not self.license.extensions:
+            msg = f"Source {self.name}: license attributes are missing"
+            raise SourceMetadataError(msg)
+        try:
+            matching_ext = next(
+                e for e in self.license.extensions if e.name == "license_attributes"
+            )
+        except StopIteration as e:
+            msg = f"Source {self.name}: license attributes are missing"
+            raise SourceMetadataError(msg) from e
+        return matching_ext.value

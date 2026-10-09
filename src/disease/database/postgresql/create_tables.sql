@@ -1,13 +1,6 @@
 CREATE TABLE disease_sources (
     name VARCHAR(127) PRIMARY KEY,
-    data_license TEXT NOT NULL,
-    data_license_url TEXT NOT NULL,
-    version TEXT NOT NULL,
-    data_url TEXT NOT NULL,
-    rdp_url TEXT,
-    data_license_nc BOOLEAN NOT NULL,
-    data_license_attr BOOLEAN NOT NULL,
-    data_license_sa BOOLEAN NOT NULL
+    data JSONB
 );
 -- see also: delete_normalized_concepts.sql
 CREATE TABLE disease_merged (

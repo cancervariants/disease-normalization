@@ -16,6 +16,7 @@ import boto3
 import click
 from boto3.dynamodb.conditions import Attr, Equals, Key
 from botocore.exceptions import ClientError
+from ga4gh.va_spec.base import DataSet
 
 from disease import ITEM_TYPES, PREFIX_LOOKUP
 from disease.config import get_config
@@ -34,6 +35,7 @@ from disease.schemas import (
     DataLicenseAttributes,
     RecordType,
     RefType,
+    SourceDataSet,
     SourceMeta,
     SourceName,
 )
@@ -217,21 +219,24 @@ class DynamoDbDatabase(AbstractDatabase):
             src_name = src_name.value
         if src_name in self._cached_sources:
             return self._cached_sources[src_name]
-        pk = f"{src_name.lower()}##source"
-        concept_id = f"source:{src_name.lower()}"
+        hash_key = f"{src_name.lower()}##source"
+        sort_key = f"source:{src_name.lower()}"
         retrieved_metadata = self.diseases.get_item(
-            Key={"label_and_type": pk, "concept_id": concept_id}
+            Key={"label_and_type": hash_key, "concept_id": sort_key}
         ).get("Item")
         if not retrieved_metadata:
             return None
+        dataset = SourceDataSet(**retrieved_metadata["data"])
+
+        # for now, restructure again into old dataset structure
         formatted_metadata = SourceMeta(
-            data_license=retrieved_metadata["data_license"],
-            data_license_url=retrieved_metadata["data_license_url"],
-            version=retrieved_metadata["version"],
-            data_url=retrieved_metadata["data_url"],
-            rdp_url=retrieved_metadata["rdp_url"],
+            data_license=dataset.license.name,
+            data_license_url=dataset.get_data_license_url(),
+            version=dataset.version,
+            data_url=dataset.get_data_url(),
+            rdp_url=dataset.get_rdp_url(),
             data_license_attributes=DataLicenseAttributes(
-                **retrieved_metadata["data_license_attributes"]
+                **dataset.get_license_attributes()
             ),
         )
         self._cached_sources[src_name] = formatted_metadata
@@ -367,21 +372,20 @@ class DynamoDbDatabase(AbstractDatabase):
             if not last_evaluated_key:
                 break
 
-    def add_source_metadata(self, src_name: SourceName, meta: SourceMeta) -> None:
+    def add_source_metadata(self, source_name: SourceName, source: DataSet) -> None:
         """Add new source metadata entry.
 
-        :param src_name: name of source
-        :param meta: known source attributes
+        :param source_name: name of source
+        :param source: source dataset description
         :raise DatabaseWriteException: if write fails
         """
-        src_name_value = src_name.value
-        metadata_item = meta.model_dump()
-        metadata_item["src_name"] = src_name_value
-        metadata_item["label_and_type"] = f"{str(src_name_value).lower()}##source"
-        metadata_item["concept_id"] = f"source:{str(src_name_value).lower()}"
-        metadata_item["item_type"] = "source"
+        hash_key = f"{source_name.value.lower()}##source"
+        sort_key = f"source:{source_name.value.lower()}"
+        data = source.model_dump_json(exclude_unset=True, exclude_none=True)
         try:
-            self.diseases.put_item(Item=metadata_item)
+            self.diseases.put_item(
+                Item={"label_and_type": hash_key, "concept_id": sort_key, "data": data}
+            )
         except ClientError as e:
             raise DatabaseWriteException(e) from e
 

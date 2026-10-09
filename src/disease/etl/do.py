@@ -1,11 +1,13 @@
 """Get Human Disease Ontology data."""
 
 import owlready2 as owl
+from ga4gh.core.models import Coding, Extension, MappableConcept, code, iriReference
+from ga4gh.va_spec.base import DataSet
 from tqdm import tqdm
 
 from disease import PREFIX_LOOKUP
 from disease.etl.base import OWLBase
-from disease.schemas import NamespacePrefix, SourceMeta
+from disease.schemas import NamespacePrefix
 
 DO_PREFIX_LOOKUP = {
     "EFO": NamespacePrefix.EFO.value,
@@ -28,17 +30,37 @@ class DO(OWLBase):
 
     def _load_meta(self) -> None:
         """Load metadata"""
-        metadata = SourceMeta(
-            data_license="CC0 1.0",
-            data_license_url="https://creativecommons.org/publicdomain/zero/1.0/legalcode",
+        metadata = DataSet(
+            name=self._src_name,
             version=self._version,
-            data_url="http://www.obofoundry.org/ontology/doid.html",
-            rdp_url=None,
-            data_license_attributes={
-                "non_commercial": False,
-                "share_alike": False,
-                "attribution": False,
-            },
+            license=MappableConcept(
+                name="CC0 1.0",
+                primaryCoding=Coding(
+                    code=code(root="CC0 1.0"),
+                    system="https://spdx.org/licenses/",
+                    iris=[
+                        iriReference(
+                            root="https://creativecommons.org/publicdomain/zero/1.0/legalcode"
+                        )
+                    ],
+                ),
+                extensions=[
+                    Extension(
+                        name="license_attributes",
+                        value={
+                            "non_commercial": False,
+                            "share_alike": False,
+                            "attribution": False,
+                        },
+                    ),
+                ],
+            ),
+            extensions=[
+                Extension(
+                    name="data_url",
+                    value="http://www.obofoundry.org/ontology/doid.html",
+                ),
+            ],
         )
         self._database.add_source_metadata(self._src_name, metadata)
 
