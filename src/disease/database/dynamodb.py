@@ -226,7 +226,7 @@ class DynamoDbDatabase(AbstractDatabase):
         ).get("Item")
         if not retrieved_metadata:
             return None
-        dataset = SourceDataSet(**retrieved_metadata["data"])
+        dataset = SourceDataSet(**json.loads(retrieved_metadata["data"]))
 
         # for now, restructure again into old dataset structure
         formatted_metadata = SourceMeta(
