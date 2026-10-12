@@ -31,6 +31,7 @@ dependencies = [
     "click",
     "boto3",
     "ga4gh.vrs>=2.2.0,<3.0",
+    "ga4gh.va_spec",
 ]
 dynamic = ["version"]
 

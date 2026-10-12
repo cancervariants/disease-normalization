@@ -3,10 +3,12 @@
 import json
 import logging
 
+from ga4gh.core.models import Coding, Extension, MappableConcept, code, iriReference
+from ga4gh.va_spec.base import DataSet
 from tqdm import tqdm
 
 from disease.etl.base import Base
-from disease.schemas import NamespacePrefix, SourceMeta
+from disease.schemas import NamespacePrefix
 
 _logger = logging.getLogger(__name__)
 
@@ -18,17 +20,37 @@ class OncoTree(Base):
 
     def _load_meta(self) -> None:
         """Load metadata"""
-        metadata = SourceMeta(
-            data_license="CC BY 4.0",
-            data_license_url="https://creativecommons.org/licenses/by/4.0/legalcode",  # F401
+        metadata = DataSet(
+            name=self._src_name,
             version=self._version,
-            data_url="http://oncotree.mskcc.org/#/home?tab=api",
-            rdp_url=None,
-            data_license_attributes={
-                "non_commercial": False,
-                "share_alike": False,
-                "attribution": True,
-            },
+            license=MappableConcept(
+                name="CC BY 4.0",
+                primaryCoding=Coding(
+                    code=code(root="CC BY 4.0"),
+                    system="https://spdx.org/licenses/",
+                    iris=[
+                        iriReference(
+                            root="https://creativecommons.org/licenses/by/4.0/legalcode"
+                        )
+                    ],
+                ),
+                extensions=[
+                    Extension(
+                        name="license_attributes",
+                        value={
+                            "non_commercial": False,
+                            "share_alike": False,
+                            "attribution": True,
+                        },
+                    ),
+                ],
+            ),
+            extensions=[
+                Extension(
+                    name="data_url",
+                    value="http://oncotree.mskcc.org/#/home?tab=api",
+                ),
+            ],
         )
         self._database.add_source_metadata(self._src_name, metadata)
 

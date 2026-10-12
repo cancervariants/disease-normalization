@@ -14,6 +14,8 @@ from pathlib import Path
 from typing import Any
 
 import click
+from ga4gh.core.models import MappableConcept
+from ga4gh.va_spec.base import DataSet
 
 from disease.config import get_config
 from disease.schemas import (
@@ -174,16 +176,16 @@ class AbstractDatabase(abc.ABC):
         """
 
     @abc.abstractmethod
-    def add_source_metadata(self, src_name: SourceName, meta: SourceMeta) -> None:
+    def add_source_metadata(self, source_name: SourceName, source: DataSet) -> None:
         """Add new source metadata entry.
 
-        :param src_name: name of source
-        :param meta: known source attributes
+        :param source_name: name of source
+        :param source: source dataset description
         :raise DatabaseWriteException: if write fails
         """
 
     @abc.abstractmethod
-    def add_record(self, record: dict, src_name: SourceName) -> None:
+    def add_record(self, record: MappableConcept, src_name: SourceName) -> None:
         """Add new record to database.
 
         :param record: record to upload
@@ -191,7 +193,7 @@ class AbstractDatabase(abc.ABC):
         """
 
     @abc.abstractmethod
-    def add_merged_record(self, record: dict) -> None:
+    def add_merged_record(self, record: MappableConcept) -> None:
         """Add merged record to database.
 
         :param record: merged record to add
