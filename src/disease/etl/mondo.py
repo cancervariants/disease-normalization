@@ -51,6 +51,7 @@ class Mondo(Base):
                     name="data_url",
                     value="https://mondo.monarchinitiative.org/pages/download/",
                 ),
+                Extension(name="rdp_url", value="http://reusabledata.org/monarch.html"),
             ],
         )
         self._database.add_source_metadata(self._src_name, metadata)
