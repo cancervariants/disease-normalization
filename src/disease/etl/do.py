@@ -5,9 +5,8 @@ from ga4gh.core.models import Coding, Extension, MappableConcept, code, iriRefer
 from ga4gh.va_spec.base import DataSet
 from tqdm import tqdm
 
-from disease import PREFIX_LOOKUP
 from disease.etl.base import OWLBase
-from disease.schemas import NamespacePrefix
+from disease.schemas import PREFIX_LOOKUP, NamespacePrefix
 
 DO_PREFIX_LOOKUP = {
     "EFO": NamespacePrefix.EFO.value,
