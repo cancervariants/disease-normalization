@@ -3,6 +3,7 @@
 Generally, users shouldn't ever have to work directly with the classes contained within.
 """
 
+from ga4gh.core.models import MappableConcept
 import logging
 from abc import ABC, abstractmethod
 from pathlib import Path
@@ -95,31 +96,29 @@ class Base(ABC):
     def _load_meta(self, *args, **kwargs) -> None:
         raise NotImplementedError
 
-    def _load_disease(self, disease: dict) -> None:
+    def _load_disease(self, disease: MappableConcept) -> None:
         """Load individual disease record."""
-        _ = Disease(**disease)
-        concept_id = disease["concept_id"]
+        concept_id: str = disease.primaryCoding.code.root
 
-        for attr_type in ITEM_TYPES:
-            if attr_type in disease:
-                value = disease[attr_type]
-                if value is not None and value != []:
-                    if isinstance(value, str):
-                        items = [value.lower()]
-                    else:
-                        disease[attr_type] = list(set(value))
-                        items = {item.lower() for item in value}
-                        if (attr_type == "aliases") and (len(items) > 20):  # noqa: PLR2004
-                            _logger.debug("%s has > 20 aliases.", concept_id)
-                            del disease[attr_type]
-                            continue
-
-                else:
-                    del disease[attr_type]
-
-        for field in ("pediatric_disease", "oncologic_disease"):
-            if field in disease and disease[field] is None:
-                del disease[field]
+        if disease.name:
+            disease.name = disease.name.lower()
+        if disease.aliases is not None:
+            if not disease.aliases:
+                disease.aliases = None
+            else:
+                disease.aliases = list({a.lower() for a in disease.aliases})
+                if len(disease.aliases) > 20:  # noqa: PLR2004
+                    _logger.debug("%s has > 20 aliases.", concept_id)
+                    disease.aliases = None
+        if disease.mappings is not None:
+            if not disease.mappings:
+                disease.mappings = None
+            else:
+                # inelegantly drop duplicates -- probably fine
+                # TODO double check this
+                disease.mappings = list(
+                    {m.coding.code.root: m for m in disease.mappings}.values()
+                )
 
         disease = self._rules.apply_rules_to_disease(disease)
         self._database.add_record(disease, self._src_name)

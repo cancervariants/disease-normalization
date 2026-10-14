@@ -1,5 +1,6 @@
 """Provide PostgreSQL client."""
 
+from ga4gh.core.models import MappableConcept
 import atexit
 import datetime
 import logging
@@ -526,8 +527,8 @@ class PostgresDatabase(AbstractDatabase):
         self.conn.commit()
 
     _add_record_query = b"""
-        INSERT INTO disease_concepts (concept_id, source, pediatric_disease, oncologic_disease)
-        VALUES (%s, %s, %s, %s);
+        INSERT INTO disease_concepts (concept_id, source, data)
+        VALUES (%s, %s, %s);
     """
     _insert_label_query = (
         b"INSERT INTO disease_labels (label, concept_id) VALUES (%s, %s)"
@@ -538,13 +539,13 @@ class PostgresDatabase(AbstractDatabase):
     _insert_xref_query = b"INSERT INTO disease_xrefs (xref, concept_id) VALUES (%s, %s)"
     _insert_assoc_query = b"INSERT INTO disease_associations (associated_with, concept_id) VALUES (%s, %s)"
 
-    def add_record(self, record: dict, src_name: SourceName) -> None:
+    def add_record(self, disease: MappableConcept, src_name: SourceName) -> None:
         """Add new record to database.
 
-        :param record: record to upload
-        :param src_name: name of source for record. Not used by PostgreSQL instance.
+        :param disease: disease record to upload
+        :param src_name: name of source for record
         """
-        concept_id = record["concept_id"]
+        concept_id = disease.primaryCoding.code.root
         with self.conn.cursor() as cur:
             try:
                 cur.execute(
@@ -552,28 +553,26 @@ class PostgresDatabase(AbstractDatabase):
                     [
                         concept_id,
                         src_name.value,
-                        record.get("pediatric_disease"),
-                        record.get("oncologic_disease"),
+                        disease.model_dump(exclude_unset=True, exclude_none=True),
                     ],
                 )
-                cur.execute(self._insert_label_query, [record["label"], concept_id])
-                for a in record.get("aliases", []):
-                    cur.execute(self._insert_alias_query, [a, concept_id])
-                for x in record.get("xrefs", []):
-                    cur.execute(self._insert_xref_query, [x, concept_id])
-                for a in record.get("associated_with", []):
-                    cur.execute(self._insert_assoc_query, [a, concept_id])
+                cur.execute(self._insert_label_query, [disease.name, concept_id])
+                if disease.aliases:
+                    for a in disease.aliases:
+                        cur.execute(self._insert_alias_query, [a, concept_id])
+                if disease.mappings:
+                    for m in disease.mappings:
+                        cur.execute(
+                            self._insert_xref_query, [m.coding.code.root, concept_id]
+                        )
                 self.conn.commit()
             except UniqueViolation:
                 _logger.error("Record with ID %s already exists", concept_id)  # noqa: TRY400
                 self.conn.rollback()
 
-    _add_merged_record_query = b"""
-    INSERT INTO disease_merged (
-        concept_id, label, aliases, associated_with, xrefs, pediatric_disease, oncologic_disease
+    _add_merged_record_query = (
+        b"""INSERT INTO disease_merged ( concept_id, data) VALUES (%s, %s);"""
     )
-    VALUES (%s, %s, %s, %s, %s, %s, %s);
-    """
 
     def add_merged_record(self, record: dict) -> None:
         """Add merged record to database.

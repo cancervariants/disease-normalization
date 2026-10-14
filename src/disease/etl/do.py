@@ -1,7 +1,15 @@
 """Get Human Disease Ontology data."""
 
+from ga4gh.core.models import Relation
 import owlready2 as owl
-from ga4gh.core.models import Coding, Extension, MappableConcept, code, iriReference
+from ga4gh.core.models import (
+    Coding,
+    Extension,
+    MappableConcept,
+    code,
+    iriReference,
+    ConceptMapping,
+)
 from ga4gh.va_spec.base import DataSet
 from tqdm import tqdm
 
@@ -86,32 +94,37 @@ class DO(OWLBase):
             synonyms = disease_class.hasExactSynonym
             aliases = list({s for s in synonyms if s != label}) if synonyms else []
 
-            xrefs = []
-            associated_with = []
+            mappings = []
             db_associated_with = set(disease_class.hasDbXref)
             for xref in db_associated_with:
                 prefix, id_no = xref.split(":", 1)
                 normed_prefix = DO_PREFIX_LOOKUP.get(prefix)
                 if normed_prefix:
                     xref_no = f"{normed_prefix}:{id_no}"
-                    if normed_prefix.lower() in PREFIX_LOOKUP:
-                        if normed_prefix == NamespacePrefix.OMIM and id_no.startswith(
-                            "PS"
-                        ):
-                            associated_with.append(xref_no)
-                        else:
-                            xrefs.append(xref_no)
-                    else:
-                        associated_with.append(xref_no)
-
-            disease = {
-                "concept_id": concept_id,
-                "label": label,
-                "aliases": aliases,
-                "xrefs": xrefs,
-                "associated_with": associated_with,
-            }
+                    mappings.append(
+                        ConceptMapping(
+                            relation=Relation.EXACT_MATCH,
+                            coding=Coding(
+                                # TODO fix up in here
+                                code=code(root="todo"),
+                                system="todo",
+                                id=xref_no,
+                            ),
+                        )
+                    )
 
             if uri in cancers:
-                disease["oncologic_disease"] = True
-            self._load_disease(disease)
+                extensions = [Extension(name="oncologic_disease", value=True)]
+            else:
+                extensions = None
+            extensions = []
+
+            self._load_disease(
+                MappableConcept(
+                    id=concept_id,
+                    name=label,
+                    aliases=aliases,
+                    mappings=mappings,
+                    extensions=extensions,
+                )
+            )

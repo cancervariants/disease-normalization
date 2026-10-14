@@ -185,10 +185,10 @@ class AbstractDatabase(abc.ABC):
         """
 
     @abc.abstractmethod
-    def add_record(self, record: MappableConcept, src_name: SourceName) -> None:
+    def add_record(self, disease: MappableConcept, src_name: SourceName) -> None:
         """Add new record to database.
 
-        :param record: record to upload
+        :param disease: disease record to upload
         :param src_name: name of source for record.
         """
 

@@ -132,12 +132,12 @@ def get_coding_object(concept_id: str) -> Coding:
     if source == NamespacePrefix.MONDO:
         source_code = concept_id.upper()
         id_ = source_code.replace(":", "_")
-    elif source == NamespacePrefix.DOID:
+    else:
         source_code = concept_id
 
     return Coding(
         id=id_,
-        code=code(source_code),
+        code=code(root=source_code),
         system=NAMESPACE_TO_SYSTEM_URI[source],
     )
 
