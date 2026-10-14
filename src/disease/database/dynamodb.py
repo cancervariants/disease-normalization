@@ -18,7 +18,6 @@ from boto3.dynamodb.conditions import Attr, Equals, Key
 from botocore.exceptions import ClientError
 from ga4gh.va_spec.base import DataSet
 
-from disease import PREFIX_LOOKUP
 from disease.config import get_config
 from disease.database.database import (
     AWS_ENV_VAR_NAME,
@@ -33,6 +32,7 @@ from disease.database.database import (
 )
 from disease.schemas import (
     ITEM_TYPES,
+    PREFIX_LOOKUP,
     DataLicenseAttributes,
     RecordType,
     RefType,
