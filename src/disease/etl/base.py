@@ -12,10 +12,9 @@ import click
 from owlready2.rdflib_store import TripleLiteRDFlibGraph as RDFGraph
 from wags_tails import CustomData, DataSource, DoData, MondoData, NcitData, OncoTreeData
 
-from disease import ITEM_TYPES, SOURCES_FOR_MERGE
 from disease.database import AbstractDatabase
 from disease.etl.rules import Rules
-from disease.schemas import Disease, SourceName
+from disease.schemas import ITEM_TYPES, Disease, SourceName
 
 DATA_DISPATCH = {
     SourceName.NCIT: NcitData,
@@ -25,6 +24,10 @@ DATA_DISPATCH = {
 }
 
 _logger = logging.getLogger(__name__)
+
+
+# Use for checking whether to pull IDs for merge group generation
+SOURCES_FOR_MERGE = {SourceName.MONDO}
 
 
 class DiseaseNormalizerEtlError(Exception):
