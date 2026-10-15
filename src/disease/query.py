@@ -1,6 +1,8 @@
 """Provides query handler class, which receives and responses to user search queries."""
 
-import datetime
+from ga4gh.core.models import ConceptMapping
+from disease.schemas import NormalizerCoding
+import datetime as dt
 import logging
 import re
 
@@ -24,8 +26,6 @@ from disease.schemas import (
     SearchService,
     ServiceMeta,
     SourceName,
-    get_coding_object,
-    get_concept_mapping,
 )
 
 _logger = logging.getLogger(__name__)
@@ -289,7 +289,7 @@ class QueryHandler:
 
         response["service_meta_"] = ServiceMeta(
             version=__version__,
-            response_datetime=datetime.datetime.now(tz=datetime.UTC),
+            response_datetime=dt.datetime.now(tz=dt.UTC),
         ).model_dump()
         return SearchService(**response)
 
@@ -336,7 +336,7 @@ class QueryHandler:
         """
         disease_obj = MappableConcept(
             id=f"normalize.disease.{record['concept_id']}",
-            primaryCoding=get_coding_object(record["concept_id"]),
+            primaryCoding=NormalizerCoding.from_concept_id(record["concept_id"]),
             conceptType="Disease",
             name=record["label"],
             extensions=[],
@@ -344,13 +344,19 @@ class QueryHandler:
 
         xrefs = record.get("xrefs", [])
         mappings = [
-            get_concept_mapping(xref_id, relation=Relation.EXACT_MATCH)
+            ConceptMapping(
+                coding=NormalizerCoding.from_concept_id(xref_id),
+                relation=Relation.EXACT_MATCH,
+            )
             for xref_id in xrefs
         ]
 
         associated_with = record.get("associated_with", [])
         mappings.extend(
-            get_concept_mapping(associated_with_id, relation=Relation.RELATED_MATCH)
+            ConceptMapping(
+                coding=NormalizerCoding.from_concept_id(associated_with_id),
+                relation=Relation.RELATED_MATCH,
+            )
             for associated_with_id in associated_with
         )
 
@@ -429,7 +435,7 @@ class QueryHandler:
             "warnings": self._emit_warnings(query),
             "service_meta_": ServiceMeta(
                 version=__version__,
-                response_datetime=datetime.datetime.now(tz=datetime.UTC),
+                response_datetime=dt.datetime.now(tz=dt.UTC),
             ),
         }
         if query == "":

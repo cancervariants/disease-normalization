@@ -3,12 +3,20 @@
 import json
 import logging
 
-from ga4gh.core.models import Coding, Extension, MappableConcept, code, iriReference
+from ga4gh.core.models import (
+    Coding,
+    ConceptMapping,
+    Extension,
+    MappableConcept,
+    Relation,
+    code,
+    iriReference,
+)
 from ga4gh.va_spec.base import DataSet
 from tqdm import tqdm
 
 from disease.etl.base import Base
-from disease.schemas import NamespacePrefix
+from disease.schemas import NamespacePrefix, NormalizerCoding
 
 _logger = logging.getLogger(__name__)
 
@@ -76,28 +84,48 @@ class OncoTree(Base):
 
         :param disease_node: individual node taken from OncoTree tree
         """
-        disease = {
-            "concept_id": f"{NamespacePrefix.ONCOTREE.value}:{disease_node['code']}",
-            "label": disease_node["name"],
-            "xrefs": [],
-            "associated_with": [],
-            "oncologic_disease": True,
-        }
+        concept_id = f"{NamespacePrefix.ONCOTREE.value}:{disease_node['code']}"
         refs = disease_node.get("externalReferences", [])
+        mappings = []
         for prefix, codes in refs.items():
             if prefix == "UMLS":
                 normed_prefix = NamespacePrefix.UMLS.value
-                for code in codes:
-                    normed_id = f"{normed_prefix}:{code}"
-                    disease["associated_with"].append(normed_id)
+                for umls_code in codes:
+                    if umls_coding := NormalizerCoding.from_concept_id(
+                        f"{normed_prefix}:{umls_code}"
+                    ):
+                        mappings.append(  # noqa: PERF401
+                            ConceptMapping(
+                                relation=Relation.RELATED_MATCH, coding=umls_coding
+                            )
+                        )
             elif prefix == "NCI":
                 normed_prefix = NamespacePrefix.NCIT.value
-                for code in codes:
-                    normed_id = f"{normed_prefix}:{code}"
-                    disease["xrefs"].append(normed_id)
+                for nci_code in codes:
+                    if nci_coding := NormalizerCoding.from_concept_id(
+                        f"{normed_prefix}:{nci_code}"
+                    ):
+                        mappings.append(  # noqa: PERF401
+                            ConceptMapping(
+                                relation=Relation.EXACT_MATCH,
+                                coding=nci_coding,
+                            )
+                        )
             else:
-                _logger.warning("Unrecognized prefix: %s", prefix)
+                _logger.warning(
+                    "Unrecognized prefix in Oncotree ingest: %s [in %s]",
+                    prefix,
+                    concept_id,
+                )
                 continue
+        primary_coding = NormalizerCoding.from_concept_id(concept_id)
+        disease = MappableConcept(
+            id=concept_id,
+            primaryCoding=primary_coding,
+            name=disease_node["name"],
+            mappings=mappings,
+            extensions=[Extension(name="oncologic_disease", value=True)],
+        )
         self._load_disease(disease)
 
     def _transform_data(self) -> None:

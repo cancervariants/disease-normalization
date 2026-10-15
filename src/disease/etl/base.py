@@ -3,18 +3,18 @@
 Generally, users shouldn't ever have to work directly with the classes contained within.
 """
 
-from ga4gh.core.models import MappableConcept
 import logging
 from abc import ABC, abstractmethod
 from pathlib import Path
 
 import click
+from ga4gh.core.models import Coding, ConceptMapping, MappableConcept, Relation, code
 from owlready2.rdflib_store import TripleLiteRDFlibGraph as RDFGraph
 from wags_tails import CustomData, DataSource, DoData, MondoData, NcitData, OncoTreeData
 
 from disease.database import AbstractDatabase
 from disease.etl.rules import Rules
-from disease.schemas import ITEM_TYPES, Disease, SourceName
+from disease.schemas import NamespacePrefix, SourceName
 
 DATA_DISPATCH = {
     SourceName.NCIT: NcitData,

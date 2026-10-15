@@ -6,12 +6,20 @@ from collections import defaultdict
 from typing import ClassVar
 
 import fastobo
-from ga4gh.core.models import Coding, Extension, MappableConcept, code, iriReference
+from ga4gh.core.models import (
+    Coding,
+    ConceptMapping,
+    Extension,
+    MappableConcept,
+    Relation,
+    code,
+    iriReference,
+)
 from ga4gh.va_spec.base import DataSet
 from tqdm import tqdm
 
 from disease.etl.base import Base
-from disease.schemas import NamespacePrefix
+from disease.schemas import NamespacePrefix, NormalizerCoding
 
 _logger = logging.getLogger(__name__)
 
@@ -170,25 +178,30 @@ class Mondo(Base):
             return None
         return prefix, local_id
 
-    def _process_term_frame(self, frame: fastobo.term.TermFrame) -> dict:
+    def _mappable_concept_from_term_frame(
+        self,
+        frame: fastobo.term.TermFrame,
+        concept_id: str,
+        is_ped: bool,
+        is_onco: bool,
+    ) -> MappableConcept:
         """Extract disease params from an OBO term frame.
 
         :param frame: individual frame from OBO file
-        :return: disease params as a dictionary
+        :param concept_id:
+        :param is_ped:
+        :param is_onco:
+        :return: disease concept
         """
-        params = {
-            "concept_id": str(frame.id).lower(),
-            "aliases": [],
-            "xrefs": [],
-            "associated_with": [],
-        }
-
+        name = None
+        aliases = []
+        mappings = []
         for clause in frame:
             tag = clause.raw_tag()
             if tag == "name":
-                params["label"] = clause.raw_value()
+                name = clause.raw_value()
             elif tag == "synonym":
-                params["aliases"].append(clause.synonym.desc)
+                aliases.append(clause.synonym.desc)
             elif tag in ("xref", "property_value"):
                 if tag == "xref":
                     xref = self._get_xref_from_xref_clause(clause)
@@ -198,17 +211,35 @@ class Mondo(Base):
                     continue
                 prefix, local_id = xref
 
-                curie = f"{prefix.value}:{local_id}"
+                coding = NormalizerCoding.from_concept_id(f"{prefix.value}:{local_id}")
+                if not coding:
+                    continue
                 if prefix in (
                     NamespacePrefix.OMIM,
                     NamespacePrefix.NCIT,
                     NamespacePrefix.DO,
                     NamespacePrefix.ONCOTREE,
                 ):
-                    params["xrefs"].append(curie)
+                    mappings.append(
+                        ConceptMapping(coding=coding, relation=Relation.EXACT_MATCH)
+                    )
                 else:
-                    params["associated_with"].append(curie)
-        return params
+                    mappings.append(
+                        ConceptMapping(coding=coding, relation=Relation.RELATED_MATCH)
+                    )
+        extensions = []
+        if is_onco:
+            extensions.append(Extension(name="oncologic_disease", value=True))
+        if is_ped:
+            extensions.append(Extension(name="pediatric_disease", value=True))
+        return MappableConcept(
+            id=concept_id,
+            primaryCoding=NormalizerCoding.from_concept_id(concept_id),
+            name=name,
+            aliases=aliases,
+            mappings=mappings,
+            extensions=extensions,
+        )
 
     def _transform_data(self) -> None:
         """Get data from file and send disease records to database."""
@@ -232,13 +263,10 @@ class Mondo(Base):
             concept_id = str(item.id).lower()
             if concept_id.upper() not in diseases:
                 continue
-
-            params = self._process_term_frame(item)
-
-            if concept_id.upper() in pediatric_diseases:
-                params["pediatric_disease"] = True
-
-            if concept_id.upper() in cancers:
-                params["oncologic_disease"] = True
-
-            self._load_disease(params)
+            disease = self._mappable_concept_from_term_frame(
+                item,
+                concept_id,
+                is_ped=concept_id.upper() in pediatric_diseases,
+                is_onco=concept_id.upper() in cancers,
+            )
+            self._load_disease(disease)

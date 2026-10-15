@@ -1,21 +1,18 @@
 """Contains data models for representing VICC normalized disease records."""
 
-import datetime
-from enum import Enum, IntEnum, StrEnum
 from types import MappingProxyType
-from typing import Literal
+import datetime as dt
+import logging
+from enum import Enum, IntEnum, StrEnum
+from typing import Literal, Self
 
-from ga4gh.core.models import (
-    Coding,
-    ConceptMapping,
-    MappableConcept,
-    Relation,
-    code,
-)
+from ga4gh.core.models import Coding, MappableConcept, code
 from ga4gh.va_spec.base import DataSet
 from pydantic import BaseModel, ConfigDict, StrictBool, StrictStr
 
 from disease import __version__
+
+_logger = logging.getLogger(__name__)
 
 
 class MatchType(IntEnum):
@@ -103,84 +100,6 @@ NAMESPACE_LOOKUP = {
 SOURCES_LOWER_LOOKUP = {
     name.value.lower(): name.value for name in SourceName.__members__.values()
 }
-
-
-# Source to URI. Will use  system URI prefix, OBO Foundry persistent URL (PURL), or source homepage
-NAMESPACE_TO_SYSTEM_URI: MappingProxyType[NamespacePrefix, str] = MappingProxyType(
-    {
-        NamespacePrefix.NCIT: "https://ncit.nci.nih.gov/ncitbrowser/ConceptReport.jsp?dictionary=NCI_Thesaurus&code=",
-        NamespacePrefix.MONDO: "https://purl.obolibrary.org/obo/",
-        NamespacePrefix.DO: "https://disease-ontology.org/?id=",
-        NamespacePrefix.DOID: "https://disease-ontology.org/?id=",
-        NamespacePrefix.OMIM: "https://omim.org/MIM:",
-        NamespacePrefix.ONCOTREE: "https://oncotree.mskcc.org/?version=oncotree_latest_stable&field=CODE&search=",
-        NamespacePrefix.EFO: "http://www.ebi.ac.uk/efo/EFO_",
-        NamespacePrefix.GARD: "https://rarediseases.info.nih.gov",
-        NamespacePrefix.ICD9CM: "https://archive.cdc.gov/www_cdc_gov/nchs/icd/icd9cm.htm",
-        NamespacePrefix.ICD10: "https://icd.who.int/browse10/2016/en#/",
-        NamespacePrefix.ICD10CM: "https://www.cdc.gov/nchs/icd/icd-10-cm/index.html",
-        NamespacePrefix.ICD10WHO: "https://icd.who.int/browse10/2016/en#/",
-        NamespacePrefix.ICDO: "https://www.who.int/standards/classifications/other-classifications/international-classification-of-diseases-for-oncology/",
-        NamespacePrefix.IMDRF: "https://www.imdrf.org/",
-        NamespacePrefix.KEGG: "https://www.genome.jp/kegg/disease/",
-        NamespacePrefix.MEDDRA: "https://bioportal.bioontology.org/ontologies/MEDDRA?p=classes&conceptid=",
-        NamespacePrefix.MEDGEN: "https://www.ncbi.nlm.nih.gov/medgen/",
-        NamespacePrefix.MESH: "https://meshb.nlm.nih.gov/record/ui?ui=",
-        NamespacePrefix.ORPHANET: "https://www.orpha.net",
-        NamespacePrefix.UMLS: "https://www.nlm.nih.gov/research/umls/index.html",
-    }
-)
-
-
-def get_coding_object(concept_id: str) -> Coding:
-    """Get coding object for CURIE identifier
-
-    ``system`` will use system prefix URL, OBO Foundry persistent URL (PURL), or
-    source homepage, in that order of preference.
-
-    :param concept_id: A lowercase concept identifier represented as a curie
-    :raises ValueError: If source of concept ID is not a valid ``NamespacePrefix``
-    :return: Coding object for identifier
-    """
-    source, source_code = concept_id.split(":")
-
-    try:
-        source = NamespacePrefix(source)
-    except ValueError:
-        try:
-            source = NamespacePrefix(source.upper())
-        except ValueError as e:
-            err_msg = f"Namespace prefix not supported: {source}"
-            raise ValueError(err_msg) from e
-
-    id_ = concept_id
-
-    if source == NamespacePrefix.MONDO:
-        source_code = concept_id.upper()
-        id_ = source_code.replace(":", "_")
-    else:
-        source_code = concept_id
-
-    return Coding(
-        id=id_,
-        code=code(root=source_code),
-        system=NAMESPACE_TO_SYSTEM_URI[source],
-    )
-
-
-def get_concept_mapping(
-    concept_id: str, relation: Relation = Relation.RELATED_MATCH
-) -> ConceptMapping:
-    """Get concept mapping for CURIE identifier
-
-    :param concept_id: A lowercase concept identifier represented as a curie
-    :param relation: SKOS mapping relationship, default is relatedMatch
-    :return: Concept mapping for identifier
-    """
-    return ConceptMapping(
-        coding=get_coding_object(concept_id),
-        relation=relation,
-    )
 
 
 class SourcePriority(IntEnum):
@@ -336,7 +255,7 @@ class ServiceMeta(BaseModel):
 
     name: Literal["disease-normalizer"] = "disease-normalizer"
     version: StrictStr
-    response_datetime: datetime.datetime
+    response_datetime: dt.datetime
     url: Literal["https://github.com/cancervariants/disease-normalization"] = (
         "https://github.com/cancervariants/disease-normalization"
     )
@@ -664,3 +583,72 @@ class SourceDataSet(DataSet):
             msg = f"Source {self.name}: license attributes are missing"
             raise SourceMetadataError(msg) from e
         return matching_ext.value
+
+
+# Source to URI. Will use  system URI prefix, OBO Foundry persistent URL (PURL), or source homepage
+NAMESPACE_TO_SYSTEM_URI: MappingProxyType[NamespacePrefix, str] = MappingProxyType(
+    {
+        NamespacePrefix.NCIT: "https://ncit.nci.nih.gov/ncitbrowser/ConceptReport.jsp?dictionary=NCI_Thesaurus&code=",
+        NamespacePrefix.MONDO: "https://purl.obolibrary.org/obo/",
+        NamespacePrefix.DO: "https://disease-ontology.org/?id=",
+        NamespacePrefix.DOID: "https://disease-ontology.org/?id=",
+        NamespacePrefix.OMIM: "https://omim.org/MIM:",
+        NamespacePrefix.ONCOTREE: "https://oncotree.mskcc.org/?version=oncotree_latest_stable&field=CODE&search=",
+        NamespacePrefix.EFO: "http://www.ebi.ac.uk/efo/EFO_",
+        NamespacePrefix.GARD: "https://rarediseases.info.nih.gov",
+        NamespacePrefix.ICD9CM: "https://archive.cdc.gov/www_cdc_gov/nchs/icd/icd9cm.htm",
+        NamespacePrefix.ICD10: "https://icd.who.int/browse10/2016/en#/",
+        NamespacePrefix.ICD10CM: "https://www.cdc.gov/nchs/icd/icd-10-cm/index.html",
+        NamespacePrefix.ICD10WHO: "https://icd.who.int/browse10/2016/en#/",
+        NamespacePrefix.ICDO: "https://www.who.int/standards/classifications/other-classifications/international-classification-of-diseases-for-oncology/",
+        NamespacePrefix.IMDRF: "https://www.imdrf.org/",
+        NamespacePrefix.KEGG: "https://www.genome.jp/kegg/disease/",
+        NamespacePrefix.MEDDRA: "https://bioportal.bioontology.org/ontologies/MEDDRA?p=classes&conceptid=",
+        NamespacePrefix.MEDGEN: "https://www.ncbi.nlm.nih.gov/medgen/",
+        NamespacePrefix.MESH: "https://meshb.nlm.nih.gov/record/ui?ui=",
+        NamespacePrefix.ORPHANET: "https://www.orpha.net",
+        NamespacePrefix.UMLS: "https://www.nlm.nih.gov/research/umls/index.html",
+    }
+)
+
+
+class NormalizerCoding(Coding):
+    """Augmented Coding class to help with construction/transformation"""
+
+    @classmethod
+    def from_concept_id(cls, concept_id: str) -> Self | None:
+        """Construct instance from a concept ID"""
+        raw_prefix, source_code = concept_id.split(":")
+
+        try:
+            prefix = NamespacePrefix(raw_prefix)
+        except ValueError:
+            try:
+                prefix = NamespacePrefix(raw_prefix.upper())
+            except ValueError:
+                _logger.info(
+                    "Namespace prefix not supported: %s [in %s]", raw_prefix, concept_id
+                )
+                return None
+
+        id_ = concept_id
+
+        if prefix == NamespacePrefix.MONDO:
+            source_code = concept_id.upper()
+            id_ = source_code.replace(":", "_")
+        elif prefix == NamespacePrefix.DOID:
+            source_code = concept_id
+
+        return Coding(
+            id=id_,
+            code=code(source_code),
+            system=NAMESPACE_TO_SYSTEM_URI[prefix],
+        )
+
+    def to_concept_id(self) -> str:
+        """Get concept ID from coding object"""
+        if self.system == NAMESPACE_TO_SYSTEM_URI[NamespacePrefix.MONDO]:
+            return self.id.replace("_", ":").lower()
+        if self.system == NAMESPACE_TO_SYSTEM_URI[NamespacePrefix.DOID]:
+            return self.code.root
+        return self.code.id

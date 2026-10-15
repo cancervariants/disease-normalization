@@ -1,20 +1,15 @@
 """Get Human Disease Ontology data."""
 
 from ga4gh.core.models import Relation
+from disease.schemas import NormalizerCoding
+from ga4gh.core.models import ConceptMapping
 import owlready2 as owl
-from ga4gh.core.models import (
-    Coding,
-    Extension,
-    MappableConcept,
-    code,
-    iriReference,
-    ConceptMapping,
-)
+from ga4gh.core.models import Coding, Extension, MappableConcept, code, iriReference
 from ga4gh.va_spec.base import DataSet
 from tqdm import tqdm
 
 from disease.etl.base import OWLBase
-from disease.schemas import PREFIX_LOOKUP, NamespacePrefix
+from disease.schemas import NamespacePrefix
 
 DO_PREFIX_LOOKUP = {
     "EFO": NamespacePrefix.EFO.value,
@@ -99,18 +94,22 @@ class DO(OWLBase):
                 prefix, id_no = xref.split(":", 1)
                 normed_prefix = DO_PREFIX_LOOKUP.get(prefix)
                 if normed_prefix:
-                    xref_no = f"{normed_prefix}:{id_no}"
-                    mappings.append(
-                        ConceptMapping(
-                            relation=Relation.EXACT_MATCH,
-                            coding=Coding(
-                                # TODO fix up in here
-                                code=code(root="todo"),
-                                system="todo",
-                                id=xref_no,
-                            ),
-                        )
-                    )
+                    xref_concept_id = f"{normed_prefix}:{id_no}"
+                    coding = NormalizerCoding.from_concept_id(xref_concept_id)
+                    if not coding:
+                        continue
+                    if normed_prefix in {
+                        NamespacePrefix.MONDO,
+                        NamespacePrefix.NCIT,
+                        NamespacePrefix.ONCOTREE,
+                        NamespacePrefix.OMIM,
+                    }:
+                        relation = Relation.EXACT_MATCH
+                    else:
+                        relation = Relation.RELATED_MATCH
+                    mapping = ConceptMapping(coding=coding, relation=relation)
+                    if mapping:
+                        mappings.append(mapping)
 
             if uri in cancers:
                 extensions = [Extension(name="oncologic_disease", value=True)]
@@ -121,6 +120,7 @@ class DO(OWLBase):
             self._load_disease(
                 MappableConcept(
                     id=concept_id,
+                    primaryCoding=NormalizerCoding.from_concept_id(concept_id),
                     name=label,
                     aliases=aliases,
                     mappings=mappings,
