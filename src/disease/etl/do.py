@@ -1,15 +1,20 @@
 """Get Human Disease Ontology data."""
 
-from ga4gh.core.models import Relation
-from disease.schemas import NormalizerCoding
-from ga4gh.core.models import ConceptMapping
 import owlready2 as owl
-from ga4gh.core.models import Coding, Extension, MappableConcept, code, iriReference
+from ga4gh.core.models import (
+    Coding,
+    ConceptMapping,
+    Extension,
+    MappableConcept,
+    Relation,
+    code,
+    iriReference,
+)
 from ga4gh.va_spec.base import DataSet
 from tqdm import tqdm
 
 from disease.etl.base import OWLBase
-from disease.schemas import NamespacePrefix
+from disease.schemas import NamespacePrefix, NormalizerCoding
 
 DO_PREFIX_LOOKUP = {
     "EFO": NamespacePrefix.EFO.value,
