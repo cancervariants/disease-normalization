@@ -1,5 +1,6 @@
 """Get OMIM disease data."""
 
+from disease.schemas import NormalizerCoding
 from pathlib import Path
 
 from ga4gh.core.models import Coding, Extension, MappableConcept, code, iriReference
@@ -83,24 +84,29 @@ class OMIM(Base):
         rows = [r.split("\t") for r in rows]
         rows = [r for r in rows if r[0] not in ("Asterisk", "Caret", "Plus")]
         for row in tqdm(rows, ncols=80, disable=self._silent):
-            disease = {
-                "concept_id": f"{NamespacePrefix.OMIM.value}:{row[1]}",
-            }
+            concept_id = f"{NamespacePrefix.OMIM.value}:{row[1]}"
             aliases = set()
 
             label_item = row[2]
             if ";" in label_item:
                 label_split = label_item.split(";")
-                disease["label"] = label_split[0]
+                name = label_split[0]
                 aliases.add(label_split[1])
             else:
-                disease["label"] = row[2]
+                name = row[2]
 
             if len(row) > 3:  # noqa: PLR2004
                 aliases |= {t for t in row[3].split(";") if t}
             if len(row) > 4:  # noqa: PLR2004
                 aliases |= {t for t in row[4].split(";") if t}
-            aliases = {alias.removesuffix(", INCLUDED") for alias in aliases}
-            disease["aliases"] = [a.lstrip() for a in aliases]
+            aliases = list(
+                {alias.removesuffix(", INCLUDED").lstrip() for alias in aliases}
+            )
 
+            disease = MappableConcept(
+                id=concept_id,
+                primaryCoding=NormalizerCoding.from_concept_id(concept_id),
+                name=name,
+                aliases=aliases,
+            )
             self._load_disease(disease)

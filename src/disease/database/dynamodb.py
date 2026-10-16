@@ -1,5 +1,6 @@
 """Provide DynamoDB client."""
 
+from ga4gh.core.models import MappableConcept
 import atexit
 import datetime
 import gzip
@@ -390,38 +391,40 @@ class DynamoDbDatabase(AbstractDatabase):
         except ClientError as e:
             raise DatabaseWriteException(e) from e
 
-    def add_record(self, record: dict, src_name: SourceName) -> None:
+    def add_record(self, disease: MappableConcept, src_name: SourceName) -> None:
         """Add new record to database.
 
-        :param Dict record: record to upload
-        :param SourceName src_name: name of source for record
+        :param disease: disease record to upload
+        :param src_name: name of source for record
         """
-        concept_id = record["concept_id"]
-        record["src_name"] = src_name.value
-        label_and_type = f"{concept_id.lower()}##identity"
-        record["label_and_type"] = label_and_type
-        record["item_type"] = "identity"
+        concept_id = disease.primaryCoding.id
+        if not concept_id:
+            raise ValueError
+        partition_key = f"{concept_id.lower()}##identity"
         try:
-            self.batch.put_item(Item=record)
+            self.batch.put_item(
+                Item={
+                    "label_and_type": partition_key,
+                    "item_type": concept_id,
+                    "data": disease.model_dump(exclude_none=True, exclude_unset=True),
+                }
+            )
         except ClientError as e:
             _logger.exception(
                 "boto3 client error on add_record for %s: %s",
                 concept_id,
                 e.response["Error"]["Message"],
             )
-        for attr_type, item_type in ITEM_TYPES.items():
-            if attr_type in record:
-                value = record.get(attr_type)
-                if not value:
-                    continue
-                if isinstance(value, str):
-                    items = [value.lower()]
-                else:
-                    items = {item.lower() for item in value}
-                for item in items:
-                    self._add_ref_record(
-                        item, record["concept_id"], item_type, src_name
-                    )
+        if disease.name:
+            self._add_ref_record(disease.name, concept_id, RefType.LABEL, src_name)
+        if disease.aliases:
+            for alias in disease.aliases:
+                self._add_ref_record(alias, concept_id, RefType.ALIASES, src_name)
+        if disease.mappings:
+            for mapping in disease.mappings:
+                self._add_ref_record(
+                    mapping.coding.code.root, concept_id, RefType.XREFS, src_name
+                )
 
     def add_merged_record(self, record: dict) -> None:
         """Add merged record to database.

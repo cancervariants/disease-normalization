@@ -1,12 +1,20 @@
 """Get Human Disease Ontology data."""
 
 import owlready2 as owl
-from ga4gh.core.models import Coding, Extension, MappableConcept, code, iriReference
+from ga4gh.core.models import (
+    Coding,
+    ConceptMapping,
+    Extension,
+    MappableConcept,
+    Relation,
+    code,
+    iriReference,
+)
 from ga4gh.va_spec.base import DataSet
 from tqdm import tqdm
 
 from disease.etl.base import OWLBase
-from disease.schemas import PREFIX_LOOKUP, NamespacePrefix
+from disease.schemas import NamespacePrefix, NormalizerCoding
 
 DO_PREFIX_LOOKUP = {
     "EFO": NamespacePrefix.EFO.value,
@@ -85,32 +93,42 @@ class DO(OWLBase):
             synonyms = disease_class.hasExactSynonym
             aliases = list({s for s in synonyms if s != label}) if synonyms else []
 
-            xrefs = []
-            associated_with = []
+            mappings = []
             db_associated_with = set(disease_class.hasDbXref)
             for xref in db_associated_with:
                 prefix, id_no = xref.split(":", 1)
                 normed_prefix = DO_PREFIX_LOOKUP.get(prefix)
                 if normed_prefix:
-                    xref_no = f"{normed_prefix}:{id_no}"
-                    if normed_prefix.lower() in PREFIX_LOOKUP:
-                        if normed_prefix == NamespacePrefix.OMIM and id_no.startswith(
-                            "PS"
-                        ):
-                            associated_with.append(xref_no)
-                        else:
-                            xrefs.append(xref_no)
+                    xref_concept_id = f"{normed_prefix}:{id_no}"
+                    coding = NormalizerCoding.from_concept_id(xref_concept_id)
+                    if not coding:
+                        continue
+                    if normed_prefix in {
+                        NamespacePrefix.MONDO,
+                        NamespacePrefix.NCIT,
+                        NamespacePrefix.ONCOTREE,
+                        NamespacePrefix.OMIM,
+                    }:
+                        relation = Relation.EXACT_MATCH
                     else:
-                        associated_with.append(xref_no)
-
-            disease = {
-                "concept_id": concept_id,
-                "label": label,
-                "aliases": aliases,
-                "xrefs": xrefs,
-                "associated_with": associated_with,
-            }
+                        relation = Relation.RELATED_MATCH
+                    mapping = ConceptMapping(coding=coding, relation=relation)
+                    if mapping:
+                        mappings.append(mapping)
 
             if uri in cancers:
-                disease["oncologic_disease"] = True
-            self._load_disease(disease)
+                extensions = [Extension(name="oncologic_disease", value=True)]
+            else:
+                extensions = None
+            extensions = []
+
+            self._load_disease(
+                MappableConcept(
+                    id=concept_id,
+                    primaryCoding=NormalizerCoding.from_concept_id(concept_id),
+                    name=label,
+                    aliases=aliases,
+                    mappings=mappings,
+                    extensions=extensions,
+                )
+            )

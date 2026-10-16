@@ -1,5 +1,9 @@
 """Get NCIt disease data."""
 
+from pydantic import ValidationError
+from ga4gh.core.models import Relation
+from ga4gh.core.models import ConceptMapping
+from disease.schemas import NormalizerCoding
 import logging
 import re
 
@@ -80,35 +84,46 @@ class NCIt(OWLBase):
             disease_class = ncit.search(iri=uri)[0]
             concept_id = f"{NamespacePrefix.NCIT.value}:{disease_class.name}"
             if disease_class.P108:
-                label = disease_class.P108.first()
+                name = disease_class.P108.first()
             else:
                 _logger.warning("No label for concept %s", concept_id)
                 continue
-            aliases = [a for a in disease_class.P90 if a != label]
+            aliases = [a for a in disease_class.P90 if a != name]
 
-            associated_with = []
-            if disease_class.P207:
-                associated_with.append(
+            mappings = []
+            if disease_class.P207:  # noqa: SIM102
+                if coding := NormalizerCoding.from_concept_id(
                     f"{NamespacePrefix.UMLS.value}:{disease_class.P207.first()}"
-                )
+                ):
+                    mappings.append(
+                        ConceptMapping(coding=coding, relation=Relation.RELATED_MATCH)
+                    )
             maps_to = disease_class.P375
             if maps_to:
                 icdo_list = list(filter(lambda s: icdo_re.match(s), maps_to))
-                if len(icdo_list) == 1:
-                    associated_with.append(
+                if len(icdo_list) == 1:  # noqa: SIM102
+                    if coding := NormalizerCoding.from_concept_id(
                         f"{NamespacePrefix.ICDO.value}:{icdo_list[0]}"
-                    )
-            imdrf = disease_class.hasDbXref
-            if imdrf:
-                associated_with.append(
-                    f"{NamespacePrefix.IMDRF.value}:{imdrf[0].split(':')[1]}"
-                )
+                    ):
+                        mappings.append(
+                            ConceptMapping(
+                                coding=coding, relation=Relation.RELATED_MATCH
+                            )
+                        )
 
-            disease = {
-                "concept_id": concept_id,
-                "src_name": self._src_name.value,
-                "label": label,
-                "aliases": aliases,
-                "associated_with": associated_with,
-            }
+            imdrf = disease_class.hasDbXref
+            if imdrf:  # noqa: SIM102
+                if coding := NormalizerCoding.from_concept_id(
+                    f"{NamespacePrefix.IMDRF.value}:{imdrf[0].split(':')[1]}"
+                ):
+                    mappings.append(
+                        ConceptMapping(coding=coding, relation=Relation.RELATED_MATCH)
+                    )
+
+            disease = MappableConcept(
+                id=concept_id,
+                primaryCoding=NormalizerCoding.from_concept_id(concept_id),
+                name=name,
+                aliases=aliases,
+            )
             self._load_disease(disease)
