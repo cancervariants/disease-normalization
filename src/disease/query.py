@@ -11,9 +11,12 @@ from ga4gh.core.models import (
     Relation,
 )
 
-from disease import NAMESPACE_LOOKUP, PREFIX_LOOKUP, SOURCES_LOWER_LOOKUP, __version__
+from disease import __version__
 from disease.database.database import AbstractDatabase
 from disease.schemas import (
+    NAMESPACE_LOOKUP,
+    PREFIX_LOOKUP,
+    SOURCES_LOWER_LOOKUP,
     Disease,
     MatchType,
     NormalizationService,

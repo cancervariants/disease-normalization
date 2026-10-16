@@ -1,7 +1,7 @@
 """Contains data models for representing VICC normalized disease records."""
 
 import datetime
-from enum import Enum, IntEnum
+from enum import Enum, IntEnum, StrEnum
 from types import MappingProxyType
 from typing import Literal
 
@@ -30,7 +30,7 @@ class MatchType(IntEnum):
     NO_MATCH = 0
 
 
-class SourceName(str, Enum):
+class SourceName(StrEnum):
     """Define string constraints to ensure consistent capitalization."""
 
     NCIT = "NCIt"
@@ -77,6 +77,32 @@ class NamespacePrefix(Enum):
     MESH = "mesh"
     ORPHANET = "orphanet"
     UMLS = "umls"
+
+
+# use to fetch source name from schema based on concept id namespace
+# e.g. {'ncit': 'NCIt', 'doid': 'DO'}
+PREFIX_LOOKUP = {
+    v.value.lower(): SourceName[k].value
+    for k, v in NamespacePrefix.__members__.items()
+    if k in SourceName.__members__
+}
+
+
+# use to generate namespace prefix from source ID value
+# e.g. {'c': 'NCIt'}
+NAMESPACE_LOOKUP = {
+    v.value.lower(): NamespacePrefix[k].value
+    for k, v in SourceIDAfterNamespace.__members__.items()
+    if v.value != ""
+}
+
+# use to lookup source name from lower-case string
+# technically the same as PREFIX_LOOKUP, but source namespace prefixes
+# sometimes differ from their names
+# e.g. {'ncit': 'NCIt'}
+SOURCES_LOWER_LOOKUP = {
+    name.value.lower(): name.value for name in SourceName.__members__.values()
+}
 
 
 # Source to URI. Will use  system URI prefix, OBO Foundry persistent URL (PURL), or source homepage
@@ -137,7 +163,7 @@ def get_coding_object(concept_id: str) -> Coding:
 
     return Coding(
         id=id_,
-        code=code(source_code),
+        code=code(root=source_code),
         system=NAMESPACE_TO_SYSTEM_URI[source],
     )
 
@@ -199,14 +225,14 @@ class Disease(BaseModel):
     )
 
 
-class RecordType(str, Enum):
+class RecordType(StrEnum):
     """Record item types."""
 
     IDENTITY = "identity"
     MERGER = "merger"
 
 
-class RefType(str, Enum):
+class RefType(StrEnum):
     """Reference item types."""
 
     # Must be in descending MatchType order.
@@ -214,6 +240,9 @@ class RefType(str, Enum):
     ALIASES = "alias"
     XREFS = "xref"
     ASSOCIATED_WITH = "associated_with"
+
+
+ITEM_TYPES = {k.lower(): v.value for k, v in RefType.__members__.items()}
 
 
 class DataLicenseAttributes(BaseModel):
@@ -511,7 +540,7 @@ class SearchService(BaseModel):
     )
 
 
-class ServiceEnvironment(str, Enum):
+class ServiceEnvironment(StrEnum):
     """Define current runtime environment."""
 
     DEV = "dev"  # local dev

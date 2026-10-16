@@ -5,10 +5,10 @@ from collections.abc import Callable
 
 import pytest
 
-from disease import SOURCES_FOR_MERGE
 from disease.database import AWS_ENV_VAR_NAME
 from disease.database.database import create_db
 from disease.etl import DO, OMIM, Merge, Mondo, NCIt, OncoTree
+from disease.etl.base import SOURCES_FOR_MERGE
 from disease.schemas import SourceName
 
 
