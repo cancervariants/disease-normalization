@@ -26,6 +26,7 @@ from disease.schemas import (
     SourceDataSet,
     SourceMeta,
     SourceName,
+    disease_record_from_mappable_concept,
 )
 
 _logger = logging.getLogger(__name__)
@@ -277,22 +278,18 @@ class PostgresDatabase(AbstractDatabase):
     def _format_source_record(self, source_row: tuple) -> dict:
         """Restructure row from disease_concepts table as source record result object.
 
+        [Temporary, eventually remove once API is fully converted to GKM models]
+
         :param source_row: result tuple from psycopg
         :return: reformatted dictionary keying disease properties to row values
         """
-        disease_record = {
-            "concept_id": source_row[0],
-            "label": source_row[1],
-            "aliases": source_row[2],
-            "associated_with": source_row[3],
-            "xrefs": source_row[4],
-            "src_name": source_row[5],
-            "merge_ref": source_row[6],
-            "pediatric_disease": source_row[7],
-            "oncologic_disease": source_row[8],
-            "item_type": RecordType.IDENTITY.value,
-        }
-        return {k: v for k, v in disease_record.items() if v}
+        mc = MappableConcept(**source_row[3])
+        params = disease_record_from_mappable_concept(mc).model_dump()
+        params["src_name"] = source_row[1]
+        params["merge_ref"] = source_row[2]
+        params["item_type"] = RecordType.IDENTITY.value
+
+        return {k: v for k, v in params.items() if v}
 
     def _get_record(self, concept_id: str) -> dict | None:
         """Retrieve non-merged record. The query is pretty different, so this method
@@ -319,17 +316,12 @@ class PostgresDatabase(AbstractDatabase):
         :param merged_row: result tuple from psycopg
         :return: reformatted dictionary keying normalized disease properties to row values
         """
-        merged_record = {
-            "concept_id": merged_row[0],
-            "label": merged_row[1],
-            "aliases": merged_row[2],
-            "associated_with": merged_row[3],
-            "xrefs": merged_row[4],
-            "pediatric_disease": merged_row[5],
-            "oncologic_disease": merged_row[6],
-            "item_type": RecordType.MERGER.value,
-        }
-        return {k: v for k, v in merged_record.items() if v}
+        disease_mc = MappableConcept(**merged_row[1])
+        record = disease_record_from_mappable_concept(disease_mc).model_dump(
+            exclude_none=True
+        )
+        record["item_type"] = RecordType.MERGER.value
+        return record
 
     def _get_merged_record(self, concept_id: str) -> dict | None:
         """Retrieve normalized record from DB.
@@ -536,10 +528,10 @@ class PostgresDatabase(AbstractDatabase):
                 self.conn.rollback()
 
     _add_merged_record_query = (
-        b"""INSERT INTO disease_merged ( concept_id, data) VALUES (%s, %s);"""
+        b"""INSERT INTO disease_merged (concept_id, data) VALUES (%s, %s);"""
     )
 
-    def add_merged_record(self, record: dict) -> None:
+    def add_merged_record(self, disease: MappableConcept) -> None:
         """Add merged record to database.
 
         :param record: merged record to add
@@ -548,13 +540,8 @@ class PostgresDatabase(AbstractDatabase):
             cur.execute(
                 self._add_merged_record_query,
                 [
-                    record["concept_id"],
-                    record["label"],
-                    record.get("aliases"),
-                    record.get("associated_with"),
-                    record.get("xrefs"),
-                    record.get("pediatric_disease"),
-                    record.get("oncologic_disease"),
+                    disease.id,
+                    Jsonb(disease.model_dump(exclude_none=True, exclude_unset=True)),
                 ],
             )
             self.conn.commit()

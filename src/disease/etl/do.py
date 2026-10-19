@@ -14,7 +14,7 @@ from ga4gh.va_spec.base import DataSet
 from tqdm import tqdm
 
 from disease.etl.base import OWLBase
-from disease.schemas import NamespacePrefix, NormalizerCoding
+from disease.schemas import NamespacePrefix, concept_id_to_coding
 
 DO_PREFIX_LOOKUP = {
     "EFO": NamespacePrefix.EFO.value,
@@ -100,7 +100,7 @@ class DO(OWLBase):
                 normed_prefix = DO_PREFIX_LOOKUP.get(prefix)
                 if normed_prefix:
                     xref_concept_id = f"{normed_prefix}:{id_no}"
-                    coding = NormalizerCoding.from_concept_id(xref_concept_id)
+                    coding = concept_id_to_coding(xref_concept_id)
                     if not coding:
                         continue
                     if normed_prefix in {
@@ -125,7 +125,7 @@ class DO(OWLBase):
             self._load_disease(
                 MappableConcept(
                     id=concept_id,
-                    primaryCoding=NormalizerCoding.from_concept_id(concept_id),
+                    primaryCoding=concept_id_to_coding(concept_id),
                     name=label,
                     aliases=aliases,
                     mappings=mappings,

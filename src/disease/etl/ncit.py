@@ -1,19 +1,23 @@
 """Get NCIt disease data."""
 
-from pydantic import ValidationError
-from ga4gh.core.models import Relation
-from ga4gh.core.models import ConceptMapping
-from disease.schemas import NormalizerCoding
 import logging
 import re
 
 import owlready2 as owl
-from ga4gh.core.models import Coding, Extension, MappableConcept, code, iriReference
+from ga4gh.core.models import (
+    Coding,
+    ConceptMapping,
+    Extension,
+    MappableConcept,
+    Relation,
+    code,
+    iriReference,
+)
 from ga4gh.va_spec.base import DataSet
 from tqdm import tqdm
 
 from disease.etl.base import OWLBase
-from disease.schemas import NamespacePrefix
+from disease.schemas import NamespacePrefix, concept_id_to_coding
 
 _logger = logging.getLogger(__name__)
 
@@ -92,7 +96,7 @@ class NCIt(OWLBase):
 
             mappings = []
             if disease_class.P207:  # noqa: SIM102
-                if coding := NormalizerCoding.from_concept_id(
+                if coding := concept_id_to_coding(
                     f"{NamespacePrefix.UMLS.value}:{disease_class.P207.first()}"
                 ):
                     mappings.append(
@@ -102,7 +106,7 @@ class NCIt(OWLBase):
             if maps_to:
                 icdo_list = list(filter(lambda s: icdo_re.match(s), maps_to))
                 if len(icdo_list) == 1:  # noqa: SIM102
-                    if coding := NormalizerCoding.from_concept_id(
+                    if coding := concept_id_to_coding(
                         f"{NamespacePrefix.ICDO.value}:{icdo_list[0]}"
                     ):
                         mappings.append(
@@ -113,7 +117,7 @@ class NCIt(OWLBase):
 
             imdrf = disease_class.hasDbXref
             if imdrf:  # noqa: SIM102
-                if coding := NormalizerCoding.from_concept_id(
+                if coding := concept_id_to_coding(
                     f"{NamespacePrefix.IMDRF.value}:{imdrf[0].split(':')[1]}"
                 ):
                     mappings.append(
@@ -122,7 +126,7 @@ class NCIt(OWLBase):
 
             disease = MappableConcept(
                 id=concept_id,
-                primaryCoding=NormalizerCoding.from_concept_id(concept_id),
+                primaryCoding=concept_id_to_coding(concept_id),
                 name=name,
                 aliases=aliases,
             )

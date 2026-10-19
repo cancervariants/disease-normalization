@@ -4,9 +4,16 @@ import datetime as dt
 import logging
 from enum import Enum, IntEnum, StrEnum
 from types import MappingProxyType
-from typing import Literal, Self
+from typing import Literal
 
-from ga4gh.core.models import Coding, MappableConcept, code
+from ga4gh.core.models import (
+    Coding,
+    ConceptMapping,
+    Extension,
+    MappableConcept,
+    Relation,
+    code,
+)
 from ga4gh.va_spec.base import DataSet
 from pydantic import BaseModel, ConfigDict, StrictBool, StrictStr
 
@@ -638,43 +645,110 @@ NAMESPACE_TO_SYSTEM_URI: MappingProxyType[NamespacePrefix, str] = MappingProxyTy
 )
 
 
-class NormalizerCoding(Coding):
-    """Augmented Coding class to help with construction/transformation"""
+def concept_id_to_coding(concept_id: str) -> Coding | None:
+    """Construct instance from a concept ID"""
+    raw_prefix, source_code = concept_id.split(":")
 
-    @classmethod
-    def from_concept_id(cls, concept_id: str) -> Self | None:
-        """Construct instance from a concept ID"""
-        raw_prefix, source_code = concept_id.split(":")
-
+    try:
+        prefix = NamespacePrefix(raw_prefix)
+    except ValueError:
         try:
-            prefix = NamespacePrefix(raw_prefix)
+            prefix = NamespacePrefix(raw_prefix.upper())
         except ValueError:
-            try:
-                prefix = NamespacePrefix(raw_prefix.upper())
-            except ValueError:
-                _logger.info(
-                    "Namespace prefix not supported: %s [in %s]", raw_prefix, concept_id
-                )
-                return None
+            _logger.info(
+                "Namespace prefix not supported: %s [in %s]", raw_prefix, concept_id
+            )
+            return None
 
-        id_ = concept_id
+    id_ = concept_id
 
-        if prefix == NamespacePrefix.MONDO:
-            source_code = concept_id.upper()
-            id_ = source_code.replace(":", "_")
-        elif prefix == NamespacePrefix.DOID:
-            source_code = concept_id
+    if prefix == NamespacePrefix.MONDO:
+        source_code = concept_id.upper()
+        id_ = source_code.replace(":", "_")
+    elif prefix == NamespacePrefix.DOID:
+        source_code = concept_id
 
-        return Coding(
-            id=id_,
-            code=code(source_code),
-            system=NAMESPACE_TO_SYSTEM_URI[prefix],
-        )
+    return Coding(
+        id=id_,
+        code=code(source_code),
+        system=NAMESPACE_TO_SYSTEM_URI[prefix],
+    )
 
-    def to_concept_id(self) -> str:
-        """Get concept ID from coding object"""
-        if self.system == NAMESPACE_TO_SYSTEM_URI[NamespacePrefix.MONDO]:
-            return self.id.replace("_", ":").lower()
-        if self.system == NAMESPACE_TO_SYSTEM_URI[NamespacePrefix.DOID]:
-            return self.code.root
-        return self.code.id
+
+def coding_to_concept_id(coding: Coding) -> str:
+    """Get concept ID from coding object"""
+    if coding.system == NAMESPACE_TO_SYSTEM_URI[NamespacePrefix.MONDO]:
+        return coding.id.replace("_", ":").lower()
+    if coding.system == NAMESPACE_TO_SYSTEM_URI[NamespacePrefix.DOID]:
+        return coding.code.root
+    return coding.code.id
+
+
+def disease_record_from_mappable_concept(disease: MappableConcept) -> Disease:
+    """Construct old-style disease record from a disease mappableconcept
+
+    This is a temporary function to help transition from the old disease class --
+    once these efforts are complete, this method will go away
+
+    It will definitely get used redundantly to preserve APIs between pull requests,
+    and at the end should unwind cleanly
+    """
+    aw = []
+    xrefs = []
+    if disease.mappings:
+        for mapping in disease.mappings:
+            if mapping.coding.system in {
+                NAMESPACE_TO_SYSTEM_URI[NamespacePrefix.ONCOTREE],
+                NAMESPACE_TO_SYSTEM_URI[NamespacePrefix.DO],
+                NAMESPACE_TO_SYSTEM_URI[NamespacePrefix.OMIM],
+                NAMESPACE_TO_SYSTEM_URI[NamespacePrefix.NCIT],
+                NAMESPACE_TO_SYSTEM_URI[NamespacePrefix.MONDO],
+            }:
+                xrefs.append(mapping.coding.id)
+            else:
+                aw.append(mapping.coding.id)
+    is_ped_disease = None
+    is_onco_disease = None
+    if disease.extensions:
+        for ext in disease.extensions:
+            if ext.name == "oncologic_disease":
+                is_onco_disease = ext.value
+            elif ext.name == "pediatric_disease":
+                is_ped_disease = ext.value
+    return Disease(
+        concept_id=coding_to_concept_id(disease.primaryCoding),
+        label=disease.name,
+        aliases=disease.aliases,
+        associated_with=aw,
+        xrefs=xrefs,
+        pediatric_disease=is_ped_disease,
+        oncologic_disease=is_onco_disease,
+    )
+
+
+def mappable_concept_from_disease_record(disease: Disease) -> MappableConcept:
+    """Get mappable concept from disease record
+
+    This function is temporary
+    """
+    extensions = []
+    if disease.pediatric_disease:
+        extensions.append(Extension(name="pediatric_disease", value=True))
+    if disease.oncologic_disease:
+        extensions.append(Extension(name="oncologic_disease", value=True))
+    mappings = []
+    mappings.extend(
+        ConceptMapping(relation=Relation.EXACT_MATCH, coding=concept_id_to_coding(xref))
+        for xref in disease.xrefs
+    )
+    mappings.extend(
+        ConceptMapping(relation=Relation.RELATED_MATCH, coding=concept_id_to_coding(aw))
+        for aw in disease.associated_with
+    )
+    return MappableConcept(
+        id=disease.concept_id,
+        primaryCoding=concept_id_to_coding(disease.concept_id),
+        extensions=extensions,
+        aliases=disease.aliases,
+        mappings=mappings,
+    )

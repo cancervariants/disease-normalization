@@ -1,6 +1,5 @@
 """Get OMIM disease data."""
 
-from disease.schemas import NormalizerCoding
 from pathlib import Path
 
 from ga4gh.core.models import Coding, Extension, MappableConcept, code, iriReference
@@ -9,7 +8,7 @@ from tqdm import tqdm
 from wags_tails import CustomData, DataSource
 
 from disease.etl.base import Base
-from disease.schemas import NamespacePrefix
+from disease.schemas import NamespacePrefix, concept_id_to_coding
 
 
 class OMIM(Base):
@@ -105,7 +104,7 @@ class OMIM(Base):
 
             disease = MappableConcept(
                 id=concept_id,
-                primaryCoding=NormalizerCoding.from_concept_id(concept_id),
+                primaryCoding=concept_id_to_coding(concept_id),
                 name=name,
                 aliases=aliases,
             )

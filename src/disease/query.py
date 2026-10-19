@@ -1,13 +1,12 @@
 """Provides query handler class, which receives and responses to user search queries."""
 
-from ga4gh.core.models import ConceptMapping
-from disease.schemas import NormalizerCoding
 import datetime as dt
 import logging
 import re
 
 from botocore.exceptions import ClientError
 from ga4gh.core.models import (
+    ConceptMapping,
     Extension,
     MappableConcept,
     Relation,
@@ -26,6 +25,7 @@ from disease.schemas import (
     SearchService,
     ServiceMeta,
     SourceName,
+    concept_id_to_coding,
 )
 
 _logger = logging.getLogger(__name__)
@@ -336,7 +336,7 @@ class QueryHandler:
         """
         disease_obj = MappableConcept(
             id=f"normalize.disease.{record['concept_id']}",
-            primaryCoding=NormalizerCoding.from_concept_id(record["concept_id"]),
+            primaryCoding=concept_id_to_coding(record["concept_id"]),
             conceptType="Disease",
             name=record["label"],
             extensions=[],
@@ -345,7 +345,7 @@ class QueryHandler:
         xrefs = record.get("xrefs", [])
         mappings = [
             ConceptMapping(
-                coding=NormalizerCoding.from_concept_id(xref_id),
+                coding=concept_id_to_coding(xref_id),
                 relation=Relation.EXACT_MATCH,
             )
             for xref_id in xrefs
@@ -354,7 +354,7 @@ class QueryHandler:
         associated_with = record.get("associated_with", [])
         mappings.extend(
             ConceptMapping(
-                coding=NormalizerCoding.from_concept_id(associated_with_id),
+                coding=concept_id_to_coding(associated_with_id),
                 relation=Relation.RELATED_MATCH,
             )
             for associated_with_id in associated_with

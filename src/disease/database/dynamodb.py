@@ -1,6 +1,5 @@
 """Provide DynamoDB client."""
 
-from ga4gh.core.models import MappableConcept
 import atexit
 import datetime
 import gzip
@@ -17,6 +16,7 @@ import boto3
 import click
 from boto3.dynamodb.conditions import Attr, Equals, Key
 from botocore.exceptions import ClientError
+from ga4gh.core.models import MappableConcept
 from ga4gh.va_spec.base import DataSet
 
 from disease.config import get_config
@@ -32,7 +32,6 @@ from disease.database.database import (
     confirm_aws_db_use,
 )
 from disease.schemas import (
-    ITEM_TYPES,
     PREFIX_LOOKUP,
     DataLicenseAttributes,
     RecordType,

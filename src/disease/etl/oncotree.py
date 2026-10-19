@@ -16,7 +16,7 @@ from ga4gh.va_spec.base import DataSet
 from tqdm import tqdm
 
 from disease.etl.base import Base
-from disease.schemas import NamespacePrefix, NormalizerCoding
+from disease.schemas import NamespacePrefix, concept_id_to_coding
 
 _logger = logging.getLogger(__name__)
 
@@ -91,7 +91,7 @@ class OncoTree(Base):
             if prefix == "UMLS":
                 normed_prefix = NamespacePrefix.UMLS.value
                 for umls_code in codes:
-                    if umls_coding := NormalizerCoding.from_concept_id(
+                    if umls_coding := concept_id_to_coding(
                         f"{normed_prefix}:{umls_code}"
                     ):
                         mappings.append(  # noqa: PERF401
@@ -102,7 +102,7 @@ class OncoTree(Base):
             elif prefix == "NCI":
                 normed_prefix = NamespacePrefix.NCIT.value
                 for nci_code in codes:
-                    if nci_coding := NormalizerCoding.from_concept_id(
+                    if nci_coding := concept_id_to_coding(
                         f"{normed_prefix}:{nci_code}"
                     ):
                         mappings.append(  # noqa: PERF401
@@ -118,7 +118,7 @@ class OncoTree(Base):
                     concept_id,
                 )
                 continue
-        primary_coding = NormalizerCoding.from_concept_id(concept_id)
+        primary_coding = concept_id_to_coding(concept_id)
         disease = MappableConcept(
             id=concept_id,
             primaryCoding=primary_coding,

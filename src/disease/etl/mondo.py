@@ -19,7 +19,7 @@ from ga4gh.va_spec.base import DataSet
 from tqdm import tqdm
 
 from disease.etl.base import Base
-from disease.schemas import NamespacePrefix, NormalizerCoding
+from disease.schemas import NamespacePrefix, concept_id_to_coding
 
 _logger = logging.getLogger(__name__)
 
@@ -211,7 +211,7 @@ class Mondo(Base):
                     continue
                 prefix, local_id = xref
 
-                coding = NormalizerCoding.from_concept_id(f"{prefix.value}:{local_id}")
+                coding = concept_id_to_coding(f"{prefix.value}:{local_id}")
                 if not coding:
                     continue
                 if prefix in (
@@ -234,7 +234,7 @@ class Mondo(Base):
             extensions.append(Extension(name="pediatric_disease", value=True))
         return MappableConcept(
             id=concept_id,
-            primaryCoding=NormalizerCoding.from_concept_id(concept_id),
+            primaryCoding=concept_id_to_coding(concept_id),
             name=name,
             aliases=aliases,
             mappings=mappings,
