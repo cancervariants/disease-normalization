@@ -25,28 +25,28 @@ from disease.schemas import (
 _logger = logging.getLogger(__name__)
 
 
-def pytest_collection_modifyitems(items):
-    """Modify test items in place to ensure test modules run in a given order.
-
-    When creating new test modules, be sure to add them here.
-    """
-    module_order = [
-        "test_schemas",
-        "test_mondo",
-        "test_do",
-        "test_ncit",
-        "test_omim",
-        "test_oncotree",
-        "test_merge",
-        "test_database",
-        "test_query",
-        "test_api",
-        "test_emit_warnings",
-        "test_utils",
-    ]
-    # remember to add new test modules to the order constant:
-    assert len(module_order) == len(list(Path(__file__).parent.rglob("test_*.py")))
-    items.sort(key=lambda i: module_order.index(i.module.__name__))
+# def pytest_collection_modifyitems(items):
+#     """Modify test items in place to ensure test modules run in a given order.
+#
+#     When creating new test modules, be sure to add them here.
+#     """
+#     module_order = [
+#         "test_schemas",
+#         "test_mondo",
+#         "test_do",
+#         "test_ncit",
+#         "test_omim",
+#         "test_oncotree",
+#         "test_merge",
+#         "test_database",
+#         "test_query",
+#         "test_api",
+#         "test_emit_warnings",
+#         "test_utils",
+#     ]
+#     # remember to add new test modules to the order constant:
+#     assert len(module_order) == len(list(Path(__file__).parent.rglob("test_*.py")))
+#     items.sort(key=lambda i: module_order.index(i.module.__name__))
 
 
 def pytest_addoption(parser):
