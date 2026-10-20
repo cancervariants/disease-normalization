@@ -162,7 +162,7 @@ fixtures = {
         ],
         extensions=[Extension(name="oncologic_disease", value=True)],
     ),
-    # use to check for application of rules
+    # test for application of rules
     "DOID:6032": MappableConcept(
         id="DOID:6032",
         primaryCoding=Coding(
