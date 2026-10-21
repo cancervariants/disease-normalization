@@ -385,7 +385,12 @@ class DynamoDbDatabase(AbstractDatabase):
         data = source.model_dump_json(exclude_unset=True, exclude_none=True)
         try:
             self.diseases.put_item(
-                Item={"label_and_type": hash_key, "concept_id": sort_key, "data": data}
+                Item={
+                    "label_and_type": hash_key,
+                    "concept_id": sort_key,
+                    "item_type": "source",  # Required by the population check's index query.
+                    "data": data,
+                }
             )
         except ClientError as e:
             raise DatabaseWriteException(e) from e
