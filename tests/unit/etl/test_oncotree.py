@@ -36,7 +36,7 @@ def test_oncotree_etl(
     assert (
         deepdiff.DeepDiff(
             db._added_sources[SourceName.ONCOTREE],
-            datasets["oncotree"],
+            datasets[SourceName.ONCOTREE],
             ignore_order=True,
         )
         == {}

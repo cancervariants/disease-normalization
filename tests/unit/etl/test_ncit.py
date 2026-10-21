@@ -13,7 +13,7 @@ def test_ncit_etl(
     mock_db_class: type[AbstractDatabase],
     test_data_dir: Path,
     diseases: dict[str, MappableConcept],
-    datasets: dict[str, DataSet],
+    datasets: dict[SourceName, DataSet],
 ):
     db = mock_db_class()
     etl = NCIt(db, test_data_dir / "ncit")
@@ -36,7 +36,7 @@ def test_ncit_etl(
     assert (
         deepdiff.DeepDiff(
             db._added_sources[SourceName.NCIT],
-            datasets["ncit"],
+            datasets[SourceName.NCIT],
             ignore_order=True,
         )
         == {}

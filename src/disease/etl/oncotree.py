@@ -16,7 +16,7 @@ from ga4gh.va_spec.base import DataSet
 from tqdm import tqdm
 
 from disease.etl.base import Base
-from disease.schemas import NamespacePrefix, concept_id_to_coding
+from disease.schemas import DISEASE_CONCEPT_TYPE, NamespacePrefix, concept_id_to_coding
 
 _logger = logging.getLogger(__name__)
 
@@ -122,8 +122,9 @@ class OncoTree(Base):
         disease = MappableConcept(
             id=concept_id,
             primaryCoding=primary_coding,
-            conceptType="disease",
+            conceptType=DISEASE_CONCEPT_TYPE,
             name=disease_node["name"],
+            aliases=[disease_node["code"]],
             mappings=mappings,
             extensions=[Extension(name="oncologic_disease", value=True)],
         )

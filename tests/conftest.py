@@ -199,18 +199,20 @@ def diseases() -> dict[str, MappableConcept]:
                 code="ICPN",
                 system="https://oncotree.mskcc.org/?version=oncotree_latest_stable&field=CODE&search=",
             ),
-            conceptType="disease",
+            aliases=["ICPN"],
+            conceptType="Disease",
             extensions=[Extension(name="oncologic_disease", value=True)],
         ),
         "oncotree:NSCLC": MappableConcept(
             id="oncotree:NSCLC",
             name="Non-Small Cell Lung Cancer",
-            conceptType="disease",
+            conceptType="Disease",
             primaryCoding=Coding(
                 id="oncotree:NSCLC",
                 code="NSCLC",
                 system="https://oncotree.mskcc.org/?version=oncotree_latest_stable&field=CODE&search=",
             ),
+            aliases=["NSCLC"],
             extensions=[Extension(name="oncologic_disease", value=True)],
             mappings=[
                 ConceptMapping(
@@ -233,12 +235,13 @@ def diseases() -> dict[str, MappableConcept]:
         ),
         "oncotree:NBL": MappableConcept(
             id="oncotree:NBL",
-            conceptType="disease",
+            conceptType="Disease",
             primaryCoding=Coding(
                 id="oncotree:NBL",
                 code="NBL",
                 system="https://oncotree.mskcc.org/?version=oncotree_latest_stable&field=CODE&search=",
             ),
+            aliases=["NBL"],
             name="Neuroblastoma",
             extensions=[Extension(name="oncologic_disease", value=True)],
             mappings=[
@@ -262,7 +265,7 @@ def diseases() -> dict[str, MappableConcept]:
         ),
         "DOID:769": MappableConcept(
             id="DOID:769",
-            conceptType="disease",
+            conceptType="Disease",
             primaryCoding=Coding(
                 id="DOID:769",
                 system="https://disease-ontology.org/?id=",
@@ -337,7 +340,7 @@ def diseases() -> dict[str, MappableConcept]:
                 code=code(root="DOID:5695"),
             ),
             name="childhood liposarcoma",
-            conceptType="disease",
+            conceptType="Disease",
             mappings=[
                 ConceptMapping(
                     relation=Relation.EXACT_MATCH,
@@ -366,7 +369,7 @@ def diseases() -> dict[str, MappableConcept]:
                 system="https://disease-ontology.org/?id=",
                 code=code(root="DOID:1703"),
             ),
-            conceptType="disease",
+            conceptType="Disease",
             name="Richter's syndrome",
             aliases=["Richter syndrome"],
             mappings=[
@@ -413,7 +416,7 @@ def diseases() -> dict[str, MappableConcept]:
                 system="https://disease-ontology.org/?id=",
                 code=code(root="DOID:6032"),
             ),
-            conceptType="disease",
+            conceptType="Disease",
             name="juvenile type testicular granulosa cell tumor",
             aliases=[
                 "Juvenile granulosa cell tumor",
@@ -453,7 +456,7 @@ def diseases() -> dict[str, MappableConcept]:
         ),
         "mondo:0005072": MappableConcept(
             id="mondo:0005072",
-            conceptType="disease",
+            conceptType="Disease",
             primaryCoding=Coding(
                 code="MONDO:0005072",
                 id="MONDO_0005072",
@@ -538,7 +541,7 @@ def diseases() -> dict[str, MappableConcept]:
         "mondo:0002083": MappableConcept(
             id="mondo:0002083",
             name="Richter syndrome",
-            conceptType="disease",
+            conceptType="Disease",
             primaryCoding=Coding(
                 code="MONDO:0002083",
                 id="MONDO_0002083",
@@ -593,7 +596,7 @@ def diseases() -> dict[str, MappableConcept]:
                 id="MONDO_0003587",
                 system="https://purl.obolibrary.org/obo/",
             ),
-            conceptType="disease",
+            conceptType="Disease",
             name="pediatric liposarcoma",
             aliases=[
                 "pediatric liposarcoma",
@@ -646,7 +649,7 @@ def diseases() -> dict[str, MappableConcept]:
                 id="MONDO_0004099",
                 system="https://purl.obolibrary.org/obo/",
             ),
-            conceptType="disease",
+            conceptType="Disease",
             name="adult cystic teratoma",
             aliases=["cystic teratoma of adults", "adult cystic teratoma"],
             extensions=[Extension(name="oncologic_disease", value=True)],
@@ -692,7 +695,7 @@ def diseases() -> dict[str, MappableConcept]:
                 id="MONDO_0005233",
                 system="https://purl.obolibrary.org/obo/",
             ),
-            conceptType="disease",
+            conceptType="Disease",
             name="non-small cell lung carcinoma",
             aliases=[
                 "NSCLC - non-small cell lung cancer",
@@ -767,7 +770,7 @@ def diseases() -> dict[str, MappableConcept]:
         ),
         "MIM:309200": MappableConcept(
             id="MIM:309200",
-            conceptType="disease",
+            conceptType="Disease",
             primaryCoding=Coding(
                 id="MIM:309200",
                 system="https://omim.org/MIM:",
@@ -787,7 +790,7 @@ def diseases() -> dict[str, MappableConcept]:
         "MIM:613065": MappableConcept(
             id="MIM:613065",
             name="LEUKEMIA, ACUTE LYMPHOBLASTIC",
-            conceptType="disease",
+            conceptType="Disease",
             primaryCoding=Coding(
                 id="MIM:613065",
                 system="https://omim.org/MIM:",
@@ -807,7 +810,7 @@ def diseases() -> dict[str, MappableConcept]:
             id="MIM:247640",
             name="LYMPHOBLASTIC LEUKEMIA, ACUTE, WITH LYMPHOMATOUS FEATURES",
             aliases=["LALL", "LYMPHOMATOUS ALL"],
-            conceptType="disease",
+            conceptType="Disease",
             primaryCoding=Coding(
                 id="MIM:247640",
                 system="https://omim.org/MIM:",
@@ -816,7 +819,7 @@ def diseases() -> dict[str, MappableConcept]:
         ),
         "ncit:C3270": MappableConcept(
             id="ncit:C3270",
-            conceptType="disease",
+            conceptType="Disease",
             primaryCoding=Coding(
                 id="ncit:C3270",
                 system="https://ncit.nci.nih.gov/ncitbrowser/ConceptReport.jsp?dictionary=NCI_Thesaurus&code=",
@@ -854,7 +857,7 @@ def diseases() -> dict[str, MappableConcept]:
         "ncit:C2926": MappableConcept(
             id="ncit:C2926",
             name="Lung Non-Small Cell Carcinoma",
-            conceptType="disease",
+            conceptType="Disease",
             primaryCoding=Coding(
                 id="ncit:C2926",
                 system="https://ncit.nci.nih.gov/ncitbrowser/ConceptReport.jsp?dictionary=NCI_Thesaurus&code=",
@@ -888,9 +891,315 @@ def diseases() -> dict[str, MappableConcept]:
 
 
 @pytest.fixture
+def merged_diseases() -> dict[str, MappableConcept]:
+    return {
+        "normalize.disease.ncit:C3270": MappableConcept(
+            conceptType="Disease",
+            id="normalize.disease.ncit:C3270",
+            primaryCoding={
+                "id": "ncit:C3270",
+                "code": "C3270",
+                "system": "https://ncit.nci.nih.gov/ncitbrowser/ConceptReport.jsp?dictionary=NCI_Thesaurus&code=",
+            },
+            name="Neuroblastoma",
+            mappings=[
+                {
+                    "coding": {
+                        "id": "MONDO_0005072",
+                        "code": "MONDO:0005072",
+                        "system": "https://purl.obolibrary.org/obo/",
+                    },
+                    "relation": "exactMatch",
+                },
+                {
+                    "coding": {
+                        "id": "oncotree:NBL",
+                        "code": "NBL",
+                        "system": "https://oncotree.mskcc.org/?version=oncotree_latest_stable&field=CODE&search=",
+                    },
+                    "relation": "exactMatch",
+                },
+                {
+                    "coding": {
+                        "id": "DOID:769",
+                        "code": "DOID:769",
+                        "system": "https://disease-ontology.org/?id=",
+                    },
+                    "relation": "exactMatch",
+                },
+                {
+                    "coding": {
+                        "id": "umls:C0027819",
+                        "code": "C0027819",
+                        "system": "https://www.nlm.nih.gov/research/umls/index.html",
+                    },
+                    "relation": "relatedMatch",
+                },
+                {
+                    "coding": {
+                        "id": "icdo:9500/3",
+                        "code": "9500/3",
+                        "system": "https://www.who.int/standards/classifications/other-classifications/international-classification-of-diseases-for-oncology/",
+                    },
+                    "relation": "relatedMatch",
+                },
+                {
+                    "coding": {
+                        "id": "efo:0000621",
+                        "code": "0000621",
+                        "system": "http://www.ebi.ac.uk/efo/EFO_",
+                    },
+                    "relation": "relatedMatch",
+                },
+                {
+                    "coding": {
+                        "id": "gard:7185",
+                        "code": "7185",
+                        "system": "https://rarediseases.info.nih.gov",
+                    },
+                    "relation": "relatedMatch",
+                },
+                {
+                    "coding": {
+                        "id": "mesh:D009447",
+                        "code": "D009447",
+                        "system": "https://meshb.nlm.nih.gov/record/ui?ui=",
+                    },
+                    "relation": "relatedMatch",
+                },
+                {
+                    "coding": {
+                        "id": "orphanet:635",
+                        "code": "635",
+                        "system": "https://www.orpha.net",
+                    },
+                    "relation": "relatedMatch",
+                },
+                {
+                    "coding": {
+                        "id": "umls:C2751421",
+                        "code": "C2751421",
+                        "system": "https://www.nlm.nih.gov/research/umls/index.html",
+                    },
+                    "relation": "relatedMatch",
+                },
+                {
+                    "coding": {
+                        "id": "medgen:18012",
+                        "code": "18012",
+                        "system": "https://www.ncbi.nlm.nih.gov/medgen/",
+                    },
+                    "relation": "relatedMatch",
+                },
+            ],
+            aliases=[
+                "NB",
+                "neuroblastoma",
+                "Neural Crest Tumor, Malignant",
+                "Neuroblastoma (Schwannian Stroma-poor)",
+                "neuroblastoma (Schwannian Stroma-poor)",
+                "Neuroblastoma (Schwannian Stroma-Poor)",
+                "Neuroblastoma, NOS",
+                "NEUROBLASTOMA, MALIGNANT",
+                "Neuroblastoma (NBL)",
+                "neural Crest tumor, malignant",
+                "neuroblastoma, malignant",
+            ],
+            extensions=[
+                Extension(name="oncologic_disease", value=True),
+            ],
+        ),
+        "normalize.disease.ncit:C167370": MappableConcept(
+            conceptType="Disease",
+            id="normalize.disease.ncit:C167370",
+            primaryCoding={
+                "id": "ncit:C167370",
+                "code": "C167370",
+                "system": "https://ncit.nci.nih.gov/ncitbrowser/ConceptReport.jsp?dictionary=NCI_Thesaurus&code=",
+            },
+            name="Skin Myoepithelioma",
+            aliases=["Cutaneous Myoepithelioma"],
+        ),
+        "normalize.disease.ncit:C9012": MappableConcept(
+            id="normalize.disease.ncit:C9012",
+            primaryCoding=Coding(
+                id="ncit:C9012",
+                code="C9012",
+                system="https://ncit.nci.nih.gov/ncitbrowser/ConceptReport.jsp?dictionary=NCI_Thesaurus&code=",
+            ),
+            conceptType="Disease",
+            name="Adult Cystic Teratoma",
+            mappings=[
+                ConceptMapping(
+                    relation=Relation.EXACT_MATCH,
+                    coding=Coding(
+                        id="MONDO_0004099",
+                        code=code(root="MONDO:0004099"),
+                        system="https://purl.obolibrary.org/obo/",
+                    ),
+                ),
+                ConceptMapping(
+                    relation=Relation.EXACT_MATCH,
+                    coding=Coding(
+                        id="DOID:7079",
+                        code=code(root="7079"),
+                        system="https://disease-ontology.org/?id=",
+                    ),
+                ),
+                ConceptMapping(
+                    relation=Relation.RELATED_MATCH,
+                    coding=Coding(
+                        id="icdo:9080/0",
+                        system="https://www.who.int/standards/classifications/other-classifications/international-classification-of-diseases-for-oncology/",
+                        code=code(root="9080/0"),
+                    ),
+                ),
+                ConceptMapping(
+                    relation=Relation.RELATED_MATCH,
+                    coding=Coding(
+                        id="umls:C1368888",
+                        system="https://www.nlm.nih.gov/research/umls/index.html",
+                        code=code(root="C1368888"),
+                    ),
+                ),
+                ConceptMapping(
+                    relation=Relation.RELATED_MATCH,
+                    coding=Coding(
+                        id="medgen:235084",
+                        system="https://www.ncbi.nlm.nih.gov/medgen/",
+                        code=code(root="235084"),
+                    ),
+                ),
+            ],
+            aliases=[
+                "Adult cystic teratoma",
+                "cystic teratoma of adults",
+                "adult cystic teratoma",
+            ],
+            extensions=[Extension(name="oncologic_disease", value=True)],
+        ),
+        "normalize.disease.mondo:0010648": MappableConcept(
+            conceptType="Disease",
+            id="normalize.disease.mondo:0010648",
+            primaryCoding={
+                "id": "MONDO_0010648",
+                "code": "MONDO:0010648",
+                "system": "https://purl.obolibrary.org/obo/",
+            },
+            name="major affective disorder 2",
+            mappings=[
+                {
+                    "coding": {
+                        "id": "MIM:309200",
+                        "code": "309200",
+                        "system": "https://omim.org/MIM:",
+                    },
+                    "relation": "exactMatch",
+                },
+                {
+                    "coding": {
+                        "id": "mesh:C564108",
+                        "code": "C564108",
+                        "system": "https://meshb.nlm.nih.gov/record/ui?ui=",
+                    },
+                    "relation": "relatedMatch",
+                },
+                {
+                    "coding": {
+                        "id": "medgen:326975",
+                        "code": "326975",
+                        "system": "https://www.ncbi.nlm.nih.gov/medgen/",
+                    },
+                    "relation": "relatedMatch",
+                },
+                {
+                    "coding": {
+                        "id": "umls:C1839839",
+                        "code": "C1839839",
+                        "system": "https://www.nlm.nih.gov/research/umls/index.html",
+                    },
+                    "relation": "relatedMatch",
+                },
+            ],
+            aliases=[
+                "MAFD2",
+                "MDI",
+                "MDX",
+                "MANIC-DEPRESSIVE ILLNESS",
+                "BPAD",
+                "MAFD2",
+                "BIPOLAR AFFECTIVE DISORDER",
+                "MANIC-DEPRESSIVE PSYCHOSIS, X-LINKED",
+                "major affective disorder 2, X-linked dominant",
+                "MAJOR affective disorder 2",
+                "bipolar affective disorder",
+                "major affective disorder 2",
+                "manic-depressive illness",
+                "manic-depressive psychosis, X-linked",
+            ],
+        ),
+        "normalize.disease.ncit:C8091": MappableConcept(
+            id="ncit:C8091",
+            conceptType="Disease",
+            primaryCoding=Coding(
+                id="ncit:C8091",
+                system="https://ncit.nci.nih.gov/ncitbrowser/ConceptReport.jsp?dictionary=NCI_Thesaurus&code=",
+                code=code(root="C8091"),
+            ),
+            mappings=[
+                ConceptMapping(
+                    relation=Relation.EXACT_MATCH,
+                    coding=Coding(
+                        id="MONDO_0003587",
+                        code=code(root="MONDO:0003587"),
+                        system="https://purl.obolibrary.org/obo/",
+                    ),
+                ),
+                ConceptMapping(
+                    relation=Relation.EXACT_MATCH,
+                    coding=Coding(
+                        id="DOID:5695",
+                        code=code(root="5696"),
+                        system="https://disease-ontology.org/?id=",
+                    ),
+                ),
+                ConceptMapping(
+                    relation=Relation.RELATED_MATCH,
+                    coding=Coding(
+                        id="umls:C0279984",
+                        system="https://www.nlm.nih.gov/research/umls/index.html",
+                        code=code(root="C0279984"),
+                    ),
+                ),
+                ConceptMapping(
+                    relation=Relation.RELATED_MATCH,
+                    coding=Coding(
+                        id="medgen:83580",
+                        system="https://www.ncbi.nlm.nih.gov/medgen/",
+                        code=code(root="83580"),
+                    ),
+                ),
+            ],
+            name="Childhood Liposarcoma",
+            aliases=[
+                "liposarcoma",
+                "Liposarcoma",
+                "Pediatric Liposarcoma",
+                "childhood liposarcoma",
+                "pediatric liposarcoma",
+            ],
+            extensions=[
+                Extension(name="pediatric_disease", value=True),
+                Extension(name="oncologic_disease", value=True),
+            ],
+        ),
+    }
+
+
+@pytest.fixture
 def datasets() -> dict[str, DataSet]:
     return {
-        "oncotree": DataSet(
+        SourceName.ONCOTREE: DataSet(
             name="OncoTree",
             version="20211102",
             extensions=[
@@ -922,7 +1231,7 @@ def datasets() -> dict[str, DataSet]:
                 ],
             ),
         ),
-        "do": DataSet(
+        SourceName.DO: DataSet(
             name="DO",
             version="20250627",
             license=MappableConcept(
@@ -954,7 +1263,7 @@ def datasets() -> dict[str, DataSet]:
                 ),
             ],
         ),
-        "mondo": DataSet(
+        SourceName.MONDO: DataSet(
             name="Mondo",
             version="20251104",
             extensions=[
@@ -987,7 +1296,7 @@ def datasets() -> dict[str, DataSet]:
                 ],
             ),
         ),
-        "omim": DataSet(
+        SourceName.OMIM: DataSet(
             name="OMIM",
             version="20240806",
             license=MappableConcept(
@@ -1016,7 +1325,7 @@ def datasets() -> dict[str, DataSet]:
                 Extension(name="rdp_url", value="http://reusabledata.org/omim.html"),
             ],
         ),
-        "ncit": DataSet(
+        SourceName.NCIT: DataSet(
             name="NCIt",
             version="25.08d",
             license=MappableConcept(

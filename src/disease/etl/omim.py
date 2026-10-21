@@ -8,7 +8,7 @@ from tqdm import tqdm
 from wags_tails import CustomData, DataSource
 
 from disease.etl.base import Base
-from disease.schemas import NamespacePrefix, concept_id_to_coding
+from disease.schemas import DISEASE_CONCEPT_TYPE, NamespacePrefix, concept_id_to_coding
 
 
 class OMIM(Base):
@@ -107,6 +107,6 @@ class OMIM(Base):
                 primaryCoding=concept_id_to_coding(concept_id),
                 name=name,
                 aliases=aliases,
-                conceptType="disease",
+                conceptType=DISEASE_CONCEPT_TYPE,
             )
             self._load_disease(disease)

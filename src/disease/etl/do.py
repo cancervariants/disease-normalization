@@ -14,7 +14,7 @@ from ga4gh.va_spec.base import DataSet
 from tqdm import tqdm
 
 from disease.etl.base import OWLBase
-from disease.schemas import NamespacePrefix, concept_id_to_coding
+from disease.schemas import DISEASE_CONCEPT_TYPE, NamespacePrefix, concept_id_to_coding
 
 DO_PREFIX_LOOKUP = {
     "EFO": NamespacePrefix.EFO.value,
@@ -122,7 +122,7 @@ class DO(OWLBase):
             self._load_disease(
                 MappableConcept(
                     id=concept_id,
-                    conceptType="disease",
+                    conceptType=DISEASE_CONCEPT_TYPE,
                     primaryCoding=concept_id_to_coding(concept_id),
                     name=label,
                     aliases=aliases,

@@ -134,6 +134,8 @@ SOURCES_LOWER_LOOKUP = {
     name.value.lower(): name.value for name in SourceName.__members__.values()
 }
 
+DISEASE_CONCEPT_TYPE = "Disease"
+
 
 class SourcePriority(IntEnum):
     """Define priorities for sources in building merged concepts."""

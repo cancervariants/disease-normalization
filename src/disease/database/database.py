@@ -8,7 +8,7 @@ database connection.
 import abc
 import sys
 from collections.abc import Generator
-from enum import Enum
+from enum import StrEnum
 from os import environ
 from pathlib import Path
 from typing import Any
@@ -262,7 +262,7 @@ AWS_ENV_VAR_NAME = "DISEASE_NORM_ENV"
 SKIP_AWS_DB_ENV_NAME = "SKIP_AWS_CONFIRMATION"
 
 
-class AwsEnvName(str, Enum):
+class AwsEnvName(StrEnum):
     """AWS environment name that is being used"""
 
     DEVELOPMENT = ServiceEnvironment.DEV.value
@@ -304,7 +304,7 @@ def create_db(
 
         db = DynamoDbDatabase()
     else:
-        endpoint_url = db_url if db_url else get_config().db_url
+        endpoint_url = db_url or get_config().db_url
 
         # prefer DynamoDB unless connection explicitly reads like a libpq URI
         if endpoint_url.startswith("postgres"):

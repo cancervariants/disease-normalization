@@ -39,6 +39,7 @@ from disease.schemas import (
     SourceDataSet,
     SourceMeta,
     SourceName,
+    mapcon_to_disease,
 )
 
 _logger = logging.getLogger(__name__)
@@ -265,13 +266,15 @@ class DynamoDbDatabase(AbstractDatabase):
                 response = self.diseases.get_item(
                     Key={"label_and_type": pk, "concept_id": concept_id}
                 )
-                record = response.get("Item")
+                _record = response.get("Item")
+                record = mapcon_to_disease(MappableConcept(**_record["data"]))
                 if not record:
                     return None
             else:
                 exp = Key("label_and_type").eq(pk)
                 response = self.diseases.query(KeyConditionExpression=exp)
-                record = response["Items"][0]
+                _record = response["Items"][0]
+                record = mapcon_to_disease(MappableConcept(**_record["data"]))
             del record["label_and_type"]
         except ClientError as e:
             _logger.exception(
@@ -409,7 +412,8 @@ class DynamoDbDatabase(AbstractDatabase):
             self.batch.put_item(
                 Item={
                     "label_and_type": partition_key,
-                    "item_type": concept_id,
+                    "concept_id": concept_id,
+                    "item_type": "identity",
                     "data": disease.model_dump(exclude_none=True, exclude_unset=True),
                 }
             )

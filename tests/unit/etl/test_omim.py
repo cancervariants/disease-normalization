@@ -36,7 +36,7 @@ def test_omim_etl(
     assert (
         deepdiff.DeepDiff(
             db._added_sources[SourceName.OMIM],
-            datasets["omim"],
+            datasets[SourceName.OMIM],
             ignore_order=True,
         )
         == {}

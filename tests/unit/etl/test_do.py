@@ -36,7 +36,7 @@ def test_do_etl(
     assert (
         deepdiff.DeepDiff(
             db._added_sources[SourceName.DO],
-            datasets["do"],
+            datasets[SourceName.DO],
             ignore_order=True,
         )
         == {}

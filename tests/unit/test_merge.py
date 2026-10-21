@@ -159,53 +159,53 @@ def ped_liposarcoma():
     }
 
 
-@pytest.fixture(scope="module")
-def teratoma():
-    """Create fixture for adult cystic teratoma."""
-    return {
-        "concept_id": "ncit:C9012",
-        "xrefs": ["mondo:0004099", "DOID:7079"],
-        "label": "Adult Cystic Teratoma",
-        "aliases": [
-            "Adult cystic teratoma",
-            "cystic teratoma of adults",
-            "adult cystic teratoma",
-        ],
-        "associated_with": ["icdo:9080/0", "umls:C1368888", "medgen:235084"],
-        "item_type": "merger",
-        "oncologic_disease": True,
-    }
+# @pytest.fixture(scope="module")
+# def teratoma():
+#     """Create fixture for adult cystic teratoma."""
+#     return {
+#         "concept_id": "ncit:C9012",
+#         "xrefs": ["mondo:0004099", "DOID:7079"],
+#         "label": "Adult Cystic Teratoma",
+#         "aliases": [
+#             "Adult cystic teratoma",
+#             "cystic teratoma of adults",
+#             "adult cystic teratoma",
+#         ],
+#         "associated_with": ["icdo:9080/0", "umls:C1368888", "medgen:235084"],
+#         "item_type": "merger",
+#         "oncologic_disease": True,
+#     }
 
 
-@pytest.fixture(scope="module")
-def mafd2():
-    """Create a fixture for major affective disorder 2. Tests whether a
-    deprecated DO reference is filtered out.
-    """
-    return {
-        "item_type": "merger",
-        "concept_id": "mondo:0010648",
-        "label": "major affective disorder 2",
-        "aliases": [
-            "BIPOLAR AFFECTIVE DISORDER",
-            "BPAD",
-            "MAFD2",
-            "MANIC-DEPRESSIVE ILLNESS",
-            "MANIC-DEPRESSIVE PSYCHOSIS, X-LINKED",
-            "MDI",
-            "MDX",
-            "major affective disorder 2, X-linked dominant",
-            "MAJOR affective disorder 2",
-            "bipolar affective disorder",
-            "major affective disorder 2",
-            "manic-depressive illness",
-            "manic-depressive psychosis, X-linked",
-        ],
-        "xrefs": [
-            "MIM:309200",
-        ],
-        "associated_with": ["mesh:C564108", "medgen:326975", "umls:C1839839"],
-    }
+# @pytest.fixture(scope="module")
+# def mafd2():
+#     """Create a fixture for major affective disorder 2. Tests whether a
+#     deprecated DO reference is filtered out.
+#     """
+#     return {
+#         "item_type": "merger",
+#         "concept_id": "mondo:0010648",
+#         "label": "major affective disorder 2",
+#         "aliases": [
+#             "BIPOLAR AFFECTIVE DISORDER",
+#             "BPAD",
+#             "MAFD2",
+#             "MANIC-DEPRESSIVE ILLNESS",
+#             "MANIC-DEPRESSIVE PSYCHOSIS, X-LINKED",
+#             "MDI",
+#             "MDX",
+#             "major affective disorder 2, X-linked dominant",
+#             "MAJOR affective disorder 2",
+#             "bipolar affective disorder",
+#             "major affective disorder 2",
+#             "manic-depressive illness",
+#             "manic-depressive psychosis, X-linked",
+#         ],
+#         "xrefs": [
+#             "MIM:309200",
+#         ],
+#         "associated_with": ["mesh:C564108", "medgen:326975", "umls:C1839839"],
+#     }
 
 
 @pytest.fixture(scope="module")

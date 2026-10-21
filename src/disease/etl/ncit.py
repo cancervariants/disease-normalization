@@ -17,7 +17,7 @@ from ga4gh.va_spec.base import DataSet
 from tqdm import tqdm
 
 from disease.etl.base import OWLBase
-from disease.schemas import NamespacePrefix, concept_id_to_coding
+from disease.schemas import DISEASE_CONCEPT_TYPE, NamespacePrefix, concept_id_to_coding
 
 _logger = logging.getLogger(__name__)
 
@@ -129,7 +129,7 @@ class NCIt(OWLBase):
                 primaryCoding=concept_id_to_coding(concept_id),
                 name=name,
                 aliases=aliases,
-                conceptType="disease",
+                conceptType=DISEASE_CONCEPT_TYPE,
                 mappings=mappings,
             )
             self._load_disease(disease)

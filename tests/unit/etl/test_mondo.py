@@ -42,7 +42,7 @@ def test_mondo_etl(
     assert (
         deepdiff.DeepDiff(
             db._added_sources[SourceName.MONDO],
-            datasets["mondo"],
+            datasets[SourceName.MONDO],
             ignore_order=True,
         )
         == {}

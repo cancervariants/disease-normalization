@@ -12,7 +12,7 @@ from typing import Any, ClassVar
 
 import psycopg
 import requests
-from ga4gh.core.models import MappableConcept
+from ga4gh.core.models import MappableConcept, Relation
 from ga4gh.va_spec.base import DataSet
 from psycopg.errors import DuplicateObject, DuplicateTable, UniqueViolation
 from psycopg.types.json import Jsonb
@@ -26,6 +26,7 @@ from disease.schemas import (
     SourceDataSet,
     SourceMeta,
     SourceName,
+    coding_to_concept_id,
     mapcon_to_disease,
 )
 
@@ -284,12 +285,12 @@ class PostgresDatabase(AbstractDatabase):
         :return: reformatted dictionary keying disease properties to row values
         """
         mc = MappableConcept(**source_row[3])
-        params = mapcon_to_disease(mc).model_dump()
-        params["src_name"] = source_row[1]
-        params["merge_ref"] = source_row[2]
-        params["item_type"] = RecordType.IDENTITY.value
+        record = mapcon_to_disease(mc).model_dump()
+        record["src_name"] = source_row[1]
+        record["merge_ref"] = source_row[2]
+        record["item_type"] = RecordType.IDENTITY.value
 
-        return {k: v for k, v in params.items() if v}
+        return record
 
     def _get_record(self, concept_id: str) -> dict | None:
         """Retrieve non-merged record. The query is pretty different, so this method
@@ -498,7 +499,7 @@ class PostgresDatabase(AbstractDatabase):
         :param disease: disease record to upload
         :param src_name: name of source for record
         """
-        concept_id = disease.primaryCoding.code.root
+        concept_id = disease.id
         with self.conn.cursor() as cur:
             try:
                 cur.execute(
@@ -517,9 +518,16 @@ class PostgresDatabase(AbstractDatabase):
                         cur.execute(self._insert_alias_query, [a, concept_id])
                 if disease.mappings:
                     for m in disease.mappings:
-                        cur.execute(
-                            self._insert_xref_query, [m.coding.code.root, concept_id]
-                        )
+                        if m.relation == Relation.EXACT_MATCH:
+                            cur.execute(
+                                self._insert_xref_query,
+                                [coding_to_concept_id(m.coding), concept_id],
+                            )
+                        else:
+                            cur.execute(
+                                self._insert_assoc_query,
+                                [coding_to_concept_id(m.coding), concept_id],
+                            )
                 self.conn.commit()
             except UniqueViolation:
                 _logger.error("Record with ID %s already exists", concept_id)  # noqa: TRY400
