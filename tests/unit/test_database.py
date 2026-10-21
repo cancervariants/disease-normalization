@@ -3,10 +3,21 @@
 import pytest
 
 from disease.config import get_config
+from disease.database.database import AbstractDatabase
 from disease.schemas import RecordType
 
 IS_DDB = not get_config().db_url.lower().startswith("postgres")
 IS_TEST_ENV = get_config().test
+
+
+def test_schema_initialized(database: AbstractDatabase) -> None:
+    """Check that the database schema is initialized."""
+    assert database.check_schema_initialized()
+
+
+def test_tables_populated(database: AbstractDatabase) -> None:
+    """Check that required tables are populated."""
+    assert database.check_tables_populated()
 
 
 def test_tables_created(database):
