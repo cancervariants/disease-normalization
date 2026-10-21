@@ -22,7 +22,7 @@ from disease.schemas import (
     mapcon_to_disease,
 )
 
-# IS_DDB = not get_config().db_url.lower().startswith("postgres")
+IS_DDB = not get_config().db_url.lower().startswith("postgres")
 IS_TEST_ENV = get_config().test
 
 
@@ -110,6 +110,7 @@ IS_TEST_ENV = get_config().test
 
 @pytest.fixture
 def db() -> AbstractDatabase:
+    """A real live db instance (gets overwritten immediately)"""
     db_instance = create_db()
     try:
         db_instance.drop_db()
@@ -117,6 +118,26 @@ def db() -> AbstractDatabase:
         yield db_instance
     finally:
         db_instance.drop_db()
+
+
+@pytest.mark.skipif(not IS_TEST_ENV, reason="not in test environment")
+def test_db_healthchecks(
+    db: AbstractDatabase,
+    datasets: dict[SourceName, DataSet],
+    diseases: dict[str, MappableConcept],
+    merged_diseases: dict[str, MappableConcept],
+):
+    assert not db.check_tables_populated(), "db should be empty"
+
+    for name in SourceName:
+        db.add_source_metadata(name, datasets[name])
+    for concept_id, disease in diseases.items():
+        src_name = PREFIX_LOOKUP[concept_id.split(":", 1)[0].lower()]
+        db.add_record(disease, SourceName(src_name))
+    for record in merged_diseases.values():
+        db.add_merged_record(record)
+
+    assert db.check_tables_populated(), "db should be populated"
 
 
 @pytest.mark.skipif(not IS_TEST_ENV, reason="not in test environment")
@@ -130,7 +151,7 @@ def test_crud_source_metadata(
         result = db.get_source_metadata(name)
         expected = datasets[name]
 
-        # TODO
+        # TODO:
         # these checks are preliminary -- should check for exact equality once API migration is done
         assert result.version == expected.version
         assert result.data_license == expected.license.name
@@ -287,4 +308,45 @@ def test_delete_source(
 ):
     # TODO add all records,
     # then iteratively delete sources and check stuff still works
-    ...
+    for name in SourceName:
+        db.add_source_metadata(name, datasets[name])
+    for concept_id, disease in diseases.items():
+        src_name = PREFIX_LOOKUP[concept_id.split(":", 1)[0].lower()]
+        db.add_record(disease, SourceName(src_name))
+
+    assert db.get_record_by_id("DOID:769")
+    assert db.get_record_by_id("oncotree:NBL")
+    assert db.get_record_by_id("mondo:0005072")
+    assert db.get_record_by_id("ncit:C3270")
+    assert db.get_record_by_id("MIM:613065")
+    db.delete_source(SourceName.OMIM)
+    assert db.get_record_by_id("DOID:769")
+    assert db.get_record_by_id("oncotree:NBL")
+    assert db.get_record_by_id("mondo:0005072")
+    assert db.get_record_by_id("ncit:C3270")
+    assert not db.get_record_by_id("MIM:613065")
+    db.delete_source(SourceName.NCIT)
+    db.delete_source(SourceName.NCIT)  # check idempotency, why not
+    assert db.get_record_by_id("DOID:769")
+    assert db.get_record_by_id("oncotree:NBL")
+    assert db.get_record_by_id("mondo:0005072")
+    assert not db.get_record_by_id("ncit:C3270")
+    assert not db.get_record_by_id("MIM:613065")
+    db.delete_source(SourceName.MONDO)
+    assert db.get_record_by_id("DOID:769")
+    assert db.get_record_by_id("oncotree:NBL")
+    assert not db.get_record_by_id("mondo:0005072")
+    assert not db.get_record_by_id("ncit:C3270")
+    assert not db.get_record_by_id("MIM:613065")
+    db.delete_source(SourceName.ONCOTREE)
+    assert db.get_record_by_id("DOID:769")
+    assert not db.get_record_by_id("oncotree:NBL")
+    assert not db.get_record_by_id("mondo:0005072")
+    assert not db.get_record_by_id("ncit:C3270")
+    assert not db.get_record_by_id("MIM:613065")
+    db.delete_source(SourceName.DO)
+    assert not db.get_record_by_id("DOID:769")
+    assert not db.get_record_by_id("oncotree:NBL")
+    assert not db.get_record_by_id("mondo:0005072")
+    assert not db.get_record_by_id("ncit:C3270")
+    assert not db.get_record_by_id("MIM:613065")
