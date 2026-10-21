@@ -3,7 +3,7 @@
 from disease.schemas import PREFIX_LOOKUP
 from ga4gh.core.models import MappableConcept
 from disease.schemas import Disease
-from disease.schemas import mappable_concept_from_disease_record
+from disease.schemas import disease_to_mapcon
 import logging
 from collections.abc import Collection
 from timeit import default_timer as timer
@@ -108,7 +108,7 @@ class Merge:
         for record_id in record_id_set:
             _record = self._database.get_record_by_id(record_id)
             if _record:
-                disease = mappable_concept_from_disease_record(Disease(**_record))
+                disease = disease_to_mapcon(Disease(**_record))
                 records.append(disease)
                 final_ids.append(disease.id)
             else:

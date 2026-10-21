@@ -684,7 +684,7 @@ def coding_to_concept_id(coding: Coding) -> str:
     return coding.code.id
 
 
-def disease_record_from_mappable_concept(disease: MappableConcept) -> Disease:
+def mapcon_to_disease(disease: MappableConcept) -> Disease:
     """Construct old-style disease record from a disease mappableconcept
 
     This is a temporary function to help transition from the old disease class --
@@ -726,10 +726,10 @@ def disease_record_from_mappable_concept(disease: MappableConcept) -> Disease:
     )
 
 
-def mappable_concept_from_disease_record(disease: Disease) -> MappableConcept:
+def disease_to_mapcon(disease: Disease) -> MappableConcept:
     """Get mappable concept from disease record
 
-    This function is temporary
+    This function is temporary (see above)
     """
     extensions = []
     if disease.pediatric_disease:

@@ -129,5 +129,7 @@ class NCIt(OWLBase):
                 primaryCoding=concept_id_to_coding(concept_id),
                 name=name,
                 aliases=aliases,
+                conceptType="disease",
+                mappings=mappings,
             )
             self._load_disease(disease)

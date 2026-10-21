@@ -122,6 +122,7 @@ class OncoTree(Base):
         disease = MappableConcept(
             id=concept_id,
             primaryCoding=primary_coding,
+            conceptType="disease",
             name=disease_node["name"],
             mappings=mappings,
             extensions=[Extension(name="oncologic_disease", value=True)],

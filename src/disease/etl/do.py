@@ -89,7 +89,6 @@ class DO(OWLBase):
 
             concept_id = f"{NamespacePrefix.DO.value}:{uri.split('_')[-1]}"
             label = disease_class.label[0]
-
             synonyms = disease_class.hasExactSynonym
             aliases = list({s for s in synonyms if s != label}) if synonyms else []
 
@@ -104,27 +103,26 @@ class DO(OWLBase):
                     if not coding:
                         continue
                     if normed_prefix in {
-                        NamespacePrefix.MONDO,
-                        NamespacePrefix.NCIT,
-                        NamespacePrefix.ONCOTREE,
-                        NamespacePrefix.OMIM,
+                        NamespacePrefix.MONDO.value,
+                        NamespacePrefix.NCIT.value,
+                        NamespacePrefix.ONCOTREE.value,
+                        NamespacePrefix.OMIM.value,
                     }:
                         relation = Relation.EXACT_MATCH
                     else:
                         relation = Relation.RELATED_MATCH
                     mapping = ConceptMapping(coding=coding, relation=relation)
-                    if mapping:
-                        mappings.append(mapping)
+                    mappings.append(mapping)
 
             if uri in cancers:
                 extensions = [Extension(name="oncologic_disease", value=True)]
             else:
                 extensions = None
-            extensions = []
 
             self._load_disease(
                 MappableConcept(
                     id=concept_id,
+                    conceptType="disease",
                     primaryCoding=concept_id_to_coding(concept_id),
                     name=label,
                     aliases=aliases,

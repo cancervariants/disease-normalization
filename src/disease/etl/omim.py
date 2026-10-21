@@ -107,5 +107,6 @@ class OMIM(Base):
                 primaryCoding=concept_id_to_coding(concept_id),
                 name=name,
                 aliases=aliases,
+                conceptType="disease",
             )
             self._load_disease(disease)

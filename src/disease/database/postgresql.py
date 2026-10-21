@@ -26,7 +26,7 @@ from disease.schemas import (
     SourceDataSet,
     SourceMeta,
     SourceName,
-    disease_record_from_mappable_concept,
+    mapcon_to_disease,
 )
 
 _logger = logging.getLogger(__name__)
@@ -284,7 +284,7 @@ class PostgresDatabase(AbstractDatabase):
         :return: reformatted dictionary keying disease properties to row values
         """
         mc = MappableConcept(**source_row[3])
-        params = disease_record_from_mappable_concept(mc).model_dump()
+        params = mapcon_to_disease(mc).model_dump()
         params["src_name"] = source_row[1]
         params["merge_ref"] = source_row[2]
         params["item_type"] = RecordType.IDENTITY.value
@@ -317,9 +317,7 @@ class PostgresDatabase(AbstractDatabase):
         :return: reformatted dictionary keying normalized disease properties to row values
         """
         disease_mc = MappableConcept(**merged_row[1])
-        record = disease_record_from_mappable_concept(disease_mc).model_dump(
-            exclude_none=True
-        )
+        record = mapcon_to_disease(disease_mc).model_dump(exclude_none=True)
         record["item_type"] = RecordType.MERGER.value
         return record
 

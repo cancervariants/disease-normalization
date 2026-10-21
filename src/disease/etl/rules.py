@@ -67,9 +67,7 @@ class Rules:
             disease.aliases.remove(value)
         elif field == "xrefs" and disease.mappings:
             disease.mappings = [
-                m
-                for m in disease.mappings
-                if m.coding.code.root.lower() != value.lower()
+                m for m in disease.mappings if m.coding.id.lower() != value.lower()
             ]
         else:
             msg = "Non-scalar fields currently not implemented"

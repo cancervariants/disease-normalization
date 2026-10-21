@@ -103,13 +103,11 @@ class Base(ABC):
         """Load individual disease record."""
         concept_id: str = disease.primaryCoding.code.root
 
-        if disease.name:
-            disease.name = disease.name.lower()
         if disease.aliases is not None:
             if not disease.aliases:
                 disease.aliases = None
             else:
-                disease.aliases = list({a.lower() for a in disease.aliases})
+                disease.aliases = list(set(disease.aliases))
                 if len(disease.aliases) > 20:  # noqa: PLR2004
                     _logger.debug("%s has > 20 aliases.", concept_id)
                     disease.aliases = None

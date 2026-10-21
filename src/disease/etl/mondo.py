@@ -210,7 +210,6 @@ class Mondo(Base):
                 if not xref:
                     continue
                 prefix, local_id = xref
-
                 coding = concept_id_to_coding(f"{prefix.value}:{local_id}")
                 if not coding:
                     continue
@@ -232,9 +231,11 @@ class Mondo(Base):
             extensions.append(Extension(name="oncologic_disease", value=True))
         if is_ped:
             extensions.append(Extension(name="pediatric_disease", value=True))
+        primary_coding = concept_id_to_coding(concept_id)
         return MappableConcept(
             id=concept_id,
-            primaryCoding=concept_id_to_coding(concept_id),
+            conceptType="disease",
+            primaryCoding=primary_coding,
             name=name,
             aliases=aliases,
             mappings=mappings,
