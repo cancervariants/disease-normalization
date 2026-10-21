@@ -9,8 +9,8 @@ from disease.utils import get_term_mappings
 
 
 @pytest.fixture(scope="module")
-def test_db(null_database_class):
-    return null_database_class(
+def test_db(mock_db_class):
+    return mock_db_class(
         get_all_records={
             RecordType.IDENTITY: [
                 {

@@ -1,17 +1,20 @@
 """Create concept groups and merged records."""
 
-from disease.schemas import PREFIX_LOOKUP
-from ga4gh.core.models import MappableConcept
-from disease.schemas import Disease
-from disease.schemas import disease_to_mapcon
 import logging
 from collections.abc import Collection
 from timeit import default_timer as timer
 
+from ga4gh.core.models import MappableConcept, Relation
 from tqdm import tqdm
 
 from disease.database.database import AbstractDatabase
-from disease.schemas import SourcePriority
+from disease.schemas import (
+    PREFIX_LOOKUP,
+    Disease,
+    SourcePriority,
+    coding_to_concept_id,
+    disease_to_mapcon,
+)
 
 _logger = logging.getLogger(__name__)
 
@@ -45,7 +48,9 @@ class Merge:
         start = timer()
         for concept_id in tqdm(record_ids, ncols=80, disable=self._silent):
             try:
-                record = self._database.get_record_by_id(concept_id)
+                # temporary -- remove once full domain model migration is complete
+                _record = self._database.get_record_by_id(concept_id)
+                record = disease_to_mapcon(_record)
             except AttributeError:
                 _logger.exception(
                     "`create_merged_concepts` received invalid concept ID: %s",
@@ -55,7 +60,11 @@ class Merge:
             if not record:
                 _logger.error("generate_merged_concepts couldn't find %s", concept_id)
                 continue
-            xrefs = record.get("xrefs", None)
+            xrefs = {
+                coding_to_concept_id(m.coding)
+                for m in record.mappings
+                if m.relation == Relation.EXACT_MATCH
+            }
             group = {*xrefs, concept_id} if xrefs else {concept_id}
             self._groups.append((concept_id, group))
         end = timer()

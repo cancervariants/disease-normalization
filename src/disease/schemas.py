@@ -681,7 +681,7 @@ def coding_to_concept_id(coding: Coding) -> str:
         return coding.id.replace("_", ":").lower()
     if coding.system == NAMESPACE_TO_SYSTEM_URI[NamespacePrefix.DOID]:
         return coding.code.root
-    return coding.code.id
+    return coding.id
 
 
 def mapcon_to_disease(disease: MappableConcept) -> Disease:
@@ -718,7 +718,7 @@ def mapcon_to_disease(disease: MappableConcept) -> Disease:
     return Disease(
         concept_id=coding_to_concept_id(disease.primaryCoding),
         label=disease.name,
-        aliases=disease.aliases,
+        aliases=disease.aliases or [],
         associated_with=aw,
         xrefs=xrefs,
         pediatric_disease=is_ped_disease,
