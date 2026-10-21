@@ -121,11 +121,12 @@ expected_dataset = DataSet(
 )
 
 
-def test_ncit_etl(mock_etl_db: AbstractDatabase, test_data_dir: Path):
-    etl = NCIt(mock_etl_db, test_data_dir / "ncit")
+def test_ncit_etl(mock_db_class: type[AbstractDatabase], test_data_dir: Path):
+    db = mock_db_class()
+    etl = NCIt(db, test_data_dir / "ncit")
     etl.perform_etl(use_existing=True)
 
-    added_records = mock_etl_db._added_records
+    added_records = db._added_records
     for id_key, expected in fixtures.items():
         assert (
             deepdiff.DeepDiff(
@@ -137,10 +138,10 @@ def test_ncit_etl(mock_etl_db: AbstractDatabase, test_data_dir: Path):
             == {}
         )
 
-    assert len(mock_etl_db._added_sources) == 1
+    assert len(db._added_sources) == 1
     assert (
         deepdiff.DeepDiff(
-            mock_etl_db._added_sources[SourceName.NCIT],
+            db._added_sources[SourceName.NCIT],
             expected_dataset,
             ignore_order=True,
         )
