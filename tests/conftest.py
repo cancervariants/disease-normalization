@@ -200,6 +200,7 @@ def merged_diseases(test_data_dir: Path) -> dict[str, MappableConcept]:
 @pytest.fixture
 def merged_groups() -> dict[str, list[str]]:
     return {
+        "normalize.disease.ncit:C167370": ["ncit:C167370"],
         "normalize.disease.ncit:C3270": [
             "ncit:C3270",
             "mondo:0005072",

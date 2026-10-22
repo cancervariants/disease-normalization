@@ -202,7 +202,7 @@ def test_get_refs_by_type(
         "DOID:3908",
     }
     results = db.get_refs_by_type("MAFD2", RefType.ALIASES)
-    assert set(results) == {"MIM:309200"}
+    assert set(results) == {"MIM:309200", "mondo:0010648"}
 
     # xrefs
     results = db.get_refs_by_type("ncit:C3270", RefType.XREFS)
@@ -239,6 +239,12 @@ def test_merged_crud(
         for grp_member_id in merged_groups[merged_id]:
             result = db.get_record_by_id(grp_member_id)
             assert result["merge_ref"] == merged_id
+
+    db.delete_normalized_concepts()
+    for merged_id in merged_diseases:
+        for grp_member_id in merged_groups[merged_id]:
+            result = db.get_record_by_id(grp_member_id)
+            assert result.get("merge_ref") is None
 
 
 @pytest.mark.skipif(not IS_TEST_ENV, reason="not in test environment")

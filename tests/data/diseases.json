@@ -74,6 +74,36 @@
       }
     ]
   },
+  "DOID:7079": {
+    "id": "DOID:7079",
+    "type": "MappableConcept",
+    "name": "adult cystic teratoma",
+    "extensions": [{ "name": "oncologic_disease", "value": true }],
+    "conceptType": "Disease",
+    "primaryCoding": {
+      "id": "DOID:7079",
+      "system": "https://disease-ontology.org/?id=",
+      "code": "DOID:7079"
+    },
+    "mappings": [
+      {
+        "coding": {
+          "id": "umls:C1368888",
+          "system": "https://www.nlm.nih.gov/research/umls/index.html",
+          "code": "C1368888"
+        },
+        "relation": "relatedMatch"
+      },
+      {
+        "coding": {
+          "id": "ncit:C9012",
+          "system": "https://ncit.nci.nih.gov/ncitbrowser/ConceptReport.jsp?dictionary=NCI_Thesaurus&code=",
+          "code": "C9012"
+        },
+        "relation": "exactMatch"
+      }
+    ]
+  },
   "DOID:3908": {
     "id": "DOID:3908",
     "type": "MappableConcept",
@@ -322,6 +352,61 @@
           "id": "umls:C1515285",
           "system": "https://www.nlm.nih.gov/research/umls/index.html",
           "code": "C1515285"
+        },
+        "relation": "relatedMatch"
+      }
+    ]
+  },
+  "mondo:0010648": {
+    "id": "mondo:0010648",
+    "type": "MappableConcept",
+    "name": "major affective disorder 2",
+    "aliases": [
+      "bipolar affective disorder",
+      "major affective disorder 2, X-linked dominant",
+      "manic-depressive illness",
+      "manic-depressive psychosis, X-linked",
+      "MAFD2",
+      "MAJOR affective disorder 2",
+      "major affective disorder 2"
+    ],
+    "extensions": [],
+    "conceptType": "Disease",
+    "primaryCoding": {
+      "id": "MONDO_0010648",
+      "system": "https://purl.obolibrary.org/obo/",
+      "code": "MONDO:0010648"
+    },
+    "mappings": [
+      {
+        "coding": {
+          "id": "medgen:326975",
+          "system": "https://www.ncbi.nlm.nih.gov/medgen/",
+          "code": "326975"
+        },
+        "relation": "relatedMatch"
+      },
+      {
+        "coding": {
+          "id": "mesh:C564108",
+          "system": "https://meshb.nlm.nih.gov/record/ui?ui=",
+          "code": "C564108"
+        },
+        "relation": "relatedMatch"
+      },
+      {
+        "coding": {
+          "id": "MIM:309200",
+          "system": "https://omim.org/MIM:",
+          "code": "309200"
+        },
+        "relation": "exactMatch"
+      },
+      {
+        "coding": {
+          "id": "umls:C1839839",
+          "system": "https://www.nlm.nih.gov/research/umls/index.html",
+          "code": "C1839839"
         },
         "relation": "relatedMatch"
       }
@@ -698,6 +783,28 @@
       "code": "247640"
     }
   },
+  "ncit:C8091": {
+    "id": "ncit:C8091",
+    "type": "MappableConcept",
+    "name": "Childhood Liposarcoma",
+    "aliases": ["Pediatric Liposarcoma", "Liposarcoma"],
+    "conceptType": "Disease",
+    "primaryCoding": {
+      "id": "ncit:C8091",
+      "system": "https://ncit.nci.nih.gov/ncitbrowser/ConceptReport.jsp?dictionary=NCI_Thesaurus&code=",
+      "code": "C8091"
+    },
+    "mappings": [
+      {
+        "coding": {
+          "id": "umls:C0279984",
+          "system": "https://www.nlm.nih.gov/research/umls/index.html",
+          "code": "C0279984"
+        },
+        "relation": "relatedMatch"
+      }
+    ]
+  },
   "ncit:C35424": {
     "id": "ncit:C35424",
     "name": "Richter Syndrome",
@@ -795,5 +902,39 @@
         "relation": "relatedMatch"
       }
     ]
+  },
+  "ncit:C9012": {
+    "id": "ncit:C9012",
+    "type": "MappableConcept",
+    "name": "Adult Cystic Teratoma",
+    "aliases": ["Adult cystic teratoma"],
+    "conceptType": "Disease",
+    "primaryCoding": {
+      "id": "ncit:C9012",
+      "system": "https://ncit.nci.nih.gov/ncitbrowser/ConceptReport.jsp?dictionary=NCI_Thesaurus&code=",
+      "code": "C9012"
+    },
+    "mappings": [
+      {
+        "coding": {
+          "id": "icdo:9080/0",
+          "system": "https://www.who.int/standards/classifications/other-classifications/international-classification-of-diseases-for-oncology/",
+          "code": "9080/0"
+        },
+        "relation": "relatedMatch"
+      }
+    ]
+  },
+  "ncit:C167370": {
+    "id": "ncit:C167370",
+    "name": "Skin Myoepithelioma",
+    "type": "MappableConcept",
+    "aliases": ["Cutaneous Myoepithelioma"],
+    "conceptType": "Disease",
+    "primaryCoding": {
+      "id": "ncit:C167370",
+      "system": "https://ncit.nci.nih.gov/ncitbrowser/ConceptReport.jsp?dictionary=NCI_Thesaurus&code=",
+      "code": "C167370"
+    }
   }
 }

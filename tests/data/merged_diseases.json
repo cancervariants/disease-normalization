@@ -425,7 +425,7 @@
     ]
   },
   "normalize.disease.ncit:C8091": {
-    "id": "ncit:C8091",
+    "id": "normalize.disease.ncit:C8091",
     "type": "MappableConcept",
     "name": "Childhood Liposarcoma",
     "aliases": [
