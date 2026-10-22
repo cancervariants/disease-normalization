@@ -17,7 +17,13 @@ from disease.config import get_config
 from disease.database.database import AWS_ENV_VAR_NAME, AbstractDatabase, create_db
 from disease.etl.base import Base
 from disease.query import QueryHandler
-from disease.schemas import RecordType, RefType, SourceMeta, SourceName
+from disease.schemas import (
+    RecordType,
+    RefType,
+    SourceMeta,
+    SourceName,
+    mapcon_to_disease,
+)
 
 _logger = logging.getLogger(__name__)
 
@@ -118,6 +124,7 @@ def mock_db_class():
     class NullDatabase(AbstractDatabase):
         def __init__(self, db_url: str | None = None, **db_args) -> None:  # noqa: ARG002
             self._get_all_records_values = db_args.get("get_all_records", {})
+            self._get_record_by_id_values = db_args.get("get_record_by_id", {})
             self._added_records: dict[str, MappableConcept] = {}
             self._added_sources: dict[SourceName, MappableConcept] = {}
             self._added_merged_records: dict[str, MappableConcept] = {}
@@ -140,8 +147,23 @@ def mock_db_class():
         ) -> SourceMeta | None: ...
 
         def get_record_by_id(
-            self, concept_id: str, case_sensitive: bool = True, merge: bool = False
-        ) -> dict | None: ...
+            self,
+            concept_id: str,
+            case_sensitive: bool = True,
+            merge: bool = False,  # noqa: ARG002
+        ) -> dict | None:
+            key = concept_id
+            if case_sensitive:
+                key = key.lower()
+                response_map = {
+                    k.lower(): v for k, v in self._get_record_by_id_values.items()
+                }
+            else:
+                response_map = self._get_record_by_id_values
+            result = response_map.get(key)
+            if not result:
+                return None
+            return mapcon_to_disease(result).model_dump()
 
         def get_refs_by_type(
             self, search_term: str, ref_type: RefType

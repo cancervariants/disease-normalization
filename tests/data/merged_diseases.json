@@ -110,9 +110,9 @@
       },
       {
         "coding": {
-          "id": "kegg.disease:05233",
+          "id": "kegg.disease:05223",
           "system": "https://www.genome.jp/kegg/disease/",
-          "code": "05233"
+          "code": "05223"
         },
         "relation": "relatedMatch"
       },
@@ -183,6 +183,7 @@
     "name": "Neuroblastoma",
     "aliases": [
       "NB",
+      "NBL",
       "neuroblastoma",
       "Neural Crest Tumor, Malignant",
       "Neuroblastoma (Schwannian Stroma-poor)",
@@ -333,7 +334,7 @@
         "coding": {
           "id": "DOID:7079",
           "system": "https://disease-ontology.org/?id=",
-          "code": "7079"
+          "code": "DOID:7079"
         },
         "relation": "exactMatch"
       },
@@ -373,7 +374,6 @@
       "MDX",
       "MANIC-DEPRESSIVE ILLNESS",
       "BPAD",
-      "MAFD2",
       "BIPOLAR AFFECTIVE DISORDER",
       "MANIC-DEPRESSIVE PSYCHOSIS, X-LINKED",
       "major affective disorder 2, X-linked dominant",
@@ -458,7 +458,7 @@
         "coding": {
           "id": "DOID:5695",
           "system": "https://disease-ontology.org/?id=",
-          "code": "5696"
+          "code": "DOID:5695"
         },
         "relation": "exactMatch"
       },

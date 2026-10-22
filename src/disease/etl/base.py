@@ -14,7 +14,7 @@ from wags_tails import CustomData, DataSource, DoData, MondoData, NcitData, Onco
 
 from disease.database import AbstractDatabase
 from disease.etl.rules import Rules
-from disease.schemas import SourceName
+from disease.schemas import DISEASE_CONCEPT_TYPE, SourceName
 
 DATA_DISPATCH = {
     SourceName.NCIT: NcitData,
@@ -101,7 +101,9 @@ class Base(ABC):
 
     def _load_disease(self, disease: MappableConcept) -> None:
         """Load individual disease record."""
-        concept_id: str = disease.primaryCoding.code.root
+        if disease.conceptType != DISEASE_CONCEPT_TYPE:
+            raise ValueError
+        concept_id: str = disease.id
 
         if disease.aliases is not None:
             if not disease.aliases:

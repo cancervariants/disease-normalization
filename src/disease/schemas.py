@@ -749,6 +749,7 @@ def disease_to_mapcon(disease: Disease) -> MappableConcept:
     )
     return MappableConcept(
         id=disease.concept_id,
+        name=disease.label,
         primaryCoding=concept_id_to_coding(disease.concept_id),
         extensions=extensions,
         aliases=disease.aliases,

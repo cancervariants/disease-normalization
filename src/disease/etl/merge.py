@@ -4,15 +4,17 @@ import logging
 from collections.abc import Collection
 from timeit import default_timer as timer
 
-from ga4gh.core.models import MappableConcept, Relation
+from ga4gh.core.models import ConceptMapping, MappableConcept, Relation
 from tqdm import tqdm
 
 from disease.database.database import AbstractDatabase
 from disease.schemas import (
+    DISEASE_CONCEPT_TYPE,
     PREFIX_LOOKUP,
     Disease,
     SourcePriority,
     coding_to_concept_id,
+    concept_id_to_coding,
     disease_to_mapcon,
 )
 
@@ -132,7 +134,7 @@ class Merge:
             prefix = disease.id.split(":", 1)[0]
             src_name = PREFIX_LOOKUP[prefix.lower()]
             source_rank = SourcePriority[src_name.upper()].value
-            return source_rank, record["concept_id"]
+            return source_rank, disease.id
 
         records.sort(key=record_order)
 
@@ -146,19 +148,34 @@ class Merge:
             if record.aliases:
                 aliases.extend(record.aliases)
             if record.mappings:
-                mappings.extend(record.mappings)
+                mappings.extend(
+                    [
+                        *record.mappings,
+                        ConceptMapping(
+                            coding=record.primaryCoding, relation=Relation.EXACT_MATCH
+                        ),
+                    ]
+                )
             if record.extensions:
                 extensions.extend(record.extensions)
 
+        primary_coding = concept_id_to_coding(concept_id)
+
         aliases = list(set(aliases))
-        mappings = list({m.id: m for m in mappings}.values())
+        mappings = list(
+            {
+                m.coding.id: m for m in mappings if m.coding.id != primary_coding.id
+            }.values()
+        )
         extensions = list({e.name: e for e in extensions}.values())
 
         merged_disease = MappableConcept(
-            id=concept_id,
+            id=f"normalize.disease.{concept_id}",
+            conceptType=DISEASE_CONCEPT_TYPE,
+            primaryCoding=primary_coding,
             name=name,
-            aliases=aliases,
-            mappings=mappings,
-            extensions=extensions,
+            aliases=aliases or None,
+            mappings=mappings or None,
+            extensions=extensions or None,
         )
         return merged_disease, final_ids
