@@ -247,3 +247,15 @@ def sources(test_data_dir: Path) -> dict[str, DataSet]:
     with (test_data_dir / "sources.json").open() as f:
         data = json.load(f)
     return {SourceName(k): DataSet(**v) for k, v in data.items()}
+
+
+@pytest.fixture
+def db() -> AbstractDatabase:
+    """A real live db instance (gets overwritten immediately)"""
+    db_instance = create_db()
+    try:
+        db_instance.drop_db()
+        db_instance.initialize_db()
+        yield db_instance
+    finally:
+        db_instance.drop_db()
