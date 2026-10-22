@@ -195,7 +195,12 @@ def test_get_refs_by_type(
 
     # alias
     results = db.get_refs_by_type("nsclc", RefType.ALIASES)
-    assert set(results) == {"ncit:C2926", "mondo:0005233", "oncotree:NSCLC"}
+    assert set(results) == {
+        "ncit:C2926",
+        "mondo:0005233",
+        "oncotree:NSCLC",
+        "DOID:3908",
+    }
     results = db.get_refs_by_type("MAFD2", RefType.ALIASES)
     assert set(results) == {"MIM:309200"}
 
@@ -209,17 +214,31 @@ def test_get_refs_by_type(
     results = db.get_refs_by_type("orphanet:635", RefType.ASSOCIATED_WITH)
     assert set(results) == {"DOID:769", "mondo:0005072"}
     results = db.get_refs_by_type("umls:C0349631", RefType.ASSOCIATED_WITH)
-    assert set(results) == {"DOID:1703", "mondo:0002083"}
+    assert set(results) == {"DOID:1703", "mondo:0002083", "ncit:C35424"}
 
 
 @pytest.mark.skipif(not IS_TEST_ENV, reason="not in test environment")
 def test_merged_crud(
     db: AbstractDatabase,
     diseases: dict[str, MappableConcept],
+    merged_diseases: dict[str, MappableConcept],
+    merged_groups: dict[str, list[str]],
     sources: dict[SourceName, DataSet],
 ):
-    # TODO test add_merged_record, update_merge_ref
-    ...
+    for name in SourceName:
+        db.add_source_metadata(name, sources[name])
+    for concept_id, disease in diseases.items():
+        src_name = PREFIX_LOOKUP[concept_id.split(":", 1)[0].lower()]
+        db.add_record(disease, SourceName(src_name))
+    for merged_id, merged_disease in merged_diseases.items():
+        db.add_merged_record(merged_disease)
+        for grp_member_id in merged_groups[merged_id]:
+            db.update_merge_ref(grp_member_id, merged_id)
+
+    for merged_id in merged_diseases:
+        for grp_member_id in merged_groups[merged_id]:
+            result = db.get_record_by_id(grp_member_id)
+            assert result["merge_ref"] == merged_id
 
 
 @pytest.mark.skipif(not IS_TEST_ENV, reason="not in test environment")

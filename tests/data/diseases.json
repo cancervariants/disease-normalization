@@ -74,6 +74,65 @@
       }
     ]
   },
+  "DOID:3908": {
+    "id": "DOID:3908",
+    "type": "MappableConcept",
+    "name": "lung non-small cell carcinoma",
+    "aliases": [
+      "NSCLC",
+      "Non-small cell lung cancer",
+      "non-small cell lung carcinoma"
+    ],
+    "extensions": [{ "name": "oncologic_disease", "value": true }],
+    "conceptType": "Disease",
+    "primaryCoding": {
+      "id": "DOID:3908",
+      "system": "https://disease-ontology.org/?id=",
+      "code": "DOID:3908"
+    },
+    "mappings": [
+      {
+        "coding": {
+          "id": "efo:0003060",
+          "system": "http://www.ebi.ac.uk/efo/EFO_",
+          "code": "0003060"
+        },
+        "relation": "relatedMatch"
+      },
+      {
+        "coding": {
+          "id": "umls:C0007131",
+          "system": "https://www.nlm.nih.gov/research/umls/index.html",
+          "code": "C0007131"
+        },
+        "relation": "relatedMatch"
+      },
+      {
+        "coding": {
+          "id": "ncit:C2926",
+          "system": "https://ncit.nci.nih.gov/ncitbrowser/ConceptReport.jsp?dictionary=NCI_Thesaurus&code=",
+          "code": "C2926"
+        },
+        "relation": "exactMatch"
+      },
+      {
+        "coding": {
+          "id": "mesh:D002289",
+          "system": "https://meshb.nlm.nih.gov/record/ui?ui=",
+          "code": "D002289"
+        },
+        "relation": "relatedMatch"
+      },
+      {
+        "coding": {
+          "id": "kegg.disease:05223",
+          "system": "https://www.genome.jp/kegg/disease/",
+          "code": "05223"
+        },
+        "relation": "relatedMatch"
+      }
+    ]
+  },
   "DOID:769": {
     "id": "DOID:769",
     "type": "MappableConcept",
@@ -638,6 +697,32 @@
       "system": "https://omim.org/MIM:",
       "code": "247640"
     }
+  },
+  "ncit:C35424": {
+    "id": "ncit:C35424",
+    "name": "Richter Syndrome",
+    "conceptType": "Disease",
+    "aliases": [
+      "Richter's Transformation",
+      "Richter syndrome",
+      "Richter transformation",
+      "Richter's Syndrome"
+    ],
+    "primaryCoding": {
+      "id": "ncit:C35424",
+      "system": "https://ncit.nci.nih.gov/ncitbrowser/ConceptReport.jsp?dictionary=NCI_Thesaurus&code=",
+      "code": "C35424"
+    },
+    "mappings": [
+      {
+        "coding": {
+          "id": "umls:C0349631",
+          "system": "https://www.nlm.nih.gov/research/umls/index.html",
+          "code": "C0349631"
+        },
+        "relation": "relatedMatch"
+      }
+    ]
   },
   "ncit:C3270": {
     "id": "ncit:C3270",

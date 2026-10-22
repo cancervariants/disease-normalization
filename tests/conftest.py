@@ -198,6 +198,28 @@ def merged_diseases(test_data_dir: Path) -> dict[str, MappableConcept]:
 
 
 @pytest.fixture
+def merged_groups() -> dict[str, list[str]]:
+    return {
+        "normalize.disease.ncit:C3270": [
+            "ncit:C3270",
+            "mondo:0005072",
+            "DOID:769",
+            "oncotree:NBL",
+        ],
+        "normalize.disease.ncit:C2926": [
+            "ncit:C2926",
+            "mondo:0005233",
+            "DOID:3908",
+            "oncotree:NSCLC",
+        ],
+        "normalize.disease.ncit:C35424": ["ncit:C35424", "mondo:0002083", "DOID:1703"],
+        "normalize.disease.ncit:C8091": ["ncit:C8091", "mondo:0003587", "DOID:5695"],
+        "normalize.disease.ncit:C9012": ["ncit:C9012", "mondo:0004099", "DOID:7079"],
+        "normalize.disease.mondo:0010648": ["mondo:0010648", "MIM:309200"],
+    }
+
+
+@pytest.fixture
 def sources(test_data_dir: Path) -> dict[str, DataSet]:
     with (test_data_dir / "sources.json").open() as f:
         data = json.load(f)
