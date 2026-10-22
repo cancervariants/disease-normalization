@@ -87,8 +87,8 @@ class Merge:
                 )
                 continue
             self._database.add_merged_record(merged_record)
-            merge_ref = merged_record["concept_id"]
 
+            merge_ref = merged_record.id
             for concept_id in merged_ids:
                 self._database.update_merge_ref(concept_id, merge_ref)
         self._database.complete_write_transaction()

@@ -475,9 +475,9 @@ class QueryHandler:
             for match in matching_records:
                 record = self.db.get_record_by_id(match["concept_id"], merge=False)
                 if record:
-                    if "merge_ref" in record:
+                    if merge_ref := record.get("merge_ref"):
                         merge = self.db.get_record_by_id(
-                            record["merge_ref"], case_sensitive=False, merge=True
+                            merge_ref, case_sensitive=False, merge=True
                         )
                         if merge is None:
                             return self._handle_failed_merge_ref(
