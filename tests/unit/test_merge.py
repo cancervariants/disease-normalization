@@ -138,25 +138,25 @@ def richter():
     }
 
 
-@pytest.fixture(scope="module")
-def ped_liposarcoma():
-    """Create pediatric liposarcoma fixture."""
-    return {
-        "concept_id": "ncit:C8091",
-        "xrefs": ["mondo:0003587", "DOID:5695"],
-        "label": "Childhood Liposarcoma",
-        "aliases": [
-            "liposarcoma",
-            "Liposarcoma",
-            "Pediatric Liposarcoma",
-            "childhood liposarcoma",
-            "pediatric liposarcoma",
-        ],
-        "associated_with": ["umls:C0279984", "medgen:83580"],
-        "pediatric_disease": True,
-        "oncologic_disease": True,
-        "item_type": "merger",
-    }
+# @pytest.fixture(scope="module")
+# def ped_liposarcoma():
+#     """Create pediatric liposarcoma fixture."""
+#     return {
+#         "concept_id": "ncit:C8091",
+#         "xrefs": ["mondo:0003587", "DOID:5695"],
+#         "label": "Childhood Liposarcoma",
+#         "aliases": [
+#             "liposarcoma",
+#             "Liposarcoma",
+#             "Pediatric Liposarcoma",
+#             "childhood liposarcoma",
+#             "pediatric liposarcoma",
+#         ],
+#         "associated_with": ["umls:C0279984", "medgen:83580"],
+#         "pediatric_disease": True,
+#         "oncologic_disease": True,
+#         "item_type": "merger",
+#     }
 
 
 # @pytest.fixture(scope="module")

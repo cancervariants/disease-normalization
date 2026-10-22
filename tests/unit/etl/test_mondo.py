@@ -13,7 +13,7 @@ def test_mondo_etl(
     mock_db_class: type[AbstractDatabase],
     test_data_dir: Path,
     diseases: dict[str, MappableConcept],
-    datasets: dict[str, DataSet],
+    sources: dict[str, DataSet],
 ):
     db = mock_db_class()
     etl = Mondo(db, test_data_dir / "mondo")
@@ -42,7 +42,7 @@ def test_mondo_etl(
     assert (
         deepdiff.DeepDiff(
             db._added_sources[SourceName.MONDO],
-            datasets[SourceName.MONDO],
+            sources[SourceName.MONDO],
             ignore_order=True,
         )
         == {}

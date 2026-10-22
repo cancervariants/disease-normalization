@@ -1,0 +1,152 @@
+{
+  "OncoTree": {
+    "type": "DataSet",
+    "name": "OncoTree",
+    "extensions": [
+      {
+        "name": "data_url",
+        "value": "http://oncotree.mskcc.org/#/home?tab=api"
+      }
+    ],
+    "version": "20211102",
+    "license": {
+      "type": "MappableConcept",
+      "name": "CC BY 4.0",
+      "extensions": [
+        {
+          "name": "license_attributes",
+          "value": {
+            "non_commercial": false,
+            "share_alike": false,
+            "attribution": true
+          }
+        }
+      ],
+      "primaryCoding": {
+        "system": "https://spdx.org/licenses/",
+        "code": "CC BY 4.0",
+        "iris": ["https://creativecommons.org/licenses/by/4.0/legalcode"]
+      }
+    }
+  },
+  "DO": {
+    "type": "DataSet",
+    "name": "DO",
+    "extensions": [
+      {
+        "name": "data_url",
+        "value": "http://www.obofoundry.org/ontology/doid.html"
+      }
+    ],
+    "version": "20250627",
+    "license": {
+      "type": "MappableConcept",
+      "name": "CC0 1.0",
+      "extensions": [
+        {
+          "name": "license_attributes",
+          "value": {
+            "non_commercial": false,
+            "share_alike": false,
+            "attribution": false
+          }
+        }
+      ],
+      "primaryCoding": {
+        "system": "https://spdx.org/licenses/",
+        "code": "CC0 1.0",
+        "iris": ["https://creativecommons.org/publicdomain/zero/1.0/legalcode"]
+      }
+    }
+  },
+  "Mondo": {
+    "type": "DataSet",
+    "name": "Mondo",
+    "extensions": [
+      {
+        "name": "data_url",
+        "value": "https://mondo.monarchinitiative.org/pages/download/"
+      },
+      { "name": "rdp_url", "value": "http://reusabledata.org/monarch.html" }
+    ],
+    "version": "20251104",
+    "license": {
+      "type": "MappableConcept",
+      "name": "CC BY 4.0",
+      "extensions": [
+        {
+          "name": "license_attributes",
+          "value": {
+            "non_commercial": false,
+            "share_alike": false,
+            "attribution": true
+          }
+        }
+      ],
+      "primaryCoding": {
+        "system": "https://spdx.org/licenses/",
+        "code": "CC-BY-4.0",
+        "iris": ["https://creativecommons.org/licenses/by/4.0/legalcode"]
+      }
+    }
+  },
+  "OMIM": {
+    "type": "DataSet",
+    "name": "OMIM",
+    "extensions": [
+      { "name": "data_url", "value": "https://www.omim.org/downloads" },
+      { "name": "rdp_url", "value": "http://reusabledata.org/omim.html" }
+    ],
+    "version": "20240806",
+    "license": {
+      "type": "MappableConcept",
+      "name": "custom",
+      "extensions": [
+        {
+          "name": "license_attributes",
+          "value": {
+            "non_commercial": false,
+            "share_alike": true,
+            "attribution": true
+          }
+        }
+      ],
+      "primaryCoding": {
+        "system": "https://omim.org",
+        "code": "OMIM-use-agreement",
+        "iris": ["https://omim.org/help/agreement"]
+      }
+    }
+  },
+  "NCIt": {
+    "type": "DataSet",
+    "name": "NCIt",
+    "extensions": [
+      {
+        "name": "data_url",
+        "value": "https://evs.nci.nih.gov/ftp1/NCI_Thesaurus/"
+      },
+      { "name": "rdp_url", "value": "http://reusabledata.org/ncit.html" }
+    ],
+    "version": "25.08d",
+    "license": {
+      "type": "MappableConcept",
+      "name": "CC BY 4.0",
+      "extensions": [
+        {
+          "name": "license_attributes",
+          "value": {
+            "non_commercial": false,
+            "share_alike": false,
+            "attribution": true
+          }
+        }
+      ],
+      "primaryCoding": {
+        "system": "https://spdx.org/licenses/",
+        "code": "CC-BY-4.0",
+        "iris": ["https://creativecommons.org/licenses/by/4.0/legalcode"]
+      }
+    }
+  }
+}

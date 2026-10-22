@@ -13,7 +13,7 @@ def test_omim_etl(
     mock_db_class: type[AbstractDatabase],
     test_data_dir: Path,
     diseases: dict[str, MappableConcept],
-    datasets: dict[str, DataSet],
+    sources: dict[str, DataSet],
 ):
     db = mock_db_class()
     etl = OMIM(db, test_data_dir / "omim")
@@ -36,7 +36,7 @@ def test_omim_etl(
     assert (
         deepdiff.DeepDiff(
             db._added_sources[SourceName.OMIM],
-            datasets[SourceName.OMIM],
+            sources[SourceName.OMIM],
             ignore_order=True,
         )
         == {}

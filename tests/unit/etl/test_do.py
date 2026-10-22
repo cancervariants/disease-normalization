@@ -13,7 +13,7 @@ def test_do_etl(
     mock_db_class: type[AbstractDatabase],
     test_data_dir: Path,
     diseases: dict[str, MappableConcept],
-    datasets: dict[str, DataSet],
+    sources: dict[str, DataSet],
 ):
     db = mock_db_class()
     etl = DO(db, test_data_dir / "do")
@@ -36,7 +36,7 @@ def test_do_etl(
     assert (
         deepdiff.DeepDiff(
             db._added_sources[SourceName.DO],
-            datasets[SourceName.DO],
+            sources[SourceName.DO],
             ignore_order=True,
         )
         == {}
