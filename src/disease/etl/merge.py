@@ -52,15 +52,17 @@ class Merge:
             try:
                 # temporary -- remove once full domain model migration is complete
                 _record = self._database.get_record_by_id(concept_id)
-                record = disease_to_mapcon(_record)
+                if not _record:
+                    _logger.error(
+                        "generate_merged_concepts couldn't find %s", concept_id
+                    )
+                    continue
+                record = disease_to_mapcon(Disease(**_record))
             except AttributeError:
                 _logger.exception(
                     "`create_merged_concepts` received invalid concept ID: %s",
                     concept_id,
                 )
-                continue
-            if not record:
-                _logger.error("generate_merged_concepts couldn't find %s", concept_id)
                 continue
             xrefs = {
                 coding_to_concept_id(m.coding)

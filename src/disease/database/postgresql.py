@@ -660,6 +660,7 @@ class PostgresDatabase(AbstractDatabase):
 
     def complete_write_transaction(self) -> None:
         """Conclude transaction or batch writing if relevant."""
+        self.conn.commit()
 
     def close_connection(self) -> None:
         """Perform any manual connection closure procedures if necessary."""
