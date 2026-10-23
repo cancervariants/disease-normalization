@@ -1,7 +1,7 @@
 """Provide PostgreSQL client."""
 
 import atexit
-import datetime
+import datetime as dt
 import logging
 import os
 import tarfile
@@ -12,13 +12,9 @@ from typing import Any, ClassVar
 
 import psycopg
 import requests
+from ga4gh.core.models import MappableConcept, Relation
 from ga4gh.va_spec.base import DataSet
-from psycopg.errors import (
-    DuplicateObject,
-    DuplicateTable,
-    UndefinedTable,
-    UniqueViolation,
-)
+from psycopg.errors import DuplicateObject, DuplicateTable, UniqueViolation
 from psycopg.types.json import Jsonb
 
 from disease.config import get_config
@@ -30,6 +26,8 @@ from disease.schemas import (
     SourceDataSet,
     SourceMeta,
     SourceName,
+    coding_to_concept_id,
+    mapcon_to_disease,
 )
 
 _logger = logging.getLogger(__name__)
@@ -97,7 +95,6 @@ class PostgresDatabase(AbstractDatabase):
         return [t[0] for t in tables]
 
     _drop_db_query = b"""
-    DROP MATERIALIZED VIEW IF EXISTS record_lookup_view;
     DROP TABLE IF EXISTS
         disease_aliases,
         disease_associations,
@@ -153,17 +150,6 @@ class PostgresDatabase(AbstractDatabase):
             return False
         try:
             with self.conn.cursor() as cur:
-                cur.execute(
-                    (SCRIPTS_DIR / "create_record_lookup_view.sql").read_bytes()
-                )
-        except DuplicateTable:
-            self.conn.rollback()
-        else:
-            _logger.info("Disease normalized view lookup failed.")
-            self.conn.rollback()
-            return False
-        try:
-            with self.conn.cursor() as cur:
                 cur.execute((SCRIPTS_DIR / "add_indexes.sql").read_bytes())
         except DuplicateTable:
             self.conn.rollback()
@@ -214,27 +200,7 @@ class PostgresDatabase(AbstractDatabase):
         if not self.check_schema_initialized():
             self.drop_db()
             self._create_tables()
-            self._create_views()
             self._add_indexes()
-
-    def _create_views(self) -> None:
-        """Create materialized views."""
-        create_view_query = (SCRIPTS_DIR / "create_record_lookup_view.sql").read_bytes()
-        with self.conn.cursor() as cur:
-            cur.execute(create_view_query)
-            self.conn.commit()
-
-    _refresh_views_query = b"REFRESH MATERIALIZED VIEW record_lookup_view;"
-
-    def _refresh_views(self) -> None:
-        """Update materialized views.
-
-        Not responsible for ensuring existence of views. Calling functions should
-        either check beforehand or catch psycopg.UndefinedTable.
-        """
-        with self.conn.cursor() as cur:
-            cur.execute(self._refresh_views_query)
-            self.conn.commit()
 
     def _add_fkeys(self) -> None:
         """Add fkey relationships."""
@@ -308,27 +274,23 @@ class PostgresDatabase(AbstractDatabase):
             self._cached_sources[src_name] = metadata
             return metadata
 
-    _record_query = b"SELECT * FROM record_lookup_view WHERE lower(concept_id) = %s;"
+    _record_query = b"SELECT * FROM disease_concepts WHERE lower(concept_id) = %s;"
 
     def _format_source_record(self, source_row: tuple) -> dict:
         """Restructure row from disease_concepts table as source record result object.
 
+        [Temporary, eventually remove once API is fully converted to GKM models]
+
         :param source_row: result tuple from psycopg
         :return: reformatted dictionary keying disease properties to row values
         """
-        disease_record = {
-            "concept_id": source_row[0],
-            "label": source_row[1],
-            "aliases": source_row[2],
-            "associated_with": source_row[3],
-            "xrefs": source_row[4],
-            "src_name": source_row[5],
-            "merge_ref": source_row[6],
-            "pediatric_disease": source_row[7],
-            "oncologic_disease": source_row[8],
-            "item_type": RecordType.IDENTITY.value,
-        }
-        return {k: v for k, v in disease_record.items() if v}
+        mc = MappableConcept(**source_row[3])
+        record = mapcon_to_disease(mc).model_dump()
+        record["src_name"] = source_row[1]
+        record["merge_ref"] = source_row[2]
+        record["item_type"] = RecordType.IDENTITY.value
+
+        return record
 
     def _get_record(self, concept_id: str) -> dict | None:
         """Retrieve non-merged record. The query is pretty different, so this method
@@ -355,17 +317,10 @@ class PostgresDatabase(AbstractDatabase):
         :param merged_row: result tuple from psycopg
         :return: reformatted dictionary keying normalized disease properties to row values
         """
-        merged_record = {
-            "concept_id": merged_row[0],
-            "label": merged_row[1],
-            "aliases": merged_row[2],
-            "associated_with": merged_row[3],
-            "xrefs": merged_row[4],
-            "pediatric_disease": merged_row[5],
-            "oncologic_disease": merged_row[6],
-            "item_type": RecordType.MERGER.value,
-        }
-        return {k: v for k, v in merged_record.items() if v}
+        disease_mc = MappableConcept(**merged_row[1])
+        record = mapcon_to_disease(disease_mc).model_dump(exclude_none=True)
+        record["item_type"] = RecordType.MERGER.value
+        return record
 
     def _get_merged_record(self, concept_id: str) -> dict | None:
         """Retrieve normalized record from DB.
@@ -455,9 +410,9 @@ class PostgresDatabase(AbstractDatabase):
 
     _get_all_normalized_records_query = b"SELECT * FROM disease_merged;"
     _get_all_unmerged_source_records_query = (
-        b"SELECT * FROM record_lookup_view WHERE merge_ref IS NULL;"
+        b"SELECT * FROM disease_concepts WHERE merge_ref IS NULL;"
     )
-    _get_all_source_records_query = b"SELECT * FROM record_lookup_view;"
+    _get_all_source_records_query = b"SELECT * FROM disease_concepts;"
 
     def get_all_records(self, record_type: RecordType) -> Generator[dict, None, None]:
         """Retrieve all source or normalized records. Either return all source records,
@@ -526,8 +481,8 @@ class PostgresDatabase(AbstractDatabase):
         self.conn.commit()
 
     _add_record_query = b"""
-        INSERT INTO disease_concepts (concept_id, source, pediatric_disease, oncologic_disease)
-        VALUES (%s, %s, %s, %s);
+        INSERT INTO disease_concepts (concept_id, source, data)
+        VALUES (%s, %s, %s);
     """
     _insert_label_query = (
         b"INSERT INTO disease_labels (label, concept_id) VALUES (%s, %s)"
@@ -538,13 +493,13 @@ class PostgresDatabase(AbstractDatabase):
     _insert_xref_query = b"INSERT INTO disease_xrefs (xref, concept_id) VALUES (%s, %s)"
     _insert_assoc_query = b"INSERT INTO disease_associations (associated_with, concept_id) VALUES (%s, %s)"
 
-    def add_record(self, record: dict, src_name: SourceName) -> None:
+    def add_record(self, disease: MappableConcept, src_name: SourceName) -> None:
         """Add new record to database.
 
-        :param record: record to upload
-        :param src_name: name of source for record. Not used by PostgreSQL instance.
+        :param disease: disease record to upload
+        :param src_name: name of source for record
         """
-        concept_id = record["concept_id"]
+        concept_id = disease.id
         with self.conn.cursor() as cur:
             try:
                 cur.execute(
@@ -552,30 +507,37 @@ class PostgresDatabase(AbstractDatabase):
                     [
                         concept_id,
                         src_name.value,
-                        record.get("pediatric_disease"),
-                        record.get("oncologic_disease"),
+                        Jsonb(
+                            disease.model_dump(exclude_unset=True, exclude_none=True)
+                        ),
                     ],
                 )
-                cur.execute(self._insert_label_query, [record["label"], concept_id])
-                for a in record.get("aliases", []):
-                    cur.execute(self._insert_alias_query, [a, concept_id])
-                for x in record.get("xrefs", []):
-                    cur.execute(self._insert_xref_query, [x, concept_id])
-                for a in record.get("associated_with", []):
-                    cur.execute(self._insert_assoc_query, [a, concept_id])
+                cur.execute(self._insert_label_query, [disease.name, concept_id])
+                if disease.aliases:
+                    for a in disease.aliases:
+                        cur.execute(self._insert_alias_query, [a, concept_id])
+                if disease.mappings:
+                    for m in disease.mappings:
+                        if m.relation == Relation.EXACT_MATCH:
+                            cur.execute(
+                                self._insert_xref_query,
+                                [coding_to_concept_id(m.coding), concept_id],
+                            )
+                        else:
+                            cur.execute(
+                                self._insert_assoc_query,
+                                [coding_to_concept_id(m.coding), concept_id],
+                            )
                 self.conn.commit()
             except UniqueViolation:
                 _logger.error("Record with ID %s already exists", concept_id)  # noqa: TRY400
                 self.conn.rollback()
 
-    _add_merged_record_query = b"""
-    INSERT INTO disease_merged (
-        concept_id, label, aliases, associated_with, xrefs, pediatric_disease, oncologic_disease
+    _add_merged_record_query = (
+        b"""INSERT INTO disease_merged (concept_id, data) VALUES (%s, %s);"""
     )
-    VALUES (%s, %s, %s, %s, %s, %s, %s);
-    """
 
-    def add_merged_record(self, record: dict) -> None:
+    def add_merged_record(self, disease: MappableConcept) -> None:
         """Add merged record to database.
 
         :param record: merged record to add
@@ -584,13 +546,8 @@ class PostgresDatabase(AbstractDatabase):
             cur.execute(
                 self._add_merged_record_query,
                 [
-                    record["concept_id"],
-                    record["label"],
-                    record.get("aliases"),
-                    record.get("associated_with"),
-                    record.get("xrefs"),
-                    record.get("pediatric_disease"),
-                    record.get("oncologic_disease"),
+                    disease.id,
+                    Jsonb(disease.model_dump(exclude_none=True, exclude_unset=True)),
                 ],
             )
             self.conn.commit()
@@ -700,15 +657,9 @@ class PostgresDatabase(AbstractDatabase):
 
         self._add_fkeys()
         self._add_indexes()
-        self._refresh_views()
 
     def complete_write_transaction(self) -> None:
         """Conclude transaction or batch writing if relevant."""
-        if not self.conn.closed:
-            try:
-                self._refresh_views()
-            except UndefinedTable:
-                self.conn.rollback()
 
     def close_connection(self) -> None:
         """Perform any manual connection closure procedures if necessary."""
@@ -772,7 +723,7 @@ class PostgresDatabase(AbstractDatabase):
                 f"Output location {output_directory} isn't a directory or doesn't exist"
             )
             raise ValueError(msg)
-        now = datetime.datetime.now(tz=datetime.UTC).strftime("%Y%m%d%H%M%S")
+        now = dt.datetime.now(tz=dt.UTC).strftime("%Y%m%d%H%M%S")
         output_location = output_directory / f"disease_norm_{now}.sql"
         user = self.conn.info.user
         host = self.conn.info.host

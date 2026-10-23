@@ -1,11 +1,12 @@
 """Provides query handler class, which receives and responses to user search queries."""
 
-import datetime
+import datetime as dt
 import logging
 import re
 
 from botocore.exceptions import ClientError
 from ga4gh.core.models import (
+    ConceptMapping,
     Extension,
     MappableConcept,
     Relation,
@@ -24,8 +25,7 @@ from disease.schemas import (
     SearchService,
     ServiceMeta,
     SourceName,
-    get_coding_object,
-    get_concept_mapping,
+    concept_id_to_coding,
 )
 
 _logger = logging.getLogger(__name__)
@@ -289,7 +289,7 @@ class QueryHandler:
 
         response["service_meta_"] = ServiceMeta(
             version=__version__,
-            response_datetime=datetime.datetime.now(tz=datetime.UTC),
+            response_datetime=dt.datetime.now(tz=dt.UTC),
         ).model_dump()
         return SearchService(**response)
 
@@ -336,7 +336,7 @@ class QueryHandler:
         """
         disease_obj = MappableConcept(
             id=f"normalize.disease.{record['concept_id']}",
-            primaryCoding=get_coding_object(record["concept_id"]),
+            primaryCoding=concept_id_to_coding(record["concept_id"]),
             conceptType="Disease",
             name=record["label"],
             extensions=[],
@@ -344,13 +344,19 @@ class QueryHandler:
 
         xrefs = record.get("xrefs", [])
         mappings = [
-            get_concept_mapping(xref_id, relation=Relation.EXACT_MATCH)
+            ConceptMapping(
+                coding=concept_id_to_coding(xref_id),
+                relation=Relation.EXACT_MATCH,
+            )
             for xref_id in xrefs
         ]
 
         associated_with = record.get("associated_with", [])
         mappings.extend(
-            get_concept_mapping(associated_with_id, relation=Relation.RELATED_MATCH)
+            ConceptMapping(
+                coding=concept_id_to_coding(associated_with_id),
+                relation=Relation.RELATED_MATCH,
+            )
             for associated_with_id in associated_with
         )
 
@@ -429,7 +435,7 @@ class QueryHandler:
             "warnings": self._emit_warnings(query),
             "service_meta_": ServiceMeta(
                 version=__version__,
-                response_datetime=datetime.datetime.now(tz=datetime.UTC),
+                response_datetime=dt.datetime.now(tz=dt.UTC),
             ),
         }
         if query == "":
@@ -469,9 +475,9 @@ class QueryHandler:
             for match in matching_records:
                 record = self.db.get_record_by_id(match["concept_id"], merge=False)
                 if record:
-                    if "merge_ref" in record:
+                    if merge_ref := record.get("merge_ref"):
                         merge = self.db.get_record_by_id(
-                            record["merge_ref"], case_sensitive=False, merge=True
+                            merge_ref, case_sensitive=False, merge=True
                         )
                         if merge is None:
                             return self._handle_failed_merge_ref(

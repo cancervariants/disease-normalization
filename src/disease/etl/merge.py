@@ -4,10 +4,19 @@ import logging
 from collections.abc import Collection
 from timeit import default_timer as timer
 
+from ga4gh.core.models import ConceptMapping, MappableConcept, Relation
 from tqdm import tqdm
 
 from disease.database.database import AbstractDatabase
-from disease.schemas import SourcePriority
+from disease.schemas import (
+    DISEASE_CONCEPT_TYPE,
+    PREFIX_LOOKUP,
+    Disease,
+    SourcePriority,
+    coding_to_concept_id,
+    concept_id_to_coding,
+    disease_to_mapcon,
+)
 
 _logger = logging.getLogger(__name__)
 
@@ -41,7 +50,9 @@ class Merge:
         start = timer()
         for concept_id in tqdm(record_ids, ncols=80, disable=self._silent):
             try:
-                record = self._database.get_record_by_id(concept_id)
+                # temporary -- remove once full domain model migration is complete
+                _record = self._database.get_record_by_id(concept_id)
+                record = disease_to_mapcon(_record)
             except AttributeError:
                 _logger.exception(
                     "`create_merged_concepts` received invalid concept ID: %s",
@@ -51,7 +62,11 @@ class Merge:
             if not record:
                 _logger.error("generate_merged_concepts couldn't find %s", concept_id)
                 continue
-            xrefs = record.get("xrefs", None)
+            xrefs = {
+                coding_to_concept_id(m.coding)
+                for m in record.mappings
+                if m.relation == Relation.EXACT_MATCH
+            }
             group = {*xrefs, concept_id} if xrefs else {concept_id}
             self._groups.append((concept_id, group))
         end = timer()
@@ -72,8 +87,8 @@ class Merge:
                 )
                 continue
             self._database.add_merged_record(merged_record)
-            merge_ref = merged_record["concept_id"]
 
+            merge_ref = merged_record.id
             for concept_id in merged_ids:
                 self._database.update_merge_ref(concept_id, merge_ref)
         self._database.complete_write_transaction()
@@ -81,7 +96,9 @@ class Merge:
         _logger.info("merged concept generation successful.")
         _logger.debug("Generated and added concepts in %s seconds", end - start)
 
-    def _generate_merged_record(self, record_id_set: set[str]) -> tuple[dict, list]:
+    def _generate_merged_record(
+        self, record_id_set: set[str]
+    ) -> tuple[MappableConcept, list]:
         """Generate merged record from provided concept ID group.
 
         Misc notes
@@ -93,17 +110,18 @@ class Merge:
         weren't able to be found in the DB, and dropping the ID that will be used as the
         primary coding for the record
 
-        :param Set record_id_set: group of concept IDs
+        :param record_id_set: group of concept IDs
         :return: completed merged drug object to be stored in DB, as well as
             a list of the IDs ultimately included in said record
         """
-        records = []
+        records: list[MappableConcept] = []
         final_ids = []
         for record_id in record_id_set:
-            record = self._database.get_record_by_id(record_id)
-            if record:
-                records.append(record)
-                final_ids.append(record["concept_id"])
+            _record = self._database.get_record_by_id(record_id)
+            if _record:
+                disease = disease_to_mapcon(Disease(**_record))
+                records.append(disease)
+                final_ids.append(disease.id)
             else:
                 _logger.error(
                     "generate_merged_record could not retrieve record for %s in %s",
@@ -111,37 +129,53 @@ class Merge:
                     record_id_set,
                 )
 
-        def record_order(record: dict) -> tuple:
+        def record_order(disease: MappableConcept) -> tuple:
             """Provide priority values of concepts for sort function."""
-            src = record["src_name"].upper()
-            source_rank = SourcePriority[src].value
-            return source_rank, record["concept_id"]
+            prefix = disease.id.split(":", 1)[0]
+            src_name = PREFIX_LOOKUP[prefix.lower()]
+            source_rank = SourcePriority[src_name.upper()].value
+            return source_rank, disease.id
 
         records.sort(key=record_order)
 
-        merged_properties = {
-            "concept_id": records[0]["concept_id"],
-            "aliases": set(),
-            "associated_with": set(),
-        }
-        if len(records) > 1:
-            merged_properties["xrefs"] = list({r["concept_id"] for r in records[1:]})
+        concept_id = records[0].id
+        name = records[0].name
+        aliases = records[0].aliases
+        mappings = records[0].mappings
+        extensions = records[0].extensions
 
-        set_fields = ["aliases", "associated_with"]
-        scalar_fields = ["label", "pediatric_disease", "oncologic_disease"]
-        for record in records:
-            for field in set_fields:
-                if field in record:
-                    merged_properties[field] |= set(record[field])
-            for field in scalar_fields:
-                if field not in merged_properties and field in record:
-                    merged_properties[field] = record[field]
+        for record in records[1:]:
+            if record.aliases:
+                aliases.extend(record.aliases)
+            if record.mappings:
+                mappings.extend(
+                    [
+                        *record.mappings,
+                        ConceptMapping(
+                            coding=record.primaryCoding, relation=Relation.EXACT_MATCH
+                        ),
+                    ]
+                )
+            if record.extensions:
+                extensions.extend(record.extensions)
 
-        for field in set_fields:
-            field_value = merged_properties[field]
-            if field_value:
-                merged_properties[field] = list(field_value)
-            else:
-                del merged_properties[field]
+        primary_coding = concept_id_to_coding(concept_id)
 
-        return merged_properties, final_ids
+        aliases = list(set(aliases))
+        mappings = list(
+            {
+                m.coding.id: m for m in mappings if m.coding.id != primary_coding.id
+            }.values()
+        )
+        extensions = list({e.name: e for e in extensions}.values())
+
+        merged_disease = MappableConcept(
+            id=f"normalize.disease.{concept_id}",
+            conceptType=DISEASE_CONCEPT_TYPE,
+            primaryCoding=primary_coding,
+            name=name,
+            aliases=aliases or None,
+            mappings=mappings or None,
+            extensions=extensions or None,
+        )
+        return merged_disease, final_ids
