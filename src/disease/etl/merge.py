@@ -32,7 +32,6 @@ class Merge:
         """
         self._database = database
         self._silent = silent
-        self._groups = []  # list of tuples: (mondo_concept_id, set_of_ids)
 
     def create_merged_concepts(self, record_ids: Collection[str]) -> None:
         """Create concept groups, generate merged concept records, and update database.
@@ -48,6 +47,7 @@ class Merge:
         # build groups
         _logger.info("Generating record ID sets from %s records", len(record_ids))
         start = timer()
+        groups = []
         for concept_id in tqdm(record_ids, ncols=80, disable=self._silent):
             try:
                 # temporary -- remove once full domain model migration is complete
@@ -70,7 +70,7 @@ class Merge:
                 if m.relation == Relation.EXACT_MATCH
             }
             group = {*xrefs, concept_id} if xrefs else {concept_id}
-            self._groups.append((concept_id, group))
+            groups.append((concept_id, group))
         end = timer()
         self._database.complete_write_transaction()
         _logger.debug("Built record ID sets in %s seconds", end - start)
@@ -78,7 +78,7 @@ class Merge:
         # build merged concepts
         _logger.info("Creating merged records and updating database...")
         start = timer()
-        for record_id, group in tqdm(self._groups, ncols=80, disable=self._silent):
+        for record_id, group in tqdm(groups, ncols=80, disable=self._silent):
             try:
                 merged_record, merged_ids = self._generate_merged_record(group)
             except AttributeError:
