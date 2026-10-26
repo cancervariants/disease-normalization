@@ -473,21 +473,19 @@ class QueryHandler:
 
             # attempt merge ref resolution until successful
             for match in matching_records:
-                record = self.db.get_record_by_id(match["concept_id"], merge=False)
-                if record:
-                    if merge_ref := record.get("merge_ref"):
-                        merge = self.db.get_record_by_id(
-                            merge_ref, case_sensitive=False, merge=True
+                if merge_ref := match.get("merge_ref"):
+                    merge = self.db.get_record_by_id(
+                        merge_ref, case_sensitive=False, merge=True
+                    )
+                    if merge is None:
+                        return self._handle_failed_merge_ref(
+                            record, response, query_str
                         )
-                        if merge is None:
-                            return self._handle_failed_merge_ref(
-                                record, response, query_str
-                            )
-                        return self._add_disease(
-                            response, merge, MatchType[match_type.upper()]
-                        )
-                    if not non_merged_match:
-                        non_merged_match = (record, match_type)
+                    return self._add_disease(
+                        response, merge, MatchType[match_type.upper()]
+                    )
+                if not non_merged_match:
+                    non_merged_match = (record, match_type)
 
         # if no successful match, try best available non-merged match
         if non_merged_match:

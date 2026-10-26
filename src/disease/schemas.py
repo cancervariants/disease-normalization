@@ -706,9 +706,9 @@ def mapcon_to_disease(disease: MappableConcept) -> Disease:
                 NAMESPACE_TO_SYSTEM_URI[NamespacePrefix.NCIT],
                 NAMESPACE_TO_SYSTEM_URI[NamespacePrefix.MONDO],
             }:
-                xrefs.append(mapping.coding.id)
+                xrefs.append(coding_to_concept_id(mapping.coding))
             else:
-                aw.append(mapping.coding.id)
+                aw.append(coding_to_concept_id(mapping.coding))
     is_ped_disease = None
     is_onco_disease = None
     if disease.extensions:

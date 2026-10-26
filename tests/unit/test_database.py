@@ -60,6 +60,7 @@ def test_db_healthchecks(
         db.add_record(disease, SourceName(src_name))
     for record in merged_diseases.values():
         db.add_merged_record(record)
+    db.complete_write_transaction()
 
     assert db.check_tables_populated(), "db should be populated"
 
@@ -91,6 +92,7 @@ def test_crud_source_records(
     for concept_id, disease in diseases.items():
         src_name = PREFIX_LOOKUP[concept_id.split(":", 1)[0].lower()]
         db.add_record(disease, SourceName(src_name))
+    db.complete_write_transaction()
 
     for concept_id, disease_mapcon in diseases.items():
         expected = mapcon_to_disease(disease_mapcon).model_dump()
