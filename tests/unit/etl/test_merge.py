@@ -46,6 +46,38 @@ def mock_db(
     return mock_db_class(get_record_by_id=diseases)
 
 
+def test_get_merged_groups(
+    mock_db: AbstractDatabase,
+    merged_groups: dict[str, list[str]],
+):
+    """Test generation of merged groups"""
+    m = Merge(mock_db)
+    group_result = m._get_merged_concept_groups(
+        # just do mondo IDs
+        [
+            "mondo:0005072",
+            "mondo:0005233",
+            "mondo:0002083",
+            "mondo:0003587",
+            "mondo:0004099",
+            "mondo:0010648",
+        ]
+    )
+    assert len(group_result) == 6
+    group_result_grouped = {i[0]: i[1] for i in group_result}
+    for normalized_id, mondo_id in (
+        ("normalize.disease.ncit:C3270", "mondo:0005072"),
+        ("normalize.disease.ncit:C2926", "mondo:0005233"),
+        ("normalize.disease.ncit:C35424", "mondo:0002083"),
+        ("normalize.disease.ncit:C8091", "mondo:0003587"),
+        ("normalize.disease.ncit:C9012", "mondo:0004099"),
+        ("normalize.disease.mondo:0010648", "mondo:0010648"),
+    ):
+        actual = group_result_grouped[mondo_id]
+        expected = merged_groups[normalized_id]
+        assert actual == set(expected)
+
+
 def test_generate_merged_record(
     mock_db: AbstractDatabase,
     merged_diseases: dict[str, MappableConcept],

@@ -12,6 +12,7 @@ from disease.schemas import (
     DISEASE_CONCEPT_TYPE,
     PREFIX_LOOKUP,
     Disease,
+    NamespacePrefix,
     SourcePriority,
     coding_to_concept_id,
     concept_id_to_coding,
@@ -47,30 +48,7 @@ class Merge:
         # build groups
         _logger.info("Generating record ID sets from %s records", len(record_ids))
         start = timer()
-        groups = []
-        for concept_id in tqdm(record_ids, ncols=80, disable=self._silent):
-            try:
-                # temporary -- remove once full domain model migration is complete
-                _record = self._database.get_record_by_id(concept_id)
-                if not _record:
-                    _logger.error(
-                        "generate_merged_concepts couldn't find %s", concept_id
-                    )
-                    continue
-                record = disease_to_mapcon(Disease(**_record))
-            except AttributeError:
-                _logger.exception(
-                    "`create_merged_concepts` received invalid concept ID: %s",
-                    concept_id,
-                )
-                continue
-            xrefs = {
-                coding_to_concept_id(m.coding)
-                for m in record.mappings
-                if m.relation == Relation.EXACT_MATCH
-            }
-            group = {*xrefs, concept_id} if xrefs else {concept_id}
-            groups.append((concept_id, group))
+        groups = self._get_merged_concept_groups(record_ids)
         end = timer()
         self._database.complete_write_transaction()
         _logger.debug("Built record ID sets in %s seconds", end - start)
@@ -97,6 +75,44 @@ class Merge:
         end = timer()
         _logger.info("merged concept generation successful.")
         _logger.debug("Generated and added concepts in %s seconds", end - start)
+
+    def _get_merged_concept_groups(
+        self, record_ids: Collection[str]
+    ) -> list[tuple[str, set[str]]]:
+        """Generate normalized groups
+
+        :param record_ids: IDs to form groups from
+        :return: tuples of (mondo_id, {set of IDs contained within})
+        :raise ValueError: if submitted IDs aren't from Mondo
+        """
+        groups = []
+        for concept_id in tqdm(record_ids, ncols=80, disable=self._silent):
+            if not concept_id.startswith(NamespacePrefix.MONDO.value):
+                msg = f"Only Mondo IDs should be used as the basis for normalized groups; received {concept_id} instead"
+                raise ValueError(msg)
+            try:
+                # temporary -- remove once full domain model migration is complete
+                _record = self._database.get_record_by_id(concept_id)
+                if not _record:
+                    _logger.error(
+                        "generate_merged_concepts couldn't find %s", concept_id
+                    )
+                    continue
+                record = disease_to_mapcon(Disease(**_record))
+            except AttributeError:
+                _logger.exception(
+                    "`create_merged_concepts` received invalid concept ID: %s",
+                    concept_id,
+                )
+                continue
+            xrefs = {
+                coding_to_concept_id(m.coding)
+                for m in record.mappings
+                if m.relation == Relation.EXACT_MATCH
+            }
+            group = {*xrefs, concept_id} if xrefs else {concept_id}
+            groups.append((concept_id, group))
+        return groups
 
     def _generate_merged_record(
         self, record_id_set: set[str]
