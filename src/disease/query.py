@@ -412,7 +412,7 @@ class QueryHandler:
         if record:
             return self._add_disease(response, record, MatchType.CONCEPT_ID)
 
-        non_merged_match = None
+        non_merged_matches = []
 
         # check for concept ID match against record that has a ref to a merged record
         record = self.db.get_record_by_id(query_str, case_sensitive=False)
@@ -424,7 +424,7 @@ class QueryHandler:
                 if merge is None:
                     return self._handle_failed_merge_ref(record, response, query_str)
                 return self._add_disease(response, merge, MatchType.CONCEPT_ID)
-            non_merged_match = (record, "concept_id")
+            non_merged_matches.append((record, MatchType.CONCEPT_ID))
 
         # check other match types
         for match_type in RefType:
@@ -437,7 +437,7 @@ class QueryHandler:
             matching_records.sort(key=self._record_order)
 
             # attempt merge ref resolution until successful
-            for match in matching_records:
+            for match in [m for m in matching_records if m is not None]:
                 if merge_ref := match.get("merge_ref"):
                     merge = self.db.get_record_by_id(
                         merge_ref, case_sensitive=False, merge=True
@@ -449,12 +449,12 @@ class QueryHandler:
                     return self._add_disease(
                         response, merge, MatchType[match_type.upper()]
                     )
-                if not non_merged_match:
-                    non_merged_match = (record, match_type)
+                non_merged_matches.append((match, MatchType[match_type.upper()]))
 
         # if no successful match, try best available non-merged match
-        if non_merged_match:
-            match_type = MatchType[non_merged_match[1].upper()]
-            return self._add_disease(response, non_merged_match[0], match_type)
+        if non_merged_matches:
+            return self._add_disease(
+                response, non_merged_matches[0][0], non_merged_matches[0][1]
+            )
 
         return NormalizationService(**response)
