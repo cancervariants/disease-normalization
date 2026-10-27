@@ -5,16 +5,11 @@ import logging
 import re
 
 from botocore.exceptions import ClientError
-from ga4gh.core.models import (
-    ConceptMapping,
-    Extension,
-    MappableConcept,
-    Relation,
-)
 
 from disease import __version__
 from disease.database.database import AbstractDatabase
 from disease.schemas import (
+    DISEASE_CONCEPT_TYPE,
     NAMESPACE_LOOKUP,
     PREFIX_LOOKUP,
     SOURCES_LOWER_LOOKUP,
@@ -25,7 +20,7 @@ from disease.schemas import (
     SearchService,
     ServiceMeta,
     SourceName,
-    concept_id_to_coding,
+    disease_to_mapcon,
 )
 
 _logger = logging.getLogger(__name__)
@@ -334,41 +329,11 @@ class QueryHandler:
         :param match_type: type of match achieved
         :return: completed normalized response object ready to return to user
         """
-        disease_obj = MappableConcept(
-            id=f"normalize.disease.{record['concept_id']}",
-            primaryCoding=concept_id_to_coding(record["concept_id"]),
-            conceptType="Disease",
-            name=record["label"],
-            extensions=[],
-        )
-
-        xrefs = record.get("xrefs", [])
-        mappings = [
-            ConceptMapping(
-                coding=concept_id_to_coding(xref_id),
-                relation=Relation.EXACT_MATCH,
-            )
-            for xref_id in xrefs
-        ]
-
-        associated_with = record.get("associated_with", [])
-        mappings.extend(
-            ConceptMapping(
-                coding=concept_id_to_coding(associated_with_id),
-                relation=Relation.RELATED_MATCH,
-            )
-            for associated_with_id in associated_with
-        )
-
-        disease_obj.mappings = mappings or None
-
-        for field in ("pediatric_disease", "oncologic_disease", "aliases"):
-            value = record.get(field)
-            if value is not None:
-                disease_obj.extensions.append(Extension(name=field, value=value))
-
+        disease_concept = disease_to_mapcon(Disease(**record))
+        disease_concept.id = f"normalize.disease.{disease_concept.id}"
+        disease_concept.conceptType = DISEASE_CONCEPT_TYPE
         response["match_type"] = match_type
-        response["disease"] = disease_obj
+        response["disease"] = disease_concept
         response = self._add_merged_meta(response)
         return NormalizationService(**response)
 

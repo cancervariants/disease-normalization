@@ -75,9 +75,6 @@ def test_query_specify_query_handlers(query_handler: QueryHandler):
 def test_normalize_query(
     query_handler: QueryHandler, merged_diseases: dict[str, MappableConcept]
 ):
-    """Test that normalized endpoint correctly resolves queries, and utilizes
-    the VOD schema.
-    """
     response = query_handler.normalize("Neuroblastoma")
     assert response.match_type == MatchType.LABEL
     assert response.warnings is None

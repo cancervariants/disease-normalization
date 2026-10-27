@@ -105,11 +105,15 @@ class Merge:
                     concept_id,
                 )
                 continue
-            xrefs = {
-                coding_to_concept_id(m.coding)
-                for m in record.mappings
-                if m.relation == Relation.EXACT_MATCH
-            }
+            xrefs = (
+                {
+                    coding_to_concept_id(m.coding)
+                    for m in record.mappings
+                    if m.relation == Relation.EXACT_MATCH
+                }
+                if record.mappings
+                else set()
+            )
             group = {*xrefs, concept_id} if xrefs else {concept_id}
             groups.append((concept_id, group))
         return groups
@@ -158,9 +162,9 @@ class Merge:
 
         concept_id = records[0].id
         name = records[0].name
-        aliases = records[0].aliases
-        mappings = records[0].mappings
-        extensions = records[0].extensions
+        aliases = records[0].aliases or []
+        mappings = records[0].mappings or []
+        extensions = records[0].extensions or []
 
         for record in records[1:]:
             if record.aliases:
@@ -179,21 +183,27 @@ class Merge:
 
         primary_coding = concept_id_to_coding(concept_id)
 
-        aliases = list(set(aliases))
-        mappings = list(
-            {
-                m.coding.id: m for m in mappings if m.coding.id != primary_coding.id
-            }.values()
+        aliases = list(set(aliases)) if aliases else None
+        mappings = (
+            list(
+                {
+                    m.coding.id: m for m in mappings if m.coding.id != primary_coding.id
+                }.values()
+            )
+            if mappings
+            else None
         )
-        extensions = list({e.name: e for e in extensions}.values())
+        extensions = (
+            list({e.name: e for e in extensions}.values()) if extensions else None
+        )
 
         merged_disease = MappableConcept(
             id=f"normalize.disease.{concept_id}",
             conceptType=DISEASE_CONCEPT_TYPE,
             primaryCoding=primary_coding,
             name=name,
-            aliases=aliases or None,
-            mappings=mappings or None,
-            extensions=extensions or None,
+            aliases=aliases,
+            mappings=mappings,
+            extensions=extensions,
         )
         return merged_disease, final_ids
