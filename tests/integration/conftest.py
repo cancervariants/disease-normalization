@@ -4,6 +4,7 @@ import pytest
 
 from disease.database import AbstractDatabase, create_db
 from disease.etl import DO, OMIM, Merge, Mondo, NCIt, OncoTree
+from disease.schemas import SourceName
 
 
 @pytest.fixture(scope="module")
@@ -35,6 +36,6 @@ def populated_db(db: AbstractDatabase, test_data_dir: Path) -> AbstractDatabase:
         etl_instance = etl_source(db, test_data_dir / pathname)
         etl_instance.perform_etl(use_existing=True)
     merge = Merge(db)
-    concept_ids = db.get_all_concept_ids()
+    concept_ids = db.get_all_concept_ids(source=SourceName.MONDO)
     merge.create_merged_concepts(concept_ids)
     return db

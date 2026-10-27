@@ -78,6 +78,18 @@ def test_get_merged_groups(
         assert actual == set(expected)
 
 
+def test_get_merged_groups_mondo_only(mock_db: AbstractDatabase):
+    """Test generation of merged groups"""
+    m = Merge(mock_db)
+    with pytest.raises(ValueError, match="Only Mondo IDs"):
+        _ = m._get_merged_concept_groups(
+            [
+                "mondo:0005072",
+                "ncit:C2926",
+            ]
+        )
+
+
 def test_generate_merged_record(
     mock_db: AbstractDatabase,
     merged_diseases: dict[str, MappableConcept],
