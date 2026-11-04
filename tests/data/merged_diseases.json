@@ -1,0 +1,483 @@
+{
+  "normalize.disease.ncit:C35424": {
+    "id": "normalize.disease.ncit:C35424",
+    "name": "Richter Syndrome",
+    "primaryCoding": {
+      "id": "ncit:C35424",
+      "system": "https://ncit.nci.nih.gov/ncitbrowser/ConceptReport.jsp?dictionary=NCI_Thesaurus&code=",
+      "code": "C35424"
+    },
+    "conceptType": "Disease",
+    "mappings": [
+      {
+        "coding": {
+          "id": "MONDO_0002083",
+          "system": "https://purl.obolibrary.org/obo/",
+          "code": "MONDO:0002083"
+        },
+        "relation": "exactMatch"
+      },
+      {
+        "coding": {
+          "id": "DOID:1703",
+          "system": "https://disease-ontology.org/?id=",
+          "code": "DOID:1703"
+        },
+        "relation": "exactMatch"
+      },
+      {
+        "coding": {
+          "id": "icd10.cm:C91.1",
+          "system": "https://www.cdc.gov/nchs/icd/icd-10-cm/index.html",
+          "code": "C91.1"
+        },
+        "relation": "relatedMatch"
+      },
+      {
+        "coding": {
+          "id": "gard:7578",
+          "system": "https://rarediseases.info.nih.gov",
+          "code": "7578"
+        },
+        "relation": "relatedMatch"
+      },
+      {
+        "coding": {
+          "id": "umls:C0349631",
+          "system": "https://www.nlm.nih.gov/research/umls/index.html",
+          "code": "C0349631"
+        },
+        "relation": "relatedMatch"
+      },
+      {
+        "coding": {
+          "id": "medgen:91159",
+          "system": "https://www.ncbi.nlm.nih.gov/medgen/",
+          "code": "91159"
+        },
+        "relation": "relatedMatch"
+      }
+    ],
+    "aliases": [
+      "Richter's Syndrome",
+      "Richter syndrome",
+      "Richter transformation",
+      "Richter's Transformation",
+      "Richter's syndrome",
+      "Richter's transformation"
+    ],
+    "extensions": [
+      {
+        "name": "oncologic_disease",
+        "value": true
+      }
+    ]
+  },
+  "normalize.disease.ncit:C2926": {
+    "id": "normalize.disease.ncit:C2926",
+    "name": "Lung Non-Small Cell Carcinoma",
+    "type": "MappableConcept",
+    "conceptType": "Disease",
+    "primaryCoding": {
+      "id": "ncit:C2926",
+      "system": "https://ncit.nci.nih.gov/ncitbrowser/ConceptReport.jsp?dictionary=NCI_Thesaurus&code=",
+      "code": "C2926"
+    },
+    "mappings": [
+      {
+        "coding": {
+          "id": "MONDO_0005233",
+          "system": "https://purl.obolibrary.org/obo/",
+          "code": "MONDO:0005233"
+        },
+        "relation": "exactMatch"
+      },
+      {
+        "coding": {
+          "id": "oncotree:NSCLC",
+          "system": "https://oncotree.mskcc.org/?version=oncotree_latest_stable&field=CODE&search=",
+          "code": "NSCLC"
+        },
+        "relation": "exactMatch"
+      },
+      {
+        "coding": {
+          "id": "DOID:3908",
+          "system": "https://disease-ontology.org/?id=",
+          "code": "DOID:3908"
+        },
+        "relation": "exactMatch"
+      },
+      {
+        "coding": {
+          "id": "kegg.disease:05223",
+          "system": "https://www.genome.jp/kegg/disease/",
+          "code": "05223"
+        },
+        "relation": "relatedMatch"
+      },
+      {
+        "coding": {
+          "id": "umls:C0007131",
+          "system": "https://www.nlm.nih.gov/research/umls/index.html",
+          "code": "C0007131"
+        },
+        "relation": "relatedMatch"
+      },
+      {
+        "coding": {
+          "id": "efo:0003060",
+          "system": "http://www.ebi.ac.uk/efo/EFO_",
+          "code": "0003060"
+        },
+        "relation": "relatedMatch"
+      },
+      {
+        "coding": {
+          "id": "mesh:D002289",
+          "system": "https://meshb.nlm.nih.gov/record/ui?ui=",
+          "code": "D002289"
+        },
+        "relation": "relatedMatch"
+      },
+      {
+        "coding": {
+          "id": "medgen:40104",
+          "system": "https://www.ncbi.nlm.nih.gov/medgen/",
+          "code": "40104"
+        },
+        "relation": "relatedMatch"
+      }
+    ],
+    "aliases": [
+      "NSCLC - Non-Small Cell Lung Cancer",
+      "NSCLC - non-small cell lung cancer",
+      "NSCLC",
+      "Non Small Cell Lung Cancer NOS",
+      "Non-Small Cell Cancer of Lung",
+      "Non-Small Cell Cancer of the Lung",
+      "Non-Small Cell Carcinoma of Lung",
+      "Non-Small Cell Carcinoma of the Lung",
+      "Non-Small Cell Lung Cancer",
+      "Non-Small Cell Lung Carcinoma",
+      "Non-small cell lung cancer",
+      "Non-small cell lung cancer, NOS",
+      "non-small cell cancer of lung",
+      "non-small cell cancer of the lung",
+      "non-small cell carcinoma of lung",
+      "non-small cell carcinoma of the lung",
+      "non-small cell lung cancer",
+      "non-small cell lung carcinoma (disease)",
+      "non-small cell lung carcinoma"
+    ],
+    "extensions": [
+      {
+        "name": "oncologic_disease",
+        "value": true
+      }
+    ]
+  },
+  "normalize.disease.ncit:C3270": {
+    "id": "normalize.disease.ncit:C3270",
+    "type": "MappableConcept",
+    "name": "Neuroblastoma",
+    "aliases": [
+      "NB",
+      "NBL",
+      "neuroblastoma",
+      "Neural Crest Tumor, Malignant",
+      "Neuroblastoma (Schwannian Stroma-poor)",
+      "neuroblastoma (Schwannian Stroma-poor)",
+      "Neuroblastoma (Schwannian Stroma-Poor)",
+      "Neuroblastoma, NOS",
+      "NEUROBLASTOMA, MALIGNANT",
+      "Neuroblastoma (NBL)",
+      "neural Crest tumor, malignant",
+      "neuroblastoma, malignant"
+    ],
+    "extensions": [{ "name": "oncologic_disease", "value": true }],
+    "conceptType": "Disease",
+    "primaryCoding": {
+      "id": "ncit:C3270",
+      "system": "https://ncit.nci.nih.gov/ncitbrowser/ConceptReport.jsp?dictionary=NCI_Thesaurus&code=",
+      "code": "C3270"
+    },
+    "mappings": [
+      {
+        "coding": {
+          "id": "MONDO_0005072",
+          "system": "https://purl.obolibrary.org/obo/",
+          "code": "MONDO:0005072"
+        },
+        "relation": "exactMatch"
+      },
+      {
+        "coding": {
+          "id": "oncotree:NBL",
+          "system": "https://oncotree.mskcc.org/?version=oncotree_latest_stable&field=CODE&search=",
+          "code": "NBL"
+        },
+        "relation": "exactMatch"
+      },
+      {
+        "coding": {
+          "id": "DOID:769",
+          "system": "https://disease-ontology.org/?id=",
+          "code": "DOID:769"
+        },
+        "relation": "exactMatch"
+      },
+      {
+        "coding": {
+          "id": "umls:C0027819",
+          "system": "https://www.nlm.nih.gov/research/umls/index.html",
+          "code": "C0027819"
+        },
+        "relation": "relatedMatch"
+      },
+      {
+        "coding": {
+          "id": "icdo:9500/3",
+          "system": "https://www.who.int/standards/classifications/other-classifications/international-classification-of-diseases-for-oncology/",
+          "code": "9500/3"
+        },
+        "relation": "relatedMatch"
+      },
+      {
+        "coding": {
+          "id": "efo:0000621",
+          "system": "http://www.ebi.ac.uk/efo/EFO_",
+          "code": "0000621"
+        },
+        "relation": "relatedMatch"
+      },
+      {
+        "coding": {
+          "id": "gard:7185",
+          "system": "https://rarediseases.info.nih.gov",
+          "code": "7185"
+        },
+        "relation": "relatedMatch"
+      },
+      {
+        "coding": {
+          "id": "mesh:D009447",
+          "system": "https://meshb.nlm.nih.gov/record/ui?ui=",
+          "code": "D009447"
+        },
+        "relation": "relatedMatch"
+      },
+      {
+        "coding": {
+          "id": "orphanet:635",
+          "system": "https://www.orpha.net",
+          "code": "635"
+        },
+        "relation": "relatedMatch"
+      },
+      {
+        "coding": {
+          "id": "umls:C2751421",
+          "system": "https://www.nlm.nih.gov/research/umls/index.html",
+          "code": "C2751421"
+        },
+        "relation": "relatedMatch"
+      },
+      {
+        "coding": {
+          "id": "medgen:18012",
+          "system": "https://www.ncbi.nlm.nih.gov/medgen/",
+          "code": "18012"
+        },
+        "relation": "relatedMatch"
+      }
+    ]
+  },
+  "normalize.disease.ncit:C167370": {
+    "id": "normalize.disease.ncit:C167370",
+    "type": "MappableConcept",
+    "name": "Skin Myoepithelioma",
+    "aliases": ["Cutaneous Myoepithelioma"],
+    "conceptType": "Disease",
+    "primaryCoding": {
+      "id": "ncit:C167370",
+      "system": "https://ncit.nci.nih.gov/ncitbrowser/ConceptReport.jsp?dictionary=NCI_Thesaurus&code=",
+      "code": "C167370"
+    }
+  },
+  "normalize.disease.ncit:C9012": {
+    "id": "normalize.disease.ncit:C9012",
+    "type": "MappableConcept",
+    "name": "Adult Cystic Teratoma",
+    "aliases": [
+      "Adult cystic teratoma",
+      "cystic teratoma of adults",
+      "adult cystic teratoma"
+    ],
+    "extensions": [{ "name": "oncologic_disease", "value": true }],
+    "conceptType": "Disease",
+    "primaryCoding": {
+      "id": "ncit:C9012",
+      "system": "https://ncit.nci.nih.gov/ncitbrowser/ConceptReport.jsp?dictionary=NCI_Thesaurus&code=",
+      "code": "C9012"
+    },
+    "mappings": [
+      {
+        "coding": {
+          "id": "MONDO_0004099",
+          "system": "https://purl.obolibrary.org/obo/",
+          "code": "MONDO:0004099"
+        },
+        "relation": "exactMatch"
+      },
+      {
+        "coding": {
+          "id": "DOID:7079",
+          "system": "https://disease-ontology.org/?id=",
+          "code": "DOID:7079"
+        },
+        "relation": "exactMatch"
+      },
+      {
+        "coding": {
+          "id": "icdo:9080/0",
+          "system": "https://www.who.int/standards/classifications/other-classifications/international-classification-of-diseases-for-oncology/",
+          "code": "9080/0"
+        },
+        "relation": "relatedMatch"
+      },
+      {
+        "coding": {
+          "id": "umls:C1368888",
+          "system": "https://www.nlm.nih.gov/research/umls/index.html",
+          "code": "C1368888"
+        },
+        "relation": "relatedMatch"
+      },
+      {
+        "coding": {
+          "id": "medgen:235084",
+          "system": "https://www.ncbi.nlm.nih.gov/medgen/",
+          "code": "235084"
+        },
+        "relation": "relatedMatch"
+      }
+    ]
+  },
+  "normalize.disease.mondo:0010648": {
+    "id": "normalize.disease.mondo:0010648",
+    "type": "MappableConcept",
+    "name": "major affective disorder 2",
+    "aliases": [
+      "MAFD2",
+      "MDI",
+      "MDX",
+      "MANIC-DEPRESSIVE ILLNESS",
+      "BPAD",
+      "BIPOLAR AFFECTIVE DISORDER",
+      "MANIC-DEPRESSIVE PSYCHOSIS, X-LINKED",
+      "major affective disorder 2, X-linked dominant",
+      "MAJOR affective disorder 2",
+      "bipolar affective disorder",
+      "major affective disorder 2",
+      "manic-depressive illness",
+      "manic-depressive psychosis, X-linked"
+    ],
+    "conceptType": "Disease",
+    "primaryCoding": {
+      "id": "MONDO_0010648",
+      "system": "https://purl.obolibrary.org/obo/",
+      "code": "MONDO:0010648"
+    },
+    "mappings": [
+      {
+        "coding": {
+          "id": "MIM:309200",
+          "system": "https://omim.org/MIM:",
+          "code": "309200"
+        },
+        "relation": "exactMatch"
+      },
+      {
+        "coding": {
+          "id": "mesh:C564108",
+          "system": "https://meshb.nlm.nih.gov/record/ui?ui=",
+          "code": "C564108"
+        },
+        "relation": "relatedMatch"
+      },
+      {
+        "coding": {
+          "id": "medgen:326975",
+          "system": "https://www.ncbi.nlm.nih.gov/medgen/",
+          "code": "326975"
+        },
+        "relation": "relatedMatch"
+      },
+      {
+        "coding": {
+          "id": "umls:C1839839",
+          "system": "https://www.nlm.nih.gov/research/umls/index.html",
+          "code": "C1839839"
+        },
+        "relation": "relatedMatch"
+      }
+    ]
+  },
+  "normalize.disease.ncit:C8091": {
+    "id": "normalize.disease.ncit:C8091",
+    "type": "MappableConcept",
+    "name": "Childhood Liposarcoma",
+    "aliases": [
+      "liposarcoma",
+      "Liposarcoma",
+      "Pediatric Liposarcoma",
+      "childhood liposarcoma",
+      "pediatric liposarcoma"
+    ],
+    "extensions": [
+      { "name": "pediatric_disease", "value": true },
+      { "name": "oncologic_disease", "value": true }
+    ],
+    "conceptType": "Disease",
+    "primaryCoding": {
+      "id": "ncit:C8091",
+      "system": "https://ncit.nci.nih.gov/ncitbrowser/ConceptReport.jsp?dictionary=NCI_Thesaurus&code=",
+      "code": "C8091"
+    },
+    "mappings": [
+      {
+        "coding": {
+          "id": "MONDO_0003587",
+          "system": "https://purl.obolibrary.org/obo/",
+          "code": "MONDO:0003587"
+        },
+        "relation": "exactMatch"
+      },
+      {
+        "coding": {
+          "id": "DOID:5695",
+          "system": "https://disease-ontology.org/?id=",
+          "code": "DOID:5695"
+        },
+        "relation": "exactMatch"
+      },
+      {
+        "coding": {
+          "id": "umls:C0279984",
+          "system": "https://www.nlm.nih.gov/research/umls/index.html",
+          "code": "C0279984"
+        },
+        "relation": "relatedMatch"
+      },
+      {
+        "coding": {
+          "id": "medgen:83580",
+          "system": "https://www.ncbi.nlm.nih.gov/medgen/",
+          "code": "83580"
+        },
+        "relation": "relatedMatch"
+      }
+    ]
+  }
+}

@@ -5,19 +5,13 @@ CREATE TABLE disease_sources (
 -- see also: delete_normalized_concepts.sql
 CREATE TABLE disease_merged (
     concept_id VARCHAR(127) PRIMARY KEY,
-    label TEXT,
-    aliases TEXT [],
-    associated_with TEXT [],
-    xrefs TEXT [],
-    pediatric_disease BOOLEAN,
-    oncologic_disease BOOLEAN
+    data JSONB
 );
 CREATE TABLE disease_concepts (
     concept_id VARCHAR(127) PRIMARY KEY,
     source VARCHAR(127) NOT NULL REFERENCES disease_sources (name),
-    pediatric_disease BOOLEAN,
-    oncologic_disease BOOLEAN,
-    merge_ref VARCHAR(127) REFERENCES disease_merged (concept_id)
+    merge_ref VARCHAR(127) REFERENCES disease_merged (concept_id),
+    data JSONB
 );
 CREATE TABLE disease_labels (
     id SERIAL PRIMARY KEY,

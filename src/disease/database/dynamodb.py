@@ -1,7 +1,7 @@
 """Provide DynamoDB client."""
 
 import atexit
-import datetime
+import datetime as dt
 import gzip
 import json
 import logging
@@ -16,6 +16,7 @@ import boto3
 import click
 from boto3.dynamodb.conditions import Attr, Equals, Key
 from botocore.exceptions import ClientError
+from ga4gh.core.models import MappableConcept
 from ga4gh.va_spec.base import DataSet
 
 from disease.config import get_config
@@ -31,14 +32,13 @@ from disease.database.database import (
     confirm_aws_db_use,
 )
 from disease.schemas import (
-    ITEM_TYPES,
-    PREFIX_LOOKUP,
     DataLicenseAttributes,
     RecordType,
     RefType,
     SourceDataSet,
     SourceMeta,
     SourceName,
+    mapcon_to_disease,
 )
 
 _logger = logging.getLogger(__name__)
@@ -81,7 +81,7 @@ class DynamoDbDatabase(AbstractDatabase):
                     "DISEASE_DYNAMO_TABLE", "disease_normalizer_nonprod"
                 )
         else:
-            endpoint_url = db_url if db_url else get_config().db_url
+            endpoint_url = db_url or get_config().db_url
             click.echo(f"***Using Disease Database Endpoint: {endpoint_url}***")
             boto_params = {"region_name": region_name, "endpoint_url": endpoint_url}
 
@@ -258,21 +258,23 @@ class DynamoDbDatabase(AbstractDatabase):
         """
         try:
             if merge:
-                pk = f"{concept_id.lower()}##{RecordType.MERGER.value}"
+                pk = (
+                    f"normalize.disease.{concept_id.lower()}##{RecordType.MERGER.value}"
+                )
             else:
                 pk = f"{concept_id.lower()}##{RecordType.IDENTITY.value}"
             if case_sensitive:
                 response = self.diseases.get_item(
                     Key={"label_and_type": pk, "concept_id": concept_id}
                 )
-                record = response.get("Item")
-                if not record:
-                    return None
+                _record = response.get("Item")
             else:
                 exp = Key("label_and_type").eq(pk)
                 response = self.diseases.query(KeyConditionExpression=exp)
-                record = response["Items"][0]
-            del record["label_and_type"]
+                _record = response["Items"][0]
+            if not _record:
+                return None
+            del _record["label_and_type"]
         except ClientError as e:
             _logger.exception(
                 "boto3 client error on get_records_by_id for search term %s: %s",
@@ -282,8 +284,11 @@ class DynamoDbDatabase(AbstractDatabase):
             return None
         except (KeyError, IndexError):  # record doesn't exist
             return None
-        else:
-            return record
+        record = mapcon_to_disease(MappableConcept(**_record["data"])).model_dump()
+        record["item_type"] = _record["item_type"]
+        record["merge_ref"] = _record.get("merge_ref")
+        record["src_name"] = _record["src_name"]
+        return record
 
     def get_refs_by_type(self, search_term: str, ref_type: RefType) -> list[str]:
         """Retrieve concept IDs for records matching the user's query. Other methods
@@ -395,52 +400,57 @@ class DynamoDbDatabase(AbstractDatabase):
         except ClientError as e:
             raise DatabaseWriteException(e) from e
 
-    def add_record(self, record: dict, src_name: SourceName) -> None:
+    def add_record(self, disease: MappableConcept, src_name: SourceName) -> None:
         """Add new record to database.
 
-        :param Dict record: record to upload
-        :param SourceName src_name: name of source for record
+        :param disease: disease record to upload
+        :param src_name: name of source for record
         """
-        concept_id = record["concept_id"]
-        record["src_name"] = src_name.value
-        label_and_type = f"{concept_id.lower()}##identity"
-        record["label_and_type"] = label_and_type
-        record["item_type"] = "identity"
+        concept_id = disease.primaryCoding.id
+        if not concept_id:
+            raise ValueError
+        partition_key = f"{concept_id.lower()}##identity"
         try:
-            self.batch.put_item(Item=record)
+            self.batch.put_item(
+                Item={
+                    "label_and_type": partition_key,
+                    "concept_id": concept_id,
+                    "item_type": "identity",
+                    "src_name": src_name.value,
+                    "data": disease.model_dump(exclude_none=True, exclude_unset=True),
+                }
+            )
         except ClientError as e:
             _logger.exception(
                 "boto3 client error on add_record for %s: %s",
                 concept_id,
                 e.response["Error"]["Message"],
             )
-        for attr_type, item_type in ITEM_TYPES.items():
-            if attr_type in record:
-                value = record.get(attr_type)
-                if not value:
-                    continue
-                if isinstance(value, str):
-                    items = [value.lower()]
-                else:
-                    items = {item.lower() for item in value}
-                for item in items:
-                    self._add_ref_record(
-                        item, record["concept_id"], item_type, src_name
-                    )
+        if disease.name:
+            self._add_ref_record(disease.name, concept_id, RefType.LABEL, src_name)
+        if disease.aliases:
+            for alias in disease.aliases:
+                self._add_ref_record(alias, concept_id, RefType.ALIASES, src_name)
+        if disease.mappings:
+            for mapping in disease.mappings:
+                self._add_ref_record(
+                    mapping.coding.code.root, concept_id, RefType.XREFS, src_name
+                )
 
-    def add_merged_record(self, record: dict) -> None:
+    def add_merged_record(self, disease: MappableConcept) -> None:
         """Add merged record to database.
 
         :param record: merged record to add
         """
-        concept_id = record["concept_id"]
-        id_prefix = concept_id.split(":")[0].lower()
-        record["src_name"] = PREFIX_LOOKUP[id_prefix]
-        label_and_type = f"{concept_id.lower()}##{RecordType.MERGER.value}"
-        record["label_and_type"] = label_and_type
-        record["item_type"] = RecordType.MERGER.value
+        concept_id = disease.id
+        params = {
+            "label_and_type": f"{concept_id.lower()}##{RecordType.MERGER.value}",
+            "concept_id": concept_id,
+            "item_type": RecordType.MERGER.value,
+            "data": disease.model_dump_json(exclude_unset=True, exclude_none=True),
+        }
         try:
-            self.batch.put_item(Item=record)
+            self.batch.put_item(Item=params)
         except ClientError as e:
             _logger.exception(
                 "boto3 client error on add_record for %s: %s",
@@ -601,7 +611,7 @@ class DynamoDbDatabase(AbstractDatabase):
             )
             raise ValueError(err_msg)
 
-        now = datetime.datetime.now(tz=datetime.UTC).strftime("%Y%m%d%H%M%S")
+        now = dt.datetime.now(tz=dt.UTC).strftime("%Y%m%d%H%M%S")
         output_location = output_directory / f"disease_norm_{now}.ndjson.gz"
 
         last_key = None

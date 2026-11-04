@@ -1,5 +1,6 @@
-"""Pytest test config tools."""
+"""Pytest tst config tools."""
 
+import json
 import logging
 import os
 from collections.abc import Generator
@@ -7,46 +8,24 @@ from pathlib import Path
 from typing import Any
 
 import pytest
+from ga4gh.core.models import (
+    MappableConcept,
+)
+from ga4gh.va_spec.base import DataSet
 
 from disease.config import get_config
 from disease.database.database import AWS_ENV_VAR_NAME, AbstractDatabase, create_db
 from disease.etl.base import Base
 from disease.query import QueryHandler
 from disease.schemas import (
-    Disease,
-    MatchType,
     RecordType,
     RefType,
     SourceMeta,
     SourceName,
-    SourceSearchMatches,
+    mapcon_to_disease,
 )
 
 _logger = logging.getLogger(__name__)
-
-
-def pytest_collection_modifyitems(items):
-    """Modify test items in place to ensure test modules run in a given order.
-
-    When creating new test modules, be sure to add them here.
-    """
-    module_order = [
-        "test_schemas",
-        "test_mondo",
-        "test_do",
-        "test_ncit",
-        "test_omim",
-        "test_oncotree",
-        "test_merge",
-        "test_database",
-        "test_query",
-        "test_api",
-        "test_emit_warnings",
-        "test_utils",
-    ]
-    # remember to add new test modules to the order constant:
-    assert len(module_order) == len(list(Path(__file__).parent.rglob("test_*.py")))
-    items.sort(key=lambda i: module_order.index(i.module.__name__))
 
 
 def pytest_addoption(parser):
@@ -135,161 +114,148 @@ def test_source(database: AbstractDatabase, is_test_env: bool, test_data_dir: Pa
     return test_source_factory
 
 
-def _compare_records(actual: Disease, fixt: Disease):
-    """Check that identity records are identical."""
-    assert actual.concept_id == fixt.concept_id
-    assert actual.label == fixt.label
+@pytest.fixture
+def mock_db_class():
+    """Provide mock db class definition
 
-    assert (actual.aliases is None) == (fixt.aliases is None)
-    if (actual.aliases is not None) and (fixt.aliases is not None):
-        assert set(actual.aliases) == set(fixt.aliases)
-
-    assert (actual.xrefs is None) == (fixt.xrefs is None)
-    if (actual.xrefs is not None) and (fixt.xrefs is not None):
-        assert set(actual.xrefs) == set(fixt.xrefs)
-
-    assert (actual.associated_with is None) == (fixt.associated_with is None)
-    if (actual.associated_with is not None) and (fixt.associated_with is not None):
-        assert set(actual.associated_with) == set(fixt.associated_with)
-
-    assert (actual.pediatric_disease is None) == (fixt.pediatric_disease is None)
-    if (actual.pediatric_disease is not None) and (fixt.pediatric_disease is not None):
-        assert actual.pediatric_disease == fixt.pediatric_disease
-
-    assert (actual.oncologic_disease is None) == (fixt.oncologic_disease is None)
-    if (actual.oncologic_disease is not None) and (fixt.oncologic_disease is not None):
-        assert actual.oncologic_disease == fixt.oncologic_disease
-
-
-@pytest.fixture(scope="session")
-def compare_records():
-    """Provide record comparison function"""
-    return _compare_records
-
-
-def _compare_response(
-    response: SourceSearchMatches,
-    match_type: MatchType,
-    fixture: Disease | None = None,
-    fixture_list: list[Disease] | None = None,
-    num_records: int = 0,
-):
-    """Check that test response is correct. Only 1 of {fixture, fixture_list}
-    should be passed as arguments. num_records should only be passed with fixture_list.
-
-    :param Dict response: response object returned by QueryHandler
-    :param MatchType match_type: expected match type
-    :param Disease fixture: single Disease object to match response against
-    :param List[Disease] fixture_list: multiple Disease objects to match response
-        against
-    :param int num_records: expected number of records in response. If not given, tests
-        for number of fixture Diseases given (ie, 1 for single fixture and length of
-        fixture_list otherwise)
-    """
-    if fixture and fixture_list:
-        pytest.fail("Args provided for both `fixture` and `fixture_list`")
-    if not fixture and not fixture_list:
-        pytest.fail("Must pass 1 of {fixture, fixture_list}")
-    if fixture and num_records:
-        pytest.fail("`num_records` should only be given with `fixture_list`.")
-
-    assert response.match_type == match_type
-    if fixture:
-        assert len(response.records) == 1
-        _compare_records(response.records[0], fixture)
-    elif fixture_list:
-        if not num_records:
-            assert len(response.records) == len(fixture_list)
-        else:
-            assert len(response.records) == num_records
-        for fixt in fixture_list:
-            for record in response.records:
-                if fixt.concept_id == record.concept_id:
-                    _compare_records(record, fixt)
-                    break
-            raise AssertionError  # test fixture not found in response
-
-
-@pytest.fixture(scope="session")
-def compare_response():
-    """Provide response comparison function"""
-    return _compare_response
-
-
-@pytest.fixture(scope="session")
-def null_database_class():
-    """Quote-unquote 'in-memory database' used like a mock for testing.
-
-    Parameters for specific methods enabled as needed. See `tests/unit/test_utils.py`
-    for example usage.
+    Instantiate
     """
 
-    class _Database(AbstractDatabase):
+    class NullDatabase(AbstractDatabase):
         def __init__(self, db_url: str | None = None, **db_args) -> None:  # noqa: ARG002
             self._get_all_records_values = db_args.get("get_all_records", {})
+            self._get_record_by_id_values = db_args.get("get_record_by_id", {})
+            self._added_records: dict[str, MappableConcept] = {}
+            self._added_sources: dict[SourceName, MappableConcept] = {}
+            self._added_merged_records: dict[str, MappableConcept] = {}
+            self._updated_merge_refs: dict[str, str] = {}
+            self._delete_merge_called = False
+            self._delete_source_calls = set()
 
-        def list_tables(self) -> list[str]:
-            raise NotImplementedError
+        def list_tables(self) -> list[str]: ...
 
-        def drop_db(self) -> None:
-            raise NotImplementedError
+        def drop_db(self) -> None: ...
 
-        def check_schema_initialized(self) -> bool:
-            raise NotImplementedError
+        def check_schema_initialized(self) -> bool: ...
 
-        def check_tables_populated(self) -> bool:
-            raise NotImplementedError
+        def check_tables_populated(self) -> bool: ...
 
-        def initialize_db(self) -> None:
-            raise NotImplementedError
+        def initialize_db(self) -> None: ...
 
-        def get_source_metadata(self, src_name: str | SourceName) -> SourceMeta | None:
-            raise NotImplementedError
+        def get_source_metadata(
+            self, src_name: str | SourceName
+        ) -> SourceMeta | None: ...
 
         def get_record_by_id(
-            self, concept_id: str, case_sensitive: bool = True, merge: bool = False
+            self,
+            concept_id: str,
+            case_sensitive: bool = True,
+            merge: bool = False,  # noqa: ARG002
         ) -> dict | None:
-            raise NotImplementedError
+            key = concept_id
+            if case_sensitive:
+                key = key.lower()
+                response_map = {
+                    k.lower(): v for k, v in self._get_record_by_id_values.items()
+                }
+            else:
+                response_map = self._get_record_by_id_values
+            result = response_map.get(key)
+            if not result:
+                return None
+            return mapcon_to_disease(result).model_dump()
 
-        def get_refs_by_type(self, search_term: str, ref_type: RefType) -> list[str]:
-            raise NotImplementedError
+        def get_refs_by_type(
+            self, search_term: str, ref_type: RefType
+        ) -> list[str]: ...
 
-        def get_all_concept_ids(self, source: SourceName | None = None) -> set[str]:
-            raise NotImplementedError
+        def get_all_concept_ids(self, source: SourceName | None = None) -> set[str]: ...
 
         def get_all_records(
             self, record_type: RecordType
         ) -> Generator[dict, None, None]:
             yield from self._get_all_records_values[record_type]
 
-        def add_source_metadata(self, src_name: SourceName, meta: SourceMeta) -> None:
-            raise NotImplementedError
+        def add_source_metadata(self, source_name: SourceName, source: DataSet) -> None:
+            self._added_sources[source_name] = source
 
-        def add_record(self, record: dict, src_name: SourceName) -> None:
-            raise NotImplementedError
+        def add_record(self, disease: MappableConcept, src_name: SourceName) -> None:  # noqa: ARG002
+            self._added_records[disease.id] = disease
 
-        def add_merged_record(self, record: dict) -> None:
-            raise NotImplementedError
+        def add_merged_record(self, record: MappableConcept) -> None:
+            self._added_merged_records[record.id] = record
 
         def update_merge_ref(self, concept_id: str, merge_ref: Any) -> None:  # noqa: ANN401
-            raise NotImplementedError
+            self._updated_merge_refs[concept_id] = merge_ref
 
         def delete_normalized_concepts(self) -> None:
-            raise NotImplementedError
+            self._delete_merge_called = True
 
         def delete_source(self, src_name: SourceName) -> None:
-            raise NotImplementedError
+            self._delete_source_calls.add(src_name)
 
-        def complete_write_transaction(self) -> None:
-            raise NotImplementedError
+        def complete_write_transaction(self) -> None: ...
 
-        def close_connection(self) -> None:
-            raise NotImplementedError
+        def close_connection(self) -> None: ...
 
-        def load_from_remote(self, url: str | None = None) -> None:
-            raise NotImplementedError
+        def load_from_remote(self, url: str | None = None) -> None: ...
 
-        def export_db(self, export_location: Path) -> None:
-            raise NotImplementedError
+        def export_db(self, output_directory: Path) -> None: ...
 
-    return _Database
+    return NullDatabase
+
+
+@pytest.fixture
+def diseases(test_data_dir: Path) -> dict[str, MappableConcept]:
+    with (test_data_dir / "diseases.json").open() as f:
+        data = json.load(f)
+    return {k: MappableConcept(**v) for k, v in data.items()}
+
+
+@pytest.fixture
+def merged_diseases(test_data_dir: Path) -> dict[str, MappableConcept]:
+    with (test_data_dir / "merged_diseases.json").open() as f:
+        data = json.load(f)
+    return {k: MappableConcept(**v) for k, v in data.items()}
+
+
+@pytest.fixture
+def merged_groups() -> dict[str, list[str]]:
+    return {
+        "normalize.disease.ncit:C167370": ["ncit:C167370"],
+        "normalize.disease.ncit:C3270": [
+            "ncit:C3270",
+            "mondo:0005072",
+            "DOID:769",
+            "oncotree:NBL",
+        ],
+        "normalize.disease.ncit:C2926": [
+            "ncit:C2926",
+            "mondo:0005233",
+            "DOID:3908",
+            "oncotree:NSCLC",
+        ],
+        "normalize.disease.ncit:C35424": ["ncit:C35424", "mondo:0002083", "DOID:1703"],
+        "normalize.disease.ncit:C8091": ["ncit:C8091", "mondo:0003587", "DOID:5695"],
+        "normalize.disease.ncit:C9012": ["ncit:C9012", "mondo:0004099", "DOID:7079"],
+        "normalize.disease.mondo:0010648": ["mondo:0010648", "MIM:309200"],
+    }
+
+
+@pytest.fixture
+def sources(test_data_dir: Path) -> dict[str, DataSet]:
+    with (test_data_dir / "sources.json").open() as f:
+        data = json.load(f)
+    return {SourceName(k): DataSet(**v) for k, v in data.items()}
+
+
+@pytest.fixture
+def db() -> AbstractDatabase:
+    """A real live db instance (gets overwritten immediately)"""
+    db_instance = create_db()
+    try:
+        db_instance.drop_db()
+        db_instance.initialize_db()
+        yield db_instance
+    finally:
+        db_instance.drop_db()

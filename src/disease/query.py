@@ -1,19 +1,15 @@
 """Provides query handler class, which receives and responses to user search queries."""
 
-import datetime
+import datetime as dt
 import logging
 import re
 
 from botocore.exceptions import ClientError
-from ga4gh.core.models import (
-    Extension,
-    MappableConcept,
-    Relation,
-)
 
 from disease import __version__
 from disease.database.database import AbstractDatabase
 from disease.schemas import (
+    DISEASE_CONCEPT_TYPE,
     NAMESPACE_LOOKUP,
     PREFIX_LOOKUP,
     SOURCES_LOWER_LOOKUP,
@@ -24,8 +20,7 @@ from disease.schemas import (
     SearchService,
     ServiceMeta,
     SourceName,
-    get_coding_object,
-    get_concept_mapping,
+    disease_to_mapcon,
 )
 
 _logger = logging.getLogger(__name__)
@@ -289,7 +284,7 @@ class QueryHandler:
 
         response["service_meta_"] = ServiceMeta(
             version=__version__,
-            response_datetime=datetime.datetime.now(tz=datetime.UTC),
+            response_datetime=dt.datetime.now(tz=dt.UTC),
         ).model_dump()
         return SearchService(**response)
 
@@ -334,35 +329,11 @@ class QueryHandler:
         :param match_type: type of match achieved
         :return: completed normalized response object ready to return to user
         """
-        disease_obj = MappableConcept(
-            id=f"normalize.disease.{record['concept_id']}",
-            primaryCoding=get_coding_object(record["concept_id"]),
-            conceptType="Disease",
-            name=record["label"],
-            extensions=[],
-        )
-
-        xrefs = record.get("xrefs", [])
-        mappings = [
-            get_concept_mapping(xref_id, relation=Relation.EXACT_MATCH)
-            for xref_id in xrefs
-        ]
-
-        associated_with = record.get("associated_with", [])
-        mappings.extend(
-            get_concept_mapping(associated_with_id, relation=Relation.RELATED_MATCH)
-            for associated_with_id in associated_with
-        )
-
-        disease_obj.mappings = mappings or None
-
-        for field in ("pediatric_disease", "oncologic_disease", "aliases"):
-            value = record.get(field)
-            if value is not None:
-                disease_obj.extensions.append(Extension(name=field, value=value))
-
+        disease_concept = disease_to_mapcon(Disease(**record))
+        disease_concept.id = f"normalize.disease.{disease_concept.id}"
+        disease_concept.conceptType = DISEASE_CONCEPT_TYPE
         response["match_type"] = match_type
-        response["disease"] = disease_obj
+        response["disease"] = disease_concept
         response = self._add_merged_meta(response)
         return NormalizationService(**response)
 
@@ -429,7 +400,7 @@ class QueryHandler:
             "warnings": self._emit_warnings(query),
             "service_meta_": ServiceMeta(
                 version=__version__,
-                response_datetime=datetime.datetime.now(tz=datetime.UTC),
+                response_datetime=dt.datetime.now(tz=dt.UTC),
             ),
         }
         if query == "":
@@ -441,7 +412,7 @@ class QueryHandler:
         if record:
             return self._add_disease(response, record, MatchType.CONCEPT_ID)
 
-        non_merged_match = None
+        non_merged_matches = []
 
         # check for concept ID match against record that has a ref to a merged record
         record = self.db.get_record_by_id(query_str, case_sensitive=False)
@@ -453,7 +424,7 @@ class QueryHandler:
                 if merge is None:
                     return self._handle_failed_merge_ref(record, response, query_str)
                 return self._add_disease(response, merge, MatchType.CONCEPT_ID)
-            non_merged_match = (record, "concept_id")
+            non_merged_matches.append((record, MatchType.CONCEPT_ID))
 
         # check other match types
         for match_type in RefType:
@@ -466,26 +437,24 @@ class QueryHandler:
             matching_records.sort(key=self._record_order)
 
             # attempt merge ref resolution until successful
-            for match in matching_records:
-                record = self.db.get_record_by_id(match["concept_id"], merge=False)
-                if record:
-                    if "merge_ref" in record:
-                        merge = self.db.get_record_by_id(
-                            record["merge_ref"], case_sensitive=False, merge=True
+            for match in [m for m in matching_records if m is not None]:
+                if merge_ref := match.get("merge_ref"):
+                    merge = self.db.get_record_by_id(
+                        merge_ref, case_sensitive=False, merge=True
+                    )
+                    if merge is None:
+                        return self._handle_failed_merge_ref(
+                            record, response, query_str
                         )
-                        if merge is None:
-                            return self._handle_failed_merge_ref(
-                                record, response, query_str
-                            )
-                        return self._add_disease(
-                            response, merge, MatchType[match_type.upper()]
-                        )
-                    if not non_merged_match:
-                        non_merged_match = (record, match_type)
+                    return self._add_disease(
+                        response, merge, MatchType[match_type.upper()]
+                    )
+                non_merged_matches.append((match, MatchType[match_type.upper()]))
 
         # if no successful match, try best available non-merged match
-        if non_merged_match:
-            match_type = MatchType[non_merged_match[1].upper()]
-            return self._add_disease(response, non_merged_match[0], match_type)
+        if non_merged_matches:
+            return self._add_disease(
+                response, non_merged_matches[0][0], non_merged_matches[0][1]
+            )
 
         return NormalizationService(**response)

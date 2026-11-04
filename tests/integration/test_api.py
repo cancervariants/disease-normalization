@@ -17,7 +17,7 @@ from disease.main import app
 
 
 @pytest_asyncio.fixture
-async def async_app():
+async def async_app(populated_db):
     async with LifespanManager(app) as manager:
         yield manager.app
 

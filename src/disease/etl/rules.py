@@ -3,6 +3,8 @@
 import csv
 from pathlib import Path
 
+from ga4gh.core.models import MappableConcept
+
 from disease.schemas import SourceName
 
 
@@ -37,33 +39,36 @@ class Rules:
                     else:
                         self.rules[concept_id].append((row["field"], row["value"]))
 
-    def apply_rules_to_disease(self, disease: dict) -> dict:
+    def apply_rules_to_disease(self, disease: MappableConcept) -> MappableConcept:
         """Apply all rules to a disease. First find relevant rules, then call the
         apply method.
 
         :param disease: disease object from ETL base
         :return: processed disease object
         """
-        relevant_rules = self.rules.get(disease["concept_id"], [])
+        relevant_rules = self.rules.get(disease.primaryCoding.code.root, [])
         for rule in relevant_rules:
-            disease = self._apply_rule_to_field(disease, rule[0], rule[1])
+            self._apply_rule_to_field(disease, rule[0], rule[1])
         return disease
 
     def _apply_rule_to_field(
-        self, disease: dict, field: str, value: str | list | dict | int | float
-    ) -> dict:
+        self,
+        disease: MappableConcept,
+        field: str,
+        value: str | list | dict | int | float,
+    ) -> None:
         """Given a (field, value) rule, apply it to the given disease object.
 
-        :param disease: disease object ready to load to DB
+        :param disease: disease object ready to load to DB (transformed in place)
         :param field: name of object property field to check
         :param value: value to remove from field, if possible
-        :return: disease object with rule applied
         """
-        if field not in {"aliases", "xrefs", "associated_with"}:
+        if field == "aliases" and disease.aliases and value in disease.aliases:
+            disease.aliases.remove(value)
+        elif field == "xrefs" and disease.mappings:
+            disease.mappings = [
+                m for m in disease.mappings if m.coding.id.lower() != value.lower()
+            ]
+        else:
             msg = "Non-scalar fields currently not implemented"
             raise ValueError(msg)
-        field_data = set(disease.get(field, []))
-        if value in field_data:
-            field_data.remove(value)
-            disease[field] = list(field_data)
-        return disease
