@@ -184,9 +184,7 @@
     "aliases": [
       "NB",
       "NBL",
-      "neuroblastoma",
       "Neural Crest Tumor, Malignant",
-      "Neuroblastoma (Schwannian Stroma-poor)",
       "neuroblastoma (Schwannian Stroma-poor)",
       "Neuroblastoma (Schwannian Stroma-Poor)",
       "Neuroblastoma, NOS",
@@ -309,11 +307,7 @@
     "id": "normalize.disease.ncit:C9012",
     "type": "MappableConcept",
     "name": "Adult Cystic Teratoma",
-    "aliases": [
-      "Adult cystic teratoma",
-      "cystic teratoma of adults",
-      "adult cystic teratoma"
-    ],
+    "aliases": ["cystic teratoma of adults", "Adult cystic teratoma"],
     "extensions": [{ "name": "oncologic_disease", "value": true }],
     "conceptType": "Disease",
     "primaryCoding": {
@@ -377,9 +371,7 @@
       "BIPOLAR AFFECTIVE DISORDER",
       "MANIC-DEPRESSIVE PSYCHOSIS, X-LINKED",
       "major affective disorder 2, X-linked dominant",
-      "MAJOR affective disorder 2",
       "bipolar affective disorder",
-      "major affective disorder 2",
       "manic-depressive illness",
       "manic-depressive psychosis, X-linked"
     ],

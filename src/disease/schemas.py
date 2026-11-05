@@ -648,7 +648,12 @@ NAMESPACE_TO_SYSTEM_URI: MappingProxyType[NamespacePrefix, str] = MappingProxyTy
 
 
 def concept_id_to_coding(concept_id: str) -> Coding | None:
-    """Construct instance from a concept ID"""
+    """Construct instance from a concept ID
+
+    Note that this won't always roundtrip properly because `concept_id` sometimes comes
+    from a case-insensitive source, and we want to ensure that the correctly-cased codings
+    (and subsequent concept IDs) are properly formatted
+    """
     raw_prefix, source_code = concept_id.split(":")
 
     try:
@@ -662,13 +667,17 @@ def concept_id_to_coding(concept_id: str) -> Coding | None:
             )
             return None
 
-    id_ = concept_id
+    # this may need to be readdressed if an exception is found, but for now, all sources
+    # that use alphabetic chars in LUIs always expect uppercase
+    source_code = source_code.upper()
+
+    id_ = f"{prefix.value}:{source_code}"
 
     if prefix == NamespacePrefix.MONDO:
         source_code = concept_id.upper()
         id_ = source_code.replace(":", "_")
     elif prefix == NamespacePrefix.DOID:
-        source_code = concept_id
+        source_code = id_
 
     return Coding(
         id=id_,

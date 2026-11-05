@@ -1,5 +1,6 @@
 """Provide DynamoDB client."""
 
+from disease.schemas import coding_to_concept_id
 import atexit
 import datetime as dt
 import gzip
@@ -59,7 +60,7 @@ class DynamoDbDatabase(AbstractDatabase):
         region_name = db_args.get("region_name", "us-east-2")
 
         if AWS_ENV_VAR_NAME in environ:
-            if "DISEASE_NORM_TEST" in environ:
+            if get_config().test:
                 msg = f"Cannot have both DISEASE_NORM_TEST and {AWS_ENV_VAR_NAME} set."
                 raise DatabaseException(msg)
 
@@ -406,7 +407,7 @@ class DynamoDbDatabase(AbstractDatabase):
         :param disease: disease record to upload
         :param src_name: name of source for record
         """
-        concept_id = disease.primaryCoding.id
+        concept_id = coding_to_concept_id(disease.primaryCoding)
         if not concept_id:
             raise ValueError
         partition_key = f"{concept_id.lower()}##identity"
@@ -429,7 +430,7 @@ class DynamoDbDatabase(AbstractDatabase):
         if disease.name:
             self._add_ref_record(disease.name, concept_id, RefType.LABEL, src_name)
         if disease.aliases:
-            for alias in disease.aliases:
+            for alias in (a.lower() for a in disease.aliases):
                 self._add_ref_record(alias, concept_id, RefType.ALIASES, src_name)
         if disease.mappings:
             for mapping in disease.mappings:

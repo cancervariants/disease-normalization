@@ -366,9 +366,7 @@
       "major affective disorder 2, X-linked dominant",
       "manic-depressive illness",
       "manic-depressive psychosis, X-linked",
-      "MAFD2",
-      "MAJOR affective disorder 2",
-      "major affective disorder 2"
+      "MAFD2"
     ],
     "extensions": [],
     "conceptType": "Disease",
@@ -418,7 +416,6 @@
     "name": "neuroblastoma",
     "aliases": [
       "NB",
-      "neuroblastoma",
       "neural Crest tumor, malignant",
       "neuroblastoma (Schwannian Stroma-poor)",
       "neuroblastoma, malignant"
@@ -502,7 +499,6 @@
     "type": "MappableConcept",
     "name": "Richter syndrome",
     "aliases": [
-      "Richter syndrome",
       "Richter's syndrome",
       "Richter transformation",
       "Richter's transformation"
@@ -553,11 +549,7 @@
     "id": "mondo:0003587",
     "type": "MappableConcept",
     "name": "pediatric liposarcoma",
-    "aliases": [
-      "pediatric liposarcoma",
-      "childhood liposarcoma",
-      "liposarcoma"
-    ],
+    "aliases": ["childhood liposarcoma", "liposarcoma"],
     "extensions": [
       { "name": "oncologic_disease", "value": true },
       { "name": "pediatric_disease", "value": true }
@@ -607,7 +599,7 @@
     "id": "mondo:0004099",
     "type": "MappableConcept",
     "name": "adult cystic teratoma",
-    "aliases": ["cystic teratoma of adults", "adult cystic teratoma"],
+    "aliases": ["cystic teratoma of adults"],
     "extensions": [{ "name": "oncologic_disease", "value": true }],
     "conceptType": "Disease",
     "primaryCoding": {
@@ -662,8 +654,7 @@
       "non-small cell cancer of lung",
       "non-small cell lung cancer",
       "non-small cell cancer of the lung",
-      "NSCLC",
-      "non-small cell lung carcinoma"
+      "NSCLC"
     ],
     "extensions": [{ "name": "oncologic_disease", "value": true }],
     "conceptType": "Disease",
@@ -838,11 +829,9 @@
     "aliases": [
       "Neural Crest Tumor, Malignant",
       "Neuroblastoma (NBL)",
-      "Neuroblastoma (Schwannian Stroma-poor)",
       "Neuroblastoma (Schwannian Stroma-Poor)",
       "NEUROBLASTOMA, MALIGNANT",
-      "Neuroblastoma, NOS",
-      "neuroblastoma"
+      "Neuroblastoma, NOS"
     ],
     "conceptType": "Disease",
     "primaryCoding": {
@@ -878,7 +867,6 @@
       "Non-Small Cell Lung Cancer",
       "Non-Small Cell Cancer of the Lung",
       "NSCLC",
-      "non-small cell lung cancer",
       "Non-Small Cell Carcinoma of the Lung",
       "Non-Small Cell Cancer of Lung",
       "Non-small cell lung cancer, NOS",

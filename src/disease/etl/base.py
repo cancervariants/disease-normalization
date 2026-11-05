@@ -100,7 +100,11 @@ class Base(ABC):
         raise NotImplementedError
 
     def _load_disease(self, disease: MappableConcept) -> None:
-        """Load individual disease record."""
+        """Load individual disease record.
+
+        * drop case duplicates (take alphabetically prior alias)
+        * drop all if > 20 aliases
+        """
         if disease.conceptType != DISEASE_CONCEPT_TYPE:
             raise ValueError
         concept_id: str = disease.id
@@ -109,10 +113,19 @@ class Base(ABC):
             if not disease.aliases:
                 disease.aliases = None
             else:
-                disease.aliases = list(set(disease.aliases))
+                new_aliases = []
+                seen = set()
+                for a in sorted(disease.aliases):
+                    a_cf = a.casefold()
+                    if a_cf == disease.name.casefold() or a_cf in seen:
+                        continue
+                    new_aliases.append(a)
+                    seen.add(a_cf)
                 if len(disease.aliases) > 20:  # noqa: PLR2004
                     _logger.debug("%s has > 20 aliases.", concept_id)
                     disease.aliases = None
+                else:
+                    disease.aliases = new_aliases
         if disease.mappings is not None:
             if not disease.mappings:
                 disease.mappings = None

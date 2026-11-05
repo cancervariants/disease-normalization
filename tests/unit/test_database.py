@@ -32,10 +32,12 @@ def db() -> AbstractDatabase:
     db_instance = create_db()
     try:
         db_instance.drop_db()
+        db_instance.complete_write_transaction()
         db_instance.initialize_db()
         yield db_instance
     finally:
         db_instance.drop_db()
+        db_instance.complete_write_transaction()
 
 
 @pytest.mark.skipif(not IS_TEST_ENV, reason="not in test environment")
@@ -140,6 +142,7 @@ def test_get_all_concept_ids(
         src = PREFIX_LOOKUP[src_prefix.lower()]
         result = db.get_all_concept_ids(src)
         assert set(result) == concept_ids
+        assert False
 
 
 @pytest.mark.skipif(not IS_TEST_ENV, reason="not in test environment")
