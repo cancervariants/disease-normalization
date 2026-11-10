@@ -244,6 +244,15 @@ def test_merged_crud(
             result = db.get_record_by_id(grp_member_id)
             assert result["merge_ref"] == merged_id
 
+    for merged_id, merged_disease in merged_diseases.items():
+        expected = mapcon_to_disease(merged_disease).model_dump(exclude_none=True)
+        expected["item_type"] = RecordType.MERGER.value
+        assert db.get_record_by_id(merged_id, merge=True) == expected
+        assert (
+            db.get_record_by_id(merged_id.upper(), case_sensitive=False, merge=True)
+            == expected
+        )
+
     db.delete_normalized_concepts()
     for merged_id in merged_diseases:
         for grp_member_id in merged_groups[merged_id]:
