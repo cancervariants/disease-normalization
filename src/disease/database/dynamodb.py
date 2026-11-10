@@ -1,6 +1,5 @@
 """Provide DynamoDB client."""
 
-from disease.schemas import coding_to_concept_id
 import atexit
 import datetime as dt
 import gzip
@@ -39,6 +38,7 @@ from disease.schemas import (
     SourceDataSet,
     SourceMeta,
     SourceName,
+    coding_to_concept_id,
     mapcon_to_disease,
 )
 

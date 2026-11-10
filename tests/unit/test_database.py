@@ -142,7 +142,6 @@ def test_get_all_concept_ids(
         src = PREFIX_LOOKUP[src_prefix.lower()]
         result = db.get_all_concept_ids(src)
         assert set(result) == concept_ids
-        assert False
 
 
 @pytest.mark.skipif(not IS_TEST_ENV, reason="not in test environment")
