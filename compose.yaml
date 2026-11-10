@@ -1,6 +1,6 @@
 services:
   api:
-    image: cancervariants/disease-normalizer-api:0.13.0
+    image: ghcr.io/cancervariants/disease-normalizer-api:0.14.0
     environment:
       # Dummy AWS credentials, don't need to use real ones
       AWS_ACCESS_KEY_ID: dummy
@@ -25,6 +25,6 @@ services:
       - /tmp
 
   disease-dynamodb-local:
-    image: cancervariants/disease-normalizer-ddb:2025-12-29
+    image: ghcr.io/cancervariants/disease-normalizer-ddb:2026-10-20
     ports:
-     - 127.0.0.1:8000:8000
+      - 127.0.0.1:8000:8000
