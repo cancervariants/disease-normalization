@@ -14,7 +14,7 @@ from wags_tails import CustomData, DataSource, DoData, MondoData, NcitData, Onco
 
 from disease.database import AbstractDatabase
 from disease.etl.rules import Rules
-from disease.schemas import DISEASE_CONCEPT_TYPE, SourceName
+from disease.schemas import DISEASE_CONCEPT_TYPE, SourceName, coding_to_concept_id
 
 DATA_DISPATCH = {
     SourceName.NCIT: NcitData,
@@ -130,10 +130,10 @@ class Base(ABC):
             if not disease.mappings:
                 disease.mappings = None
             else:
-                # inelegantly drop duplicates -- probably fine
-                # TODO double check this
                 disease.mappings = list(
-                    {m.coding.code.root: m for m in disease.mappings}.values()
+                    {
+                        coding_to_concept_id(m.coding): m for m in disease.mappings
+                    }.values()
                 )
 
         disease = self._rules.apply_rules_to_disease(disease)
