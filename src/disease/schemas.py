@@ -652,6 +652,8 @@ def concept_id_to_coding(concept_id: str) -> Coding | None:
     Note that this won't always roundtrip properly because `concept_id` sometimes comes
     from a case-insensitive source, and we want to ensure that the correctly-cased codings
     (and subsequent concept IDs) are properly formatted
+
+    :param concept_id: Namespaced concept identifier to convert to a coding.
     """
     raw_prefix, source_code = concept_id.split(":")
 
@@ -686,7 +688,10 @@ def concept_id_to_coding(concept_id: str) -> Coding | None:
 
 
 def coding_to_concept_id(coding: Coding) -> str:
-    """Get concept ID from coding object"""
+    """Get concept ID from coding object
+
+    :param coding: Coding to convert to a namespaced concept identifier.
+    """
     if coding.system == NAMESPACE_TO_SYSTEM_URI[NamespacePrefix.MONDO]:
         return coding.id.replace("_", ":").lower()
     if coding.system == NAMESPACE_TO_SYSTEM_URI[NamespacePrefix.DOID]:
@@ -702,6 +707,8 @@ def mapcon_to_disease(disease: Condition) -> Disease:
 
     It will definitely get used redundantly to preserve APIs between pull requests,
     and at the end should unwind cleanly
+
+    :param disease: Disease mappable concept to convert to an old-style disease record.
     """
     aw = []
     xrefs = []
@@ -740,6 +747,8 @@ def disease_to_mapcon(disease: Disease) -> Condition:
     """Get mappable concept from disease record
 
     This function is temporary (see above)
+
+    :param disease: Old-style disease record to convert to a disease mappable concept.
     """
     extensions = []
     if disease.pediatric_disease:
