@@ -109,6 +109,14 @@ def test_normalize_non_mondo(
     compare_disease(response, merged_diseases["normalize.disease.ncit:C167370"])
     assert SourceName.NCIT in response.source_meta_
 
+    for concept_id in ("ncit:C167370", "NCIT:c167370"):
+        response = query_handler.normalize(concept_id)
+        assert response.match_type == MatchType.CONCEPT_ID
+        assert response.warnings is None
+        assert len(response.source_meta_) == 1
+        compare_disease(response, merged_diseases["normalize.disease.ncit:C167370"])
+        assert SourceName.NCIT in response.source_meta_
+
     response = query_handler.normalize("orphanet:635")
     assert response.match_type == MatchType.XREF
     assert len(response.source_meta_) == 4
