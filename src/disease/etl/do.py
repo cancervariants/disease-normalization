@@ -10,7 +10,7 @@ from ga4gh.core.models import (
     code,
     iriReference,
 )
-from ga4gh.va_spec.base import DataSet
+from ga4gh.va_spec.base import Condition, DataSet
 from tqdm import tqdm
 
 from disease.etl.base import OWLBase
@@ -120,7 +120,7 @@ class DO(OWLBase):
                 extensions = None
 
             self._load_disease(
-                MappableConcept(
+                Condition(
                     id=concept_id,
                     conceptType=DISEASE_CONCEPT_TYPE,
                     primaryCoding=concept_id_to_coding(concept_id),

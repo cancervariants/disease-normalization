@@ -14,8 +14,7 @@ from pathlib import Path
 from typing import Any
 
 import click
-from ga4gh.core.models import MappableConcept
-from ga4gh.va_spec.base import DataSet
+from ga4gh.va_spec.base import Condition, DataSet
 
 from disease.config import get_config
 from disease.schemas import (
@@ -185,7 +184,7 @@ class AbstractDatabase(abc.ABC):
         """
 
     @abc.abstractmethod
-    def add_record(self, disease: MappableConcept, src_name: SourceName) -> None:
+    def add_record(self, disease: Condition, src_name: SourceName) -> None:
         """Add new record to database.
 
         :param disease: disease record to upload
@@ -193,7 +192,7 @@ class AbstractDatabase(abc.ABC):
         """
 
     @abc.abstractmethod
-    def add_merged_record(self, record: MappableConcept) -> None:
+    def add_merged_record(self, record: Condition) -> None:
         """Add merged record to database.
 
         :param record: merged record to add

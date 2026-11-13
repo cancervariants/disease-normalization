@@ -16,8 +16,7 @@ import boto3
 import click
 from boto3.dynamodb.conditions import Attr, ConditionBase, Key
 from botocore.exceptions import ClientError
-from ga4gh.core.models import MappableConcept
-from ga4gh.va_spec.base import DataSet
+from ga4gh.va_spec.base import Condition, DataSet
 
 from disease.config import get_config
 from disease.database.database import (
@@ -292,9 +291,9 @@ class DynamoDbDatabase(AbstractDatabase):
         """Convert a stored concept to the database response format."""
         data = _record["data"]
         concept = (
-            MappableConcept.model_validate_json(data)
+            Condition.model_validate_json(data)
             if isinstance(data, str)
-            else MappableConcept(**data)
+            else Condition(**data)
         )
         record = mapcon_to_disease(concept).model_dump(
             exclude_none=_record["item_type"] == RecordType.MERGER
@@ -421,7 +420,7 @@ class DynamoDbDatabase(AbstractDatabase):
         except ClientError as e:
             raise DatabaseWriteException(e) from e
 
-    def add_record(self, disease: MappableConcept, src_name: SourceName) -> None:
+    def add_record(self, disease: Condition, src_name: SourceName) -> None:
         """Add new record to database.
 
         :param disease: disease record to upload
@@ -460,17 +459,17 @@ class DynamoDbDatabase(AbstractDatabase):
             for term in terms:
                 self._add_ref_record(term, concept_id, ref_type, src_name)
 
-    def add_merged_record(self, disease: MappableConcept) -> None:
+    def add_merged_record(self, record: Condition) -> None:
         """Add merged record to database.
 
         :param record: merged record to add
         """
-        concept_id = disease.id
+        concept_id = record.id
         params = {
             "label_and_type": f"{concept_id.lower()}##{RecordType.MERGER.value}",
             "concept_id": concept_id,
             "item_type": RecordType.MERGER.value,
-            "data": disease.model_dump_json(exclude_unset=True, exclude_none=True),
+            "data": record.model_dump_json(exclude_unset=True, exclude_none=True),
         }
         try:
             self.batch.put_item(Item=params)

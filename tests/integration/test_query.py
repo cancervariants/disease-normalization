@@ -4,7 +4,7 @@ from datetime import datetime
 
 import pytest
 from deepdiff import DeepDiff
-from ga4gh.core.models import MappableConcept
+from ga4gh.va_spec.base import Condition
 
 from disease.database import AbstractDatabase
 from disease.query import InvalidParameterException, QueryHandler
@@ -73,7 +73,7 @@ def test_query_specify_query_handlers(query_handler: QueryHandler):
 
 
 def test_normalize_query(
-    query_handler: QueryHandler, merged_diseases: dict[str, MappableConcept]
+    query_handler: QueryHandler, merged_diseases: dict[str, Condition]
 ):
     response = query_handler.normalize("Neuroblastoma")
     assert response.match_type == MatchType.LABEL
@@ -94,7 +94,7 @@ def test_normalize_query(
 
 
 def test_normalize_non_mondo(
-    query_handler: QueryHandler, merged_diseases: dict[str, MappableConcept]
+    query_handler: QueryHandler, merged_diseases: dict[str, Condition]
 ):
     """Test that normalize endpoint returns records not in Mondo groups."""
     response = query_handler.normalize("Skin Myoepithelioma")

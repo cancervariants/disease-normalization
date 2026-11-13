@@ -3,7 +3,7 @@
 import csv
 from pathlib import Path
 
-from ga4gh.core.models import MappableConcept
+from ga4gh.va_spec.base import Condition
 
 from disease.schemas import SourceName
 
@@ -39,9 +39,8 @@ class Rules:
                     else:
                         self.rules[concept_id].append((row["field"], row["value"]))
 
-    def apply_rules_to_disease(self, disease: MappableConcept) -> MappableConcept:
-        """Apply all rules to a disease. First find relevant rules, then call the
-        apply method.
+    def apply_rules_to_disease(self, disease: Condition) -> Condition:
+        """Apply all rules to a disease. First find relevant rules, then call the apply method.
 
         :param disease: disease object from ETL base
         :return: processed disease object
@@ -53,7 +52,7 @@ class Rules:
 
     def _apply_rule_to_field(
         self,
-        disease: MappableConcept,
+        disease: Condition,
         field: str,
         value: str | list | dict | int | float,
     ) -> None:

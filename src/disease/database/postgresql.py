@@ -12,8 +12,8 @@ from typing import Any, ClassVar
 
 import psycopg
 import requests
-from ga4gh.core.models import MappableConcept, Relation
-from ga4gh.va_spec.base import DataSet
+from ga4gh.core.models import Relation
+from ga4gh.va_spec.base import Condition, DataSet
 from psycopg.errors import DuplicateObject, DuplicateTable, UniqueViolation
 from psycopg.types.json import Jsonb
 
@@ -284,7 +284,7 @@ class PostgresDatabase(AbstractDatabase):
         :param source_row: result tuple from psycopg
         :return: reformatted dictionary keying disease properties to row values
         """
-        mc = MappableConcept(**source_row[3])
+        mc = Condition(**source_row[3])
         record = mapcon_to_disease(mc).model_dump()
         record["src_name"] = source_row[1]
         record["merge_ref"] = source_row[2]
@@ -317,7 +317,7 @@ class PostgresDatabase(AbstractDatabase):
         :param merged_row: result tuple from psycopg
         :return: reformatted dictionary keying normalized disease properties to row values
         """
-        disease_mc = MappableConcept(**merged_row[1])
+        disease_mc = Condition(**merged_row[1])
         record = mapcon_to_disease(disease_mc).model_dump(exclude_none=True)
         record["item_type"] = RecordType.MERGER.value
         return record
@@ -493,7 +493,7 @@ class PostgresDatabase(AbstractDatabase):
     _insert_xref_query = b"INSERT INTO disease_xrefs (xref, concept_id) VALUES (%s, %s)"
     _insert_assoc_query = b"INSERT INTO disease_associations (associated_with, concept_id) VALUES (%s, %s)"
 
-    def add_record(self, disease: MappableConcept, src_name: SourceName) -> None:
+    def add_record(self, disease: Condition, src_name: SourceName) -> None:
         """Add new record to database.
 
         :param disease: disease record to upload
@@ -537,7 +537,7 @@ class PostgresDatabase(AbstractDatabase):
         b"""INSERT INTO disease_merged (concept_id, data) VALUES (%s, %s);"""
     )
 
-    def add_merged_record(self, disease: MappableConcept) -> None:
+    def add_merged_record(self, record: Condition) -> None:
         """Add merged record to database.
 
         :param record: merged record to add
@@ -546,8 +546,8 @@ class PostgresDatabase(AbstractDatabase):
             cur.execute(
                 self._add_merged_record_query,
                 [
-                    disease.id,
-                    Jsonb(disease.model_dump(exclude_none=True, exclude_unset=True)),
+                    record.id,
+                    Jsonb(record.model_dump(exclude_none=True, exclude_unset=True)),
                 ],
             )
             self.conn.commit()

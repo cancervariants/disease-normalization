@@ -13,7 +13,7 @@ from ga4gh.core.models import (
     code,
     iriReference,
 )
-from ga4gh.va_spec.base import DataSet
+from ga4gh.va_spec.base import Condition, DataSet
 from tqdm import tqdm
 
 from disease.etl.base import OWLBase
@@ -124,7 +124,7 @@ class NCIt(OWLBase):
                         ConceptMapping(coding=coding, relation=Relation.RELATED_MATCH)
                     )
 
-            disease = MappableConcept(
+            disease = Condition(
                 id=concept_id,
                 primaryCoding=concept_id_to_coding(concept_id),
                 name=name,

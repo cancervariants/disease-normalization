@@ -12,7 +12,7 @@ from ga4gh.core.models import (
     code,
     iriReference,
 )
-from ga4gh.va_spec.base import DataSet
+from ga4gh.va_spec.base import Condition, DataSet
 from tqdm import tqdm
 
 from disease.etl.base import Base
@@ -119,7 +119,7 @@ class OncoTree(Base):
                 )
                 continue
         primary_coding = concept_id_to_coding(concept_id)
-        disease = MappableConcept(
+        disease = Condition(
             id=concept_id,
             primaryCoding=primary_coding,
             conceptType=DISEASE_CONCEPT_TYPE,

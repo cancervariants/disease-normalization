@@ -1,8 +1,7 @@
 from pathlib import Path
 
 import deepdiff
-from ga4gh.core.models import MappableConcept
-from ga4gh.va_spec.base import DataSet
+from ga4gh.va_spec.base import Condition, DataSet
 
 from disease.database import AbstractDatabase
 from disease.etl.ncit import NCIt
@@ -12,7 +11,7 @@ from disease.schemas import SourceName
 def test_ncit_etl(
     mock_db_class: type[AbstractDatabase],
     test_data_dir: Path,
-    diseases: dict[str, MappableConcept],
+    diseases: dict[str, Condition],
     sources: dict[SourceName, DataSet],
 ):
     db = mock_db_class()

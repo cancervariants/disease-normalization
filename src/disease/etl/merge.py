@@ -4,7 +4,8 @@ import logging
 from collections.abc import Collection
 from timeit import default_timer as timer
 
-from ga4gh.core.models import ConceptMapping, MappableConcept, Relation
+from ga4gh.core.models import ConceptMapping, Relation
+from ga4gh.va_spec.base import Condition
 from tqdm import tqdm
 
 from disease.database.database import AbstractDatabase
@@ -120,7 +121,7 @@ class Merge:
 
     def _generate_merged_record(
         self, record_id_set: set[str]
-    ) -> tuple[MappableConcept, list]:
+    ) -> tuple[Condition, list]:
         """Generate merged record from provided concept ID group.
 
         Misc notes
@@ -136,7 +137,7 @@ class Merge:
         :return: completed merged drug object to be stored in DB, as well as
             a list of the IDs ultimately included in said record
         """
-        records: list[MappableConcept] = []
+        records: list[Condition] = []
         final_ids = []
         for record_id in record_id_set:
             _record = self._database.get_record_by_id(record_id)
@@ -151,7 +152,7 @@ class Merge:
                     record_id_set,
                 )
 
-        def record_order(disease: MappableConcept) -> tuple:
+        def record_order(disease: Condition) -> tuple:
             """Provide priority values of concepts for sort function."""
             prefix = disease.id.split(":", 1)[0]
             src_name = PREFIX_LOOKUP[prefix.lower()]
@@ -197,7 +198,7 @@ class Merge:
             list({e.name: e for e in extensions}.values()) if extensions else None
         )
 
-        merged_disease = MappableConcept(
+        merged_disease = Condition(
             id=f"normalize.disease.{concept_id}",
             conceptType=DISEASE_CONCEPT_TYPE,
             primaryCoding=primary_coding,

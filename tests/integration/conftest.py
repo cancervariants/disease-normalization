@@ -1,3 +1,4 @@
+from collections.abc import Generator
 from pathlib import Path
 
 import pytest
@@ -8,7 +9,7 @@ from disease.schemas import SourceName
 
 
 @pytest.fixture(scope="module")
-def db() -> AbstractDatabase:
+def db() -> Generator[AbstractDatabase, None, None]:
     """A real live db instance (gets overwritten immediately)
 
     Different from the DB defined in tests/conftest.py by scope -- this should only

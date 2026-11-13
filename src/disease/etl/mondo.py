@@ -15,7 +15,7 @@ from ga4gh.core.models import (
     code,
     iriReference,
 )
-from ga4gh.va_spec.base import DataSet
+from ga4gh.va_spec.base import Condition, DataSet
 from tqdm import tqdm
 
 from disease.etl.base import Base
@@ -184,7 +184,7 @@ class Mondo(Base):
         concept_id: str,
         is_ped: bool,
         is_onco: bool,
-    ) -> MappableConcept:
+    ) -> Condition:
         """Extract disease params from an OBO term frame.
 
         :param frame: individual frame from OBO file
@@ -232,7 +232,7 @@ class Mondo(Base):
         if is_ped:
             extensions.append(Extension(name="pediatric_disease", value=True))
         primary_coding = concept_id_to_coding(concept_id)
-        return MappableConcept(
+        return Condition(
             id=concept_id,
             conceptType=DISEASE_CONCEPT_TYPE,
             primaryCoding=primary_coding,

@@ -3,7 +3,7 @@
 from pathlib import Path
 
 from ga4gh.core.models import Coding, Extension, MappableConcept, code, iriReference
-from ga4gh.va_spec.base import DataSet
+from ga4gh.va_spec.base import Condition, DataSet
 from tqdm import tqdm
 from wags_tails import CustomData, DataSource
 
@@ -102,7 +102,7 @@ class OMIM(Base):
                 {alias.removesuffix(", INCLUDED").lstrip() for alias in aliases}
             )
 
-            disease = MappableConcept(
+            disease = Condition(
                 id=concept_id,
                 primaryCoding=concept_id_to_coding(concept_id),
                 name=name,

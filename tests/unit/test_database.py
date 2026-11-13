@@ -7,8 +7,7 @@ migration to VA-Spec for everything is complete.
 from collections import defaultdict
 
 import pytest
-from ga4gh.core.models import MappableConcept
-from ga4gh.va_spec.base import DataSet
+from ga4gh.va_spec.base import Condition, DataSet
 
 from disease.config import get_config
 from disease.database import create_db
@@ -44,8 +43,8 @@ def db() -> AbstractDatabase:
 def test_db_healthchecks(
     db: AbstractDatabase,
     sources: dict[SourceName, DataSet],
-    diseases: dict[str, MappableConcept],
-    merged_diseases: dict[str, MappableConcept],
+    diseases: dict[str, Condition],
+    merged_diseases: dict[str, Condition],
 ):
     # this should always pass here but just double-checking
     assert db.check_schema_initialized(), "schema appears un-initialized"
@@ -86,7 +85,7 @@ def test_crud_source_metadata(db: AbstractDatabase, sources: dict[SourceName, Da
 @pytest.mark.skipif(not IS_TEST_ENV, reason="not in test environment")
 def test_crud_source_records(
     db: AbstractDatabase,
-    diseases: dict[str, MappableConcept],
+    diseases: dict[str, Condition],
     sources: dict[SourceName, DataSet],
 ):
     for name in SourceName:
@@ -120,7 +119,7 @@ def test_crud_source_records(
 @pytest.mark.skipif(not IS_TEST_ENV, reason="not in test environment")
 def test_get_all_concept_ids(
     db: AbstractDatabase,
-    diseases: dict[str, MappableConcept],
+    diseases: dict[str, Condition],
     sources: dict[SourceName, DataSet],
 ):
     for name in SourceName:
@@ -147,7 +146,7 @@ def test_get_all_concept_ids(
 @pytest.mark.skipif(not IS_TEST_ENV, reason="not in test environment")
 def test_get_all_records(
     db: AbstractDatabase,
-    diseases: dict[str, MappableConcept],
+    diseases: dict[str, Condition],
     sources: dict[SourceName, DataSet],
 ):
     for name in SourceName:
@@ -164,7 +163,7 @@ def test_get_all_records(
 @pytest.mark.skipif(not IS_TEST_ENV, reason="not in test environment")
 def test_get_all_merged_records(
     db: AbstractDatabase,
-    merged_diseases: dict[str, MappableConcept],
+    merged_diseases: dict[str, Condition],
 ):
     for record in merged_diseases.values():
         db.add_merged_record(record)
@@ -182,7 +181,7 @@ def test_get_all_merged_records(
 @pytest.mark.skipif(not IS_TEST_ENV, reason="not in test environment")
 def test_get_refs_by_type(
     db: AbstractDatabase,
-    diseases: dict[str, MappableConcept],
+    diseases: dict[str, Condition],
     sources: dict[SourceName, DataSet],
 ):
     for name in SourceName:
@@ -224,8 +223,8 @@ def test_get_refs_by_type(
 @pytest.mark.skipif(not IS_TEST_ENV, reason="not in test environment")
 def test_merged_crud(
     db: AbstractDatabase,
-    diseases: dict[str, MappableConcept],
-    merged_diseases: dict[str, MappableConcept],
+    diseases: dict[str, Condition],
+    merged_diseases: dict[str, Condition],
     merged_groups: dict[str, list[str]],
     sources: dict[SourceName, DataSet],
 ):
@@ -263,7 +262,7 @@ def test_merged_crud(
 @pytest.mark.skipif(not IS_TEST_ENV, reason="not in test environment")
 def test_delete_source(
     db: AbstractDatabase,
-    diseases: dict[str, MappableConcept],
+    diseases: dict[str, Condition],
     sources: dict[SourceName, DataSet],
 ):
     for name in SourceName:

@@ -8,10 +8,7 @@ from pathlib import Path
 from typing import Any
 
 import pytest
-from ga4gh.core.models import (
-    MappableConcept,
-)
-from ga4gh.va_spec.base import DataSet
+from ga4gh.va_spec.base import Condition, DataSet
 
 from disease.config import get_config
 from disease.database.database import AWS_ENV_VAR_NAME, AbstractDatabase, create_db
@@ -125,9 +122,9 @@ def mock_db_class():
         def __init__(self, db_url: str | None = None, **db_args) -> None:  # noqa: ARG002
             self._get_all_records_values = db_args.get("get_all_records", {})
             self._get_record_by_id_values = db_args.get("get_record_by_id", {})
-            self._added_records: dict[str, MappableConcept] = {}
-            self._added_sources: dict[SourceName, MappableConcept] = {}
-            self._added_merged_records: dict[str, MappableConcept] = {}
+            self._added_records: dict[str, Condition] = {}
+            self._added_sources: dict[SourceName, Condition] = {}
+            self._added_merged_records: dict[str, Condition] = {}
             self._updated_merge_refs: dict[str, str] = {}
             self._delete_merge_called = False
             self._delete_source_calls = set()
@@ -179,10 +176,10 @@ def mock_db_class():
         def add_source_metadata(self, source_name: SourceName, source: DataSet) -> None:
             self._added_sources[source_name] = source
 
-        def add_record(self, disease: MappableConcept, src_name: SourceName) -> None:  # noqa: ARG002
+        def add_record(self, disease: Condition, src_name: SourceName) -> None:  # noqa: ARG002
             self._added_records[disease.id] = disease
 
-        def add_merged_record(self, record: MappableConcept) -> None:
+        def add_merged_record(self, record: Condition) -> None:
             self._added_merged_records[record.id] = record
 
         def update_merge_ref(self, concept_id: str, merge_ref: Any) -> None:  # noqa: ANN401
@@ -206,17 +203,17 @@ def mock_db_class():
 
 
 @pytest.fixture
-def diseases(test_data_dir: Path) -> dict[str, MappableConcept]:
+def diseases(test_data_dir: Path) -> dict[str, Condition]:
     with (test_data_dir / "diseases.json").open() as f:
         data = json.load(f)
-    return {k: MappableConcept(**v) for k, v in data.items()}
+    return {k: Condition(**v) for k, v in data.items()}
 
 
 @pytest.fixture
-def merged_diseases(test_data_dir: Path) -> dict[str, MappableConcept]:
+def merged_diseases(test_data_dir: Path) -> dict[str, Condition]:
     with (test_data_dir / "merged_diseases.json").open() as f:
         data = json.load(f)
-    return {k: MappableConcept(**v) for k, v in data.items()}
+    return {k: Condition(**v) for k, v in data.items()}
 
 
 @pytest.fixture
@@ -250,7 +247,7 @@ def sources(test_data_dir: Path) -> dict[str, DataSet]:
 
 
 @pytest.fixture
-def db() -> AbstractDatabase:
+def db() -> Generator[AbstractDatabase, None, None]:
     """A real live db instance (gets overwritten immediately)"""
     db_instance = create_db()
     try:

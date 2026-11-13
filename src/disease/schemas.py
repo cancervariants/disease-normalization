@@ -10,11 +10,10 @@ from ga4gh.core.models import (
     Coding,
     ConceptMapping,
     Extension,
-    MappableConcept,
     Relation,
     code,
 )
-from ga4gh.va_spec.base import DataSet
+from ga4gh.va_spec.base import Condition, DataSet
 from pydantic import BaseModel, ConfigDict, StrictBool, StrictStr
 
 from disease import __version__
@@ -313,7 +312,7 @@ class NormalizationService(BaseModel):
     query: StrictStr
     warnings: dict | None = None
     match_type: MatchType
-    disease: MappableConcept | None = None
+    disease: Condition | None = None
     source_meta_: dict[SourceName, SourceMeta] | None = None
     service_meta_: ServiceMeta
 
@@ -695,7 +694,7 @@ def coding_to_concept_id(coding: Coding) -> str:
     return coding.id
 
 
-def mapcon_to_disease(disease: MappableConcept) -> Disease:
+def mapcon_to_disease(disease: Condition) -> Disease:
     """Construct old-style disease record from a disease mappableconcept
 
     This is a temporary function to help transition from the old disease class --
@@ -737,7 +736,7 @@ def mapcon_to_disease(disease: MappableConcept) -> Disease:
     )
 
 
-def disease_to_mapcon(disease: Disease) -> MappableConcept:
+def disease_to_mapcon(disease: Disease) -> Condition:
     """Get mappable concept from disease record
 
     This function is temporary (see above)
@@ -756,7 +755,8 @@ def disease_to_mapcon(disease: Disease) -> MappableConcept:
         ConceptMapping(relation=Relation.RELATED_MATCH, coding=concept_id_to_coding(aw))
         for aw in disease.associated_with
     )
-    return MappableConcept(
+    return Condition(
+        conceptType=DISEASE_CONCEPT_TYPE,
         id=disease.concept_id,
         name=disease.label,
         primaryCoding=concept_id_to_coding(disease.concept_id),

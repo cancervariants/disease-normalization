@@ -8,7 +8,7 @@ from abc import ABC, abstractmethod
 from pathlib import Path
 
 import click
-from ga4gh.core.models import MappableConcept
+from ga4gh.va_spec.base import Condition
 from owlready2.rdflib_store import TripleLiteRDFlibGraph as RDFGraph
 from wags_tails import CustomData, DataSource, DoData, MondoData, NcitData, OncoTreeData
 
@@ -99,7 +99,7 @@ class Base(ABC):
     def _load_meta(self, *args, **kwargs) -> None:
         raise NotImplementedError
 
-    def _load_disease(self, disease: MappableConcept) -> None:
+    def _load_disease(self, disease: Condition) -> None:
         """Load individual disease record.
 
         * drop case duplicates (take alphabetically prior alias)
