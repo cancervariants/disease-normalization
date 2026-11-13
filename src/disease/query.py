@@ -443,9 +443,7 @@ class QueryHandler:
                         merge_ref, case_sensitive=False, merge=True
                     )
                     if merge is None:
-                        return self._handle_failed_merge_ref(
-                            record, response, query_str
-                        )
+                        return self._handle_failed_merge_ref(match, response, query_str)
                     return self._add_disease(
                         response, merge, MatchType[match_type.upper()]
                     )
