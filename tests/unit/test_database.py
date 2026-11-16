@@ -5,6 +5,7 @@ migration to VA-Spec for everything is complete.
 """
 
 from collections import defaultdict
+from collections.abc import Generator
 
 import pytest
 from ga4gh.va_spec.base import Condition, DataSet
@@ -26,7 +27,7 @@ IS_TEST_ENV = get_config().test
 
 
 @pytest.fixture
-def db() -> AbstractDatabase:
+def db() -> Generator[AbstractDatabase]:
     """A real live db instance (gets overwritten immediately)"""
     db_instance = create_db()
     try:
@@ -138,7 +139,7 @@ def test_get_all_concept_ids(
         prefix = curie.split(":", 1)[0]
         grouped[prefix].add(curie)
     for src_prefix, concept_ids in grouped.items():
-        src = PREFIX_LOOKUP[src_prefix.lower()]
+        src = SourceName[PREFIX_LOOKUP[src_prefix.lower()]]
         result = db.get_all_concept_ids(src)
         assert set(result) == concept_ids
 

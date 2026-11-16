@@ -12,7 +12,7 @@ from pydantic import BaseModel, field_validator
 
 from disease.schemas import concept_id_to_coding
 
-_ETL_DIR = files("disease").joinpath("etl")
+_ETL_DIR = files("disease.etl")
 CATEGORY_MAPPINGS = _ETL_DIR.joinpath("category_mappings.sssom.tsv")
 CONCEPT_MAPPINGS = _ETL_DIR.joinpath("concept_mappings.sssom.tsv")
 
@@ -91,7 +91,7 @@ def load_mappings(path: Traversable) -> defaultdict[str, list[SssomMapping]]:
 
 
 def get_etl_mappings() -> defaultdict[str, list[ConceptMapping]]:
-    """Return curated mappings for the database API, keyed by source concept ID.
+    """Return mappings for the ETL process, keyed by source concept ID.
 
     Category mappings must be broad matches to OncoTree; concept mappings must be
     exact matches. Callers must pass the results separately from source-derived

@@ -11,7 +11,8 @@ CREATE TABLE disease_concepts (
     concept_id VARCHAR(127) PRIMARY KEY,
     source VARCHAR(127) NOT NULL REFERENCES disease_sources (name),
     merge_ref VARCHAR(127) REFERENCES disease_merged (concept_id),
-    data JSONB
+    data JSONB,
+    curated_mappings JSONB NOT NULL DEFAULT '[]'::jsonb
 );
 CREATE TABLE disease_labels (
     id SERIAL PRIMARY KEY,

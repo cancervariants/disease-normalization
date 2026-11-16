@@ -14,6 +14,7 @@ from pathlib import Path
 from typing import Any
 
 import click
+from ga4gh.core.models import ConceptMapping
 from ga4gh.va_spec.base import Condition, DataSet
 
 from disease.config import get_config
@@ -184,11 +185,21 @@ class AbstractDatabase(abc.ABC):
         """
 
     @abc.abstractmethod
-    def add_record(self, disease: Condition, src_name: SourceName) -> None:
-        """Add new record to database.
+    def add_record(
+        self,
+        disease: Condition,
+        src_name: SourceName,
+        *,
+        curated_mappings: list[ConceptMapping] | None = None,
+    ) -> None:
+        """Add a source-derived record with separately stored curated mappings.
 
-        :param disease: disease record to upload
-        :param src_name: name of source for record.
+        :param disease: source-derived disease record, including source-provided
+            mappings only
+        :param src_name: name of source for record
+        :param curated_mappings: curated additions to store separately from the
+            source record. Omitted, None, and empty lists mean no curated mappings.
+            These additions do not affect retrieval or lookup indexing yet.
         """
 
     @abc.abstractmethod

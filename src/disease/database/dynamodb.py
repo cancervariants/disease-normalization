@@ -16,6 +16,7 @@ import boto3
 import click
 from boto3.dynamodb.conditions import Attr, ConditionBase, Key
 from botocore.exceptions import ClientError
+from ga4gh.core.models import ConceptMapping
 from ga4gh.va_spec.base import Condition, DataSet
 
 from disease.config import get_config
@@ -420,11 +421,21 @@ class DynamoDbDatabase(AbstractDatabase):
         except ClientError as e:
             raise DatabaseWriteException(e) from e
 
-    def add_record(self, disease: Condition, src_name: SourceName) -> None:
-        """Add new record to database.
+    def add_record(
+        self,
+        disease: Condition,
+        src_name: SourceName,
+        *,
+        curated_mappings: list[ConceptMapping] | None = None,
+    ) -> None:
+        """Add a source-derived record with separately stored curated mappings.
 
-        :param disease: disease record to upload
+        :param disease: source-derived disease record, including source-provided
+            mappings only
         :param src_name: name of source for record
+        :param curated_mappings: curated additions to store separately from the
+            source record. Omitted, None, and empty lists mean no curated mappings.
+            These additions do not affect retrieval or lookup indexing yet.
         """
         concept_id = coding_to_concept_id(disease.primaryCoding)
         if not concept_id:
@@ -438,6 +449,12 @@ class DynamoDbDatabase(AbstractDatabase):
                     "item_type": "identity",
                     "src_name": src_name.value,
                     "data": disease.model_dump(exclude_none=True, exclude_unset=True),
+                    "curated_mappings": [
+                        mapping.model_dump(
+                            mode="json", exclude_unset=True, exclude_none=True
+                        )
+                        for mapping in (curated_mappings or [])
+                    ],
                 }
             )
         except ClientError as e:

@@ -12,7 +12,7 @@ from typing import Any, ClassVar
 
 import psycopg
 import requests
-from ga4gh.core.models import Relation
+from ga4gh.core.models import ConceptMapping, Relation
 from ga4gh.va_spec.base import Condition, DataSet
 from psycopg.errors import DuplicateObject, DuplicateTable, UniqueViolation
 from psycopg.types.json import Jsonb
@@ -481,8 +481,8 @@ class PostgresDatabase(AbstractDatabase):
         self.conn.commit()
 
     _add_record_query = b"""
-        INSERT INTO disease_concepts (concept_id, source, data)
-        VALUES (%s, %s, %s);
+        INSERT INTO disease_concepts (concept_id, source, data, curated_mappings)
+        VALUES (%s, %s, %s, %s);
     """
     _insert_label_query = (
         b"INSERT INTO disease_labels (label, concept_id) VALUES (%s, %s)"
@@ -493,11 +493,21 @@ class PostgresDatabase(AbstractDatabase):
     _insert_xref_query = b"INSERT INTO disease_xrefs (xref, concept_id) VALUES (%s, %s)"
     _insert_assoc_query = b"INSERT INTO disease_associations (associated_with, concept_id) VALUES (%s, %s)"
 
-    def add_record(self, disease: Condition, src_name: SourceName) -> None:
-        """Add new record to database.
+    def add_record(
+        self,
+        disease: Condition,
+        src_name: SourceName,
+        *,
+        curated_mappings: list[ConceptMapping] | None = None,
+    ) -> None:
+        """Add a source-derived record with separately stored curated mappings.
 
-        :param disease: disease record to upload
+        :param disease: source-derived disease record, including source-provided
+            mappings only
         :param src_name: name of source for record
+        :param curated_mappings: curated additions to store separately from the
+            source record. Omitted, None, and empty lists mean no curated mappings.
+            These additions do not affect retrieval or lookup indexing yet.
         """
         concept_id = disease.id
         with self.conn.cursor() as cur:
@@ -509,6 +519,14 @@ class PostgresDatabase(AbstractDatabase):
                         src_name.value,
                         Jsonb(
                             disease.model_dump(exclude_unset=True, exclude_none=True)
+                        ),
+                        Jsonb(
+                            [
+                                mapping.model_dump(
+                                    mode="json", exclude_unset=True, exclude_none=True
+                                )
+                                for mapping in (curated_mappings or [])
+                            ]
                         ),
                     ],
                 )
