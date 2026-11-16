@@ -124,9 +124,27 @@ class AbstractDatabase(abc.ABC):
         :return: source metadata, if lookup is successful
         """
 
+    @staticmethod
+    def _with_curated_mappings(
+        concept: Condition, curated_mappings: list[ConceptMapping]
+    ) -> Condition:
+        """Return an augmented copy, retaining mappings with distinct provenance."""
+        augmented = concept.model_copy(deep=True)
+        combined = list(augmented.mappings or [])
+        for mapping in curated_mappings:
+            if mapping not in combined:
+                combined.append(mapping.model_copy(deep=True))
+        augmented.mappings = combined or None
+        return augmented
+
     @abc.abstractmethod
     def get_record_by_id(
-        self, concept_id: str, case_sensitive: bool = True, merge: bool = False
+        self,
+        concept_id: str,
+        case_sensitive: bool = True,
+        merge: bool = False,
+        *,
+        include_curated_mappings: bool = False,
     ) -> dict | None:
         """Fetch record corresponding to provided concept ID
 
@@ -135,6 +153,10 @@ class AbstractDatabase(abc.ABC):
             Otherwise, performs filter operation, which doesn't require correct casing.
         :param merge: if true, look for merged record; look for identity
             record otherwise.
+        :param include_curated_mappings: include separately stored curated mappings
+            for source records only. Stored merged records remain unchanged.
+            The legacy dict conversion does not preserve mapping provenance or
+            relation detail. Defaults to False.
         :return: complete record, if match is found; None otherwise
         """
 
@@ -157,7 +179,9 @@ class AbstractDatabase(abc.ABC):
         """
 
     @abc.abstractmethod
-    def get_all_records(self, record_type: RecordType) -> Generator[dict, None, None]:
+    def get_all_records(
+        self, record_type: RecordType, *, include_curated_mappings: bool = False
+    ) -> Generator[dict, None, None]:
         """Retrieve all source or normalized records. Either return all source records,
         or all records that qualify as "normalized" (i.e., merged groups + source
         records that are otherwise ungrouped).
@@ -172,6 +196,10 @@ class AbstractDatabase(abc.ABC):
            >>>     pass  # do something
 
         :param record_type: type of result to return
+        :param include_curated_mappings: include separately stored curated mappings
+            for source records only. Stored merged records remain unchanged.
+            The legacy dict conversion does not preserve mapping provenance or
+            relation detail. Defaults to False.
         :return: Generator that lazily provides records as they are retrieved
         """
 

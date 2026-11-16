@@ -93,7 +93,9 @@ class Merge:
                 raise ValueError(msg)
             try:
                 # temporary -- remove once full domain model migration is complete
-                _record = self._database.get_record_by_id(concept_id)
+                _record = self._database.get_record_by_id(
+                    concept_id, include_curated_mappings=True
+                )
                 if not _record:
                     _logger.error(
                         "generate_merged_concepts couldn't find %s", concept_id
@@ -140,7 +142,9 @@ class Merge:
         records: list[Condition] = []
         final_ids = []
         for record_id in record_id_set:
-            _record = self._database.get_record_by_id(record_id)
+            _record = self._database.get_record_by_id(
+                record_id, include_curated_mappings=True
+            )
             if _record:
                 disease = disease_to_mapcon(Disease(**_record))
                 records.append(disease)

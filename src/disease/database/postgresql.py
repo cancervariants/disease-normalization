@@ -276,7 +276,9 @@ class PostgresDatabase(AbstractDatabase):
 
     _record_query = b"SELECT * FROM disease_concepts WHERE lower(concept_id) = %s;"
 
-    def _format_source_record(self, source_row: tuple) -> dict:
+    def _format_source_record(
+        self, source_row: tuple, *, include_curated_mappings: bool = False
+    ) -> dict:
         """Restructure row from disease_concepts table as source record result object.
 
         [Temporary, eventually remove once API is fully converted to GKM models]
@@ -285,6 +287,10 @@ class PostgresDatabase(AbstractDatabase):
         :return: reformatted dictionary keying disease properties to row values
         """
         mc = Condition(**source_row[3])
+        if include_curated_mappings:
+            mc = self._with_curated_mappings(
+                mc, [ConceptMapping.model_validate(m) for m in (source_row[4] or [])]
+            )
         record = mapcon_to_disease(mc).model_dump()
         record["src_name"] = source_row[1]
         record["merge_ref"] = source_row[2]
@@ -292,7 +298,9 @@ class PostgresDatabase(AbstractDatabase):
 
         return record
 
-    def _get_record(self, concept_id: str) -> dict | None:
+    def _get_record(
+        self, concept_id: str, *, include_curated_mappings: bool = False
+    ) -> dict | None:
         """Retrieve non-merged record. The query is pretty different, so this method
         is broken out for PostgreSQL.
 
@@ -307,7 +315,9 @@ class PostgresDatabase(AbstractDatabase):
         if not result:
             return None
 
-        return self._format_source_record(result)
+        return self._format_source_record(
+            result, include_curated_mappings=include_curated_mappings
+        )
 
     _merged_record_query = b"SELECT * FROM disease_merged WHERE lower(concept_id) = %s;"
 
@@ -342,6 +352,8 @@ class PostgresDatabase(AbstractDatabase):
         concept_id: str,
         case_sensitive: bool = True,  # noqa: ARG002
         merge: bool = False,
+        *,
+        include_curated_mappings: bool = False,
     ) -> dict | None:
         """Fetch record corresponding to provided concept ID
 
@@ -350,11 +362,17 @@ class PostgresDatabase(AbstractDatabase):
            case-insensitive index
         :param bool merge: if true, look for merged record; look for identity record
            otherwise.
+        :param include_curated_mappings: include separately stored curated mappings
+            for source records only. Stored merged records remain unchanged.
+            The legacy dict conversion does not preserve mapping provenance or
+            relation detail. Defaults to False.
         :return: complete disease record, if match is found; None otherwise
         """
         if merge:
             return self._get_merged_record(concept_id)
-        return self._get_record(concept_id)
+        return self._get_record(
+            concept_id, include_curated_mappings=include_curated_mappings
+        )
 
     _ref_types_query: ClassVar[dict] = {
         RefType.LABEL: b"SELECT concept_id FROM disease_labels WHERE lower(label) = %s;",
@@ -414,7 +432,9 @@ class PostgresDatabase(AbstractDatabase):
     )
     _get_all_source_records_query = b"SELECT * FROM disease_concepts;"
 
-    def get_all_records(self, record_type: RecordType) -> Generator[dict, None, None]:
+    def get_all_records(
+        self, record_type: RecordType, *, include_curated_mappings: bool = False
+    ) -> Generator[dict, None, None]:
         """Retrieve all source or normalized records. Either return all source records,
         or all records that qualify as "normalized" (i.e., merged groups + source
         records that are otherwise ungrouped).
@@ -435,6 +455,10 @@ class PostgresDatabase(AbstractDatabase):
         belong to a normalized concept group.
 
         :param record_type: type of result to return
+        :param include_curated_mappings: include separately stored curated mappings
+            for source records only. Stored merged records remain unchanged.
+            The legacy dict conversion does not preserve mapping provenance or
+            relation detail. Defaults to False.
         :return: Generator that lazily provides records as they are retrieved
         """
         batch_size = 500
@@ -452,7 +476,9 @@ class PostgresDatabase(AbstractDatabase):
                 fetched = results.fetchmany(batch_size)
                 while fetched:
                     for result in fetched:
-                        yield self._format_source_record(result)
+                        yield self._format_source_record(
+                            result, include_curated_mappings=include_curated_mappings
+                        )
                     fetched = results.fetchmany(batch_size)
         else:
             with self.conn.cursor() as cur:
@@ -460,7 +486,9 @@ class PostgresDatabase(AbstractDatabase):
                 fetched = results.fetchmany(batch_size)
                 while fetched:
                     for result in fetched:
-                        yield self._format_source_record(result)
+                        yield self._format_source_record(
+                            result, include_curated_mappings=include_curated_mappings
+                        )
                     fetched = results.fetchmany(batch_size)
 
     def add_source_metadata(self, source_name: SourceName, source: DataSet) -> None:
