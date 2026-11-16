@@ -8,6 +8,7 @@ from collections import defaultdict
 from collections.abc import Generator
 
 import pytest
+from ga4gh.core.models import ConceptMapping, Relation
 from ga4gh.va_spec.base import Condition, DataSet
 
 from disease.config import get_config
@@ -19,6 +20,7 @@ from disease.schemas import (
     RefType,
     SourceName,
     coding_to_concept_id,
+    concept_id_to_coding,
     mapcon_to_disease,
 )
 
@@ -142,6 +144,43 @@ def test_get_all_concept_ids(
         src = SourceName[PREFIX_LOOKUP[src_prefix.lower()]]
         result = db.get_all_concept_ids(src)
         assert set(result) == concept_ids
+
+
+@pytest.mark.skipif(not IS_TEST_ENV, reason="not in test environment")
+def test_curated_mappings_inclusion(
+    db: AbstractDatabase,
+    diseases: dict[str, Condition],
+    sources: dict[SourceName, DataSet],
+):
+    concept_id = "DOID:769"
+    curated_target = "ncit:C4207"
+    db.add_source_metadata(SourceName.DO, sources[SourceName.DO])
+    db.add_record(
+        diseases[concept_id],
+        SourceName.DO,
+        curated_mappings=[
+            ConceptMapping(
+                coding=concept_id_to_coding(curated_target),
+                relation=Relation.EXACT_MATCH,
+            )
+        ],
+    )
+    db.complete_write_transaction()
+
+    source = db.get_record_by_id(concept_id)
+    assert source is not None
+    assert curated_target not in source["xrefs"]
+    expected_augmented = {**source, "xrefs": [*source["xrefs"], curated_target]}
+    assert (
+        db.get_record_by_id(concept_id, include_curated_mappings=True)
+        == expected_augmented
+    )
+
+    assert list(db.get_all_records(RecordType.IDENTITY)) == [source]
+    assert list(
+        db.get_all_records(RecordType.IDENTITY, include_curated_mappings=True)
+    ) == [expected_augmented]
+    assert db.get_record_by_id(concept_id) == source
 
 
 @pytest.mark.skipif(not IS_TEST_ENV, reason="not in test environment")
