@@ -1,0 +1,11 @@
+# license: https://creativecommons.org/licenses/by/4.0/
+# mapping_set_id: https://github.com/cancervariants/disease-normalization/blob/main/src/disease/etl/concept_mappings.sssom.tsv
+# curie_map:
+#   DOID: http://purl.obolibrary.org/obo/DOID_
+#   ncit: http://purl.obolibrary.org/obo/NCIT_
+#   oncotree: http://oncotree.mskcc.org/#/home?version=oncotree_latest_stable&field=CODE&search=
+#   skos: http://www.w3.org/2004/02/skos/core#
+#   semapv: https://w3id.org/semapv/vocab/
+#   orcid: https://orcid.org/
+subject_id	subject_label	predicate_id	object_id	object_label	mapping_justification	author_id	comment
+DOID:6032	juvenile type testicular granulosa cell tumor	skos:exactMatch	ncit:C4207	Juvenile Granulosa Cell Tumor	semapv:ManualMappingCuration	orcid:0000-0002-2568-6163
