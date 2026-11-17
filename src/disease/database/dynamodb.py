@@ -1,7 +1,7 @@
 """Provide DynamoDB client."""
 
 import atexit
-import datetime
+import datetime as dt
 import gzip
 import json
 import logging
@@ -14,9 +14,9 @@ from typing import Any
 
 import boto3
 import click
-from boto3.dynamodb.conditions import Attr, Equals, Key
+from boto3.dynamodb.conditions import Attr, ConditionBase, Key
 from botocore.exceptions import ClientError
-from ga4gh.va_spec.base import DataSet
+from ga4gh.va_spec.base import Condition, DataSet
 
 from disease.config import get_config
 from disease.database.database import (
@@ -31,14 +31,14 @@ from disease.database.database import (
     confirm_aws_db_use,
 )
 from disease.schemas import (
-    ITEM_TYPES,
-    PREFIX_LOOKUP,
     DataLicenseAttributes,
     RecordType,
     RefType,
     SourceDataSet,
     SourceMeta,
     SourceName,
+    coding_to_concept_id,
+    mapcon_to_disease,
 )
 
 _logger = logging.getLogger(__name__)
@@ -59,7 +59,7 @@ class DynamoDbDatabase(AbstractDatabase):
         region_name = db_args.get("region_name", "us-east-2")
 
         if AWS_ENV_VAR_NAME in environ:
-            if "DISEASE_NORM_TEST" in environ:
+            if get_config().test:
                 msg = f"Cannot have both DISEASE_NORM_TEST and {AWS_ENV_VAR_NAME} set."
                 raise DatabaseException(msg)
 
@@ -81,7 +81,7 @@ class DynamoDbDatabase(AbstractDatabase):
                     "DISEASE_DYNAMO_TABLE", "disease_normalizer_nonprod"
                 )
         else:
-            endpoint_url = db_url if db_url else get_config().db_url
+            endpoint_url = db_url or get_config().db_url
             click.echo(f"***Using Disease Database Endpoint: {endpoint_url}***")
             boto_params = {"region_name": region_name, "endpoint_url": endpoint_url}
 
@@ -117,6 +117,7 @@ class DynamoDbDatabase(AbstractDatabase):
         except DatabaseWriteException:
             _logger.exception("Encountered DB write error when trying to drop DB")
             raise
+        self.complete_write_transaction()
         if self.disease_table in self.list_tables():
             self.dynamodb.Table(self.disease_table).delete()
 
@@ -256,6 +257,7 @@ class DynamoDbDatabase(AbstractDatabase):
             otherwise.
         :return: complete record, if match is found; None otherwise
         """
+        self.complete_write_transaction()
         try:
             if merge:
                 pk = f"{concept_id.lower()}##{RecordType.MERGER.value}"
@@ -265,14 +267,14 @@ class DynamoDbDatabase(AbstractDatabase):
                 response = self.diseases.get_item(
                     Key={"label_and_type": pk, "concept_id": concept_id}
                 )
-                record = response.get("Item")
-                if not record:
-                    return None
+                _record = response.get("Item")
             else:
                 exp = Key("label_and_type").eq(pk)
                 response = self.diseases.query(KeyConditionExpression=exp)
-                record = response["Items"][0]
-            del record["label_and_type"]
+                _record = response["Items"][0]
+            if not _record:
+                return None
+            del _record["label_and_type"]
         except ClientError as e:
             _logger.exception(
                 "boto3 client error on get_records_by_id for search term %s: %s",
@@ -282,8 +284,27 @@ class DynamoDbDatabase(AbstractDatabase):
             return None
         except (KeyError, IndexError):  # record doesn't exist
             return None
-        else:
+        return self._format_record(_record)
+
+    @staticmethod
+    def _format_record(_record: dict) -> dict:
+        """Convert a stored concept to the database response format."""
+        data = _record["data"]
+        concept = (
+            Condition.model_validate_json(data)
+            if isinstance(data, str)
+            else Condition(**data)
+        )
+        record = mapcon_to_disease(concept).model_dump(
+            exclude_none=_record["item_type"] == RecordType.MERGER
+        )
+        if _record["item_type"] == RecordType.MERGER:
+            record["item_type"] = _record["item_type"]
             return record
+        record["item_type"] = _record["item_type"]
+        record["merge_ref"] = _record.get("merge_ref")
+        record["src_name"] = _record["src_name"]
+        return record
 
     def get_refs_by_type(self, search_term: str, ref_type: RefType) -> list[str]:
         """Retrieve concept IDs for records matching the user's query. Other methods
@@ -293,7 +314,8 @@ class DynamoDbDatabase(AbstractDatabase):
         :param ref_type: type of match to look for.
         :return: list of associated concept IDs. Empty if lookup fails.
         """
-        pk = f"{search_term}##{ref_type.value.lower()}"
+        self.complete_write_transaction()
+        pk = f"{search_term.lower()}##{ref_type.value.lower()}"
         filter_exp = Key("label_and_type").eq(pk)
         try:
             matches = self.diseases.query(KeyConditionExpression=filter_exp)
@@ -312,13 +334,15 @@ class DynamoDbDatabase(AbstractDatabase):
         :param source: optionally, just get all IDs for a specific source
         :return: Set of concept IDs as strings.
         """
+        self.complete_write_transaction()
         last_evaluated_key = None
         concept_ids = []
-        params: dict[str, str | Equals] = {
+        params: dict[str, str | ConditionBase] = {
             "ProjectionExpression": "concept_id",
+            "FilterExpression": Attr("item_type").eq(RecordType.IDENTITY.value),
         }
         if source is not None:
-            params["FilterExpression"] = Attr("src_name").eq(source.value)
+            params["FilterExpression"] &= Attr("src_name").eq(source)
         while True:
             if last_evaluated_key:
                 response = self.diseases.scan(
@@ -350,6 +374,7 @@ class DynamoDbDatabase(AbstractDatabase):
         :param record_type: type of result to return
         :return: Generator that lazily provides records as they are retrieved
         """
+        self.complete_write_transaction()
         last_evaluated_key = None
         while True:
             if last_evaluated_key:
@@ -363,12 +388,12 @@ class DynamoDbDatabase(AbstractDatabase):
                 incoming_record_type = record.get("item_type")
                 if record_type == RecordType.IDENTITY:
                     if incoming_record_type == record_type:
-                        yield record
+                        yield self._format_record(record)
                 elif (
                     incoming_record_type == RecordType.IDENTITY
                     and not record.get("merge_ref")
                 ) or incoming_record_type == RecordType.MERGER:
-                    yield record
+                    yield self._format_record(record)
             last_evaluated_key = response.get("LastEvaluatedKey")
             if not last_evaluated_key:
                 break
@@ -395,52 +420,59 @@ class DynamoDbDatabase(AbstractDatabase):
         except ClientError as e:
             raise DatabaseWriteException(e) from e
 
-    def add_record(self, record: dict, src_name: SourceName) -> None:
+    def add_record(self, disease: Condition, src_name: SourceName) -> None:
         """Add new record to database.
 
-        :param Dict record: record to upload
-        :param SourceName src_name: name of source for record
+        :param disease: disease record to upload
+        :param src_name: name of source for record
         """
-        concept_id = record["concept_id"]
-        record["src_name"] = src_name.value
-        label_and_type = f"{concept_id.lower()}##identity"
-        record["label_and_type"] = label_and_type
-        record["item_type"] = "identity"
+        concept_id = coding_to_concept_id(disease.primaryCoding)
+        if not concept_id:
+            raise ValueError
+        partition_key = f"{concept_id.lower()}##identity"
         try:
-            self.batch.put_item(Item=record)
+            self.batch.put_item(
+                Item={
+                    "label_and_type": partition_key,
+                    "concept_id": concept_id,
+                    "item_type": "identity",
+                    "src_name": src_name.value,
+                    "data": disease.model_dump(exclude_none=True, exclude_unset=True),
+                }
+            )
         except ClientError as e:
             _logger.exception(
                 "boto3 client error on add_record for %s: %s",
                 concept_id,
                 e.response["Error"]["Message"],
             )
-        for attr_type, item_type in ITEM_TYPES.items():
-            if attr_type in record:
-                value = record.get(attr_type)
-                if not value:
-                    continue
-                if isinstance(value, str):
-                    items = [value.lower()]
-                else:
-                    items = {item.lower() for item in value}
-                for item in items:
-                    self._add_ref_record(
-                        item, record["concept_id"], item_type, src_name
-                    )
+        if disease.name:
+            self._add_ref_record(disease.name, concept_id, RefType.LABEL, src_name)
+        if disease.aliases:
+            for alias in (a.lower() for a in disease.aliases):
+                self._add_ref_record(alias, concept_id, RefType.ALIASES, src_name)
+        formatted = mapcon_to_disease(disease)
+        for ref_type, terms in (
+            (RefType.XREFS, formatted.xrefs),
+            (RefType.ASSOCIATED_WITH, formatted.associated_with),
+        ):
+            for term in terms:
+                self._add_ref_record(term, concept_id, ref_type, src_name)
 
-    def add_merged_record(self, record: dict) -> None:
+    def add_merged_record(self, record: Condition) -> None:
         """Add merged record to database.
 
         :param record: merged record to add
         """
-        concept_id = record["concept_id"]
-        id_prefix = concept_id.split(":")[0].lower()
-        record["src_name"] = PREFIX_LOOKUP[id_prefix]
-        label_and_type = f"{concept_id.lower()}##{RecordType.MERGER.value}"
-        record["label_and_type"] = label_and_type
-        record["item_type"] = RecordType.MERGER.value
+        concept_id = record.id
+        params = {
+            "label_and_type": f"{concept_id.lower()}##{RecordType.MERGER.value}",
+            "concept_id": concept_id,
+            "item_type": RecordType.MERGER.value,
+            "data": record.model_dump_json(exclude_unset=True, exclude_none=True),
+        }
         try:
-            self.batch.put_item(Item=record)
+            self.batch.put_item(Item=params)
         except ClientError as e:
             _logger.exception(
                 "boto3 client error on add_record for %s: %s",
@@ -462,7 +494,7 @@ class DynamoDbDatabase(AbstractDatabase):
         label_and_type = f"{term.lower()}##{ref_type}"
         record = {
             "label_and_type": label_and_type,
-            "concept_id": concept_id.lower(),
+            "concept_id": concept_id,
             "src_name": src_name.value,
             "item_type": ref_type,
         }
@@ -484,10 +516,11 @@ class DynamoDbDatabase(AbstractDatabase):
         :param merge_ref: new ref value
         :raise DatabaseWriteException: if attempting to update non-existent record
         """
+        self.complete_write_transaction()
         label_and_type = f"{concept_id.lower()}##identity"
         key = {"label_and_type": label_and_type, "concept_id": concept_id}
         update_expression = "set merge_ref=:r"
-        update_values = {":r": merge_ref.lower()}
+        update_values = {":r": merge_ref}
         condition_expression = "attribute_exists(label_and_type)"
         try:
             self.diseases.update_item(
@@ -514,6 +547,16 @@ class DynamoDbDatabase(AbstractDatabase):
             encounters a failure in the process
         :raise DatabaseWriteException: if deletion call fails
         """
+        self.complete_write_transaction()
+        for record in self.get_all_records(RecordType.IDENTITY):
+            if record.get("merge_ref"):
+                self.diseases.update_item(
+                    Key={
+                        "label_and_type": f"{record['concept_id'].lower()}##identity",
+                        "concept_id": record["concept_id"],
+                    },
+                    UpdateExpression="REMOVE merge_ref",
+                )
         while True:
             with self.diseases.batch_writer(
                 overwrite_by_pkeys=["label_and_type", "concept_id"]
@@ -546,6 +589,7 @@ class DynamoDbDatabase(AbstractDatabase):
             encounters a failure in the process
         :raise DatabaseWriteException: if deletion call fails
         """
+        self.complete_write_transaction()
         while True:
             try:
                 response = self.diseases.query(
@@ -601,7 +645,7 @@ class DynamoDbDatabase(AbstractDatabase):
             )
             raise ValueError(err_msg)
 
-        now = datetime.datetime.now(tz=datetime.UTC).strftime("%Y%m%d%H%M%S")
+        now = dt.datetime.now(tz=dt.UTC).strftime("%Y%m%d%H%M%S")
         output_location = output_directory / f"disease_norm_{now}.ndjson.gz"
 
         last_key = None
