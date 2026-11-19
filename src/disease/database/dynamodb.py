@@ -16,7 +16,7 @@ import boto3
 import click
 from boto3.dynamodb.conditions import Attr, ConditionBase, Key
 from botocore.exceptions import ClientError
-from ga4gh.core.models import ConceptMapping
+from ga4gh.core.models import ConceptMapping, Relation
 from ga4gh.va_spec.base import Condition, DataSet
 
 from disease.config import get_config
@@ -505,6 +505,10 @@ class DynamoDbDatabase(AbstractDatabase):
         ):
             for term in terms:
                 self._add_ref_record(term, concept_id, ref_type, src_name)
+        for mapping in curated_mappings or []:
+            if mapping.relation == Relation.EXACT_MATCH:
+                term = coding_to_concept_id(mapping.coding)
+                self._add_ref_record(term, concept_id, RefType.XREFS, src_name)
 
     def add_merged_record(self, record: Condition) -> None:
         """Add merged record to database.

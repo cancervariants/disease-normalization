@@ -23,6 +23,7 @@ We need a portable format for curated mappings and a way to apply them while pre
 * Store curated mappings separately from the source-derived `Condition` JSONB in the database so retrieval can return either a **source view** or an **augmented view** of a concept:
   * The source view contains the source-derived record, without our curated additions.
   * The augmented view combines the source-derived record with applicable curated mappings.
+* Retrieval by mapping should be able to opt into usage of the curated mappings; IE, the existing `GET /search` behavior should be able to query the database just by the record as the source gives it to us, but `GET /normalize` should use the curated mappings.
 
 ## Consequences
 
