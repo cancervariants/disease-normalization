@@ -141,7 +141,7 @@ def test_get_all_concept_ids(
         prefix = curie.split(":", 1)[0]
         grouped[prefix].add(curie)
     for src_prefix, concept_ids in grouped.items():
-        src = SourceName[PREFIX_LOOKUP[src_prefix.lower()]]
+        src = SourceName(PREFIX_LOOKUP[src_prefix.lower()])
         result = db.get_all_concept_ids(src)
         assert set(result) == concept_ids
 
