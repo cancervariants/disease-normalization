@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Any
 
 import pytest
+from ga4gh.core.models import ConceptMapping
 from ga4gh.va_spec.base import Condition, DataSet
 
 from disease.config import get_config
@@ -123,6 +124,7 @@ def mock_db_class():
             self._get_all_records_values = db_args.get("get_all_records", {})
             self._get_record_by_id_values = db_args.get("get_record_by_id", {})
             self._added_records: dict[str, Condition] = {}
+            self._added_curated_mappings: dict[str, list[ConceptMapping]] = {}
             self._added_sources: dict[SourceName, Condition] = {}
             self._added_merged_records: dict[str, Condition] = {}
             self._updated_merge_refs: dict[str, str] = {}
@@ -148,6 +150,8 @@ def mock_db_class():
             concept_id: str,
             case_sensitive: bool = True,
             merge: bool = False,  # noqa: ARG002
+            *,
+            include_curated_mappings: bool = False,  # noqa: ARG002
         ) -> dict | None:
             key = concept_id
             if case_sensitive:
@@ -176,8 +180,15 @@ def mock_db_class():
         def add_source_metadata(self, source_name: SourceName, source: DataSet) -> None:
             self._added_sources[source_name] = source
 
-        def add_record(self, disease: Condition, src_name: SourceName) -> None:  # noqa: ARG002
+        def add_record(
+            self,
+            disease: Condition,
+            src_name: SourceName,  # noqa: ARG002
+            *,
+            curated_mappings: list[ConceptMapping] | None = None,
+        ) -> None:
             self._added_records[disease.id] = disease
+            self._added_curated_mappings[disease.id] = curated_mappings or []
 
         def add_merged_record(self, record: Condition) -> None:
             self._added_merged_records[record.id] = record
