@@ -17,17 +17,20 @@ We need a portable format for curated mappings and a way to apply them while pre
 ## Decision
 
 * Bundle two mapping files in Simple Standard for Sharing Ontological Mappings (SSSOM) format with the source code:
-  * **Disease category mappings**: `broadMatch` mappings from disease concepts to broader OncoTree categories.
+  * **Curated disease category mappings**: manually curated `broadMatch` mappings from disease concepts to broader OncoTree categories.
   * **Curated exact mappings**: manually curated concept-to-concept `exactMatch` mappings.
 * Add to ETL module to apply these mappings when concepts are generated from source files.
-* Store curated mappings separately from the source-derived `Condition` JSONB in the database so retrieval can return either a **source view** or an **augmented view** of a concept:
-  * The source view contains the source-derived record, without our curated additions.
-  * The augmented view combines the source-derived record with applicable curated mappings.
-* Retrieval by mapping should be able to opt into usage of the curated mappings; IE, the existing `GET /search` behavior should be able to query the database just by the record as the source gives it to us, but `GET /normalize` should use the curated mappings.
+* During ETL, attempt to compute a single best OncoTree `broadMatch` for each eligible MONDO and NCIt concept. A concept may have no inferred category.
+* Store curated and inferred mappings separately from the source-derived `Condition` JSONB, preserving the provenance of each mapping. Retrieval supports two views:
+  * The **source view** contains the source record and its source-provided mappings.
+  * The **augmented view** combines the source record with applicable curated and inferred mappings.
+* Retrieval by mapping should use the source view for `GET /search` and the augmented view for `GET /normalize`.
 
 ## Consequences
 
 * Convert the existing single-entry mapping file to SSSOM format.
+* For NCIt category inference, load the OncoTree release file once per inference run and index its NCIt cross-references by NCIt concept ID. Regenerate NCIt inferences when either the NCIt or OncoTree release changes.
+* Record the input releases in generated SSSOM mappings. Use `subject_source_version` for the MONDO or NCIt release and `object_source_version` for the OncoTree release.
 * Update ETL, storage, and retrieval to preserve the distinction between source-derived records and curated mappings.
   * Extend the database API to accept curated mappings separately: `add_record(self, disease: Condition, src_name: SourceName, *, curated_mappings: list[ConceptMapping] | None = None) -> None`. The `disease` argument must contain only source-derived data, including source-provided mappings. Treat an omitted value or `None` as no curated mappings for that record. Similarly, add a param to record retrieval methods on the DB for whether curated mappings should be included in the result.
   * Update both database implementations to persist curated mappings separately from the source record. ETL must pass these mappings through the new argument instead of appending them to `disease.mappings`.
