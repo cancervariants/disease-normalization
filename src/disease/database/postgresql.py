@@ -574,7 +574,12 @@ class PostgresDatabase(AbstractDatabase):
                                 self._insert_assoc_query,
                                 [coding_to_concept_id(m.coding), concept_id],
                             )
-                self.conn.commit()
+
+                for m in curated_mappings or []:
+                    if m.relation == Relation.EXACT_MATCH:
+                        term = coding_to_concept_id(m.coding)
+                        cur.execute(self._insert_xref_query, [term, concept_id])
+                        self.conn.commit()
             except UniqueViolation:
                 _logger.error("Record with ID %s already exists", concept_id)  # noqa: TRY400
                 self.conn.rollback()
