@@ -40,7 +40,7 @@ def test_load_and_convert(tmp_path, comment):
     assert rows[0].subject_source == "doid"
     assert rows[0].subject_source_version == "2025-06-27"
     assert rows[0].object_source == "ncit"
-    assert rows[0].object_source_version == ""
+    assert rows[0].object_source_version is None
     converted = rows[0].to_concept_mapping()
     assert converted.relation == Relation.EXACT_MATCH
     assert converted.coding.code.root == "C4207"
