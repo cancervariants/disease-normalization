@@ -21,6 +21,7 @@ class MappingJustification(StrEnum):
     """Supported justifications for asserting a mapping."""
 
     MANUAL_MAPPING_CURATION = "semapv:ManualMappingCuration"
+    LOGICAL_REASONING = "semapv:LogicalReasoning"
 
 
 class SssomMapping(BaseModel):
@@ -28,9 +29,13 @@ class SssomMapping(BaseModel):
 
     subject_id: str
     subject_label: str
+    subject_source: str | None = None
+    subject_source_version: str
     predicate_id: Relation
     object_id: str
     object_label: str
+    object_source: str | None = None
+    object_source_version: str
     mapping_justification: MappingJustification
     author_id: str
     comment: str | None = None
@@ -64,7 +69,7 @@ def load_mappings(path: Traversable) -> defaultdict[str, list[SssomMapping]]:
 
     Provenance must be supplied on each row; mapping-set metadata is not inherited.
     Leading comment lines contain mapping-set metadata. Rows must have all declared
-    columns, including an empty comment column when no comment is supplied.
+    columns. Source version columns are required, but their cells may be empty.
 
     :param path: mapping file to read
     :raise ValueError: if a row has an incorrect number of columns
@@ -76,7 +81,12 @@ def load_mappings(path: Traversable) -> defaultdict[str, list[SssomMapping]]:
             dropwhile(lambda line: line.startswith("#") or not line.strip(), f),
             delimiter="\t",
         )
-        required = SssomMapping.model_fields.keys() - {"comment"}
+        optional = {
+            "comment",
+            "subject_source",
+            "object_source",
+        }
+        required = SssomMapping.model_fields.keys() - optional
         if not reader.fieldnames or not required.issubset(reader.fieldnames):
             msg = f"Missing required SSSOM columns in {path}"
             raise ValueError(msg)
@@ -84,7 +94,8 @@ def load_mappings(path: Traversable) -> defaultdict[str, list[SssomMapping]]:
             if None in row or any(value is None for value in row.values()):
                 msg = f"Incorrect number of SSSOM columns in {path}: {row}"
                 raise ValueError(msg)
-            row["comment"] = row.get("comment") or None
+            for field in optional:
+                row[field] = row.get(field) or None
             mapping = SssomMapping(**row)
             mappings[mapping.subject_id].append(mapping)
     return mappings
