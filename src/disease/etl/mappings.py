@@ -95,7 +95,7 @@ def get_etl_mappings() -> defaultdict[str, list[ConceptMapping]]:
 
     Category mappings must be broad matches to OncoTree; concept mappings must be
     exact matches. Callers must pass the results separately from source-derived
-    ``Condition.mappings``, using the proposed ``curated_mappings`` argument.
+    ``Condition.mappings``, using the ``supplemental_mappings`` argument.
     """
     mappings = defaultdict(list)
     for path, relation in (

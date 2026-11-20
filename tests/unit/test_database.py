@@ -147,7 +147,7 @@ def test_get_all_concept_ids(
 
 
 @pytest.mark.skipif(not IS_TEST_ENV, reason="not in test environment")
-def test_curated_mappings_inclusion(
+def test_supplemental_mappings_inclusion(
     db: AbstractDatabase,
     diseases: dict[str, Condition],
     sources: dict[SourceName, DataSet],
@@ -158,7 +158,7 @@ def test_curated_mappings_inclusion(
     db.add_record(
         diseases[concept_id],
         SourceName.DO,
-        curated_mappings=[
+        supplemental_mappings=[
             ConceptMapping(
                 coding=concept_id_to_coding(curated_target),
                 relation=Relation.EXACT_MATCH,
@@ -167,18 +167,27 @@ def test_curated_mappings_inclusion(
     )
     db.complete_write_transaction()
 
+    assert db.get_refs_by_type(curated_target, RefType.XREFS) == [concept_id]
+    assert db.get_refs_by_type(
+        curated_target, RefType.XREFS, include_supplemental=True
+    ) == [concept_id]
+    assert (
+        db.get_refs_by_type(curated_target, RefType.XREFS, include_supplemental=False)
+        == []
+    )
+
     source = db.get_record_by_id(concept_id)
     assert source is not None
     assert curated_target not in source["xrefs"]
     expected_augmented = {**source, "xrefs": [*source["xrefs"], curated_target]}
     assert (
-        db.get_record_by_id(concept_id, include_curated_mappings=True)
+        db.get_record_by_id(concept_id, include_supplemental_mappings=True)
         == expected_augmented
     )
 
     assert list(db.get_all_records(RecordType.IDENTITY)) == [source]
     assert list(
-        db.get_all_records(RecordType.IDENTITY, include_curated_mappings=True)
+        db.get_all_records(RecordType.IDENTITY, include_supplemental_mappings=True)
     ) == [expected_augmented]
     assert db.get_record_by_id(concept_id) == source
 

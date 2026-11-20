@@ -17,20 +17,24 @@ CREATE TABLE disease_concepts (
 CREATE TABLE disease_labels (
     id SERIAL PRIMARY KEY,
     label TEXT NOT NULL,
+    is_supplemental BOOLEAN NOT NULL DEFAULT FALSE,
     concept_id VARCHAR(127) REFERENCES disease_concepts (concept_id)
 );
 CREATE TABLE disease_aliases (
     id SERIAL PRIMARY KEY,
     alias TEXT NOT NULL,
+    is_supplemental BOOLEAN NOT NULL DEFAULT FALSE,
     concept_id VARCHAR(127) NOT NULL REFERENCES disease_concepts (concept_id)
 );
 CREATE TABLE disease_xrefs (
     id SERIAL PRIMARY KEY,
     xref TEXT NOT NULL,
+    is_supplemental BOOLEAN NOT NULL DEFAULT FALSE,
     concept_id VARCHAR(127) NOT NULL REFERENCES disease_concepts (concept_id)
 );
 CREATE TABLE disease_associations (
     id SERIAL PRIMARY KEY,
     associated_with TEXT NOT NULL,
+    is_supplemental BOOLEAN NOT NULL DEFAULT FALSE,
     concept_ID VARCHAR(127) NOT NULL REFERENCES disease_concepts (concept_id)
 );
