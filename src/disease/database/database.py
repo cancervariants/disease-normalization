@@ -14,15 +14,19 @@ from pathlib import Path
 from typing import Any
 
 import click
+from ga4gh.core.models import ConceptMapping
 from ga4gh.va_spec.base import Condition, DataSet
 
 from disease.config import get_config
 from disease.schemas import (
+    PredicateModifier,
     RecordType,
     RefType,
     ServiceEnvironment,
     SourceMeta,
     SourceName,
+    SssomMapping,
+    coding_to_concept_id,
 )
 
 
@@ -123,10 +127,51 @@ class AbstractDatabase(abc.ABC):
         :return: source metadata, if lookup is successful
         """
 
+    @staticmethod
+    def _with_supplemental_mappings(
+        concept: Condition, supplemental_mappings: list[ConceptMapping]
+    ) -> Condition:
+        """Return an augmented copy, retaining mappings with distinct provenance."""
+        augmented = concept.model_copy(deep=True)
+        combined = list(augmented.mappings or [])
+        for mapping in supplemental_mappings:
+            if mapping not in combined:
+                combined.append(mapping.model_copy(deep=True))
+        augmented.mappings = combined or None
+        return augmented
+
+    @staticmethod
+    def _without_negated_mappings(
+        concept: Condition, negations: list[SssomMapping]
+    ) -> Condition:
+        """Return a copy with matching source assertions filtered out."""
+        rejected = {
+            (row.object_id.lower(), row.predicate_id)
+            for row in negations
+            if row.predicate_modifier == PredicateModifier.NOT
+            and row.subject_id.lower() == concept.id.lower()
+        }
+        if not rejected:
+            return concept
+        mappings = [
+            mapping
+            for mapping in concept.mappings or []
+            if (coding_to_concept_id(mapping.coding).lower(), mapping.relation)
+            not in rejected
+        ]
+        return concept.model_copy(update={"mappings": mappings or None})
+
     @abc.abstractmethod
     def get_record_by_id(
-        self, concept_id: str, case_sensitive: bool = True, merge: bool = False
-    ) -> dict | None:
+        self,
+        concept_id: str,
+        case_sensitive: bool = True,
+        merge: bool = False,
+        *,
+        include_supplemental_mappings: bool = False,
+        apply_mapping_negations: bool = False,
+        as_condition: bool = False,
+    ) -> dict | Condition | None:
         """Fetch record corresponding to provided concept ID
 
         :param concept_id: concept ID for record
@@ -134,16 +179,30 @@ class AbstractDatabase(abc.ABC):
             Otherwise, performs filter operation, which doesn't require correct casing.
         :param merge: if true, look for merged record; look for identity
             record otherwise.
+        :param include_supplemental_mappings: include separately stored supplemental mappings
+            for source records only. Stored merged records remain unchanged.
+            The legacy dict conversion does not preserve mapping provenance or
+            relation detail. Defaults to False.
+        :param apply_mapping_negations: filter rejected source assertions.
+        :param as_condition: return the native model with mapping predicates preserved.
         :return: complete record, if match is found; None otherwise
         """
 
     @abc.abstractmethod
-    def get_refs_by_type(self, search_term: str, ref_type: RefType) -> list[str]:
+    def get_refs_by_type(
+        self,
+        search_term: str,
+        ref_type: RefType,
+        *,
+        include_supplemental: bool = True,
+    ) -> list[str]:
         """Retrieve concept IDs for records matching the user's query. Other methods
         are responsible for actually retrieving full records.
 
         :param search_term: string to match against
         :param ref_type: type of match to look for.
+        :param include_supplemental: use curated additions and negations.
+            False selects original source references.
         :return: list of associated concept IDs. Empty if lookup fails.
         """
 
@@ -156,7 +215,13 @@ class AbstractDatabase(abc.ABC):
         """
 
     @abc.abstractmethod
-    def get_all_records(self, record_type: RecordType) -> Generator[dict, None, None]:
+    def get_all_records(
+        self,
+        record_type: RecordType,
+        *,
+        include_supplemental_mappings: bool = False,
+        apply_mapping_negations: bool = False,
+    ) -> Generator[dict, None, None]:
         """Retrieve all source or normalized records. Either return all source records,
         or all records that qualify as "normalized" (i.e., merged groups + source
         records that are otherwise ungrouped).
@@ -171,6 +236,11 @@ class AbstractDatabase(abc.ABC):
            >>>     pass  # do something
 
         :param record_type: type of result to return
+        :param include_supplemental_mappings: include separately stored supplemental mappings
+            for source records only. Stored merged records remain unchanged.
+            The legacy dict conversion does not preserve mapping provenance or
+            relation detail. Defaults to False.
+        :param apply_mapping_negations: filter rejected source assertions.
         :return: Generator that lazily provides records as they are retrieved
         """
 
@@ -184,11 +254,22 @@ class AbstractDatabase(abc.ABC):
         """
 
     @abc.abstractmethod
-    def add_record(self, disease: Condition, src_name: SourceName) -> None:
-        """Add new record to database.
+    def add_record(
+        self,
+        disease: Condition,
+        src_name: SourceName,
+        *,
+        supplemental_mappings: list[ConceptMapping] | None = None,
+        mapping_negations: list[SssomMapping] | None = None,
+    ) -> None:
+        """Add a source-derived record with separately stored supplemental mappings.
 
-        :param disease: disease record to upload
-        :param src_name: name of source for record.
+        :param disease: source-derived disease record, including source-provided
+            mappings only
+        :param src_name: name of source for record
+        :param supplemental_mappings: supplemental mappings to store separately from the
+            source record. Omitted, None, and empty lists mean no curated mappings.
+        :param mapping_negations: curated rejections of source assertions.
         """
 
     @abc.abstractmethod

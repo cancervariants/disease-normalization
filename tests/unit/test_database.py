@@ -5,8 +5,10 @@ migration to VA-Spec for everything is complete.
 """
 
 from collections import defaultdict
+from collections.abc import Generator
 
 import pytest
+from ga4gh.core.models import ConceptMapping, Relation
 from ga4gh.va_spec.base import Condition, DataSet
 
 from disease.config import get_config
@@ -14,10 +16,13 @@ from disease.database import create_db
 from disease.database.database import AbstractDatabase
 from disease.schemas import (
     PREFIX_LOOKUP,
+    PredicateModifier,
     RecordType,
     RefType,
     SourceName,
+    SssomMapping,
     coding_to_concept_id,
+    concept_id_to_coding,
     mapcon_to_disease,
 )
 
@@ -25,8 +30,72 @@ IS_DDB = not get_config().db_url.lower().startswith("postgres")
 IS_TEST_ENV = get_config().test
 
 
+@pytest.mark.skipif(not IS_TEST_ENV, reason="not in test environment")
+@pytest.mark.parametrize("independent_exact_match", [False, True])
+def test_mapping_negation_views(db, diseases, sources, independent_exact_match):
+    subject = "DOID:6032"
+    target = "ncit:C4207"
+    coding = concept_id_to_coding(target)
+    supplemental = [ConceptMapping(coding=coding, relation=Relation.BROAD_MATCH)]
+    if independent_exact_match:
+        supplemental.append(
+            ConceptMapping(coding=coding, relation=Relation.EXACT_MATCH)
+        )
+    db.add_source_metadata(SourceName.DO, sources[SourceName.DO])
+    db.add_record(
+        diseases[subject],
+        SourceName.DO,
+        supplemental_mappings=supplemental,
+        mapping_negations=[
+            SssomMapping(
+                subject_id=subject,
+                object_id=target,
+                predicate_id=Relation.EXACT_MATCH,
+                predicate_modifier=PredicateModifier.NOT,
+                subject_label=None,
+                object_label=None,
+                subject_source_version=None,
+                object_source_version=None,
+                mapping_justification="semapv:ManualMappingCuration",
+                author_id="orcid:test",
+            )
+        ],
+    )
+    db.complete_write_transaction()
+
+    expected_augmented = [subject] if independent_exact_match else []
+    assert db.get_refs_by_type(target, RefType.XREFS) == expected_augmented
+    assert (
+        db.get_refs_by_type(target, RefType.XREFS, include_supplemental=True)
+        == expected_augmented
+    )
+    assert db.get_refs_by_type(target, RefType.XREFS, include_supplemental=False) == [
+        subject
+    ]
+    assert target in db.get_record_by_id(subject)["xrefs"]
+    assert (
+        target
+        not in db.get_record_by_id(subject, apply_mapping_negations=True)["xrefs"]
+    )
+    corrected = db.get_record_by_id(
+        subject,
+        apply_mapping_negations=True,
+        include_supplemental_mappings=True,
+        as_condition=True,
+    )
+    assert [
+        mapping.relation
+        for mapping in corrected.mappings
+        if mapping.coding.id == target
+    ] == [mapping.relation for mapping in supplemental]
+    (bulk_record,) = db.get_all_records(
+        RecordType.IDENTITY, apply_mapping_negations=True
+    )
+    assert target not in bulk_record["xrefs"]
+
+
 @pytest.fixture
-def db() -> AbstractDatabase:
+def db() -> Generator[AbstractDatabase]:
     """A real live db instance (gets overwritten immediately)"""
     db_instance = create_db()
     try:
@@ -138,9 +207,55 @@ def test_get_all_concept_ids(
         prefix = curie.split(":", 1)[0]
         grouped[prefix].add(curie)
     for src_prefix, concept_ids in grouped.items():
-        src = PREFIX_LOOKUP[src_prefix.lower()]
+        src = SourceName(PREFIX_LOOKUP[src_prefix.lower()])
         result = db.get_all_concept_ids(src)
         assert set(result) == concept_ids
+
+
+@pytest.mark.skipif(not IS_TEST_ENV, reason="not in test environment")
+def test_supplemental_mappings_inclusion(
+    db: AbstractDatabase,
+    diseases: dict[str, Condition],
+    sources: dict[SourceName, DataSet],
+):
+    concept_id = "DOID:769"
+    curated_target = "ncit:C4207"
+    db.add_source_metadata(SourceName.DO, sources[SourceName.DO])
+    db.add_record(
+        diseases[concept_id],
+        SourceName.DO,
+        supplemental_mappings=[
+            ConceptMapping(
+                coding=concept_id_to_coding(curated_target),
+                relation=Relation.EXACT_MATCH,
+            )
+        ],
+    )
+    db.complete_write_transaction()
+
+    assert db.get_refs_by_type(curated_target, RefType.XREFS) == [concept_id]
+    assert db.get_refs_by_type(
+        curated_target, RefType.XREFS, include_supplemental=True
+    ) == [concept_id]
+    assert (
+        db.get_refs_by_type(curated_target, RefType.XREFS, include_supplemental=False)
+        == []
+    )
+
+    source = db.get_record_by_id(concept_id)
+    assert source is not None
+    assert curated_target not in source["xrefs"]
+    expected_augmented = {**source, "xrefs": [*source["xrefs"], curated_target]}
+    assert (
+        db.get_record_by_id(concept_id, include_supplemental_mappings=True)
+        == expected_augmented
+    )
+
+    assert list(db.get_all_records(RecordType.IDENTITY)) == [source]
+    assert list(
+        db.get_all_records(RecordType.IDENTITY, include_supplemental_mappings=True)
+    ) == [expected_augmented]
+    assert db.get_record_by_id(concept_id) == source
 
 
 @pytest.mark.skipif(not IS_TEST_ENV, reason="not in test environment")

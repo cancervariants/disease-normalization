@@ -13,7 +13,7 @@ from owlready2.rdflib_store import TripleLiteRDFlibGraph as RDFGraph
 from wags_tails import CustomData, DataSource, DoData, MondoData, NcitData, OncoTreeData
 
 from disease.database import AbstractDatabase
-from disease.etl.rules import Rules
+from disease.etl.mappings import get_etl_mappings
 from disease.schemas import DISEASE_CONCEPT_TYPE, SourceName, coding_to_concept_id
 
 DATA_DISPATCH = {
@@ -56,7 +56,7 @@ class Base(ABC):
         )
         self._database = database
         self.store_ids = self.__class__.__name__ in SOURCES_FOR_MERGE
-        self._rules = Rules(self._src_name)
+        self._supplemental_mappings, self._mapping_negations = get_etl_mappings()
         self._added_ids = []
 
     def _get_data_handler(self, data_path: Path | None = None) -> DataSource:
@@ -136,8 +136,12 @@ class Base(ABC):
                     }.values()
                 )
 
-        disease = self._rules.apply_rules_to_disease(disease)
-        self._database.add_record(disease, self._src_name)
+        self._database.add_record(
+            disease,
+            self._src_name,
+            supplemental_mappings=self._supplemental_mappings.get(concept_id),
+            mapping_negations=self._mapping_negations.get(concept_id),
+        )
         self._added_ids.append(concept_id)
 
 
