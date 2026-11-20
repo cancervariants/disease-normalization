@@ -6,7 +6,8 @@ from ga4gh.core.models import ConceptMapping, Relation
 from disease.etl import mappings
 
 HEADER = (
-    "subject_id\tsubject_label\tpredicate_id\tobject_id\tobject_label\t"
+    "subject_id\tsubject_label\tsubject_source\tsubject_source_version\t"
+    "predicate_id\tobject_id\tobject_label\tobject_source\tobject_source_version\t"
     "mapping_justification\tauthor_id\tcomment\n"
 )
 
@@ -20,7 +21,8 @@ def write_tsv(path, *rows):
 
 def row(predicate="skos:exactMatch", target="ncit:C4207", comment=""):
     return (
-        f"DOID:6032\tSubject\t{predicate}\t{target}\tTarget\t"
+        f"DOID:6032\tSubject\tdoid\t2025-06-27\t{predicate}\t{target}\tTarget\t"
+        f"{target.partition(':')[0]}\t\t"
         f"semapv:ManualMappingCuration\torcid:test\t{comment}\n"
     )
 
@@ -35,6 +37,10 @@ def test_load_and_convert(tmp_path, comment):
     rows = loaded["DOID:6032"]
     assert [r.object_id for r in rows] == ["ncit:C4207", "ncit:C1"]
     assert rows[0].comment == (comment or None)
+    assert rows[0].subject_source == "doid"
+    assert rows[0].subject_source_version == "2025-06-27"
+    assert rows[0].object_source == "ncit"
+    assert rows[0].object_source_version == ""
     converted = rows[0].to_concept_mapping()
     assert converted.relation == Relation.EXACT_MATCH
     assert converted.coding.code.root == "C4207"
@@ -52,6 +58,10 @@ def test_load_and_convert(tmp_path, comment):
     ("content", "message"),
     [
         ("subject_id\n", "Missing required SSSOM columns"),
+        (
+            HEADER.replace("object_source_version\t", ""),
+            "Missing required SSSOM columns",
+        ),
         (HEADER + row().rstrip("\t\n") + "\n", "Incorrect number"),
         (HEADER + row().rstrip("\n") + "\textra\n", "Incorrect number"),
         (HEADER + row(predicate="skos:unknown"), "predicate_id"),
