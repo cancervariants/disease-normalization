@@ -44,4 +44,4 @@ ncit:C6791	""	""	""	skos:broadMatch	""	oncotree:SACA	""	OncoTree	20251003	semapv
 ncit:C4726	""	""	""	skos:broadMatch	""	oncotree:ACPG	""	OncoTree	20251003	semapv:LogicalReasoning	0000-0002-2568-6163	""
 ncit:C129424	""	""	""	skos:broadMatch	""	oncotree:DIFG	""	OncoTree	20251003	semapv:LogicalReasoning	0000-0002-2568-6163	""
 ncit:C129309	""	""	""	skos:broadMatch	""	oncotree:DIFG	""	OncoTree	20251003	semapv:LogicalReasoning	0000-0002-2568-6163	"mondo record has outdated oncotree xref"
-DOID:6032	"juvenile type testicular granulosa cell tumor"	""	20261029	skos:exactMatch	Not	ncit:C4207	"Juvenile Granulosa Cell Tumor"	""	26.02d	semapv:ManualMappingCuration	""
+DOID:6032	"juvenile type testicular granulosa cell tumor"	""	20261029	skos:exactMatch	Not	ncit:C4207	"Juvenile Granulosa Cell Tumor"	""	26.02d	semapv:ManualMappingCuration	0000-0002-2568-6163	""
