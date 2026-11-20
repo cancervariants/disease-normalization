@@ -38,6 +38,7 @@ from disease.schemas import (
     SourceDataSet,
     SourceMeta,
     SourceName,
+    SssomMapping,
     coding_to_concept_id,
     mapcon_to_disease,
 )
@@ -252,7 +253,9 @@ class DynamoDbDatabase(AbstractDatabase):
         merge: bool = False,
         *,
         include_supplemental_mappings: bool = False,
-    ) -> dict | None:
+        apply_mapping_negations: bool = False,
+        as_condition: bool = False,
+    ) -> dict | Condition | None:
         """Fetch record corresponding to provided concept ID
 
         :param str concept_id: concept ID for disease record
@@ -265,6 +268,8 @@ class DynamoDbDatabase(AbstractDatabase):
             for source records only. Stored merged records remain unchanged.
             The legacy dict conversion does not preserve mapping provenance or
             relation detail. Defaults to False.
+        :param apply_mapping_negations: filter rejected source assertions.
+        :param as_condition: return the native model with mapping predicates preserved.
         :return: complete record, if match is found; None otherwise
         """
         self.complete_write_transaction()
@@ -295,12 +300,20 @@ class DynamoDbDatabase(AbstractDatabase):
         except (KeyError, IndexError):  # record doesn't exist
             return None
         return self._format_record(
-            _record, include_supplemental_mappings=include_supplemental_mappings
+            _record,
+            include_supplemental_mappings=include_supplemental_mappings,
+            apply_mapping_negations=apply_mapping_negations,
+            as_condition=as_condition,
         )
 
     def _format_record(
-        self, _record: dict, *, include_supplemental_mappings: bool = False
-    ) -> dict:
+        self,
+        _record: dict,
+        *,
+        include_supplemental_mappings: bool = False,
+        apply_mapping_negations: bool = False,
+        as_condition: bool = False,
+    ) -> dict | Condition:
         """Convert a stored concept to the database response format."""
         data = _record["data"]
         concept = (
@@ -308,6 +321,14 @@ class DynamoDbDatabase(AbstractDatabase):
             if isinstance(data, str)
             else Condition(**data)
         )
+        if apply_mapping_negations and _record["item_type"] == RecordType.IDENTITY:
+            concept = self._without_negated_mappings(
+                concept,
+                [
+                    SssomMapping.model_validate(row)
+                    for row in _record.get("mapping_negations", [])
+                ],
+            )
         if (
             include_supplemental_mappings
             and _record["item_type"] == RecordType.IDENTITY
@@ -319,6 +340,8 @@ class DynamoDbDatabase(AbstractDatabase):
                     for m in (_record.get("curated_mappings") or [])
                 ],
             )
+        if as_condition:
+            return concept
         record = mapcon_to_disease(concept).model_dump(
             exclude_none=_record["item_type"] == RecordType.MERGER
         )
@@ -331,14 +354,19 @@ class DynamoDbDatabase(AbstractDatabase):
         return record
 
     def get_refs_by_type(
-        self, search_term: str, ref_type: RefType, *, include_supplemental: bool = True
+        self,
+        search_term: str,
+        ref_type: RefType,
+        *,
+        include_supplemental: bool = True,
     ) -> list[str]:
         """Retrieve concept IDs for records matching the user's query. Other methods
         are responsible for actually retrieving full records.
 
         :param search_term: string to match against
         :param ref_type: type of match to look for.
-        :param include_supplemental: include matches from supplemental references.
+        :param include_supplemental: use curated additions and negations.
+            False selects original source references.
         :return: list of associated concept IDs. Empty if lookup fails.
         """
         self.complete_write_transaction()
@@ -352,8 +380,14 @@ class DynamoDbDatabase(AbstractDatabase):
                 concept_ids.extend(
                     match["concept_id"]
                     for match in matches.get("Items", [])
-                    if include_supplemental
-                    or not self._is_supplemental_ref(match, term, ref_type)
+                    if (
+                        (
+                            not match.get("is_negated", False)
+                            or match.get("has_supplemental", False)
+                        )
+                        if include_supplemental
+                        else not self._is_supplemental_ref(match, term, ref_type)
+                    )
                 )
                 last_key = matches.get("LastEvaluatedKey")
                 if not last_key:
@@ -425,7 +459,11 @@ class DynamoDbDatabase(AbstractDatabase):
         return set(concept_ids)
 
     def get_all_records(
-        self, record_type: RecordType, *, include_supplemental_mappings: bool = False
+        self,
+        record_type: RecordType,
+        *,
+        include_supplemental_mappings: bool = False,
+        apply_mapping_negations: bool = False,
     ) -> Generator[dict, None, None]:
         """Retrieve all source or normalized records. Either return all source records,
         or all records that qualify as "normalized" (i.e., merged groups + source
@@ -445,6 +483,7 @@ class DynamoDbDatabase(AbstractDatabase):
             for source records only. Stored merged records remain unchanged.
             The legacy dict conversion does not preserve mapping provenance or
             relation detail. Defaults to False.
+        :param apply_mapping_negations: filter rejected source assertions.
         :return: Generator that lazily provides records as they are retrieved
         """
         self.complete_write_transaction()
@@ -464,6 +503,7 @@ class DynamoDbDatabase(AbstractDatabase):
                         yield self._format_record(
                             record,
                             include_supplemental_mappings=include_supplemental_mappings,
+                            apply_mapping_negations=apply_mapping_negations,
                         )
                 elif (
                     incoming_record_type == RecordType.IDENTITY
@@ -472,6 +512,7 @@ class DynamoDbDatabase(AbstractDatabase):
                     yield self._format_record(
                         record,
                         include_supplemental_mappings=include_supplemental_mappings,
+                        apply_mapping_negations=apply_mapping_negations,
                     )
             last_evaluated_key = response.get("LastEvaluatedKey")
             if not last_evaluated_key:
@@ -505,6 +546,7 @@ class DynamoDbDatabase(AbstractDatabase):
         src_name: SourceName,
         *,
         supplemental_mappings: list[ConceptMapping] | None = None,
+        mapping_negations: list[SssomMapping] | None = None,
     ) -> None:
         """Add a source-derived record with separately stored supplemental mappings.
 
@@ -513,6 +555,7 @@ class DynamoDbDatabase(AbstractDatabase):
         :param src_name: name of source for record
         :param supplemental_mappings: supplemental mappings to store separately from the
             source record. Supplemental exact matches are indexed as supplemental xrefs.
+        :param mapping_negations: curated rejections of source assertions.
         """
         concept_id = coding_to_concept_id(disease.primaryCoding)
         if not concept_id:
@@ -526,6 +569,10 @@ class DynamoDbDatabase(AbstractDatabase):
                     "item_type": "identity",
                     "src_name": src_name.value,
                     "data": disease.model_dump(exclude_none=True, exclude_unset=True),
+                    "mapping_negations": [
+                        row.model_dump(mode="json", exclude_none=True)
+                        for row in mapping_negations or []
+                    ],
                     "curated_mappings": [
                         mapping.model_dump(
                             mode="json", exclude_unset=True, exclude_none=True
@@ -546,21 +593,42 @@ class DynamoDbDatabase(AbstractDatabase):
             for alias in (a.lower() for a in disease.aliases):
                 self._add_ref_record(alias, concept_id, RefType.ALIASES, src_name)
         formatted = mapcon_to_disease(disease)
-        for ref_type, terms in (
-            (RefType.XREFS, formatted.xrefs),
-            (RefType.ASSOCIATED_WITH, formatted.associated_with),
+        corrected = mapcon_to_disease(
+            self._without_negated_mappings(disease, mapping_negations or [])
+        )
+        supplemental_xrefs = {
+            coding_to_concept_id(mapping.coding).lower(): coding_to_concept_id(
+                mapping.coding
+            )
+            for mapping in supplemental_mappings or []
+            if mapping.relation == Relation.EXACT_MATCH
+        }
+        for ref_type, terms, accepted_terms in (
+            (RefType.XREFS, formatted.xrefs, corrected.xrefs),
+            (
+                RefType.ASSOCIATED_WITH,
+                formatted.associated_with,
+                corrected.associated_with,
+            ),
         ):
-            for term in terms:
-                self._add_ref_record(term, concept_id, ref_type, src_name)
-        indexed_xrefs = {xref.lower() for xref in formatted.xrefs}
-        for mapping in supplemental_mappings or []:
-            if mapping.relation == Relation.EXACT_MATCH:
-                term = coding_to_concept_id(mapping.coding)
-                if term.lower() not in indexed_xrefs:
-                    self._add_ref_record(
-                        term, concept_id, RefType.XREFS, src_name, is_supplemental=True
-                    )
-                    indexed_xrefs.add(term.lower())
+            accepted = {term.lower() for term in accepted_terms}
+            for term in dict.fromkeys(term.lower() for term in terms):
+                has_supplemental = (
+                    ref_type == RefType.XREFS
+                    and supplemental_xrefs.pop(term, None) is not None
+                )
+                self._add_ref_record(
+                    term,
+                    concept_id,
+                    ref_type,
+                    src_name,
+                    is_negated=term not in accepted,
+                    has_supplemental=has_supplemental,
+                )
+        for term in supplemental_xrefs.values():
+            self._add_ref_record(
+                term, concept_id, RefType.XREFS, src_name, is_supplemental=True
+            )
 
     def add_merged_record(self, record: Condition) -> None:
         """Add merged record to database.
@@ -591,6 +659,8 @@ class DynamoDbDatabase(AbstractDatabase):
         src_name: SourceName,
         *,
         is_supplemental: bool = False,
+        is_negated: bool = False,
+        has_supplemental: bool = False,
     ) -> None:
         """Add auxiliary/reference record to database.
 
@@ -608,6 +678,8 @@ class DynamoDbDatabase(AbstractDatabase):
             "src_name": src_name.value,
             "item_type": ref_type,
             "is_supplemental": is_supplemental,
+            "is_negated": is_negated,
+            "has_supplemental": has_supplemental,
         }
         try:
             self.batch.put_item(Item=record)

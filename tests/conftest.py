@@ -20,6 +20,7 @@ from disease.schemas import (
     RefType,
     SourceMeta,
     SourceName,
+    SssomMapping,
     mapcon_to_disease,
 )
 
@@ -123,6 +124,7 @@ def mock_db_class():
         def __init__(self, db_url: str | None = None, **db_args) -> None:  # noqa: ARG002
             self._get_all_records_values = db_args.get("get_all_records", {})
             self._get_record_by_id_values = db_args.get("get_record_by_id", {})
+            self._added_mapping_negations: dict[str, list[SssomMapping]] = {}
             self._added_records: dict[str, Condition] = {}
             self._added_supplemental_mappings: dict[str, list[ConceptMapping]] = {}
             self._added_sources: dict[SourceName, Condition] = {}
@@ -152,7 +154,9 @@ def mock_db_class():
             merge: bool = False,  # noqa: ARG002
             *,
             include_supplemental_mappings: bool = False,  # noqa: ARG002
-        ) -> dict | None:
+            apply_mapping_negations: bool = False,  # noqa: ARG002
+            as_condition: bool = False,
+        ) -> dict | Condition | None:
             key = concept_id
             if case_sensitive:
                 key = key.lower()
@@ -164,7 +168,11 @@ def mock_db_class():
             result = response_map.get(key)
             if not result:
                 return None
-            return mapcon_to_disease(result).model_dump()
+            return (
+                result.model_copy(deep=True)
+                if as_condition
+                else mapcon_to_disease(result).model_dump()
+            )
 
         def get_refs_by_type(
             self,
@@ -177,7 +185,11 @@ def mock_db_class():
         def get_all_concept_ids(self, source: SourceName | None = None) -> set[str]: ...
 
         def get_all_records(
-            self, record_type: RecordType
+            self,
+            record_type: RecordType,
+            *,
+            include_supplemental_mappings: bool = False,  # noqa: ARG002
+            apply_mapping_negations: bool = False,  # noqa: ARG002
         ) -> Generator[dict, None, None]:
             yield from self._get_all_records_values[record_type]
 
@@ -190,7 +202,9 @@ def mock_db_class():
             src_name: SourceName,  # noqa: ARG002
             *,
             supplemental_mappings: list[ConceptMapping] | None = None,
+            mapping_negations: list[SssomMapping] | None = None,
         ) -> None:
+            self._added_mapping_negations[disease.id] = mapping_negations or []
             self._added_records[disease.id] = disease
             self._added_supplemental_mappings[disease.id] = supplemental_mappings or []
 

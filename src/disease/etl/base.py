@@ -56,7 +56,7 @@ class Base(ABC):
         )
         self._database = database
         self.store_ids = self.__class__.__name__ in SOURCES_FOR_MERGE
-        self._supplemental_mappings = get_etl_mappings()
+        self._supplemental_mappings, self._mapping_negations = get_etl_mappings()
         self._added_ids = []
 
     def _get_data_handler(self, data_path: Path | None = None) -> DataSource:
@@ -140,6 +140,7 @@ class Base(ABC):
             disease,
             self._src_name,
             supplemental_mappings=self._supplemental_mappings.get(concept_id),
+            mapping_negations=self._mapping_negations.get(concept_id),
         )
         self._added_ids.append(concept_id)
 
