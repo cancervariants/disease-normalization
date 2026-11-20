@@ -28,23 +28,23 @@ class SssomMapping(BaseModel):
     """Represent a curated SSSOM row with explicit per-mapping provenance."""
 
     subject_id: str
-    subject_label: str
+    subject_label: str | None
     subject_source: str | None = None
-    subject_source_version: str
+    subject_source_version: str | None
     predicate_id: Relation
     object_id: str
-    object_label: str
+    object_label: str | None
     object_source: str | None = None
-    object_source_version: str
+    object_source_version: str | None
     mapping_justification: MappingJustification
     author_id: str
     comment: str | None = None
 
     @field_validator("predicate_id", mode="before")
     @classmethod
-    def parse_predicate(cls, value: str) -> str:
+    def parse_predicate(cls, value: str | None) -> str | None:
         """Translate a SKOS CURIE into the relation used by GKM."""
-        return value.removeprefix("skos:")
+        return value.removeprefix("skos:") if value is not None else None
 
     def to_concept_mapping(self) -> ConceptMapping:
         """Convert the target and curation provenance to a GKM mapping."""
@@ -94,9 +94,9 @@ def load_mappings(path: Traversable) -> defaultdict[str, list[SssomMapping]]:
             if None in row or any(value is None for value in row.values()):
                 msg = f"Incorrect number of SSSOM columns in {path}: {row}"
                 raise ValueError(msg)
-            for field in optional:
-                row[field] = row.get(field) or None
-            mapping = SssomMapping(**row)
+            mapping = SssomMapping(
+                **{field: value or None for field, value in row.items()}
+            )
             mappings[mapping.subject_id].append(mapping)
     return mappings
 
