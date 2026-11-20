@@ -94,7 +94,7 @@ class Merge:
             try:
                 # temporary -- remove once full domain model migration is complete
                 _record = self._database.get_record_by_id(
-                    concept_id, include_curated_mappings=True
+                    concept_id, include_supplemental_mappings=True
                 )
                 if not _record:
                     _logger.error(
@@ -143,7 +143,7 @@ class Merge:
         final_ids = []
         for record_id in record_id_set:
             _record = self._database.get_record_by_id(
-                record_id, include_curated_mappings=True
+                record_id, include_supplemental_mappings=True
             )
             if _record:
                 disease = disease_to_mapcon(Disease(**_record))

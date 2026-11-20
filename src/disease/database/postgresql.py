@@ -201,6 +201,20 @@ class PostgresDatabase(AbstractDatabase):
             self.drop_db()
             self._create_tables()
             self._add_indexes()
+        else:
+            self._migrate_reference_provenance()
+
+    def _migrate_reference_provenance(self) -> None:
+        with self.conn.transaction(), self.conn.cursor() as cur:
+            cur.execute(
+                """SELECT EXISTS (
+                    SELECT 1 FROM pg_attribute
+                    WHERE attrelid = 'disease_xrefs'::regclass
+                      AND attname = 'is_supplemental' AND NOT attisdropped
+                );"""
+            )
+            if not cur.fetchone()[0]:
+                cur.execute((SCRIPTS_DIR / "add_reference_provenance.sql").read_bytes())
 
     def _add_fkeys(self) -> None:
         """Add fkey relationships."""
@@ -277,7 +291,7 @@ class PostgresDatabase(AbstractDatabase):
     _record_query = b"SELECT * FROM disease_concepts WHERE lower(concept_id) = %s;"
 
     def _format_source_record(
-        self, source_row: tuple, *, include_curated_mappings: bool = False
+        self, source_row: tuple, *, include_supplemental_mappings: bool = False
     ) -> dict:
         """Restructure row from disease_concepts table as source record result object.
 
@@ -287,8 +301,8 @@ class PostgresDatabase(AbstractDatabase):
         :return: reformatted dictionary keying disease properties to row values
         """
         mc = Condition(**source_row[3])
-        if include_curated_mappings:
-            mc = self._with_curated_mappings(
+        if include_supplemental_mappings:
+            mc = self._with_supplemental_mappings(
                 mc, [ConceptMapping.model_validate(m) for m in (source_row[4] or [])]
             )
         record = mapcon_to_disease(mc).model_dump()
@@ -299,7 +313,7 @@ class PostgresDatabase(AbstractDatabase):
         return record
 
     def _get_record(
-        self, concept_id: str, *, include_curated_mappings: bool = False
+        self, concept_id: str, *, include_supplemental_mappings: bool = False
     ) -> dict | None:
         """Retrieve non-merged record. The query is pretty different, so this method
         is broken out for PostgreSQL.
@@ -316,7 +330,7 @@ class PostgresDatabase(AbstractDatabase):
             return None
 
         return self._format_source_record(
-            result, include_curated_mappings=include_curated_mappings
+            result, include_supplemental_mappings=include_supplemental_mappings
         )
 
     _merged_record_query = b"SELECT * FROM disease_merged WHERE lower(concept_id) = %s;"
@@ -353,7 +367,7 @@ class PostgresDatabase(AbstractDatabase):
         case_sensitive: bool = True,  # noqa: ARG002
         merge: bool = False,
         *,
-        include_curated_mappings: bool = False,
+        include_supplemental_mappings: bool = False,
     ) -> dict | None:
         """Fetch record corresponding to provided concept ID
 
@@ -362,7 +376,7 @@ class PostgresDatabase(AbstractDatabase):
            case-insensitive index
         :param bool merge: if true, look for merged record; look for identity record
            otherwise.
-        :param include_curated_mappings: include separately stored curated mappings
+        :param include_supplemental_mappings: include separately stored supplemental mappings
             for source records only. Stored merged records remain unchanged.
             The legacy dict conversion does not preserve mapping provenance or
             relation detail. Defaults to False.
@@ -371,22 +385,25 @@ class PostgresDatabase(AbstractDatabase):
         if merge:
             return self._get_merged_record(concept_id)
         return self._get_record(
-            concept_id, include_curated_mappings=include_curated_mappings
+            concept_id, include_supplemental_mappings=include_supplemental_mappings
         )
 
     _ref_types_query: ClassVar[dict] = {
-        RefType.LABEL: b"SELECT concept_id FROM disease_labels WHERE lower(label) = %s;",
-        RefType.ALIASES: b"SELECT concept_id FROM disease_aliases WHERE lower(alias) = %s;",
-        RefType.XREFS: "SELECT concept_id FROM disease_xrefs WHERE lower(xref) = %s;",
-        RefType.ASSOCIATED_WITH: "SELECT concept_id FROM disease_associations WHERE lower(associated_with) = %s;",
+        RefType.LABEL: "SELECT DISTINCT concept_id FROM disease_labels WHERE lower(label) = %s AND (%s OR NOT is_supplemental);",
+        RefType.ALIASES: "SELECT DISTINCT concept_id FROM disease_aliases WHERE lower(alias) = %s AND (%s OR NOT is_supplemental);",
+        RefType.XREFS: "SELECT DISTINCT concept_id FROM disease_xrefs WHERE lower(xref) = %s AND (%s OR NOT is_supplemental);",
+        RefType.ASSOCIATED_WITH: "SELECT DISTINCT concept_id FROM disease_associations WHERE lower(associated_with) = %s AND (%s OR NOT is_supplemental);",
     }
 
-    def get_refs_by_type(self, search_term: str, ref_type: RefType) -> list[str]:
+    def get_refs_by_type(
+        self, search_term: str, ref_type: RefType, *, include_supplemental: bool = True
+    ) -> list[str]:
         """Retrieve concept IDs for records matching the user's query. Other methods
         are responsible for actually retrieving full records.
 
         :param search_term: string to match against
         :param ref_type: type of match to look for.
+        :param include_supplemental: include matches from supplemental references.
         :return: list of associated concept IDs. Empty if lookup fails.
         """
         query = self._ref_types_query.get(ref_type)
@@ -395,7 +412,7 @@ class PostgresDatabase(AbstractDatabase):
             raise ValueError(msg)
 
         with self.conn.cursor() as cur:
-            cur.execute(query, (search_term.lower(),))
+            cur.execute(query, (search_term.lower(), include_supplemental))
             concept_ids = cur.fetchall()
         if concept_ids:
             return [i[0] for i in concept_ids]
@@ -433,7 +450,7 @@ class PostgresDatabase(AbstractDatabase):
     _get_all_source_records_query = b"SELECT * FROM disease_concepts;"
 
     def get_all_records(
-        self, record_type: RecordType, *, include_curated_mappings: bool = False
+        self, record_type: RecordType, *, include_supplemental_mappings: bool = False
     ) -> Generator[dict, None, None]:
         """Retrieve all source or normalized records. Either return all source records,
         or all records that qualify as "normalized" (i.e., merged groups + source
@@ -455,7 +472,7 @@ class PostgresDatabase(AbstractDatabase):
         belong to a normalized concept group.
 
         :param record_type: type of result to return
-        :param include_curated_mappings: include separately stored curated mappings
+        :param include_supplemental_mappings: include separately stored supplemental mappings
             for source records only. Stored merged records remain unchanged.
             The legacy dict conversion does not preserve mapping provenance or
             relation detail. Defaults to False.
@@ -477,7 +494,8 @@ class PostgresDatabase(AbstractDatabase):
                 while fetched:
                     for result in fetched:
                         yield self._format_source_record(
-                            result, include_curated_mappings=include_curated_mappings
+                            result,
+                            include_supplemental_mappings=include_supplemental_mappings,
                         )
                     fetched = results.fetchmany(batch_size)
         else:
@@ -487,7 +505,8 @@ class PostgresDatabase(AbstractDatabase):
                 while fetched:
                     for result in fetched:
                         yield self._format_source_record(
-                            result, include_curated_mappings=include_curated_mappings
+                            result,
+                            include_supplemental_mappings=include_supplemental_mappings,
                         )
                     fetched = results.fetchmany(batch_size)
 
@@ -518,7 +537,7 @@ class PostgresDatabase(AbstractDatabase):
     _insert_alias_query = (
         b"INSERT INTO disease_aliases (alias, concept_id) VALUES (%s, %s)"
     )
-    _insert_xref_query = b"INSERT INTO disease_xrefs (xref, concept_id) VALUES (%s, %s)"
+    _insert_xref_query = b"INSERT INTO disease_xrefs (xref, concept_id, is_supplemental) VALUES (%s, %s, %s)"
     _insert_assoc_query = b"INSERT INTO disease_associations (associated_with, concept_id) VALUES (%s, %s)"
 
     def add_record(
@@ -526,16 +545,15 @@ class PostgresDatabase(AbstractDatabase):
         disease: Condition,
         src_name: SourceName,
         *,
-        curated_mappings: list[ConceptMapping] | None = None,
+        supplemental_mappings: list[ConceptMapping] | None = None,
     ) -> None:
-        """Add a source-derived record with separately stored curated mappings.
+        """Add a source-derived record with separately stored supplemental mappings.
 
         :param disease: source-derived disease record, including source-provided
             mappings only
         :param src_name: name of source for record
-        :param curated_mappings: curated additions to store separately from the
-            source record. Omitted, None, and empty lists mean no curated mappings.
-            These additions do not affect retrieval or lookup indexing yet.
+        :param supplemental_mappings: supplemental mappings to store separately from the
+            source record. Supplemental exact matches are indexed as supplemental xrefs.
         """
         concept_id = disease.id
         with self.conn.cursor() as cur:
@@ -553,7 +571,7 @@ class PostgresDatabase(AbstractDatabase):
                                 mapping.model_dump(
                                     mode="json", exclude_unset=True, exclude_none=True
                                 )
-                                for mapping in (curated_mappings or [])
+                                for mapping in (supplemental_mappings or [])
                             ]
                         ),
                     ],
@@ -567,7 +585,7 @@ class PostgresDatabase(AbstractDatabase):
                         if m.relation == Relation.EXACT_MATCH:
                             cur.execute(
                                 self._insert_xref_query,
-                                [coding_to_concept_id(m.coding), concept_id],
+                                [coding_to_concept_id(m.coding), concept_id, False],
                             )
                         else:
                             cur.execute(
@@ -575,11 +593,10 @@ class PostgresDatabase(AbstractDatabase):
                                 [coding_to_concept_id(m.coding), concept_id],
                             )
 
-                for m in curated_mappings or []:
+                for m in supplemental_mappings or []:
                     if m.relation == Relation.EXACT_MATCH:
                         term = coding_to_concept_id(m.coding)
-                        cur.execute(self._insert_xref_query, [term, concept_id])
-                        self.conn.commit()
+                        cur.execute(self._insert_xref_query, [term, concept_id, True])
             except UniqueViolation:
                 _logger.error("Record with ID %s already exists", concept_id)  # noqa: TRY400
                 self.conn.rollback()
@@ -760,6 +777,7 @@ class PostgresDatabase(AbstractDatabase):
         if result != 0:
             msg = f"System call '{result}' returned failing exit code."
             raise DatabaseException(msg)
+        self._migrate_reference_provenance()
 
     def export_db(self, output_directory: Path) -> None:
         """Dump DB to specified location.

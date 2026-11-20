@@ -251,7 +251,7 @@ class DynamoDbDatabase(AbstractDatabase):
         case_sensitive: bool = True,
         merge: bool = False,
         *,
-        include_curated_mappings: bool = False,
+        include_supplemental_mappings: bool = False,
     ) -> dict | None:
         """Fetch record corresponding to provided concept ID
 
@@ -261,7 +261,7 @@ class DynamoDbDatabase(AbstractDatabase):
             correct casing.
         :param bool merge: if true, look for merged record; look for identity record
             otherwise.
-        :param include_curated_mappings: include separately stored curated mappings
+        :param include_supplemental_mappings: include separately stored supplemental mappings
             for source records only. Stored merged records remain unchanged.
             The legacy dict conversion does not preserve mapping provenance or
             relation detail. Defaults to False.
@@ -295,11 +295,11 @@ class DynamoDbDatabase(AbstractDatabase):
         except (KeyError, IndexError):  # record doesn't exist
             return None
         return self._format_record(
-            _record, include_curated_mappings=include_curated_mappings
+            _record, include_supplemental_mappings=include_supplemental_mappings
         )
 
     def _format_record(
-        self, _record: dict, *, include_curated_mappings: bool = False
+        self, _record: dict, *, include_supplemental_mappings: bool = False
     ) -> dict:
         """Convert a stored concept to the database response format."""
         data = _record["data"]
@@ -308,8 +308,11 @@ class DynamoDbDatabase(AbstractDatabase):
             if isinstance(data, str)
             else Condition(**data)
         )
-        if include_curated_mappings and _record["item_type"] == RecordType.IDENTITY:
-            concept = self._with_curated_mappings(
+        if (
+            include_supplemental_mappings
+            and _record["item_type"] == RecordType.IDENTITY
+        ):
+            concept = self._with_supplemental_mappings(
                 concept,
                 [
                     ConceptMapping.model_validate(m)
@@ -327,20 +330,37 @@ class DynamoDbDatabase(AbstractDatabase):
         record["src_name"] = _record["src_name"]
         return record
 
-    def get_refs_by_type(self, search_term: str, ref_type: RefType) -> list[str]:
+    def get_refs_by_type(
+        self, search_term: str, ref_type: RefType, *, include_supplemental: bool = True
+    ) -> list[str]:
         """Retrieve concept IDs for records matching the user's query. Other methods
         are responsible for actually retrieving full records.
 
         :param search_term: string to match against
         :param ref_type: type of match to look for.
+        :param include_supplemental: include matches from supplemental references.
         :return: list of associated concept IDs. Empty if lookup fails.
         """
         self.complete_write_transaction()
-        pk = f"{search_term.lower()}##{ref_type.value.lower()}"
+        term = search_term.lower()
+        pk = f"{term}##{ref_type.value.lower()}"
         filter_exp = Key("label_and_type").eq(pk)
+        concept_ids = []
         try:
             matches = self.diseases.query(KeyConditionExpression=filter_exp)
-            return [m["concept_id"] for m in matches.get("Items", None)]
+            while True:
+                concept_ids.extend(
+                    match["concept_id"]
+                    for match in matches.get("Items", [])
+                    if include_supplemental
+                    or not self._is_supplemental_ref(match, term, ref_type)
+                )
+                last_key = matches.get("LastEvaluatedKey")
+                if not last_key:
+                    return concept_ids
+                matches = self.diseases.query(
+                    KeyConditionExpression=filter_exp, ExclusiveStartKey=last_key
+                )
         except ClientError as e:
             _logger.exception(
                 "boto3 client error on get_refs_by_type for search term %s: %s",
@@ -348,6 +368,32 @@ class DynamoDbDatabase(AbstractDatabase):
                 e.response["Error"]["Message"],
             )
             return []
+
+    def _is_supplemental_ref(self, ref: dict, term: str, ref_type: RefType) -> bool:
+        """Resolve provenance for both current and legacy reference items."""
+        if "is_supplemental" in ref:
+            return ref["is_supplemental"]
+        if ref_type != RefType.XREFS:
+            return False
+
+        # Older xref items stored provenance only on the identity item.
+        concept_id = ref["concept_id"]
+        record = self.diseases.get_item(
+            Key={
+                "label_and_type": f"{concept_id.lower()}##{RecordType.IDENTITY.value}",
+                "concept_id": concept_id,
+            }
+        ).get("Item", {})
+        has_supplemental_match = any(
+            mapping.relation == Relation.EXACT_MATCH
+            and coding_to_concept_id(mapping.coding).lower() == term
+            for mapping in map(
+                ConceptMapping.model_validate, record.get("curated_mappings") or []
+            )
+        )
+        return has_supplemental_match and not any(
+            xref.lower() == term for xref in self._format_record(record)["xrefs"]
+        )
 
     def get_all_concept_ids(self, source: SourceName | None = None) -> set[str]:
         """Retrieve concept IDs for use in generating normalized records.
@@ -379,7 +425,7 @@ class DynamoDbDatabase(AbstractDatabase):
         return set(concept_ids)
 
     def get_all_records(
-        self, record_type: RecordType, *, include_curated_mappings: bool = False
+        self, record_type: RecordType, *, include_supplemental_mappings: bool = False
     ) -> Generator[dict, None, None]:
         """Retrieve all source or normalized records. Either return all source records,
         or all records that qualify as "normalized" (i.e., merged groups + source
@@ -395,7 +441,7 @@ class DynamoDbDatabase(AbstractDatabase):
            >>>     pass  # do something
 
         :param record_type: type of result to return
-        :param include_curated_mappings: include separately stored curated mappings
+        :param include_supplemental_mappings: include separately stored supplemental mappings
             for source records only. Stored merged records remain unchanged.
             The legacy dict conversion does not preserve mapping provenance or
             relation detail. Defaults to False.
@@ -416,14 +462,16 @@ class DynamoDbDatabase(AbstractDatabase):
                 if record_type == RecordType.IDENTITY:
                     if incoming_record_type == record_type:
                         yield self._format_record(
-                            record, include_curated_mappings=include_curated_mappings
+                            record,
+                            include_supplemental_mappings=include_supplemental_mappings,
                         )
                 elif (
                     incoming_record_type == RecordType.IDENTITY
                     and not record.get("merge_ref")
                 ) or incoming_record_type == RecordType.MERGER:
                     yield self._format_record(
-                        record, include_curated_mappings=include_curated_mappings
+                        record,
+                        include_supplemental_mappings=include_supplemental_mappings,
                     )
             last_evaluated_key = response.get("LastEvaluatedKey")
             if not last_evaluated_key:
@@ -456,16 +504,15 @@ class DynamoDbDatabase(AbstractDatabase):
         disease: Condition,
         src_name: SourceName,
         *,
-        curated_mappings: list[ConceptMapping] | None = None,
+        supplemental_mappings: list[ConceptMapping] | None = None,
     ) -> None:
-        """Add a source-derived record with separately stored curated mappings.
+        """Add a source-derived record with separately stored supplemental mappings.
 
         :param disease: source-derived disease record, including source-provided
             mappings only
         :param src_name: name of source for record
-        :param curated_mappings: curated additions to store separately from the
-            source record. Omitted, None, and empty lists mean no curated mappings.
-            These additions do not affect retrieval or lookup indexing yet.
+        :param supplemental_mappings: supplemental mappings to store separately from the
+            source record. Supplemental exact matches are indexed as supplemental xrefs.
         """
         concept_id = coding_to_concept_id(disease.primaryCoding)
         if not concept_id:
@@ -483,7 +530,7 @@ class DynamoDbDatabase(AbstractDatabase):
                         mapping.model_dump(
                             mode="json", exclude_unset=True, exclude_none=True
                         )
-                        for mapping in (curated_mappings or [])
+                        for mapping in (supplemental_mappings or [])
                     ],
                 }
             )
@@ -505,10 +552,15 @@ class DynamoDbDatabase(AbstractDatabase):
         ):
             for term in terms:
                 self._add_ref_record(term, concept_id, ref_type, src_name)
-        for mapping in curated_mappings or []:
+        indexed_xrefs = {xref.lower() for xref in formatted.xrefs}
+        for mapping in supplemental_mappings or []:
             if mapping.relation == Relation.EXACT_MATCH:
                 term = coding_to_concept_id(mapping.coding)
-                self._add_ref_record(term, concept_id, RefType.XREFS, src_name)
+                if term.lower() not in indexed_xrefs:
+                    self._add_ref_record(
+                        term, concept_id, RefType.XREFS, src_name, is_supplemental=True
+                    )
+                    indexed_xrefs.add(term.lower())
 
     def add_merged_record(self, record: Condition) -> None:
         """Add merged record to database.
@@ -532,7 +584,13 @@ class DynamoDbDatabase(AbstractDatabase):
             )
 
     def _add_ref_record(
-        self, term: str, concept_id: str, ref_type: str, src_name: SourceName
+        self,
+        term: str,
+        concept_id: str,
+        ref_type: str,
+        src_name: SourceName,
+        *,
+        is_supplemental: bool = False,
     ) -> None:
         """Add auxiliary/reference record to database.
 
@@ -541,6 +599,7 @@ class DynamoDbDatabase(AbstractDatabase):
         :param str ref_type: one of {'alias', 'label', 'xref',
             'associated_with'}
         :param src_name: name of source for record
+        :param is_supplemental: whether the reference comes from a supplemental mapping
         """
         label_and_type = f"{term.lower()}##{ref_type}"
         record = {
@@ -548,6 +607,7 @@ class DynamoDbDatabase(AbstractDatabase):
             "concept_id": concept_id,
             "src_name": src_name.value,
             "item_type": ref_type,
+            "is_supplemental": is_supplemental,
         }
         try:
             self.batch.put_item(Item=record)

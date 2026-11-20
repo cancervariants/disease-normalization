@@ -32,14 +32,14 @@ def test_do_etl(
             == {}
         )
 
-    (mapping,) = db._added_curated_mappings["DOID:6032"]
+    (mapping,) = db._added_supplemental_mappings["DOID:6032"]
     assert mapping.coding.id == "ncit:C4207"
     assert mapping.relation == Relation.EXACT_MATCH
     assert {extension.name: extension.value for extension in mapping.extensions} == {
         "mapping_justification": "semapv:ManualMappingCuration",
         "author_id": "orcid:0000-0002-2568-6163",
     }
-    assert not db._added_curated_mappings["DOID:769"]
+    assert not db._added_supplemental_mappings["DOID:769"]
 
     assert len(db._added_sources) == 1
     assert (
