@@ -2,16 +2,22 @@
 
 import os
 from collections.abc import Callable
+from unittest.mock import Mock
 
 import deepdiff
 import pytest
-from ga4gh.core.models import MappableConcept
+from ga4gh.core.models import ConceptMapping, MappableConcept, Relation
 
 from disease.database import AWS_ENV_VAR_NAME, AbstractDatabase
 from disease.database.database import create_db
 from disease.etl import DO, OMIM, Merge, Mondo, NCIt, OncoTree
 from disease.etl.base import SOURCES_FOR_MERGE
-from disease.schemas import SourceName
+from disease.schemas import (
+    PredicateModifier,
+    SourceName,
+    SssomMapping,
+    concept_id_to_coding,
+)
 
 
 @pytest.fixture(scope="module")
@@ -44,6 +50,45 @@ def mock_db(
     mock_db_class: type[AbstractDatabase], diseases: dict[str, MappableConcept]
 ) -> AbstractDatabase:
     return mock_db_class(get_record_by_id=diseases)
+
+
+def test_merge_honors_mapping_negation(diseases):
+    subject, target = "mondo:0005072", "ncit:C3270"
+    coding = concept_id_to_coding(target)
+    original = diseases[subject].model_copy(
+        update={
+            "mappings": [ConceptMapping(coding=coding, relation=Relation.EXACT_MATCH)]
+        }
+    )
+    negation = SssomMapping(
+        subject_id=subject,
+        object_id=target,
+        predicate_id=Relation.EXACT_MATCH,
+        predicate_modifier=PredicateModifier.NOT,
+        subject_label=None,
+        object_label=None,
+        subject_source_version=None,
+        object_source_version=None,
+        mapping_justification="semapv:ManualMappingCuration",
+        author_id="orcid:test",
+    )
+    broad = ConceptMapping(coding=coding, relation=Relation.BROAD_MATCH)
+    corrected = AbstractDatabase._without_negated_mappings(original, [negation])
+    augmented = AbstractDatabase._with_supplemental_mappings(corrected, [broad])
+    db = Mock(spec=AbstractDatabase)
+    db.get_record_by_id.return_value = augmented
+    merge = Merge(db)
+
+    assert merge._get_merged_concept_groups([subject]) == [(subject, {subject})]
+    db.get_record_by_id.assert_called_once_with(
+        subject,
+        include_supplemental_mappings=True,
+        apply_mapping_negations=True,
+        as_condition=True,
+    )
+    merged, _ = merge._generate_merged_record({subject})
+    assert merged.mappings == [broad]
+    assert original.mappings[0].relation == Relation.EXACT_MATCH
 
 
 def test_get_merged_groups(

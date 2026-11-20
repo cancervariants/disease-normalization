@@ -1,13 +1,14 @@
 """Tests for curated mapping loading and conversion."""
 
 import pytest
-from ga4gh.core.models import ConceptMapping, Relation
+from ga4gh.core.models import Relation
 
 from disease.etl import mappings
+from disease.schemas import PredicateModifier
 
 HEADER = (
     "subject_id\tsubject_label\tsubject_source\tsubject_source_version\t"
-    "predicate_id\tobject_id\tobject_label\tobject_source\tobject_source_version\t"
+    "predicate_id\tpredicate_modifier\tobject_id\tobject_label\tobject_source\tobject_source_version\t"
     "mapping_justification\tauthor_id\tcomment\n"
 )
 
@@ -19,9 +20,9 @@ def write_tsv(path, *rows):
     return path
 
 
-def row(predicate="skos:exactMatch", target="ncit:C4207", comment=""):
+def row(predicate="skos:exactMatch", target="ncit:C4207", comment="", modifier=""):
     return (
-        f"DOID:6032\tSubject\tdoid\t2025-06-27\t{predicate}\t{target}\tTarget\t"
+        f"DOID:6032\tSubject\tdoid\t2025-06-27\t{predicate}\t{modifier}\t{target}\tTarget\t"
         f"{target.partition(':')[0]}\t\t"
         f"semapv:ManualMappingCuration\torcid:test\t{comment}\n"
     )
@@ -65,6 +66,7 @@ def test_load_and_convert(tmp_path, comment):
         (HEADER + row().rstrip("\t\n") + "\n", "Incorrect number"),
         (HEADER + row().rstrip("\n") + "\textra\n", "Incorrect number"),
         (HEADER + row(predicate="skos:unknown"), "predicate_id"),
+        (HEADER + row(modifier="unknown"), "predicate_modifier"),
     ],
 )
 def test_malformed_input(tmp_path, content, message):
@@ -74,42 +76,37 @@ def test_malformed_input(tmp_path, content, message):
         mappings.load_mappings(path)
 
 
-@pytest.mark.parametrize("with_category", [False, True])
-def test_combined_mappings(tmp_path, monkeypatch, with_category):
-    category_rows = [row("skos:broadMatch", "oncotree:OVT")] if with_category else []
-    monkeypatch.setattr(
-        mappings,
-        "CATEGORY_MAPPINGS",
-        write_tsv(tmp_path / "category.tsv", *category_rows),
+def test_positive_and_negated_mappings(tmp_path, monkeypatch):
+    path = write_tsv(
+        tmp_path / "curated.tsv",
+        row(modifier="Not", comment="Review found a broader match"),
+        row(predicate="skos:broadMatch"),
+        row(predicate="skos:broadMatch", target="oncotree:OVT"),
+        row(target="ncit:C1"),
     )
-    monkeypatch.setattr(
-        mappings, "CONCEPT_MAPPINGS", write_tsv(tmp_path / "concept.tsv", row())
-    )
-    loaded = mappings.get_etl_mappings()
-    assert list(loaded) == ["DOID:6032"]
-    result = loaded["DOID:6032"]
-    assert all(isinstance(mapping, ConceptMapping) for mapping in result)
-    expected = [Relation.BROAD_MATCH] if with_category else []
-    assert [mapping.relation for mapping in result] == [*expected, Relation.EXACT_MATCH]
+    monkeypatch.setattr(mappings, "CURATED_MAPPINGS", path)
+
+    negation = mappings.load_mappings(path)["DOID:6032"][0]
+    assert negation.predicate_modifier == PredicateModifier.NOT
+    assert negation.predicate_id == Relation.EXACT_MATCH
+    assert negation.comment == "Review found a broader match"
+    assert negation.author_id == "orcid:test"
+    with pytest.raises(ValueError, match="negated assertion"):
+        negation.to_concept_mapping()
+
+    positive, negative = mappings.get_etl_mappings()
+    assert negative["DOID:6032"][0].object_id == "ncit:C4207"
+    assert negative["DOID:6032"][0].comment == negation.comment
+    result = positive["DOID:6032"]
+    assert [(mapping.coding.id, mapping.relation) for mapping in result] == [
+        ("ncit:C4207", Relation.BROAD_MATCH),
+        ("oncotree:OVT", Relation.BROAD_MATCH),
+        ("ncit:C1", Relation.EXACT_MATCH),
+    ]
 
 
-@pytest.mark.parametrize(
-    ("category", "predicate", "target", "message"),
-    [
-        (True, "skos:exactMatch", "oncotree:OVT", "Expected broadMatch"),
-        (False, "skos:broadMatch", "ncit:C4207", "Expected exactMatch"),
-        (True, "skos:broadMatch", "ncit:C4207", "Expected an OncoTree category"),
-        (False, "skos:exactMatch", "unknown:1", "Unsupported mapping target"),
-    ],
-)
-def test_invalid_semantics(tmp_path, monkeypatch, category, predicate, target, message):
-    category_path = write_tsv(
-        tmp_path / "category.tsv", *([row(predicate, target)] if category else [])
-    )
-    concept_path = write_tsv(
-        tmp_path / "concept.tsv", *([] if category else [row(predicate, target)])
-    )
-    monkeypatch.setattr(mappings, "CATEGORY_MAPPINGS", category_path)
-    monkeypatch.setattr(mappings, "CONCEPT_MAPPINGS", concept_path)
-    with pytest.raises(ValueError, match=message):
+def test_unsupported_target(tmp_path, monkeypatch):
+    path = write_tsv(tmp_path / "curated.tsv", row(target="unknown:1"))
+    monkeypatch.setattr(mappings, "CURATED_MAPPINGS", path)
+    with pytest.raises(ValueError, match="Unsupported mapping target"):
         mappings.get_etl_mappings()

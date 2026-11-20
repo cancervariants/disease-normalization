@@ -5,6 +5,7 @@ import logging
 import re
 
 from botocore.exceptions import ClientError
+from ga4gh.va_spec.base import Condition
 
 from disease import __version__
 from disease.database.database import AbstractDatabase
@@ -16,6 +17,7 @@ from disease.schemas import (
     Disease,
     MatchType,
     NormalizationService,
+    RecordType,
     RefType,
     SearchService,
     ServiceMeta,
@@ -180,7 +182,9 @@ class QueryHandler:
         :return: Tuple with updated resp object and updated set of unmatched
                  sources
         """
-        matching_ids = self.db.get_refs_by_type(query, match_type)
+        matching_ids = self.db.get_refs_by_type(
+            query, match_type, include_supplemental=False
+        )
         if matching_ids:
             (resp, matched_srcs) = self._fetch_records(
                 resp, set(matching_ids), match_type
@@ -329,8 +333,19 @@ class QueryHandler:
         :param match_type: type of match achieved
         :return: completed normalized response object ready to return to user
         """
-        disease_concept = disease_to_mapcon(Disease(**record))
-        disease_concept.id = f"normalize.disease.{disease_concept.id}"
+        concept_id = record["concept_id"]
+        merged = record.get("item_type") == RecordType.MERGER
+        disease_concept = self.db.get_record_by_id(
+            f"normalize.disease.{concept_id}" if merged else concept_id,
+            case_sensitive=False,
+            merge=merged,
+            include_supplemental_mappings=True,
+            apply_mapping_negations=True,
+            as_condition=True,
+        )
+        if not isinstance(disease_concept, Condition):
+            disease_concept = disease_to_mapcon(Disease(**record))
+        disease_concept.id = f"normalize.disease.{concept_id}"
         disease_concept.conceptType = DISEASE_CONCEPT_TYPE
         response["match_type"] = match_type
         response["disease"] = disease_concept
@@ -415,7 +430,12 @@ class QueryHandler:
         non_merged_matches = []
 
         # check for concept ID match against record that has a ref to a merged record
-        record = self.db.get_record_by_id(query_str, case_sensitive=False)
+        record = self.db.get_record_by_id(
+            query_str,
+            case_sensitive=False,
+            include_supplemental_mappings=True,
+            apply_mapping_negations=True,
+        )
         if record:
             if merge_ref := record.get("merge_ref"):
                 merge = self.db.get_record_by_id(
@@ -429,15 +449,25 @@ class QueryHandler:
         # check other match types
         for match_type in RefType:
             # get matches list for match tier
-            matching_refs = self.db.get_refs_by_type(query_str, match_type)
+            matching_refs = self.db.get_refs_by_type(
+                query_str, match_type, include_supplemental=True
+            )
             matching_records = [
-                self.db.get_record_by_id(ref, case_sensitive=False)
+                self.db.get_record_by_id(
+                    ref,
+                    case_sensitive=False,
+                    include_supplemental_mappings=True,
+                    apply_mapping_negations=True,
+                )
                 for ref in matching_refs
             ]
-            matching_records.sort(key=self._record_order)
+            matching_records = sorted(
+                (record for record in matching_records if record is not None),
+                key=self._record_order,
+            )
 
             # attempt merge ref resolution until successful
-            for match in [m for m in matching_records if m is not None]:
+            for match in matching_records:
                 if merge_ref := match.get("merge_ref"):
                     merge = self.db.get_record_by_id(
                         merge_ref, case_sensitive=False, merge=True

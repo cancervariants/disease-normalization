@@ -12,12 +12,10 @@ from disease.database.database import AbstractDatabase
 from disease.schemas import (
     DISEASE_CONCEPT_TYPE,
     PREFIX_LOOKUP,
-    Disease,
     NamespacePrefix,
     SourcePriority,
     coding_to_concept_id,
     concept_id_to_coding,
-    disease_to_mapcon,
 )
 
 _logger = logging.getLogger(__name__)
@@ -92,16 +90,17 @@ class Merge:
                 msg = f"Only Mondo IDs should be used as the basis for normalized groups; received {concept_id} instead"
                 raise ValueError(msg)
             try:
-                # temporary -- remove once full domain model migration is complete
-                _record = self._database.get_record_by_id(
-                    concept_id, include_supplemental_mappings=True
+                record = self._database.get_record_by_id(
+                    concept_id,
+                    include_supplemental_mappings=True,
+                    apply_mapping_negations=True,
+                    as_condition=True,
                 )
-                if not _record:
+                if record is None:
                     _logger.error(
                         "generate_merged_concepts couldn't find %s", concept_id
                     )
                     continue
-                record = disease_to_mapcon(Disease(**_record))
             except AttributeError:
                 _logger.exception(
                     "`create_merged_concepts` received invalid concept ID: %s",
@@ -142,11 +141,13 @@ class Merge:
         records: list[Condition] = []
         final_ids = []
         for record_id in record_id_set:
-            _record = self._database.get_record_by_id(
-                record_id, include_supplemental_mappings=True
+            disease = self._database.get_record_by_id(
+                record_id,
+                include_supplemental_mappings=True,
+                apply_mapping_negations=True,
+                as_condition=True,
             )
-            if _record:
-                disease = disease_to_mapcon(Disease(**_record))
+            if disease is not None:
                 records.append(disease)
                 final_ids.append(disease.id)
             else:
