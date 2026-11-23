@@ -8,12 +8,13 @@ from abc import ABC, abstractmethod
 from pathlib import Path
 
 import click
+from ga4gh.va_spec.base import Condition
 from owlready2.rdflib_store import TripleLiteRDFlibGraph as RDFGraph
 from wags_tails import CustomData, DataSource, DoData, MondoData, NcitData, OncoTreeData
 
 from disease.database import AbstractDatabase
 from disease.etl.rules import Rules
-from disease.schemas import ITEM_TYPES, Disease, SourceName
+from disease.schemas import DISEASE_CONCEPT_TYPE, SourceName, coding_to_concept_id
 
 DATA_DISPATCH = {
     SourceName.NCIT: NcitData,
@@ -98,31 +99,42 @@ class Base(ABC):
     def _load_meta(self, *args, **kwargs) -> None:
         raise NotImplementedError
 
-    def _load_disease(self, disease: dict) -> None:
-        """Load individual disease record."""
-        _ = Disease(**disease)
-        concept_id = disease["concept_id"]
+    def _load_disease(self, disease: Condition) -> None:
+        """Load individual disease record.
 
-        for attr_type in ITEM_TYPES:
-            if attr_type in disease:
-                value = disease[attr_type]
-                if value is not None and value != []:
-                    if isinstance(value, str):
-                        items = [value.lower()]
-                    else:
-                        disease[attr_type] = list(set(value))
-                        items = {item.lower() for item in value}
-                        if (attr_type == "aliases") and (len(items) > 20):  # noqa: PLR2004
-                            _logger.debug("%s has > 20 aliases.", concept_id)
-                            del disease[attr_type]
-                            continue
+        * drop case duplicates (take alphabetically prior alias)
+        * drop all if > 20 aliases
+        """
+        if disease.conceptType != DISEASE_CONCEPT_TYPE:
+            raise ValueError
+        concept_id: str = disease.id
 
+        if disease.aliases is not None:
+            if not disease.aliases:
+                disease.aliases = None
+            else:
+                new_aliases = []
+                seen = set()
+                for a in sorted(disease.aliases):
+                    a_cf = a.casefold()
+                    if a_cf == disease.name.casefold() or a_cf in seen:
+                        continue
+                    new_aliases.append(a)
+                    seen.add(a_cf)
+                if len(disease.aliases) > 20:  # noqa: PLR2004
+                    _logger.debug("%s has > 20 aliases.", concept_id)
+                    disease.aliases = None
                 else:
-                    del disease[attr_type]
-
-        for field in ("pediatric_disease", "oncologic_disease"):
-            if field in disease and disease[field] is None:
-                del disease[field]
+                    disease.aliases = new_aliases
+        if disease.mappings is not None:
+            if not disease.mappings:
+                disease.mappings = None
+            else:
+                disease.mappings = list(
+                    {
+                        coding_to_concept_id(m.coding): m for m in disease.mappings
+                    }.values()
+                )
 
         disease = self._rules.apply_rules_to_disease(disease)
         self._database.add_record(disease, self._src_name)
