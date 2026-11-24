@@ -169,7 +169,7 @@ class Merge:
         concept_id = records[0].id
         name = records[0].name
         aliases = records[0].aliases or []
-        mappings = records[0].mappings or []
+        mappings = list(records[0].mappings or [])
         extensions = records[0].extensions or []
 
         for record in records[1:]:
@@ -190,15 +190,13 @@ class Merge:
         primary_coding = concept_id_to_coding(concept_id)
 
         aliases = list(set(aliases)) if aliases else None
-        mappings = (
-            list(
-                {
-                    m.coding.id: m for m in mappings if m.coding.id != primary_coding.id
-                }.values()
-            )
-            if mappings
-            else None
-        )
+        unique_mappings = []
+        for mapping in mappings:
+            if (
+                mapping.coding.id != primary_coding.id
+                and mapping not in unique_mappings
+            ):
+                unique_mappings.append(mapping)
         extensions = (
             list({e.name: e for e in extensions}.values()) if extensions else None
         )
@@ -209,7 +207,7 @@ class Merge:
             primaryCoding=primary_coding,
             name=name,
             aliases=aliases,
-            mappings=mappings,
+            mappings=unique_mappings if mappings else None,
             extensions=extensions,
         )
         return merged_disease, final_ids

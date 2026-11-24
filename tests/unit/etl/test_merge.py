@@ -7,6 +7,7 @@ from unittest.mock import Mock
 import deepdiff
 import pytest
 from ga4gh.core.models import ConceptMapping, MappableConcept, Relation
+from ga4gh.va_spec.base import Condition
 
 from disease.database import AWS_ENV_VAR_NAME, AbstractDatabase
 from disease.database.database import create_db
@@ -89,6 +90,43 @@ def test_merge_honors_mapping_negation(diseases):
     merged, _ = merge._generate_merged_record({subject})
     assert merged.mappings == [broad]
     assert original.mappings[0].relation == Relation.EXACT_MATCH
+
+
+def test_merge_preserves_mapping_predicates_and_provenance():
+    mondo_id, ncit_id = "mondo:0005072", "ncit:C3270"
+    target = "oncotree:OVT"
+    exact = ConceptMapping(
+        coding=concept_id_to_coding(target), relation=Relation.EXACT_MATCH
+    )
+    curated = [
+        SssomMapping(
+            subject_id=subject,
+            object_id=target,
+            predicate_id=Relation.BROAD_MATCH,
+            mapping_justification="semapv:ManualMappingCuration",
+            author_id=author,
+        ).to_concept_mapping()
+        for subject, author in [(ncit_id, "orcid:first"), (mondo_id, "orcid:second")]
+    ]
+    ncit = Condition(
+        id=ncit_id, primaryCoding=concept_id_to_coding(ncit_id), mappings=[exact]
+    )
+    mondo = Condition(
+        id=mondo_id,
+        primaryCoding=concept_id_to_coding(mondo_id),
+        mappings=[exact.model_copy(deep=True)],
+    )
+    records = {
+        ncit_id: AbstractDatabase._with_supplemental_mappings(ncit, curated[:1]),
+        mondo_id: AbstractDatabase._with_supplemental_mappings(mondo, curated),
+    }
+    db = Mock(spec=AbstractDatabase)
+    db.get_record_by_id.side_effect = lambda record_id, **_: records.get(record_id)
+
+    merged, _ = Merge(db)._generate_merged_record({mondo_id, ncit_id})
+
+    assert [m for m in merged.mappings if m.coding.id == target] == [exact, *curated]
+    assert records[ncit_id].mappings == [exact, curated[0]]
 
 
 def test_get_merged_groups(
