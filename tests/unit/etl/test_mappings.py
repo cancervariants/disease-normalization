@@ -101,10 +101,11 @@ def test_positive_and_negated_mappings(tmp_path, monkeypatch):
     with pytest.raises(ValueError, match="negated assertion"):
         negation.to_concept_mapping()
 
-    positive, negative = mappings.get_etl_mappings()
-    assert negative["DOID:6032"][0].object_id == "ncit:C4207"
-    assert negative["DOID:6032"][0].comment == negation.comment
-    result = positive["DOID:6032"]
+    etl_mappings = mappings.get_etl_mappings()
+    (rejected,) = etl_mappings.mapping_negations["DOID:6032"]
+    assert rejected.coding.id == "ncit:C4207"
+    assert rejected.relation == Relation.EXACT_MATCH
+    result = etl_mappings.curated_mappings["DOID:6032"]
     assert [(mapping.coding.id, mapping.relation) for mapping in result] == [
         ("ncit:C4207", Relation.BROAD_MATCH),
         ("oncotree:OVT", Relation.BROAD_MATCH),
@@ -112,8 +113,11 @@ def test_positive_and_negated_mappings(tmp_path, monkeypatch):
     ]
 
 
-def test_unsupported_target(tmp_path, monkeypatch):
-    path = write_tsv(tmp_path / "curated.tsv", row(target="unknown:1"))
+@pytest.mark.parametrize("modifier", ["", "Not"])
+def test_unsupported_target(tmp_path, monkeypatch, modifier):
+    path = write_tsv(
+        tmp_path / "curated.tsv", row(target="unknown:1", modifier=modifier)
+    )
     monkeypatch.setattr(mappings, "CURATED_MAPPINGS", path)
     with pytest.raises(ValueError, match="Unsupported mapping target"):
         mappings.get_etl_mappings()

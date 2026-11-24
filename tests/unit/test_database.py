@@ -16,13 +16,12 @@ from disease.config import get_config
 from disease.database import create_db
 from disease.database.database import AbstractDatabase
 from disease.database.dynamodb import DynamoDbDatabase
+from disease.database.postgresql import PostgresDatabase
 from disease.schemas import (
     PREFIX_LOOKUP,
-    PredicateModifier,
     RecordType,
     RefType,
     SourceName,
-    SssomMapping,
     coding_to_concept_id,
     concept_id_to_coding,
     mapcon_to_disease,
@@ -53,13 +52,7 @@ def test_dynamodb_indexes_mapping_negation_by_predicate(independent_exact_match)
         SourceName.DO,
         supplemental_mappings=[exact_match] if independent_exact_match else [],
         mapping_negations=[
-            SssomMapping(
-                subject_id=subject,
-                object_id=target,
-                predicate_id=Relation.EXACT_MATCH,
-                predicate_modifier=PredicateModifier.NOT,
-                mapping_justification="semapv:ManualMappingCuration",
-            )
+            ConceptMapping(coding=coding, relation=Relation.EXACT_MATCH)
         ],
     )
 
@@ -91,18 +84,7 @@ def test_mapping_negation_views(db, diseases, sources, independent_exact_match):
         SourceName.DO,
         supplemental_mappings=supplemental,
         mapping_negations=[
-            SssomMapping(
-                subject_id=subject,
-                object_id=target,
-                predicate_id=Relation.EXACT_MATCH,
-                predicate_modifier=PredicateModifier.NOT,
-                subject_label=None,
-                object_label=None,
-                subject_source_version=None,
-                object_source_version=None,
-                mapping_justification="semapv:ManualMappingCuration",
-                author_id="orcid:test",
-            )
+            ConceptMapping(coding=coding, relation=Relation.EXACT_MATCH)
         ],
     )
     db.complete_write_transaction()
@@ -466,3 +448,33 @@ def test_delete_source(
     assert not db.get_record_by_id("mondo:0005072")
     assert not db.get_record_by_id("ncit:C3270")
     assert not db.get_record_by_id("MIM:613065")
+
+
+@pytest.mark.parametrize("backend", ["postgres", "dynamodb"])
+def test_stored_mapping_negation(backend):
+    subject = "DOID:6032"
+    target = "ncit:C4207"
+    coding = concept_id_to_coding(target)
+    exact = ConceptMapping(coding=coding, relation=Relation.EXACT_MATCH)
+    broad = ConceptMapping(coding=coding, relation=Relation.BROAD_MATCH)
+    concept = Condition(
+        id=subject, primaryCoding=concept_id_to_coding(subject), mappings=[exact, broad]
+    )
+    stored = exact.model_dump(mode="json")
+    data = concept.model_dump(mode="json")
+    if backend == "postgres":
+        db = PostgresDatabase.__new__(PostgresDatabase)
+        row = (subject, SourceName.DO, None, data, [], [stored])
+        format_record = db._format_source_record
+    else:
+        db = DynamoDbDatabase.__new__(DynamoDbDatabase)
+        row = {
+            "data": data,
+            "item_type": RecordType.IDENTITY,
+            "mapping_negations": [stored],
+        }
+        format_record = db._format_record
+    assert format_record(row, as_condition=True).mappings == [exact, broad]
+    assert format_record(
+        row, as_condition=True, apply_mapping_negations=True
+    ).mappings == [broad]

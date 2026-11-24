@@ -14,7 +14,6 @@ from disease.database.database import create_db
 from disease.etl import DO, OMIM, Merge, Mondo, NCIt, OncoTree
 from disease.etl.base import SOURCES_FOR_MERGE
 from disease.schemas import (
-    PredicateModifier,
     SourceName,
     SssomMapping,
     concept_id_to_coding,
@@ -61,18 +60,7 @@ def test_merge_honors_mapping_negation(diseases):
             "mappings": [ConceptMapping(coding=coding, relation=Relation.EXACT_MATCH)]
         }
     )
-    negation = SssomMapping(
-        subject_id=subject,
-        object_id=target,
-        predicate_id=Relation.EXACT_MATCH,
-        predicate_modifier=PredicateModifier.NOT,
-        subject_label=None,
-        object_label=None,
-        subject_source_version=None,
-        object_source_version=None,
-        mapping_justification="semapv:ManualMappingCuration",
-        author_id="orcid:test",
-    )
+    negation = ConceptMapping(coding=coding, relation=Relation.EXACT_MATCH)
     broad = ConceptMapping(coding=coding, relation=Relation.BROAD_MATCH)
     corrected = AbstractDatabase._without_negated_mappings(original, [negation])
     augmented = AbstractDatabase._with_supplemental_mappings(corrected, [broad])

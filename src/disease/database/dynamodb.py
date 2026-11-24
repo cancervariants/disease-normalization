@@ -38,7 +38,6 @@ from disease.schemas import (
     SourceDataSet,
     SourceMeta,
     SourceName,
-    SssomMapping,
     coding_to_concept_id,
     mapcon_to_disease,
 )
@@ -325,8 +324,8 @@ class DynamoDbDatabase(AbstractDatabase):
             concept = self._without_negated_mappings(
                 concept,
                 [
-                    SssomMapping.model_validate(row)
-                    for row in _record.get("mapping_negations", [])
+                    ConceptMapping.model_validate(mapping)
+                    for mapping in _record.get("mapping_negations", [])
                 ],
             )
         if (
@@ -546,7 +545,7 @@ class DynamoDbDatabase(AbstractDatabase):
         src_name: SourceName,
         *,
         supplemental_mappings: list[ConceptMapping] | None = None,
-        mapping_negations: list[SssomMapping] | None = None,
+        mapping_negations: list[ConceptMapping] | None = None,
     ) -> None:
         """Add a source-derived record with separately stored supplemental mappings.
 

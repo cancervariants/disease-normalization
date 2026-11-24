@@ -5,6 +5,7 @@ from csv import DictReader
 from importlib.resources import files
 from importlib.resources.abc import Traversable
 from itertools import dropwhile
+from typing import NamedTuple
 
 from ga4gh.core.models import ConceptMapping
 
@@ -51,9 +52,14 @@ def load_mappings(path: Traversable) -> defaultdict[str, list[SssomMapping]]:
     return mappings
 
 
-def get_etl_mappings() -> tuple[
-    dict[str, list[ConceptMapping]], dict[str, list[SssomMapping]]
-]:
+class EtlMappings(NamedTuple):
+    """Curated additions and rejections, indexed by subject ID."""
+
+    curated_mappings: dict[str, list[ConceptMapping]]
+    mapping_negations: dict[str, list[ConceptMapping]]
+
+
+def get_etl_mappings() -> EtlMappings:
     """Return positive mappings and negations, each keyed by subject ID."""
     mappings = defaultdict(list)
     negations = defaultdict(list)
@@ -62,7 +68,5 @@ def get_etl_mappings() -> tuple[
             if row.predicate_modifier is None:
                 mappings[subject_id].append(row.to_concept_mapping())
             else:
-                negations[subject_id].append(
-                    SssomMapping.model_validate(row.model_dump())
-                )
-    return mappings, negations
+                negations[subject_id].append(row.to_concept_mapping(allow_negated=True))
+    return EtlMappings(mappings, negations)

@@ -26,7 +26,6 @@ from disease.schemas import (
     SourceDataSet,
     SourceMeta,
     SourceName,
-    SssomMapping,
     coding_to_concept_id,
     mapcon_to_disease,
 )
@@ -307,7 +306,8 @@ class PostgresDatabase(AbstractDatabase):
         mc = Condition(**source_row[3])
         if apply_mapping_negations:
             mc = self._without_negated_mappings(
-                mc, [SssomMapping.model_validate(row) for row in source_row[5]]
+                mc,
+                [ConceptMapping.model_validate(mapping) for mapping in source_row[5]],
             )
         if include_supplemental_mappings:
             mc = self._with_supplemental_mappings(
@@ -592,7 +592,7 @@ class PostgresDatabase(AbstractDatabase):
         src_name: SourceName,
         *,
         supplemental_mappings: list[ConceptMapping] | None = None,
-        mapping_negations: list[SssomMapping] | None = None,
+        mapping_negations: list[ConceptMapping] | None = None,
     ) -> None:
         """Add a source-derived record with separately stored supplemental mappings.
 

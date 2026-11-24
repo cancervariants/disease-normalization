@@ -19,13 +19,11 @@ from ga4gh.va_spec.base import Condition, DataSet
 
 from disease.config import get_config
 from disease.schemas import (
-    PredicateModifier,
     RecordType,
     RefType,
     ServiceEnvironment,
     SourceMeta,
     SourceName,
-    SssomMapping,
     coding_to_concept_id,
 )
 
@@ -142,14 +140,12 @@ class AbstractDatabase(abc.ABC):
 
     @staticmethod
     def _without_negated_mappings(
-        concept: Condition, negations: list[SssomMapping]
+        concept: Condition, negations: list[ConceptMapping]
     ) -> Condition:
         """Return a copy with matching source assertions filtered out."""
         rejected = {
-            (row.object_id.lower(), row.predicate_id)
-            for row in negations
-            if row.predicate_modifier == PredicateModifier.NOT
-            and row.subject_id.lower() == concept.id.lower()
+            (coding_to_concept_id(mapping.coding).lower(), mapping.relation)
+            for mapping in negations
         }
         if not rejected:
             return concept
@@ -183,7 +179,9 @@ class AbstractDatabase(abc.ABC):
             for source records only. Stored merged records remain unchanged.
             The legacy dict conversion does not preserve mapping provenance or
             relation detail. Defaults to False.
-        :param apply_mapping_negations: filter rejected source assertions.
+        :param apply_mapping_negations: filter rejected source assertions. This flag
+            and include_supplemental_mappings are temporary until the GKM-only
+            retrieval API moves augmented record construction to a shared resolver.
         :param as_condition: return the native model with mapping predicates preserved.
         :return: complete record, if match is found; None otherwise
         """
@@ -240,7 +238,9 @@ class AbstractDatabase(abc.ABC):
             for source records only. Stored merged records remain unchanged.
             The legacy dict conversion does not preserve mapping provenance or
             relation detail. Defaults to False.
-        :param apply_mapping_negations: filter rejected source assertions.
+        :param apply_mapping_negations: filter rejected source assertions. This flag
+            and include_supplemental_mappings are temporary until the GKM-only
+            retrieval API moves augmented record construction to a shared resolver.
         :return: Generator that lazily provides records as they are retrieved
         """
 
@@ -260,7 +260,7 @@ class AbstractDatabase(abc.ABC):
         src_name: SourceName,
         *,
         supplemental_mappings: list[ConceptMapping] | None = None,
-        mapping_negations: list[SssomMapping] | None = None,
+        mapping_negations: list[ConceptMapping] | None = None,
     ) -> None:
         """Add a source-derived record with separately stored supplemental mappings.
 

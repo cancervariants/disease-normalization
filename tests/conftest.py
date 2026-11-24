@@ -20,7 +20,6 @@ from disease.schemas import (
     RefType,
     SourceMeta,
     SourceName,
-    SssomMapping,
     mapcon_to_disease,
 )
 
@@ -124,7 +123,7 @@ def mock_db_class():
         def __init__(self, db_url: str | None = None, **db_args) -> None:  # noqa: ARG002
             self._get_all_records_values = db_args.get("get_all_records", {})
             self._get_record_by_id_values = db_args.get("get_record_by_id", {})
-            self._added_mapping_negations: dict[str, list[SssomMapping]] = {}
+            self._added_mapping_negations: dict[str, list[ConceptMapping]] = {}
             self._added_records: dict[str, Condition] = {}
             self._added_supplemental_mappings: dict[str, list[ConceptMapping]] = {}
             self._added_sources: dict[SourceName, Condition] = {}
@@ -202,7 +201,7 @@ def mock_db_class():
             src_name: SourceName,  # noqa: ARG002
             *,
             supplemental_mappings: list[ConceptMapping] | None = None,
-            mapping_negations: list[SssomMapping] | None = None,
+            mapping_negations: list[ConceptMapping] | None = None,
         ) -> None:
             self._added_mapping_negations[disease.id] = mapping_negations or []
             self._added_records[disease.id] = disease
