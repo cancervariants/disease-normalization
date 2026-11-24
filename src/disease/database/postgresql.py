@@ -214,8 +214,6 @@ class PostgresDatabase(AbstractDatabase):
                       AND attname = 'is_supplemental' AND NOT attisdropped
                 );"""
             )
-            if not cur.fetchone()[0]:
-                cur.execute((SCRIPTS_DIR / "add_reference_provenance.sql").read_bytes())
 
     def _add_fkeys(self) -> None:
         """Add fkey relationships."""

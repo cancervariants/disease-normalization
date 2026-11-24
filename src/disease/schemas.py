@@ -6,13 +6,7 @@ from enum import Enum, IntEnum, StrEnum
 from types import MappingProxyType
 from typing import Literal
 
-from ga4gh.core.models import (
-    Coding,
-    ConceptMapping,
-    Extension,
-    Relation,
-    code,
-)
+from ga4gh.core.models import Coding, ConceptMapping, Extension, Relation, code
 from ga4gh.va_spec.base import Condition, DataSet
 from pydantic import BaseModel, ConfigDict, StrictBool, StrictStr, field_validator
 
@@ -38,17 +32,17 @@ class SssomMapping(BaseModel):
     """Represent a curated SSSOM row with explicit per-mapping provenance."""
 
     subject_id: str
-    subject_label: str | None
+    subject_label: str | None = None
     subject_source: str | None = None
-    subject_source_version: str | None
+    subject_source_version: str | None = None
     predicate_id: Relation
     predicate_modifier: PredicateModifier | None = None
     object_id: str
-    object_label: str | None
+    object_label: str | None = None
     object_source: str | None = None
-    object_source_version: str | None
+    object_source_version: str | None = None
     mapping_justification: MappingJustification
-    author_id: str
+    author_id: str | None = None
     comment: str | None = None
 
     @field_validator("predicate_id", mode="before")
@@ -71,8 +65,6 @@ class SssomMapping(BaseModel):
             Extension(name="mapping_justification", value=self.mapping_justification),
             Extension(name="author_id", value=self.author_id),
         ]
-        if self.comment:
-            extensions.append(Extension(name="comment", value=self.comment))
         return ConceptMapping(
             coding=coding, relation=self.predicate_id, extensions=extensions
         )

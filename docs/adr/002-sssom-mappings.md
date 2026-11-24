@@ -19,6 +19,7 @@ Additionally, in applications like MetaKB, we are adding computed broadMatches f
 ## Decision
 
 * Bundle one `curated_mappings.sssom.tsv` file with the source code in Simple Standard for Sharing Ontological Mappings (SSSOM) format. Include human-curated mapping additions and corrections, including OncoTree categories.
+  * For now, include schema-valid additions like subject/object versions, because they may be helpful for valid in the future or in another context, but don't worry about using them for any validation here, at least for now.
 * To reject a source assertion, add a row with the same subject, predicate, and object and set `predicate_modifier` to `Not`. Record the curator, the rationale, and the source release when known.
 * To change a mapping's scope, negate the original assertion and add a positive row with the corrected predicate. For example, negate `X skos:exactMatch Y` and add `X skos:broadMatch Y` when Y is broader than X.
 * Load curated mappings and corrections during ETL.
