@@ -661,6 +661,7 @@ class PostgresDatabase(AbstractDatabase):
                         cur.execute(
                             self._insert_xref_query, [term, concept_id, True, False]
                         )
+                self.conn.commit()
             except UniqueViolation:
                 _logger.error("Record with ID %s already exists", concept_id)  # noqa: TRY400
                 self.conn.rollback()
