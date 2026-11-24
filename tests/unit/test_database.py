@@ -16,7 +16,6 @@ from disease.config import get_config
 from disease.database import create_db
 from disease.database.database import AbstractDatabase
 from disease.database.dynamodb import DynamoDbDatabase
-from disease.database.postgresql import PostgresDatabase
 from disease.schemas import (
     PREFIX_LOOKUP,
     RecordType,
@@ -450,8 +449,8 @@ def test_delete_source(
     assert not db.get_record_by_id("MIM:613065")
 
 
-@pytest.mark.parametrize("backend", ["postgres", "dynamodb"])
-def test_stored_mapping_negation(backend):
+@pytest.mark.skipif(not IS_TEST_ENV, reason="not in test environment")
+def test_stored_mapping_negation(db: AbstractDatabase, sources):
     subject = "DOID:6032"
     target = "ncit:C4207"
     coding = concept_id_to_coding(target)
@@ -460,21 +459,13 @@ def test_stored_mapping_negation(backend):
     concept = Condition(
         id=subject, primaryCoding=concept_id_to_coding(subject), mappings=[exact, broad]
     )
-    stored = exact.model_dump(mode="json")
-    data = concept.model_dump(mode="json")
-    if backend == "postgres":
-        db = PostgresDatabase.__new__(PostgresDatabase)
-        row = (subject, SourceName.DO, None, data, [], [stored])
-        format_record = db._format_source_record
-    else:
-        db = DynamoDbDatabase.__new__(DynamoDbDatabase)
-        row = {
-            "data": data,
-            "item_type": RecordType.IDENTITY,
-            "mapping_negations": [stored],
-        }
-        format_record = db._format_record
-    assert format_record(row, as_condition=True).mappings == [exact, broad]
-    assert format_record(
-        row, as_condition=True, apply_mapping_negations=True
-    ).mappings == [broad]
+    db.add_source_metadata(SourceName.DO, sources[SourceName.DO])
+    db.add_record(concept, SourceName.DO, mapping_negations=[exact])
+    db.complete_write_transaction()
+
+    original = db.get_record_by_id(subject, as_condition=True)
+    corrected = db.get_record_by_id(
+        subject, as_condition=True, apply_mapping_negations=True
+    )
+    assert original.mappings == [exact, broad]
+    assert corrected.mappings == [broad]
