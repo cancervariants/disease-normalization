@@ -6,19 +6,79 @@ from enum import Enum, IntEnum, StrEnum
 from types import MappingProxyType
 from typing import Literal
 
-from ga4gh.core.models import (
-    Coding,
-    ConceptMapping,
-    Extension,
-    Relation,
-    code,
-)
+from ga4gh.core.models import Coding, ConceptMapping, Extension, Relation, code
 from ga4gh.va_spec.base import Condition, DataSet
-from pydantic import BaseModel, ConfigDict, StrictBool, StrictStr
+from pydantic import BaseModel, ConfigDict, StrictBool, StrictStr, field_validator
 
 from disease import __version__
 
 _logger = logging.getLogger(__name__)
+
+
+class PredicateModifier(StrEnum):
+    """Supported SSSOM predicate modifiers."""
+
+    NOT = "Not"
+
+
+class MappingJustification(StrEnum):
+    """Supported justifications for asserting a mapping."""
+
+    MANUAL_MAPPING_CURATION = "semapv:ManualMappingCuration"
+    LOGICAL_REASONING = "semapv:LogicalReasoning"
+
+
+class SssomMapping(BaseModel):
+    """Represent a curated SSSOM row with explicit per-mapping provenance."""
+
+    subject_id: str
+    subject_label: str | None = None
+    subject_source: str | None = None
+    subject_source_version: str | None = None
+    predicate_id: Relation
+    predicate_modifier: PredicateModifier | None = None
+    object_id: str
+    object_label: str | None = None
+    object_source: str | None = None
+    object_source_version: str | None = None
+    mapping_justification: MappingJustification
+    author_id: str | None = None
+    comment: str | None = None
+
+    @field_validator("predicate_id", mode="before")
+    @classmethod
+    def parse_predicate(cls, value: str | None) -> str | None:
+        """Translate a SKOS CURIE into the relation used by GKM."""
+        return value.removeprefix("skos:") if value is not None else None
+
+    def to_concept_mapping(self, *, allow_negated: bool = False) -> ConceptMapping:
+        """Convert the target and curation provenance to a GKM mapping.
+
+        Use the predicate as the relation and derive the coding from the object ID.
+        Set the coding name from the object label and its system version from the
+        object source version when supplied. The two extensions are mapping
+        justification and author ID, with a null value for a missing author ID.
+
+        :param allow_negated: Allow conversion when the caller tracks negation.
+        :raises ValueError: If negation is disallowed or the target ID is unsupported.
+        """
+        if self.predicate_modifier == PredicateModifier.NOT and not allow_negated:
+            msg = "Cannot convert a negated assertion to a positive ConceptMapping"
+            raise ValueError(msg)
+        coding = concept_id_to_coding(self.object_id)
+        if coding is None:
+            msg = f"Unsupported mapping target: {self.object_id}"
+            raise ValueError(msg)
+        coding.name = self.object_label
+        if self.object_source_version:
+            coding.systemVersion = self.object_source_version
+        extensions = [
+            Extension(name="mapping_justification", value=self.mapping_justification),
+            Extension(name="author_id", value=self.author_id),
+        ]
+        return ConceptMapping(
+            coding=coding, relation=self.predicate_id, extensions=extensions
+        )
 
 
 class MatchType(IntEnum):

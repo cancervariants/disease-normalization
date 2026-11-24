@@ -333,6 +333,14 @@
     "mappings": [
       {
         "coding": {
+          "id": "ncit:C4207",
+          "system": "https://ncit.nci.nih.gov/ncitbrowser/ConceptReport.jsp?dictionary=NCI_Thesaurus&code=",
+          "code": "C4207"
+        },
+        "relation": "exactMatch"
+      },
+      {
+        "coding": {
           "id": "ncit:C39947",
           "system": "https://ncit.nci.nih.gov/ncitbrowser/ConceptReport.jsp?dictionary=NCI_Thesaurus&code=",
           "code": "C39947"

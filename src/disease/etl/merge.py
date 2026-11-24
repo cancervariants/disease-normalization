@@ -12,12 +12,10 @@ from disease.database.database import AbstractDatabase
 from disease.schemas import (
     DISEASE_CONCEPT_TYPE,
     PREFIX_LOOKUP,
-    Disease,
     NamespacePrefix,
     SourcePriority,
     coding_to_concept_id,
     concept_id_to_coding,
-    disease_to_mapcon,
 )
 
 _logger = logging.getLogger(__name__)
@@ -92,14 +90,17 @@ class Merge:
                 msg = f"Only Mondo IDs should be used as the basis for normalized groups; received {concept_id} instead"
                 raise ValueError(msg)
             try:
-                # temporary -- remove once full domain model migration is complete
-                _record = self._database.get_record_by_id(concept_id)
-                if not _record:
+                record = self._database.get_record_by_id(
+                    concept_id,
+                    include_supplemental_mappings=True,
+                    apply_mapping_negations=True,
+                    as_condition=True,
+                )
+                if record is None:
                     _logger.error(
                         "generate_merged_concepts couldn't find %s", concept_id
                     )
                     continue
-                record = disease_to_mapcon(Disease(**_record))
             except AttributeError:
                 _logger.exception(
                     "`create_merged_concepts` received invalid concept ID: %s",
@@ -140,9 +141,13 @@ class Merge:
         records: list[Condition] = []
         final_ids = []
         for record_id in record_id_set:
-            _record = self._database.get_record_by_id(record_id)
-            if _record:
-                disease = disease_to_mapcon(Disease(**_record))
+            disease = self._database.get_record_by_id(
+                record_id,
+                include_supplemental_mappings=True,
+                apply_mapping_negations=True,
+                as_condition=True,
+            )
+            if disease is not None:
                 records.append(disease)
                 final_ids.append(disease.id)
             else:
@@ -164,7 +169,7 @@ class Merge:
         concept_id = records[0].id
         name = records[0].name
         aliases = records[0].aliases or []
-        mappings = records[0].mappings or []
+        mappings = list(records[0].mappings or [])
         extensions = records[0].extensions or []
 
         for record in records[1:]:
@@ -185,15 +190,13 @@ class Merge:
         primary_coding = concept_id_to_coding(concept_id)
 
         aliases = list(set(aliases)) if aliases else None
-        mappings = (
-            list(
-                {
-                    m.coding.id: m for m in mappings if m.coding.id != primary_coding.id
-                }.values()
-            )
-            if mappings
-            else None
-        )
+        unique_mappings = []
+        for mapping in mappings:
+            if (
+                mapping.coding.id != primary_coding.id
+                and mapping not in unique_mappings
+            ):
+                unique_mappings.append(mapping)
         extensions = (
             list({e.name: e for e in extensions}.values()) if extensions else None
         )
@@ -204,7 +207,7 @@ class Merge:
             primaryCoding=primary_coding,
             name=name,
             aliases=aliases,
-            mappings=mappings,
+            mappings=unique_mappings if mappings else None,
             extensions=extensions,
         )
         return merged_disease, final_ids

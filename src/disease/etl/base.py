@@ -13,7 +13,7 @@ from owlready2.rdflib_store import TripleLiteRDFlibGraph as RDFGraph
 from wags_tails import CustomData, DataSource, DoData, MondoData, NcitData, OncoTreeData
 
 from disease.database import AbstractDatabase
-from disease.etl.rules import Rules
+from disease.etl.mappings import EtlMappings, get_etl_mappings
 from disease.schemas import DISEASE_CONCEPT_TYPE, SourceName, coding_to_concept_id
 
 DATA_DISPATCH = {
@@ -56,8 +56,6 @@ class Base(ABC):
         )
         self._database = database
         self.store_ids = self.__class__.__name__ in SOURCES_FOR_MERGE
-        self._rules = Rules(self._src_name)
-        self._added_ids = []
 
     def _get_data_handler(self, data_path: Path | None = None) -> DataSource:
         """Construct data handler instance for source. Overwrite for edge-case sources.
@@ -67,13 +65,24 @@ class Base(ABC):
         """
         return DATA_DISPATCH[self._src_name](data_dir=data_path, silent=self._silent)
 
-    def perform_etl(self, use_existing: bool = False) -> list:
+    def perform_etl(
+        self,
+        use_existing: bool = False,
+        *,
+        curated_mappings: EtlMappings | None = None,
+    ) -> list[str]:
         """Public-facing method to begin ETL procedures on given data.
 
         :param use_existing: if True, use local data instead of retrieving most recent
             version
+        :param curated_mappings: Run-specific curation, or None for the bundled TSV.
         :return: List of concept IDs to be added to merge generation.
         """
+        self._added_ids: list[str] = []
+        if curated_mappings is None:
+            curated_mappings = get_etl_mappings()
+        self._supplemental_mappings = curated_mappings.curated_mappings
+        self._mapping_negations = curated_mappings.mapping_negations
         self._extract_data(use_existing)
         self._load_meta()
         if not self._silent:
@@ -136,8 +145,12 @@ class Base(ABC):
                     }.values()
                 )
 
-        disease = self._rules.apply_rules_to_disease(disease)
-        self._database.add_record(disease, self._src_name)
+        self._database.add_record(
+            disease,
+            self._src_name,
+            supplemental_mappings=self._supplemental_mappings.get(concept_id),
+            mapping_negations=self._mapping_negations.get(concept_id),
+        )
         self._added_ids.append(concept_id)
 
 
