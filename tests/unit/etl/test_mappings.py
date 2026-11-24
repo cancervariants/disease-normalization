@@ -20,18 +20,27 @@ def write_tsv(path, *rows):
     return path
 
 
-def row(predicate="skos:exactMatch", target="ncit:C4207", comment="", modifier=""):
+def row(
+    predicate="skos:exactMatch",
+    target="ncit:C4207",
+    comment="",
+    modifier="",
+    version="",
+):
     return (
         f"DOID:6032\tSubject\tdoid\t2025-06-27\t{predicate}\t{modifier}\t{target}\tTarget\t"
-        f"{target.partition(':')[0]}\t\t"
+        f"{target.partition(':')[0]}\t{version}\t"
         f"semapv:ManualMappingCuration\torcid:test\t{comment}\n"
     )
 
 
 @pytest.mark.parametrize("comment", ["", "Reviewed manually"])
-def test_load_and_convert(tmp_path, comment):
+@pytest.mark.parametrize("version", ["", "25.05d"])
+def test_load_and_convert(tmp_path, comment, version):
     path = write_tsv(
-        tmp_path / "mappings.tsv", row(comment=comment), row(target="ncit:C1")
+        tmp_path / "mappings.tsv",
+        row(comment=comment, version=version),
+        row(target="ncit:C1"),
     )
     loaded = mappings.load_mappings(path)
     assert list(loaded) == ["DOID:6032"]
@@ -41,18 +50,16 @@ def test_load_and_convert(tmp_path, comment):
     assert rows[0].subject_source == "doid"
     assert rows[0].subject_source_version == "2025-06-27"
     assert rows[0].object_source == "ncit"
-    assert rows[0].object_source_version is None
+    assert rows[0].object_source_version == (version or None)
     converted = rows[0].to_concept_mapping()
     assert converted.relation == Relation.EXACT_MATCH
     assert converted.coding.code.root == "C4207"
     assert converted.coding.name == "Target"
-    expected = {
+    assert converted.coding.systemVersion == (version or None)
+    assert {e.name: e.value for e in converted.extensions} == {
         "author_id": "orcid:test",
         "mapping_justification": "semapv:ManualMappingCuration",
     }
-    if comment:
-        expected["comment"] = comment
-    assert {e.name: e.value for e in converted.extensions} == expected
 
 
 @pytest.mark.parametrize(

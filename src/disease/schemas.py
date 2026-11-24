@@ -52,7 +52,16 @@ class SssomMapping(BaseModel):
         return value.removeprefix("skos:") if value is not None else None
 
     def to_concept_mapping(self) -> ConceptMapping:
-        """Convert the target and curation provenance to a GKM mapping."""
+        """Convert the target and curation provenance to a GKM mapping.
+
+        Use the predicate as the relation and derive the coding from the object ID.
+        Set the coding name from the object label and its system version from the
+        object source version when supplied. The two extensions are mapping
+        justification and author ID, with a null value for a missing author ID.
+
+        :raises ValueError: If the assertion is negated or the target ID cannot
+            be converted to a coding.
+        """
         if self.predicate_modifier == PredicateModifier.NOT:
             msg = "Cannot convert a negated assertion to a positive ConceptMapping"
             raise ValueError(msg)
@@ -61,6 +70,8 @@ class SssomMapping(BaseModel):
             msg = f"Unsupported mapping target: {self.object_id}"
             raise ValueError(msg)
         coding.name = self.object_label
+        if self.object_source_version:
+            coding.systemVersion = self.object_source_version
         extensions = [
             Extension(name="mapping_justification", value=self.mapping_justification),
             Extension(name="author_id", value=self.author_id),

@@ -36,7 +36,10 @@ dependencies = [
 dynamic = ["version"]
 
 [project.optional-dependencies]
-pg = ["psycopg[binary]", "requests"]
+pg = [
+    "psycopg[binary] ~= 3.3",
+    "requests",
+]
 etl = [
     "owlready2",
     "rdflib",
