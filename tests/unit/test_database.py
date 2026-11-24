@@ -457,7 +457,10 @@ def test_stored_mapping_negation(db: AbstractDatabase, sources):
     exact = ConceptMapping(coding=coding, relation=Relation.EXACT_MATCH)
     broad = ConceptMapping(coding=coding, relation=Relation.BROAD_MATCH)
     concept = Condition(
-        id=subject, primaryCoding=concept_id_to_coding(subject), mappings=[exact, broad]
+        id=subject,
+        name="a disease",
+        primaryCoding=concept_id_to_coding(subject),
+        mappings=[exact, broad],
     )
     db.add_source_metadata(SourceName.DO, sources[SourceName.DO])
     db.add_record(concept, SourceName.DO, mapping_negations=[exact])
