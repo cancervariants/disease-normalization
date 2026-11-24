@@ -592,10 +592,17 @@ class DynamoDbDatabase(AbstractDatabase):
         if disease.aliases:
             for alias in (a.lower() for a in disease.aliases):
                 self._add_ref_record(alias, concept_id, RefType.ALIASES, src_name)
-        formatted = mapcon_to_disease(disease)
-        corrected = mapcon_to_disease(
-            self._without_negated_mappings(disease, mapping_negations or [])
-        )
+
+        def reference_key(mapping: ConceptMapping) -> tuple[RefType, str]:
+            ref_type = (
+                RefType.XREFS
+                if mapping.relation == Relation.EXACT_MATCH
+                else RefType.ASSOCIATED_WITH
+            )
+            return ref_type, coding_to_concept_id(mapping.coding).lower()
+
+        corrected = self._without_negated_mappings(disease, mapping_negations or [])
+        accepted = {reference_key(mapping) for mapping in corrected.mappings or []}
         supplemental_xrefs = {
             coding_to_concept_id(mapping.coding).lower(): coding_to_concept_id(
                 mapping.coding
@@ -603,28 +610,19 @@ class DynamoDbDatabase(AbstractDatabase):
             for mapping in supplemental_mappings or []
             if mapping.relation == Relation.EXACT_MATCH
         }
-        for ref_type, terms, accepted_terms in (
-            (RefType.XREFS, formatted.xrefs, corrected.xrefs),
-            (
-                RefType.ASSOCIATED_WITH,
-                formatted.associated_with,
-                corrected.associated_with,
-            ),
-        ):
-            accepted = {term.lower() for term in accepted_terms}
-            for term in dict.fromkeys(term.lower() for term in terms):
-                has_supplemental = (
-                    ref_type == RefType.XREFS
-                    and supplemental_xrefs.pop(term, None) is not None
-                )
-                self._add_ref_record(
-                    term,
-                    concept_id,
-                    ref_type,
-                    src_name,
-                    is_negated=term not in accepted,
-                    has_supplemental=has_supplemental,
-                )
+        for ref_type, term in dict.fromkeys(map(reference_key, disease.mappings or [])):
+            has_supplemental = (
+                ref_type == RefType.XREFS
+                and supplemental_xrefs.pop(term, None) is not None
+            )
+            self._add_ref_record(
+                term,
+                concept_id,
+                ref_type,
+                src_name,
+                is_negated=(ref_type, term) not in accepted,
+                has_supplemental=has_supplemental,
+            )
         for term in supplemental_xrefs.values():
             self._add_ref_record(
                 term, concept_id, RefType.XREFS, src_name, is_supplemental=True

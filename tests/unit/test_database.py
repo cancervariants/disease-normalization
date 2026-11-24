@@ -6,6 +6,7 @@ migration to VA-Spec for everything is complete.
 
 from collections import defaultdict
 from collections.abc import Generator
+from unittest.mock import Mock
 
 import pytest
 from ga4gh.core.models import ConceptMapping, Relation
@@ -14,6 +15,7 @@ from ga4gh.va_spec.base import Condition, DataSet
 from disease.config import get_config
 from disease.database import create_db
 from disease.database.database import AbstractDatabase
+from disease.database.dynamodb import DynamoDbDatabase
 from disease.schemas import (
     PREFIX_LOOKUP,
     PredicateModifier,
@@ -28,6 +30,48 @@ from disease.schemas import (
 
 IS_DDB = not get_config().db_url.lower().startswith("postgres")
 IS_TEST_ENV = get_config().test
+
+
+@pytest.mark.parametrize("independent_exact_match", [False, True])
+def test_dynamodb_indexes_mapping_negation_by_predicate(independent_exact_match):
+    subject = "DOID:6032"
+    target = "ncit:C4207"
+    coding = concept_id_to_coding(target)
+    exact_match = ConceptMapping(coding=coding, relation=Relation.EXACT_MATCH)
+    disease = Condition(
+        id=subject,
+        primaryCoding=concept_id_to_coding(subject),
+        mappings=[
+            exact_match,
+            ConceptMapping(coding=coding, relation=Relation.BROAD_MATCH),
+        ],
+    )
+    db = DynamoDbDatabase.__new__(DynamoDbDatabase)
+    db.batch = Mock()
+    db.add_record(
+        disease,
+        SourceName.DO,
+        supplemental_mappings=[exact_match] if independent_exact_match else [],
+        mapping_negations=[
+            SssomMapping(
+                subject_id=subject,
+                object_id=target,
+                predicate_id=Relation.EXACT_MATCH,
+                predicate_modifier=PredicateModifier.NOT,
+                mapping_justification="semapv:ManualMappingCuration",
+            )
+        ],
+    )
+
+    items = (call.kwargs["Item"] for call in db.batch.put_item.call_args_list)
+    assert [
+        (item["label_and_type"], item["is_negated"], item["has_supplemental"])
+        for item in items
+        if item["item_type"] in {RefType.XREFS, RefType.ASSOCIATED_WITH}
+    ] == [
+        (f"{target.lower()}##{RefType.XREFS}", True, independent_exact_match),
+        (f"{target.lower()}##{RefType.ASSOCIATED_WITH}", False, False),
+    ]
 
 
 @pytest.mark.skipif(not IS_TEST_ENV, reason="not in test environment")
